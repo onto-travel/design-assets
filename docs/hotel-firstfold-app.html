@@ -334,7 +334,7 @@
         <!-- selected room -->
         <button type="button" class="selroom" id="selRoom">
           <span class="sr-tag" id="srTag">Best match for your trip</span>
-          <div class="sr-line"><span class="sr-name" id="srName">Villa Room</span><span id="srMeta"> · Garden view · 56 m²</span></div>
+          <div class="sr-line"><span class="sr-name" id="srName">Villa Room</span><span id="srMeta"> · 1 King · Garden view · 56 m²</span></div>
         </button>
 
         <!-- match validation -->
@@ -538,7 +538,12 @@
              {src:'images/pv-06-pool.png',alt:'Private plunge pool'}]}
     ];
 
-    const shortMeta = r => r.chips.filter(c => !/^Sleeps/i.test(c)).join(' · ');
+    const bedOf = r => (r.meta.split('·')[1] || '').trim();  // middle segment, e.g. "1 King"
+    const shortMeta = r => {
+      const bed = bedOf(r);
+      const rest = r.chips.filter(c => !/^Sleeps/i.test(c) && c !== bed);
+      return [bed, ...rest].filter(Boolean).join(' · ');
+    };
     const rsList   = $('rsList');
     const roomSheet = $('roomSheet'), roomScrim = $('roomScrim');
     let expandedKey = 'villa';
