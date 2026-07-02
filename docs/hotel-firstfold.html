@@ -132,9 +132,8 @@
     display:flex;flex-direction:column;gap:9px;transition:background .15s;
   }
   .selroom:hover{background:#f0ebe2;}
-  .selroom .sr-tag{align-self:flex-start;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
-    font-weight:700;color:#4f7a63;background:#e7f0ea;border-radius:20px;padding:5px 12px;}
   .selroom .sr-line{font-size:15px;color:var(--muted);}
+  .selroom .sr-tag{align-self:flex-start;font-size:12.5px;color:#9a948c;font-weight:500;}
   .selroom .sr-name{font-family:Georgia,serif;font-size:15.5px;font-weight:500;color:var(--ink);}
 
   /* --- price: 3-night total primary, per-night secondary --- */
@@ -524,7 +523,7 @@
     cursor:pointer;font-family:inherit;}
   .dr-disclose .dc-ic{color:var(--navy);font-size:22px;font-weight:400;line-height:1;transition:transform .2s;}
   .dr-disclose[aria-expanded=true] .dc-ic{transform:rotate(45deg);}
-  .amen[hidden]{display:none;}
+  #drAmen[hidden]{display:none;}
   #drAmen{margin-top:14px;list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;}
   .amen li{position:relative;padding-left:22px;font-size:14.5px;color:#3f3b36;}
   .amen li::before{content:"✓";position:absolute;left:0;top:0;color:var(--navy);font-weight:700;}
@@ -648,7 +647,6 @@
             <div class="cal-grid" id="calGrid"></div>
             <div class="cal-foot">
               <span class="cf-tx" id="calFootTxt"></span>
-              <button type="button" class="cal-done" id="calDone">Done</button>
             </div>
           </div>
 
@@ -668,8 +666,8 @@
 
         <!-- selected room — whole card opens the details drawer -->
         <button type="button" class="selroom" id="roomCard" aria-label="See all room choices">
-          <span class="sr-tag">Best match for your trip</span>
-          <div class="sr-line"><span class="sr-name">Villa Room</span> · Garden view · 56 m² · Sleeps 3</div>
+          <div class="sr-line"><span class="sr-name">Villa Room</span> · 1 King · Garden view · 56 m²</div>
+          <span class="sr-tag">Cancellable till 9th Jul · Breakfast included</span>
         </button>
 
         <!-- price: 3-night total primary, per-night secondary -->
@@ -1045,6 +1043,28 @@
   document.getElementById('nextBtn').addEventListener('click', e => { e.stopPropagation(); show(cur + 1); });
   thumbBtns.forEach(t => t.addEventListener('click', () => show(+t.dataset.i)));
 
+  // ---- lightweight toast (reusable) ----
+  function showToast(msg){
+    let t = document.getElementById('toast');
+    if(!t){
+      t = document.createElement('div');
+      t.id = 'toast';
+      t.setAttribute('role','status');
+      t.setAttribute('aria-live','polite');
+      t.style.cssText = 'position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(12px);'+
+        'background:var(--ink);color:#fff;font-size:14px;font-weight:500;padding:12px 20px;border-radius:12px;'+
+        'box-shadow:0 8px 24px rgba(0,0,0,.22);z-index:200;opacity:0;pointer-events:none;'+
+        'transition:opacity .2s ease, transform .2s ease;font-family:inherit;white-space:nowrap;';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    clearTimeout(t._hideTimer);
+    requestAnimationFrame(()=>{ t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; });
+    t._hideTimer = setTimeout(()=>{
+      t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(12px)';
+    }, 2200);
+  }
+
   // ---- CTAs: primary → checkout, secondary → wishlist ----
   document.getElementById('bookNow').addEventListener('click',
     () => { location.href = 'checkout.html'; });
@@ -1055,6 +1075,7 @@
     const lbl = on ? 'Added to trip' : 'Add to trip';
     this.setAttribute('aria-label', lbl);
     this.setAttribute('title', lbl);
+    showToast(on ? 'Added to trip' : 'Removed from trip');
   });
 </script>
 
@@ -1076,6 +1097,10 @@
     let people = ['you','wife','kid'];  // named travellers, in selection order
     let extras = 0;                  // additional un-named guests
     const MAXG = 8;
+
+    // shared party size → drives how many rooms each category needs (⌈guests ÷ capacity⌉)
+    window.PARTY = window.PARTY || { guests: 3 };
+    window.roomsNeeded = cap => Math.max(1, Math.ceil((window.PARTY.guests||1)/(cap||1)));
 
     const $ = id => document.getElementById(id);
     const pop = $('guestPop'), trigger = $('guestChip');
@@ -1110,6 +1135,8 @@
     }
     function apply(){
       const t = total();
+      window.PARTY.guests = t;               // keep room-count maths in sync with party size
+      if(window.refreshPricing) window.refreshPricing();
       // stepper
       $('cNum').textContent = t;
       $('cMinus').disabled = t<=1;
@@ -1194,13 +1221,16 @@
       }
       $('dateVal').innerHTML = label;
       $('nightsVal').textContent = n+' night'+(n>1?'s':'');
-      // keep booking-module total + Book now label in sync with the stay length
-      const totTxt = '₹'+(RATE*n).toLocaleString('en-IN');
+      // keep booking-module total + Book now label in sync with stay length AND party size.
+      // Villa Room (the best-match rate) sleeps 3, so a larger party needs multiple rooms.
+      const rooms = window.roomsNeeded ? window.roomsNeeded(3) : 1;
+      const totTxt = '₹'+(RATE*n*rooms).toLocaleString('en-IN');
       const bt = $('bkTotal');   if(bt) bt.textContent = totTxt;
-      const bn = $('bkNights');  if(bn) bn.textContent = n+' night'+(n>1?'s':'');
+      const bn = $('bkNights');  if(bn) bn.textContent = (rooms>1?rooms+' rooms · ':'')+n+' night'+(n>1?'s':'');
       const bk = $('bookNow'); if(bk) bk.textContent = 'Book now · '+totTxt;
       if(window.refreshRoomPrices) window.refreshRoomPrices();
     }
+    window.refreshPricing = renderChip;   // guest-count changes re-run the whole price cascade
     const inRange = d => d > startOfDay(checkIn) && d < startOfDay(checkOut);
 
     function renderCal(){
@@ -1227,7 +1257,9 @@
         grid.appendChild(cell);
       }
       const n = nights(checkIn, checkOut);
-      $('calFootTxt').innerHTML = n>0 ? '<b>'+n+'</b> night'+(n>1?'s':'') : 'Select check-out';
+      $('calFootTxt').innerHTML = n>0
+        ? '<b>'+n+'</b> night'+(n>1?'s':'')+' · ₹'+(RATE*n).toLocaleString('en-IN')
+        : 'Select check-out';
     }
 
     function pick(d){
@@ -1255,7 +1287,6 @@
     chip.addEventListener('click', e=>{ e.stopPropagation(); pop.hidden ? open() : close(); });
     $('calPrev').addEventListener('click', ()=>{ view = new Date(view.getFullYear(), view.getMonth()-1, 1); renderCal(); });
     $('calNext').addEventListener('click', ()=>{ view = new Date(view.getFullYear(), view.getMonth()+1, 1); renderCal(); });
-    $('calDone').addEventListener('click', close);
     pop.addEventListener('click', e=>e.stopPropagation());
     document.addEventListener('click', e=>{ if(!pop.hidden && !pop.contains(e.target) && !chip.contains(e.target)) close(); });
     document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !pop.hidden) close(); });
@@ -1454,6 +1485,15 @@
     ];
     const ROOM_BY = {}; ROOMS.forEach(r=>ROOM_BY[r.key]=r);
 
+    // unified room descriptor used everywhere: bed type · view · size
+    const bedOf  = r => (r.meta.split('·')[1] || '').trim();      // e.g. "1 King", "2 bedrooms"
+    const viewOf = r => r.chips.find(c => /view/i.test(c)) || ''; // e.g. "Garden view"
+    const sizeOf = r => r.chips.find(c => /m²/.test(c)) || '';    // e.g. "56 m²"
+    const descriptor = r => [bedOf(r), viewOf(r), sizeOf(r)].filter(Boolean).join(' · ');
+    // capacity (from the "Sleeps N" chip) → rooms this category needs for the current party
+    const capOf = r => { const m = (r.chips.find(c => /sleeps/i.test(c)) || '').match(/\d+/); return m ? +m[0] : 2; };
+    const roomsFor = r => window.roomsNeeded ? window.roomsNeeded(capOf(r)) : 1;
+
     /* ---------- room cards ---------- */
     const scroll = $('roomsScroll');
     const syncers = [];
@@ -1471,7 +1511,7 @@
         '</div>'+
         '<div class="rc-body">'+
           '<h3 class="rc-name">'+r.name+'</h3>'+
-          '<div class="rc-meta">'+r.meta+'</div>'+
+          '<div class="rc-meta">'+descriptor(r)+'</div>'+
           (r.why ? '<div class="rc-why"><h5>Why +'+fmt(r.why.amt)+'/night</h5><ul>'+
              r.why.points.map(p=>'<li>'+p+'</li>').join('')+'</ul></div>' : '')+
           '<div class="rc-foot">'+
@@ -1499,12 +1539,18 @@
             totLbl = el.querySelector('.rc-totlbl'), flex = el.querySelector('.rc-flex');
       const sync = () => {
         const nn = nightsNow();
-        const nightly = r.base + (flex.checked ? FLEX_ADD : 0);
+        const rooms = roomsFor(r);
+        const nightly = r.base + (flex.checked ? FLEX_ADD : 0);   // per room, per night
         nightlyEl.textContent = fmt(nightly);
-        totEl.textContent = fmt(nightly*nn);
-        totLbl.textContent = 'total · '+nn+' night'+(nn>1?'s':'');
+        totEl.textContent = fmt(nightly*nn*rooms);
+        totLbl.textContent = 'total · '+(rooms>1?rooms+' rooms · ':'')+nn+' night'+(nn>1?'s':'');
       };
-      flex.addEventListener('change', sync);
+      // free cancellation is a stay-wide choice: mirror this toggle onto every room card
+      flex.addEventListener('change', () => {
+        const on = flex.checked;
+        document.querySelectorAll('.rc-flex').forEach(cb => { cb.checked = on; });
+        syncers.forEach(fn => fn());
+      });
       syncers.push(sync);
 
       el.querySelector('.rc-name').addEventListener('click', ()=>openRoom(r.key));
@@ -1525,10 +1571,11 @@
     function renderDrawerPrice(){
       if(!dr) return;
       const N = nightsNow();
-      const nightly = dr.r.base + (dr.flex ? FLEX_ADD : 0);
-      const total = nightly*N + (dr.breakfast ? BREAKFAST*N : 0);
+      const rooms = roomsFor(dr.r);
+      const nightly = dr.r.base + (dr.flex ? FLEX_ADD : 0) + (dr.breakfast ? BREAKFAST : 0);
+      const total = nightly*N*rooms;
       $('drPrice').textContent = fmt(nightly);
-      $('drTotal').textContent = fmt(total) + ' total · ' + N + ' night' + (N>1?'s':'');
+      $('drTotal').textContent = fmt(total) + ' total · ' + (rooms>1?rooms+' rooms · ':'') + N + ' night' + (N>1?'s':'');
     }
     function openRoom(key){
       const r = ROOM_BY[key]; if(!r) return;

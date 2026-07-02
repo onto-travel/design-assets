@@ -105,9 +105,8 @@
     background:#f6f3ee;border:none;border-radius:14px;padding:12px 15px;
     display:flex;flex-direction:column;gap:8px;transition:background .15s;}
   .selroom:active{background:#efe9df;}
-  .sr-tag{align-self:flex-start;font-size:10px;letter-spacing:.07em;text-transform:uppercase;
-    font-weight:700;color:#4f7a63;background:#e7f0ea;border-radius:20px;padding:5px 11px;}
   .sr-line{font-size:13.5px;color:var(--muted);}
+  .sr-tag{align-self:flex-start;font-size:11.5px;color:#9a948c;font-weight:500;}
   .sr-name{font-family:Georgia,serif;font-size:15px;font-weight:500;color:var(--ink);}
 
   /* match validation */
@@ -141,7 +140,7 @@
   .msheet{position:absolute;left:0;right:0;bottom:0;z-index:51;background:#fff;
     border-radius:24px 24px 0 0;transform:translateY(101%);
     transition:transform .42s cubic-bezier(.22,1,.36,1);
-    padding:6px 20px 30px;height:468px;overflow:hidden;box-shadow:0 -12px 40px rgba(0,0,0,.22);
+    padding:6px 20px 42px;height:458px;overflow:hidden;box-shadow:0 -12px 40px rgba(0,0,0,.22);
     display:flex;flex-direction:column;}
   .msheet.open{transform:translateY(0);}
   .msheet-grab{flex:none;width:40px;height:4px;border-radius:3px;background:#ddd5c7;margin:8px auto 16px;}
@@ -154,7 +153,7 @@
   .cal-nav:disabled{opacity:.35;cursor:default;}
   .cal-dows{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px;}
   .cal-dows span{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:6px 0;}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);min-height:252px;align-content:start;}
   .cal-cell{position:relative;display:flex;align-items:center;justify-content:center;padding:2px 0;}
   .cal-cell.rng::before{content:"";position:absolute;top:2px;bottom:2px;left:0;right:0;background:#e9f0f7;z-index:0;}
   .cal-cell.rng.start::before{left:50%;}
@@ -168,9 +167,10 @@
   .cal-day.today{font-weight:700;}
   .cal-day.disabled{color:#cbc4b7;cursor:default;}
   .cal-day.disabled:hover{background:none;}
-  .cal-foot{flex:none;display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:16px;border-top:1px solid var(--line);}
-  .cf-tx{font-size:13.5px;color:var(--muted);}
-  .cf-tx b{color:var(--ink);font-weight:700;font-size:15px;}
+  .cal-foot{flex:none;display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);}
+  .cf-tx{font-size:15.5px;color:var(--muted);}
+  .cf-tx b{color:var(--ink);font-weight:700;font-size:18px;}
+  .cf-tx .cf-cost{color:var(--ink);font-weight:600;font-size:18px;}
   .sheet-done{background:var(--navy);color:#fff;border:none;padding:11px 26px;border-radius:11px;font-size:15px;
     font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s;}
   .sheet-done:active{background:var(--navy-deep);}
@@ -182,7 +182,7 @@
   #compList::-webkit-scrollbar{display:none;}
   .gc-lab{font-size:16px;font-weight:600;}
   .stepper{display:flex;align-items:center;gap:16px;}
-  .stepper button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:20px;
+  .stepper button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:17px;
     line-height:1;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;}
   .stepper button:disabled{opacity:.4;cursor:default;}
   .gc-n{font-size:17px;font-weight:700;min-width:22px;text-align:center;}
@@ -333,8 +333,8 @@
 
         <!-- selected room -->
         <button type="button" class="selroom" id="selRoom">
-          <span class="sr-tag" id="srTag">Best match for your trip</span>
           <div class="sr-line"><span class="sr-name" id="srName">Villa Room</span><span id="srMeta"> · 1 King · Garden view · 56 m²</span></div>
+          <span class="sr-tag" id="srTag">Cancellable till 9th Jul · Breakfast included</span>
         </button>
 
         <!-- match validation -->
@@ -360,7 +360,6 @@
       <div class="cal-grid" id="calGrid"></div>
       <div class="cal-foot">
         <span class="cf-tx" id="calFootTxt"></span>
-        <button type="button" class="sheet-done" id="calDone">Done</button>
       </div>
     </div>
 
@@ -376,7 +375,6 @@
         </div>
       </div>
       <div id="compList"></div>
-      <button type="button" class="sheet-done" id="guestDone" style="width:100%;margin-top:16px;flex:none;">Done</button>
     </div>
 
     <!-- room options sheet -->
@@ -404,12 +402,17 @@
 
 <script>
   // shared booking state → keeps the sticky price bar in sync
-  window.STAY = { rate:18500, nights:3 };
+  window.STAY = { rate:18500, nights:3, guests:3, cap:3 };
+  // rooms needed for the party at a given per-room capacity (⌈guests ÷ capacity⌉)
+  window.roomsFor = cap => Math.max(1, Math.ceil((window.STAY.guests||1)/(cap||1)));
   window.refreshBookBar = function(){
     const s = window.STAY, f = n => '₹' + n.toLocaleString('en-IN');
     const bn = document.getElementById('bbNightly'); if(bn) bn.textContent = f(s.rate);
     const bs = document.getElementById('bbSmall');
-    if(bs) bs.textContent = f(s.rate * s.nights) + ' total · ' + s.nights + ' night' + (s.nights>1?'s':'');
+    if(bs){
+      const rooms = window.roomsFor(s.cap);
+      bs.textContent = f(s.rate * s.nights * rooms) + ' total · ' + (rooms>1?rooms+' rooms · ':'') + s.nights + ' night' + (s.nights>1?'s':'');
+    }
   };
 
   // gallery dots + counter
@@ -544,6 +547,8 @@
       const rest = r.chips.filter(c => !/^Sleeps/i.test(c) && c !== bed);
       return [bed, ...rest].filter(Boolean).join(' · ');
     };
+    // capacity from the "Sleeps N" chip → rooms this category needs for the party
+    const capOf = r => { const m = (r.chips.find(c => /sleeps/i.test(c)) || '').match(/\d+/); return m ? +m[0] : 2; };
     const rsList   = $('rsList');
     const roomSheet = $('roomSheet'), roomScrim = $('roomScrim');
     let expandedKey = 'villa';
@@ -563,6 +568,7 @@
 
     function buildCard(r){
       const nights = window.STAY.nights;
+      const rooms = window.roomsFor(capOf(r));
       const el = document.createElement('article');
       el.className = 'ro-card';
       el.innerHTML =
@@ -581,7 +587,7 @@
           (r.why ? '<div class="ro-why"><b>Why +'+fmt(r.why.amt)+'/night:</b> '+r.why.points.join(' · ')+'</div>' : '')+
           '<div class="ro-priced">'+
             '<div class="ro-nightly"><b class="ro-nb">'+fmt(r.base)+'</b> <small>/ night</small></div>'+
-            '<div class="ro-tot"><b class="ro-tb">'+fmt(r.base*nights)+'</b>total · '+nights+' night'+(nights>1?'s':'')+'</div>'+
+            '<div class="ro-tot"><b class="ro-tb">'+fmt(r.base*nights*rooms)+'</b>total · '+(rooms>1?rooms+' rooms · ':'')+nights+' night'+(nights>1?'s':'')+'</div>'+
           '</div>'+
           '<div class="ro-cta"><button class="ro-details">View details</button>'+
             '<button class="ro-book">Book now</button></div>'+
@@ -600,7 +606,7 @@
       flex.addEventListener('change', () => {
         const nightly = r.base + (flex.checked ? FLEX_ADD : 0);
         nb.textContent = fmt(nightly);
-        tb.textContent = fmt(nightly * window.STAY.nights);
+        tb.textContent = fmt(nightly * window.STAY.nights * rooms);
       });
 
       el.querySelector('.ro-book').addEventListener('click', () => selectRoom(r, flex.checked));
@@ -613,13 +619,14 @@
       rsList.innerHTML = '';
       ROOMS.forEach(r => rsList.appendChild(r.key===expandedKey ? buildCard(r) : buildRow(r)));
     }
+    window.refreshRooms = renderList;   // re-run room-count maths when the party size changes
 
     function selectRoom(r, flexOn){
       window.STAY.rate = r.base + (flexOn ? FLEX_ADD : 0);
+      window.STAY.cap = capOf(r);            // selected room's capacity drives rooms-needed maths
       window.refreshBookBar();
       $('srName').textContent = r.name;
       $('srMeta').textContent = ' · ' + shortMeta(r);
-      $('srTag').textContent = r.badge === 'Best value' ? 'Best match for your trip' : 'Your selection';
       expandedKey = r.key;
       closeSheet();
     }
@@ -702,6 +709,9 @@
       }
       function apply(){
         const t = total();
+        window.STAY.guests = t;               // party size drives rooms-needed everywhere
+        window.refreshBookBar();
+        if(window.refreshRooms) window.refreshRooms();
         $('cNum').textContent = t;
         $('cMinus').disabled = t<=1;
         $('cPlus').disabled  = t>=MAXG;
@@ -735,7 +745,6 @@
         openSheet($('guestSheet'));
         $('guestChip').setAttribute('aria-expanded','true');
       });
-      $('guestDone').addEventListener('click', closeSheets);
 
       apply();
     })();
@@ -800,7 +809,10 @@
           grid.appendChild(cell);
         }
         const n = nights(checkIn, checkOut);
-        $('calFootTxt').innerHTML = n>0 ? '<b>'+n+'</b> night'+(n>1?'s':'') : 'Select check-out';
+        $('calFootTxt').innerHTML = n>0
+          ? (function(){ const rooms = window.roomsFor ? window.roomsFor(window.STAY.cap) : 1;
+              return '<b>'+n+'</b> night'+(n>1?'s':'')+(rooms>1?' · '+rooms+' rooms':'')+' · <span class="cf-cost">₹'+((window.STAY.rate||18500)*n*rooms).toLocaleString('en-IN')+'</span>'; })()
+          : 'Select check-out';
       }
 
       function pick(d){
@@ -824,7 +836,6 @@
       });
       $('calPrev').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth()-1, 1); renderCal(); });
       $('calNext').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth()+1, 1); renderCal(); });
-      $('calDone').addEventListener('click', closeSheets);
 
       renderChip(); renderCal();
     })();
