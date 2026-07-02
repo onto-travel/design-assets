@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taj Exotica · First fold</title>
+<style>
+  :root{
+    --bg:#efeae1;
+    --card:#ffffff;
+    --ink:#1c1c1c;
+    --muted:#7c7771;
+    --line:#e7e1d6;
+    --navy:#2f4f74;
+    --navy-deep:#284667;
+    --gold:#c19a4b;
+    --pill:#ece6db;
+    --info:#ece7dc;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 12px 30px rgba(40,30,10,.06);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+
+  /* ---------- HERO (first fold only) ---------- */
+  .hero{display:grid;grid-template-columns:1.15fr 1fr;gap:34px;
+    padding:40px 0 34px;align-items:stretch;}
+  .gallery{display:flex;flex-direction:column;min-height:0;}
+  .gallery .main{
+    position:relative;border-radius:18px;overflow:hidden;flex:1;min-height:340px;cursor:zoom-in;
+    background:linear-gradient(135deg,#c9b48c,#7c8b6f 60%,#3f5566);
+    box-shadow:var(--shadow);
+  }
+  .gallery .main img{width:100%;height:100%;object-fit:cover;display:block;}
+  .badge{
+    position:absolute;top:16px;left:16px;background:rgba(20,18,16,.78);color:#fff;
+    font-size:13px;font-weight:600;padding:7px 14px;border-radius:20px;backdrop-filter:blur(4px);
+  }
+  .nav{
+    position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;
+    background:rgba(255,255,255,.9);border:none;cursor:pointer;font-size:24px;line-height:1;color:#222;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.2);
+    transition:background .15s,transform .15s;
+  }
+  .nav:hover{background:#fff;}
+  .nav:active{transform:translateY(-50%) scale(.92);}
+  .nav.prev{left:14px;padding-right:3px;}
+  .nav.next{right:14px;padding-left:3px;}
+  .counter{
+    position:absolute;bottom:16px;right:16px;background:rgba(20,18,16,.72);color:#fff;
+    font-size:13px;font-weight:600;padding:5px 12px;border-radius:16px;backdrop-filter:blur(4px);
+  }
+  .thumbs{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-top:12px;flex:none;}
+  .thumb{
+    aspect-ratio:1/1;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);
+    padding:0;border:2px solid transparent;cursor:pointer;background:none;transition:border-color .15s,opacity .15s;
+    opacity:.72;
+  }
+  .thumb:hover{opacity:1;}
+  .thumb.active{border-color:var(--navy);opacity:1;}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* ---------- INFO CARD ---------- */
+  .book{
+    background:var(--card);border-radius:18px;padding:26px 28px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;align-self:start;
+  }
+  .stars{color:var(--gold);letter-spacing:3px;font-size:15px;}
+  .book h1{font-size:28px;margin:8px 0 5px;}
+  .place{color:var(--navy);font-weight:600;font-size:12.5px;letter-spacing:.08em;}
+
+  /* --- headline price, sits right under name/location --- */
+  /* --- 2. BOOKING MODULE: the dominant block --- */
+  .booking{margin-top:28px;}
+
+  /* --- 3. DECISION VALIDATION: reassurance, faint outlined box --- */
+  .validate{margin-top:22px;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .vd-score{font-size:16px;font-weight:700;color:#2f5d47;margin:0 0 12px;}
+  .vd-chips{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0;padding:0;}
+  .vd-chips li{font-size:12.5px;color:#37423b;background:#eef2ee;border:1px solid #e0e7e0;border-radius:20px;padding:5px 11px;}
+  .vd-chips li.spot{color:#8a6a24;background:#f7f0e0;border-color:#ebddbf;font-weight:600;}
+
+  /* --- "your stay": two subtle filled cards (low contrast on white) --- */
+  .trip{position:relative;}
+  .trip-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .tripchip{
+    text-align:left;background:#f6f3ee;border:none;border-radius:14px;padding:15px 17px;
+    cursor:pointer;font-family:inherit;display:flex;flex-direction:column;gap:6px;position:relative;transition:background .15s;
+  }
+  .tripchip:hover{background:#f0ebe2;}
+  .tripchip .tc-k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .tripchip .tc-cnt{text-transform:none;letter-spacing:normal;font-weight:400;font-size:11.5px;color:var(--muted);}
+  .tripchip .tc-cnt::before{content:"·";margin:0 5px;}
+  .tripchip .tc-v{font-size:16.5px;font-weight:600;color:var(--ink);}
+
+  /* --- selected room: subtle filled card, opens details drawer --- */
+  .selroom{
+    width:100%;text-align:left;font-family:inherit;cursor:pointer;margin-top:12px;
+    background:#f6f3ee;border:none;border-radius:14px;padding:12px 16px;
+    display:flex;flex-direction:column;gap:9px;transition:background .15s;
+  }
+  .selroom:hover{background:#f0ebe2;}
+  .selroom .sr-tag{align-self:flex-start;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;color:#4f7a63;background:#e7f0ea;border-radius:20px;padding:5px 12px;}
+  .selroom .sr-line{font-size:15px;color:var(--muted);}
+  .selroom .sr-name{font-family:Georgia,serif;font-size:15.5px;font-weight:500;color:var(--ink);}
+
+  /* --- price: 3-night total primary, per-night secondary --- */
+  .bk-price{margin-top:26px;}
+  .bk-total{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px;}
+  .bk-total b{font-family:Georgia,serif;font-size:34px;font-weight:600;color:var(--ink);letter-spacing:-.015em;line-height:1;}
+  .bk-total span{font-size:15px;color:var(--muted);}
+  .bk-per{font-size:13.5px;color:var(--muted);margin-top:9px;}
+  .bk-per #bkTotal{font-weight:600;color:#4a4641;}
+
+  /* --- CTAs: secondary + primary side by side, tertiary below --- */
+  .cta-stack{margin-top:26px;display:flex;flex-direction:column;gap:14px;}
+  .cta-main{display:flex;gap:12px;}
+  .cta-main .btn{flex:1;}
+  .cta-main .btn-secondary{flex:0 0 auto;}
+  .btn{
+    border:none;background:var(--navy);color:#fff;font-size:16px;font-weight:600;white-space:nowrap;
+    padding:16px 18px;border-radius:12px;cursor:pointer;transition:background .15s;font-family:inherit;
+  }
+  .btn:hover{background:var(--navy-deep);}
+  .btn-secondary{
+    display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;
+    background:#fff;color:var(--navy);border:1px solid #d9d1c1;border-radius:12px;
+    font-size:14.5px;font-weight:600;padding:13px 16px;cursor:pointer;font-family:inherit;transition:all .15s;
+  }
+  .btn-secondary:hover{border-color:#c2b8a4;background:#faf7f1;}
+  .btn-secondary.on{color:#2a7d5f;border-color:#bfe0cf;background:#eef6f1;}
+  .btn-secondary.icon-only{width:56px;padding:0;gap:0;}
+  .btn-secondary .hz{font-size:17px;font-weight:600;line-height:1;}
+  .btn-secondary.icon-only .hz{font-size:22px;}
+  .btn-ghost{
+    width:100%;background:none;color:var(--muted);border:none;
+    font-size:14px;font-weight:600;padding:2px;cursor:pointer;font-family:inherit;transition:color .15s;
+  }
+  .btn-ghost:hover{color:var(--navy);text-decoration:underline;}
+
+  /* ---------- CHOOSE YOUR ROOM: horizontal row of vertical cards ---------- */
+  .rooms-wrap{padding-top:28px;padding-bottom:64px;}
+  .rooms-h{font-family:Georgia,serif;font-size:26px;letter-spacing:-.01em;margin:0 0 12px;color:var(--ink);}
+  .rooms-scroll{display:flex;gap:20px;overflow-x:auto;padding:4px 2px 18px;scroll-snap-type:x proximity;}
+  .rooms-scroll::-webkit-scrollbar{height:8px;}
+  .rooms-scroll::-webkit-scrollbar-track{background:transparent;}
+  .rooms-scroll::-webkit-scrollbar-thumb{background:#d9d1c1;border-radius:8px;}
+  .rooms-scroll .rcard{flex:0 0 300px;scroll-snap-align:start;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);}
+  .rc-photo{position:relative;aspect-ratio:4/3;background:#e9e4da;overflow:hidden;flex:none;}
+  .rc-photo .rc-img{width:100%;height:100%;object-fit:cover;display:block;}
+  .rc-badge{position:absolute;top:0;left:0;right:0;background:#2a7d5f;color:#fff;font-size:12.5px;
+    font-weight:600;letter-spacing:.03em;text-align:center;padding:8px;}
+  .rc-nav{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;
+    background:rgba(255,255,255,.9);border:none;cursor:pointer;font-size:18px;line-height:1;color:#222;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);
+    opacity:0;transition:opacity .15s,background .15s;}
+  .rcard:hover .rc-nav{opacity:1;}
+  .rc-nav:hover{background:#fff;}
+  .rc-prev{left:10px;} .rc-next{right:10px;}
+  .rc-count{position:absolute;bottom:10px;right:10px;background:rgba(20,18,16,.72);color:#fff;
+    font-size:12px;font-weight:600;padding:3px 9px;border-radius:12px;backdrop-filter:blur(4px);}
+  .rc-body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;}
+  .rc-name{font-family:Georgia,serif;font-size:19px;font-weight:600;margin:0 0 4px;color:var(--ink);
+    cursor:pointer;display:inline-block;}
+  .rc-name:hover{text-decoration:underline;}
+  .rc-meta{font-size:13px;color:var(--muted);margin-bottom:13px;}
+  .rc-opt{display:flex;align-items:center;gap:9px;font-size:13px;color:#444;margin-top:13px;cursor:pointer;}
+  .rc-opt input{width:16px;height:16px;accent-color:var(--navy);flex:none;}
+  .rc-why{background:var(--info);border-radius:11px;padding:12px 14px;margin:4px 0 2px;}
+  .rc-why h5{margin:0 0 8px;color:var(--navy);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;line-height:1.3;}
+  .rc-why ul{margin:0;padding:0;list-style:none;}
+  .rc-why li{position:relative;padding-left:14px;font-size:13px;color:#3a3a3a;margin-bottom:5px;}
+  .rc-why li:last-child{margin-bottom:0;}
+  .rc-why li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--navy);}
+  .rc-foot{margin-top:auto;}
+  .rc-price-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
+    border-top:1px solid var(--line);padding-top:14px;margin-top:16px;margin-bottom:14px;}
+  .rc-price b{font-family:Georgia,serif;font-size:22px;font-weight:600;color:var(--ink);}
+  .rc-price small{font-size:12.5px;color:var(--muted);}
+  .rc-total{text-align:right;}
+  .rc-total b{font-size:14px;font-weight:600;color:#4a4641;display:block;line-height:1.2;}
+  .rc-total span{font-size:11.5px;color:var(--muted);}
+  .rc-cta{display:flex;}
+  .rc-book{flex:1;border:none;border-radius:10px;font-size:14px;font-weight:600;padding:13px;
+    cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap;
+    background:var(--navy);color:#fff;}
+  .rc-book:hover{background:var(--navy-deep);}
+
+  /* ---------- ported from index: sections, reviews ---------- */
+  section{padding:38px 0;}
+  .sec-h{font-family:Georgia,"Times New Roman",serif;font-size:40px;letter-spacing:-.01em;margin-bottom:4px;color:var(--ink);}
+  .sec-sub{color:var(--muted);max-width:560px;margin:4px 0 26px;}
+  .rev-top{display:flex;align-items:baseline;gap:16px;margin-bottom:14px;}
+  .rev-top .score{font-size:34px;color:var(--navy);font-weight:700;font-family:Georgia,serif;}
+  .rev-top .count{color:var(--muted);}
+  .pills{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0 26px;}
+  .pill{background:#fff;border:1px solid var(--line);border-radius:30px;padding:9px 18px;font-size:14.5px;cursor:pointer;color:#333;transition:all .15s;}
+  .pill .n{color:var(--muted);}
+  .pill.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .pill.active .n{color:#cdd8e6;}
+  .rev-carousel{position:relative;}
+  .rev-track{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:4px 2px 14px;scrollbar-width:thin;}
+  .rev-track::-webkit-scrollbar{height:7px;}
+  .rev-track::-webkit-scrollbar-thumb{background:#d6cfc2;border-radius:6px;}
+  .rev-track .rcard{flex:0 0 312px;scroll-snap-align:start;display:flex;flex-direction:column;}
+  .rev-track .rcard p{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+  .rev-track .rcard .tags{margin-top:auto;}
+  .rev-arrow{position:absolute;top:42%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid var(--line);cursor:pointer;font-size:22px;line-height:1;color:#222;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.14);z-index:3;transition:background .15s;}
+  .rev-arrow:hover{background:#f3efe8;}
+  .rev-arrow.prev{left:-14px;padding-right:3px;}
+  .rev-arrow.next{right:-14px;padding-left:3px;}
+  .rev-head-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .seeall{background:none;border:none;color:var(--navy);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;padding:6px 0;white-space:nowrap;}
+  .seeall:hover{text-decoration:underline;}
+  .rev-search{flex:none;padding:14px 26px;border-bottom:1px solid var(--line);position:relative;display:flex;align-items:center;}
+  .rev-search .rs-ic{position:absolute;left:38px;color:var(--muted);font-size:16px;transform:rotate(45deg);}
+  .rev-search input{width:100%;padding:11px 14px 11px 38px;border:1px solid var(--line);border-radius:10px;font-size:14.5px;font-family:inherit;background:#faf8f4;color:var(--ink);}
+  .rev-search input:focus{outline:none;border-color:var(--navy);background:#fff;}
+  .rev-noresult{padding:30px 2px;color:var(--muted);font-size:15px;text-align:center;}
+  .rev-list-item{padding:20px 2px;border-bottom:1px solid var(--line);}
+  .rev-list-item:last-child{border-bottom:none;}
+  .rli-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .rli-head .name{font-weight:700;font-size:16px;}
+  .rli-head .type{color:var(--muted);font-size:13.5px;margin-top:1px;}
+  .rli-head .rs{color:var(--navy);font-weight:700;font-size:18px;}
+  .rli-head .rs.low{color:#b0563d;}
+  .rev-list-item .rstay{font-size:13px;color:#5b5650;margin-top:10px;}
+  .rev-list-item .rstay b{color:var(--navy);font-weight:600;}
+  .rev-list-item p{font-size:15px;color:#333;margin:10px 0 12px;line-height:1.55;}
+  #reviews .rcard{background:var(--card);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow);}
+  #reviews .rcard .rh{display:flex;justify-content:space-between;align-items:flex-start;}
+  #reviews .rcard .name{font-weight:700;font-size:16px;}
+  #reviews .rcard .type{color:var(--muted);font-size:13.5px;margin-top:1px;}
+  #reviews .rcard .rs{color:var(--navy);font-weight:700;font-size:18px;}
+  #reviews .rcard .rstay{font-size:13px;color:#5b5650;margin-top:12px;}
+  #reviews .rcard .rstay b{color:var(--navy);font-weight:600;}
+  #reviews .rcard p{font-size:15px;color:#333;margin:12px 0 16px;}
+  #reviews .rcard .rs.low{color:#b0563d;}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;}
+  .tag{background:var(--pill);color:#5b5650;font-size:13px;padding:4px 12px;border-radius:8px;}
+
+  /* ---------- ported from index: location + good to know ---------- */
+  .two{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto;gap:0 54px;align-items:stretch;}
+  .loc-h{grid-column:1;grid-row:1;margin-bottom:22px;font-size:28px;}
+  .map{grid-column:1;grid-row:2;}
+  .dist{grid-column:1;grid-row:3;}
+  .gtk-h{grid-column:2;grid-row:1;margin-bottom:22px;font-size:28px;}
+  .acc{grid-column:2;grid-row:2;}
+  .map{background:#f3efe7;border-radius:16px;min-height:340px;position:relative;overflow:hidden;border:1px solid var(--line);}
+  .map svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  .map .showmap{position:absolute;top:12px;right:12px;z-index:2;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,.08);backdrop-filter:blur(4px);}
+  .map .showmap:hover{background:#fff;}
+  .dist{margin-top:14px;color:#4a4641;font-size:15px;}
+  .dist b{font-weight:700;}
+  .acc{background:#fff;border-radius:16px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;}
+  .acc .item{border-bottom:1px solid var(--line);flex:1;display:flex;flex-direction:column;justify-content:center;}
+  .acc .item:last-child{border-bottom:none;}
+  .acc button{width:100%;background:none;border:none;text-align:left;padding:22px 26px;font-size:17px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--ink);font-family:inherit;}
+  .acc button .plus{color:var(--navy);font-size:22px;font-weight:400;transition:transform .2s;}
+  .acc .item.open button .plus{transform:rotate(45deg);}
+  .acc .panel{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+  .acc .item.open .panel{max-height:420px;}
+  .acc .panel .inner{padding:0 26px 22px;color:#494540;font-size:15px;}
+  .acc .panel .inner p{margin:0 0 10px;}
+  .acc .panel .inner p:last-child{margin-bottom:0;}
+  footer{padding:40px 0 60px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:20px;}
+
+  /* ---------- fullscreen lightbox + reviews (always shown) ---------- */
+  .lbx{position:fixed;inset:0;z-index:200;background:rgba(16,18,20,.92);
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;}
+  .lbx[hidden]{display:none;}
+  .lbx-inner{position:relative;margin:auto;width:min(1180px,96vw);height:min(760px,92vh);
+    border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55);}
+  .lbx-stage{position:absolute;inset:0;background:#0c0e10;display:flex;align-items:center;justify-content:center;}
+  .lbx-stage img{width:100%;height:100%;object-fit:cover;display:block;}
+  /* left-side wash for arrows/tag only — keep the right clear so the glass reads */
+  .lbx-stage::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(90deg,rgba(0,0,0,.34) 0%,rgba(0,0,0,0) 30%);}
+  .lbx-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:44px;height:44px;border-radius:50%;
+    border:none;cursor:pointer;background:rgba(20,22,24,.5);color:#fff;font-size:24px;line-height:1;
+    display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    transition:background .15s,transform .12s;}
+  .lbx-nav:hover{background:rgba(20,22,24,.82);}
+  .lbx-nav:active{transform:translateY(-50%) scale(.92);}
+  .lbx-prev{left:18px;} .lbx-next{right:calc(372px + 18px + 16px);}
+  .lbx-tag{position:absolute;left:18px;top:18px;z-index:4;background:rgba(0,0,0,.5);color:#fff;
+    font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:6px 11px;border-radius:8px;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+  .lbx-close{position:absolute;right:20px;top:18px;z-index:7;width:40px;height:40px;border-radius:50%;
+    border:none;cursor:pointer;background:rgba(20,22,24,.6);color:#fff;font-size:18px;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .15s;}
+  .lbx-close:hover{background:rgba(20,22,24,.9);}
+  /* floating frosted review card, overlapping the photo */
+  .lbx-panel{position:absolute;z-index:5;top:18px;right:18px;bottom:18px;width:372px;
+    background:linear-gradient(158deg,rgba(255,255,255,.42),rgba(247,244,239,.64) 55%,rgba(242,238,231,.62));
+    backdrop-filter:blur(30px) saturate(.85) brightness(1.05);
+    -webkit-backdrop-filter:blur(30px) saturate(.85) brightness(1.05);
+    border:1px solid rgba(255,255,255,.6);border-radius:18px;overflow-y:auto;padding:22px 22px 26px;
+    box-shadow:0 18px 55px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.65);}
+  /* trust panel */
+  .tr-head{display:flex;align-items:flex-start;gap:15px;}
+  .tr-score{flex:none;width:74px;height:74px;border-radius:50%;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;color:#fff;line-height:1;}
+  .tr-score b{font-size:23px;font-family:Georgia,serif;}
+  .tr-score span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:3px;opacity:.9;}
+  .tr-score.s-good{background:#2a7d5f;}
+  .tr-score.s-mid{background:#c08a2d;}
+  .tr-score.s-low{background:#b4483f;}
+  .tr-score.s-rev{background:var(--navy);}
+  .tr-headtx h3{margin:0 0 5px;font-size:17px;color:#211f1b;}
+  .tr-headtx p{margin:0;font-size:13.5px;color:#3d3934;line-height:1.5;}
+  .tr-sec{margin-top:18px;border-top:1px solid rgba(120,110,95,.28);padding-top:15px;}
+  .tr-sec h4{margin:0 0 9px;font-size:11px;letter-spacing:.09em;font-weight:700;color:#6b6459;}
+  .tr-gphotos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+  .tr-gphotos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:block;}
+  .tr-gcap{margin:8px 0 0;font-size:11.5px;color:#6b6459;}
+  .tr-summary{margin:0;font-size:14px;color:#33302a;line-height:1.6;font-weight:500;}
+  .tr-keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+  .tr-key{font-size:12px;font-weight:600;padding:4px 10px;border-radius:7px;
+    background:rgba(42,125,95,.16);color:#256b51;border:1px solid rgba(42,125,95,.26);}
+  .tr-key.neg{background:rgba(176,86,45,.15);color:#a1502c;border-color:rgba(176,86,45,.28);}
+  .tr-chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .tr-chips .tc{background:var(--pill);color:#5b5650;font-size:12.5px;padding:4px 11px;border-radius:8px;}
+  .tr-chips .tc b{color:var(--navy);font-weight:700;}
+  .tr-rev{margin-bottom:13px;}
+  .tr-rev:last-child{margin-bottom:0;}
+  .tr-rev .rv-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .tr-rev .rv-name{font-size:13px;font-weight:600;}
+  .tr-rev .rv-stars{color:var(--gold);font-size:12px;letter-spacing:1px;}
+  .tr-rev .rv-when{font-size:11px;color:#6b6459;margin-left:auto;}
+  .tr-rev .rv-tx{margin:0;font-size:13px;color:#3a3733;line-height:1.45;}
+  .tr-rev .rv-tx mark{background:#fdf3d6;color:inherit;padding:0 2px;border-radius:3px;}
+
+  /* ---------- guests popover ---------- */
+  .guest-pop{
+    position:absolute;top:calc(100% + 8px);right:0;width:322px;max-width:90vw;z-index:40;
+    background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 36px rgba(40,30,10,.18);
+    padding:14px;
+  }
+  .guest-pop[hidden]{display:none;}
+  .gp-seg{display:flex;background:#f1ece3;border-radius:10px;padding:3px;margin-bottom:13px;}
+  .gp-seg button{
+    flex:1;border:none;background:none;font-family:inherit;font-size:13px;font-weight:600;color:#6b665f;
+    padding:8px 6px;border-radius:8px;cursor:pointer;transition:all .15s;
+  }
+  .gp-seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .gp-note{font-size:12px;color:var(--muted);margin:0 2px 12px;line-height:1.45;}
+  .gp-panel[hidden]{display:none;}
+  .compbtn{
+    width:100%;display:flex;align-items:center;gap:11px;padding:10px 12px;margin-bottom:8px;
+    border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;font-family:inherit;
+    text-align:left;transition:all .15s;
+  }
+  .compbtn:last-child{margin-bottom:0;}
+  .compbtn:hover{border-color:#c9c0ae;}
+  .compbtn.on{border-color:var(--navy);background:#f4f7fb;}
+  .compbtn .cb-em{font-size:18px;flex:none;width:24px;text-align:center;}
+  .compbtn .cb-tx{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .compbtn .cb-name{display:block;font-size:14.5px;font-weight:600;color:var(--ink);}
+  .compbtn .cb-sub{display:block;font-size:12px;color:var(--muted);margin-top:1px;}
+  .compbtn .cb-check{
+    flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid #cfc8bb;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;transition:all .15s;
+  }
+  .compbtn.on .cb-check{background:var(--navy);border-color:var(--navy);}
+  .gp-count{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 12px;
+    border-bottom:1px solid var(--line);margin-bottom:12px;}
+  .gp-count .gc-lab{font-size:14.5px;font-weight:600;}
+  .stepper{display:flex;align-items:center;gap:14px;}
+  .stepper button{
+    width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:19px;
+    line-height:1;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .stepper button:disabled{opacity:.4;cursor:default;}
+  .stepper .gc-n{font-size:16px;font-weight:700;min-width:20px;text-align:center;}
+
+  /* ---------- date range picker ---------- */
+  .cal-pop{
+    position:absolute;top:calc(100% + 8px);left:0;width:310px;max-width:92vw;z-index:45;
+    background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(40,30,10,.18);
+    padding:16px;
+  }
+  .cal-pop[hidden]{display:none;}
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .cal-title{font-family:Georgia,serif;font-size:17px;font-weight:600;}
+  .cal-nav{
+    width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);
+    font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;
+  }
+  .cal-nav:hover{background:#f3efe8;}
+  .cal-nav:disabled{opacity:.35;cursor:default;}
+  .cal-dows{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px;}
+  .cal-dows span{text-align:center;font-size:11px;font-weight:600;letter-spacing:.03em;color:var(--muted);padding:5px 0;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+  .cal-cell{position:relative;display:flex;align-items:center;justify-content:center;padding:2px 0;}
+  .cal-cell.rng::before{content:"";position:absolute;top:2px;bottom:2px;left:0;right:0;background:#e9f0f7;z-index:0;}
+  .cal-cell.rng.start::before{left:50%;}
+  .cal-cell.rng.end::before{right:50%;}
+  .cal-cell.rng.start.end::before{display:none;}
+  .cal-day{
+    position:relative;z-index:1;width:36px;height:36px;border:none;background:none;border-radius:50%;
+    font-family:inherit;font-size:14px;color:var(--ink);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:background .12s;
+  }
+  .cal-day:hover{background:#efe9df;}
+  .cal-day.sel{background:var(--navy);color:#fff;}
+  .cal-day.sel:hover{background:var(--navy-deep);}
+  .cal-day.today{font-weight:700;}
+  .cal-day.disabled{color:#cbc4b7;cursor:default;}
+  .cal-day.disabled:hover{background:none;}
+  .cal-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);}
+  .cal-foot .cf-tx{font-size:13.5px;color:var(--muted);}
+  .cal-foot .cf-tx b{color:var(--ink);font-weight:700;font-size:15px;}
+  .cal-done{
+    background:var(--navy);color:#fff;border:none;padding:9px 22px;border-radius:9px;font-size:14px;font-weight:600;
+    font-family:inherit;cursor:pointer;transition:background .15s;
+  }
+  .cal-done:hover{background:var(--navy-deep);}
+
+  /* ---------- room details drawer ---------- */
+  .scrim{position:fixed;inset:0;background:rgba(20,18,16,.45);opacity:0;visibility:hidden;
+    transition:opacity .25s;z-index:90;}
+  .scrim.open{opacity:1;visibility:visible;}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(560px,100%);background:#fff;z-index:100;
+    display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;
+    box-shadow:-12px 0 40px rgba(0,0,0,.2);border-top-left-radius:18px;border-bottom-left-radius:18px;}
+  .drawer.open{transform:translateX(0);}
+  .dr-head{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:22px 26px;border-bottom:1px solid var(--line);flex:none;}
+  .dr-head h3{font-family:Georgia,serif;font-size:24px;margin:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .dr-badge{background:#2a7d5f;color:#fff;font-size:11.5px;font-weight:600;letter-spacing:.04em;
+    padding:5px 11px;border-radius:7px;font-family:-apple-system,sans-serif;white-space:nowrap;}
+  .dr-close{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;
+    font-size:18px;color:#444;display:flex;align-items:center;justify-content:center;flex:none;transition:background .15s;}
+  .dr-close:hover{background:#f3efe8;}
+  .dr-body{flex:1;overflow-y:auto;padding:22px 26px 26px;}
+  .dr-main{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#e9e4da;}
+  .dr-main img{width:100%;height:100%;object-fit:cover;display:block;}
+  .dr-main .nav{box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .dr-thumbs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin-top:8px;}
+  .dr-thumb{aspect-ratio:1/1;border-radius:10px;overflow:hidden;border:2px solid transparent;padding:0;cursor:pointer;
+    background:none;opacity:.7;transition:opacity .15s,border-color .15s;}
+  .dr-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .dr-thumb:hover{opacity:1;}
+  .dr-thumb.active{opacity:1;border-color:var(--navy);}
+  .dr-chips{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0 6px;}
+  .dr-chip{background:#f3efe8;border:1px solid var(--line);border-radius:20px;padding:7px 15px;font-size:14px;color:#3a3a3a;}
+  .dr-desc{color:#4a4641;font-size:15px;margin:14px 0 0;line-height:1.55;}
+  .dr-sectitle{font-size:12px;letter-spacing:.1em;color:var(--muted);font-weight:700;margin:26px 0 12px;text-transform:uppercase;}
+  .dr-card{border:1px solid var(--line);border-radius:14px;padding:20px 22px;}
+  .dr-card h4{margin:0 0 14px;font-size:16px;}
+  .opt{display:flex;align-items:center;gap:12px;padding:9px 0;font-size:15.5px;color:#2a2a2a;cursor:pointer;}
+  .opt .save{margin-left:auto;font-weight:700;font-size:14px;color:#2a7d5f;}
+  .opt input[type=radio]{width:19px;height:19px;accent-color:var(--navy);cursor:pointer;}
+  .dr-sep{border:none;border-top:1px solid var(--line);margin:8px 0;}
+  .addon{display:flex;align-items:center;gap:12px;padding:13px 0;font-size:15.5px;}
+  .addon .ax{flex:1;}
+  .addon .ax small{color:var(--muted);font-weight:400;}
+  .tg{position:relative;width:52px;height:30px;flex:none;}
+  .tg input{opacity:0;width:0;height:0;position:absolute;}
+  .tg label{position:absolute;inset:0;background:#cfc8bb;border-radius:30px;cursor:pointer;transition:background .2s;}
+  .tg label::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+  .tg input:checked + label{background:var(--navy);}
+  .tg input:checked + label::after{transform:translateX(22px);}
+  .dr-disclose{width:100%;background:none;border:none;border-top:1px solid var(--line);
+    margin-top:24px;padding:18px 0 4px;display:flex;justify-content:space-between;align-items:center;
+    font-size:12px;letter-spacing:.1em;color:var(--muted);font-weight:700;text-transform:uppercase;
+    cursor:pointer;font-family:inherit;}
+  .dr-disclose .dc-ic{color:var(--navy);font-size:22px;font-weight:400;line-height:1;transition:transform .2s;}
+  .dr-disclose[aria-expanded=true] .dc-ic{transform:rotate(45deg);}
+  .amen[hidden]{display:none;}
+  #drAmen{margin-top:14px;list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;}
+  .amen li{position:relative;padding-left:22px;font-size:14.5px;color:#3f3b36;}
+  .amen li::before{content:"✓";position:absolute;left:0;top:0;color:var(--navy);font-weight:700;}
+  .dr-foot{flex:none;border-top:1px solid var(--line);padding:18px 26px;display:flex;align-items:center;
+    justify-content:space-between;gap:16px;background:#fff;}
+  .dr-foot .pr b{font-size:26px;font-family:Georgia,serif;}
+  .dr-foot .pr small{color:var(--muted);font-size:14px;}
+  .dr-foot .pr .tot{display:block;color:var(--muted);font-size:13px;margin-top:2px;}
+  .book-now{background:var(--navy);color:#fff;border:none;font-size:16px;font-weight:600;padding:16px 34px;border-radius:12px;
+    cursor:pointer;transition:background .15s;white-space:nowrap;font-family:inherit;}
+  .book-now:hover{background:var(--navy-deep);}
+
+  @media(max-width:920px){
+    .hero{grid-template-columns:1fr;min-height:0;}
+    .gallery .main{min-height:300px;}
+    .two{grid-template-columns:1fr;grid-template-rows:none;gap:0;}
+    .loc-h,.map,.dist,.gtk-h,.acc{grid-column:1;grid-row:auto;}
+    .gtk-h{margin-top:40px;}
+    .dist{margin-bottom:0;}
+  }
+  @media(max-width:820px){
+    .lbx-inner{width:96vw;height:92vh;}
+    .lbx-panel{top:auto;left:12px;right:12px;bottom:12px;width:auto;max-height:54%;}
+    .lbx-next{right:18px;}
+    .lbx-nav{top:38%;}
+    .lbx-stage::after{background:linear-gradient(180deg,rgba(0,0,0,.25) 0%,rgba(0,0,0,0) 30%,rgba(10,12,14,.4) 100%);}
+  }
+  @media(max-width:560px){
+    .rel-list{grid-template-columns:1fr;}
+    .trip-row{grid-template-columns:1fr;}
+    .drawer{border-radius:0;}
+    #drAmen{grid-template-columns:1fr;}
+    .rooms-scroll .rcard{flex-basis:82vw;}
+    .rev-track .rcard{flex:0 0 80%;}
+    .sec-h{font-size:32px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- hotel switcher (mockup only) -->
+<script src="tabs.js"></script>
+
+<!-- ================= HERO / FIRST FOLD ================= -->
+<div class="wrap" id="top">
+  <div class="hero">
+    <div class="gallery" id="gallery">
+      <div class="main">
+        <img id="mainImg" src="images/gv-01-bedroom.png" alt="Villa Room — garden-view bedroom">
+        <span class="badge">Villa Room · Garden View</span>
+        <button class="nav prev" id="prevBtn" aria-label="Previous photo">&#8249;</button>
+        <button class="nav next" id="nextBtn" aria-label="Next photo">&#8250;</button>
+        <span class="counter"><span id="counterNow">1</span> / 8</span>
+      </div>
+      <div class="thumbs" id="thumbs">
+        <button class="thumb active" data-i="0"><img src="images/gv-01-bedroom.png" alt="Villa Room bedroom"></button>
+        <button class="thumb" data-i="1"><img src="images/gv-02-balcony.png" alt="Villa Room private balcony"></button>
+        <button class="thumb" data-i="2"><img src="images/gv-03-bathroom.png" alt="Villa Room bathroom"></button>
+        <button class="thumb" data-i="3"><img src="images/gv-04-exterior.png" alt="Villa block exterior"></button>
+        <button class="thumb" data-i="4"><img src="images/06-aerial-pool.png" alt="Aerial view of main pool"></button>
+        <button class="thumb" data-i="5"><img src="images/04-pool-sunset.png" alt="Pool at sunset"></button>
+        <button class="thumb" data-i="6"><img src="images/07-garden-view.png" alt="Garden and grounds"></button>
+        <button class="thumb" data-i="7"><img src="images/08-villa-exterior.png" alt="Resort villa exteriors"></button>
+      </div>
+    </div>
+
+    <div class="book">
+      <!-- ===== 1. HEADER ===== -->
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <h1>Taj Exotica Resort &amp; Spa</h1>
+      <div class="place">BENAULIM BEACH · GOA, INDIA</div>
+
+      <!-- ===== 2. BOOKING MODULE (dominant) ===== -->
+      <div class="booking">
+        <!-- your stay: known info, tweakable -->
+        <div class="trip">
+          <div class="trip-row">
+            <button type="button" class="tripchip" id="dateChip" aria-haspopup="true">
+              <span class="tc-k">Dates <span class="tc-cnt" id="nightsVal">3 nights</span></span>
+              <span class="tc-v" id="dateVal">Fri 10 &ndash; Mon 13 Jul</span>
+            </button>
+            <button type="button" class="tripchip" id="guestChip" aria-haspopup="true" aria-expanded="false">
+              <span class="tc-k">Guests <span class="tc-cnt" id="guestSub">3 guests</span></span>
+              <span class="tc-v" id="guestVal">You, Priya &amp; Aarav</span>
+            </button>
+          </div>
+
+          <!-- date popover -->
+          <div class="cal-pop" id="calPop" hidden>
+            <div class="cal-head">
+              <button type="button" class="cal-nav" id="calPrev" aria-label="Previous month">&#8249;</button>
+              <span class="cal-title" id="calTitle"></span>
+              <button type="button" class="cal-nav" id="calNext" aria-label="Next month">&#8250;</button>
+            </div>
+            <div class="cal-dows"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-foot">
+              <span class="cf-tx" id="calFootTxt"></span>
+              <button type="button" class="cal-done" id="calDone">Done</button>
+            </div>
+          </div>
+
+          <!-- guests popover: number and profiles work together -->
+          <div class="guest-pop" id="guestPop" hidden>
+            <div class="gp-count">
+              <span class="gc-lab">Guests</span>
+              <div class="stepper">
+                <button type="button" id="cMinus" aria-label="Fewer guests">&#8722;</button>
+                <span class="gc-n" id="cNum">3</span>
+                <button type="button" id="cPlus" aria-label="More guests">&#43;</button>
+              </div>
+            </div>
+            <div id="compList"></div>
+          </div>
+        </div>
+
+        <!-- selected room — whole card opens the details drawer -->
+        <button type="button" class="selroom" id="roomCard" aria-label="See all room choices">
+          <span class="sr-tag">Best match for your trip</span>
+          <div class="sr-line"><span class="sr-name">Villa Room</span> · Garden view · 56 m² · Sleeps 3</div>
+        </button>
+
+        <!-- price: 3-night total primary, per-night secondary -->
+        <div class="bk-price">
+          <div class="bk-total"><b>₹18,500</b><span>/ night</span></div>
+          <div class="bk-per"><span id="bkTotal">₹55,500</span> total · <span id="bkNights">3 nights</span></div>
+        </div>
+
+        <!-- CTAs directly under price -->
+        <div class="cta-stack">
+          <div class="cta-main">
+            <button class="btn" id="bookNow">Book now &middot; ₹55,500</button>
+            <button class="btn-secondary icon-only" id="addTrip" aria-pressed="false" aria-label="Add to trip" title="Add to trip">
+              <span class="hz">&#43;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 3. DECISION VALIDATION (reassurance) ===== -->
+      <div class="validate">
+        <div class="vd-score" id="relScore">94% match for your trip</div>
+        <div id="relGroups"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CHOOSE YOUR ROOM ================= -->
+<div class="wrap rooms-wrap" id="rooms">
+  <h2 class="rooms-h">Choose your room</h2>
+  <div class="rooms-scroll" id="roomsScroll"></div>
+</div>
+
+<!-- ================= REVIEWS ================= -->
+<section id="reviews">
+  <div class="wrap">
+    <div class="rev-head-row">
+      <div class="rev-top">
+        <h2 class="sec-h serif">Reviews</h2>
+        <span class="score">8.7</span>
+        <span class="count">from 1,284 reviews</span>
+      </div>
+      <button class="seeall" id="seeAll">See all 11 reviews &rarr;</button>
+    </div>
+    <p class="sec-sub" style="max-width:660px">Guests single out the warm, personal service — staff are repeatedly named by guests — along with the food and the lush beachfront gardens. The most common notes are that the property is huge and that service can slow down in the off-season.</p>
+
+    <div class="pills" id="pills">
+      <span class="pill active" data-f="all">All <span class="n">11</span></span>
+      <span class="pill" data-f="Service">Service <span class="n">10</span></span>
+      <span class="pill" data-f="Food">Food <span class="n">4</span></span>
+      <span class="pill" data-f="Family">Family <span class="n">4</span></span>
+      <span class="pill" data-f="Rooms">Rooms <span class="n">4</span></span>
+      <span class="pill" data-f="Location">Location <span class="n">3</span></span>
+      <span class="pill" data-f="Grounds">Grounds <span class="n">2</span></span>
+    </div>
+
+    <div class="rev-carousel">
+    <button class="rev-arrow prev" id="revPrev" aria-label="Previous reviews">&#8249;</button>
+    <div class="rev-track" id="revgrid">
+      <div class="rcard" data-tags="Family,Grounds,Service">
+        <div class="rh"><div><div class="name">Gaurav</div><div class="type">Family · India</div></div><div class="rs">10</div></div>
+        <div class="rstay"><b>Villa Room, Garden View</b> · 3 nights · May 2026</div>
+        <p>Our stay was exceptional. The resort is beautifully maintained with lush landscaped gardens, spacious rooms and direct access to the pristine Benaulim Beach. Every staff member was warm and attentive, and travelling with an infant was very comfortable thanks to the family-friendly facilities.</p>
+        <div class="tags"><span class="tag">Family</span><span class="tag">Grounds</span><span class="tag">Service</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Service,Food,Location">
+        <div class="rh"><div><div class="name">Arne</div><div class="type">Couple · United Kingdom</div></div><div class="rs">10</div></div>
+        <div class="rstay"><b>Villa Room, Garden View</b> · 8 nights · Mar 2026</div>
+        <p>All the staff were polite, friendly and attentive — a special mention for Cleto Pereira, the Loyalty Manager. When they learnt it was our 40th wedding anniversary they decorated our bed, serenaded us at breakfast and provided a cake. Breakfast was excellent, especially the Indian food, and the lawns were lush and beautifully maintained. It would have been nice to have a shuttle to Benaulim town.</p>
+        <div class="tags"><span class="tag">Service</span><span class="tag">Food</span><span class="tag">Location</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Service,Rooms,Location">
+        <div class="rh"><div><div class="name">Rishabh Agrawal</div><div class="type">Family · Google</div></div><div class="rs">8.0</div></div>
+        <div class="rstay">Stayed with 2 adults &amp; 2 kids</div>
+        <p>Amazing experience and hospitality, especially the team at the front desk — a special shout out to Sunil. Rooms are spacious and comfortable for a family of two adults and two kids, and the location is great, right on the beach with a golf course. Food options could be better, but the taste was fine.</p>
+        <div class="tags"><span class="tag">Service</span><span class="tag">Rooms</span><span class="tag">Location</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Service,Food,Grounds">
+        <div class="rh"><div><div class="name">Nitish Singh</div><div class="type">Couple · Google</div></div><div class="rs">10</div></div>
+        <div class="rstay">Celebrating a special occasion</div>
+        <p>From the moment we arrived the hospitality felt truly special. The property is stunning, with beautifully maintained gardens and a peaceful private beach, and the rooms were spacious and elegant. We celebrated a special occasion and the team made it even more memorable.</p>
+        <div class="tags"><span class="tag">Service</span><span class="tag">Food</span><span class="tag">Grounds</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Family,Food">
+        <div class="rh"><div><div class="name">Swati P.</div><div class="type">Family · Google</div></div><div class="rs">10</div></div>
+        <div class="rstay">Family getaway with kids</div>
+        <p>Our family getaway with the kids was magical. From the swimming pool to endless activities — tambola, traditional dance showcases and hair-braiding sessions — the kids were entertained the whole time. And the food was extraordinary, every meal a feast of buffet options.</p>
+        <div class="tags"><span class="tag">Family</span><span class="tag">Food</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Service">
+        <div class="rh"><div><div class="name">Deepak Khaitan</div><div class="type">Couple · Google</div></div><div class="rs">10</div></div>
+        <div class="rstay">Highlight: the Taj culture</div>
+        <p>The entire staff is very hospitable and the Taj culture is amazing. A special mention for Siddharth, who made our stay special, Juhi who was always welcoming, and Sunil at the entrance who handled valet parking exemplarily.</p>
+        <div class="tags"><span class="tag">Service</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Service,Family">
+        <div class="rh"><div><div class="name">Shreya Sharma</div><div class="type">Family · Google</div></div><div class="rs low">2.0</div></div>
+        <div class="rstay">2 nights · long weekend in May</div>
+        <p>It was our anniversary and the front desk listened keenly but were slow to act — decorations and cake only arrived by 10pm. Even a tea sachet or a buggy meant a 30–45 minute wait. The off-season service didn't leave a good impression.</p>
+        <div class="tags"><span class="tag">Service</span><span class="tag">Family</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Rooms,Food,Service">
+        <div class="rh"><div><div class="name">Sunil Kumar Mandal</div><div class="type">Family · Google</div></div><div class="rs">10</div></div>
+        <div class="rstay"><b>Sea-facing room with private pool</b></div>
+        <p>Got a sea-facing room with a private pool and it was awesome — definitely a must-have experience. A very huge property with extraordinary service, and the food is very tasty.</p>
+        <div class="tags"><span class="tag">Rooms</span><span class="tag">Food</span><span class="tag">Service</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Service,Rooms,Location">
+        <div class="rh"><div><div class="name">Keith</div><div class="type">Couple · United Kingdom</div></div><div class="rs">9.0</div></div>
+        <div class="rstay"><b>Villa Room with Plunge Pool</b> · 6 nights · Nov 2025</div>
+        <p>Wonderful hotel and experience — staff went out of their way to ensure we had a superb time. The hotel and room were beautifully decorated and the buffet meals were very good with plenty to choose from. The location was pretty but a little remote.</p>
+        <div class="tags"><span class="tag">Service</span><span class="tag">Rooms</span><span class="tag">Location</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Family,Service">
+        <div class="rh"><div><div class="name">Prakash</div><div class="type">Family · India</div></div><div class="rs">9.0</div></div>
+        <div class="rstay"><b>Villa Room, Garden View</b> · 3 nights · Jun 2025</div>
+        <p>The kids' activity area and all the staff there were very nice to our children, and the hotel and restaurant staff were lovely too. Construction was going on in the pool area and the kids' pool was missing during our stay.</p>
+        <div class="tags"><span class="tag">Family</span><span class="tag">Service</span></div>
+      </div>
+
+      <div class="rcard" data-tags="Rooms,Service">
+        <div class="rh"><div><div class="name">Racchith Kothari</div><div class="type">Friends · Google</div></div><div class="rs">8.0</div></div>
+        <div class="rstay">1 night · October</div>
+        <p>The hotel is really good, with very good amenities and infrastructure. Check-in could be faster and in-room dining took a while, and there were quite a few mosquitoes near the beach bar — but overall a very good stay.</p>
+        <div class="tags"><span class="tag">Rooms</span><span class="tag">Service</span></div>
+      </div>
+    </div>
+    <button class="rev-arrow next" id="revNext" aria-label="More reviews">&#8250;</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LOCATION + GOOD TO KNOW ================= -->
+<section id="location">
+  <div class="wrap two">
+    <h2 class="sec-h serif loc-h">Right on Benaulim Beach</h2>
+    <div class="map">
+      <a class="showmap" href="#" onclick="return false;">Show on map &#8250;</a>
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="Illustrated neighbourhood map: Taj Exotica sits between Benaulim Beach, a cafe, the village market and the church">
+        <style>
+          .pl{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+              font-size:11px;font-weight:600;fill:#4a443a;letter-spacing:.7px;}
+          .ic{stroke:#4a443a;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+        </style>
+        <rect width="400" height="300" fill="#f3efe7"/>
+
+        <!-- city blocks / parcels -->
+        <rect x="16" y="16" width="150" height="82" rx="7" fill="#c6c8a2"/>
+        <polygon points="182,16 250,16 214,104 150,104" fill="#ded7c5"/>
+        <rect x="16" y="118" width="58" height="74" rx="7" fill="#e1dac9"/>
+        <rect x="86" y="118" width="80" height="74" rx="7" fill="#d6cfba"/>
+        <rect x="16" y="212" width="150" height="72" rx="7" fill="#e1dac9"/>
+        <rect x="150" y="116" width="108" height="98" rx="7" fill="#efe9df"/>
+        <rect x="270" y="16" width="114" height="94" rx="7" fill="#ded7c5"/>
+        <rect x="270" y="126" width="44" height="66" rx="7" fill="#cc9a7e"/>
+        <rect x="326" y="126" width="58" height="92" rx="7" fill="#d8d1bd"/>
+        <rect x="270" y="212" width="114" height="72" rx="7" fill="#d6cfba"/>
+        <rect x="188" y="230" width="66" height="54" rx="7" fill="#cf9d82"/>
+
+        <!-- roads -->
+        <g stroke="#e7dfcf" stroke-width="2" stroke-dasharray="7 7" fill="none">
+          <path d="M0 110 H400"/>
+          <path d="M262 0 V300"/>
+        </g>
+
+        <!-- THE BEACH -->
+        <g class="ic" transform="translate(70,48)">
+          <path d="M-20 2 q5 -5 10 0 t10 0 t10 0"/>
+          <path d="M-20 9 q5 -5 10 0 t10 0 t10 0"/>
+        </g>
+        <text class="pl" x="70" y="82" text-anchor="middle">THE BEACH</text>
+
+        <!-- THE CAFE -->
+        <g class="ic" transform="translate(324,50)">
+          <path d="M-8 -14 c0 4 -3 4 -3 8 M0 -14 c0 4 -3 4 -3 8 M8 -14 c0 4 -3 4 -3 8"/>
+          <path d="M-14 -2 H10 V8 a10 10 0 0 1 -10 10 H-4 a10 10 0 0 1 -10 -10 Z"/>
+          <path d="M10 1 h5 a5 5 0 0 1 0 10 h-2"/>
+          <path d="M-16 22 H14"/>
+        </g>
+        <text class="pl" x="324" y="82" text-anchor="middle">THE CAFE</text>
+
+        <!-- THE MARKET -->
+        <g transform="translate(96,244)">
+          <circle cx="-6" cy="-6" r="5.5" fill="#cf9d82"/>
+          <circle cx="5" cy="-5" r="5.5" fill="#c98a6b"/>
+          <circle cx="-1" cy="-9" r="5.5" fill="#d8ac8c"/>
+          <path class="ic" d="M-17 -2 H17 l-3 20 H-14 Z" fill="#f3efe7"/>
+          <path class="ic" d="M-19 -2 H19"/>
+          <path class="ic" d="M-13 5 H13 M-12 11 H12"/>
+        </g>
+        <text class="pl" x="96" y="280" text-anchor="middle">THE MARKET</text>
+
+        <!-- THE CHURCH -->
+        <g class="ic" transform="translate(322,240)">
+          <path d="M-12 20 V-2 H12 V20"/>
+          <path d="M-14 -2 L0 -16 L14 -2"/>
+          <path d="M0 -16 V-24 M-3.5 -20.5 H3.5"/>
+          <rect x="-4" y="8" width="8" height="12" fill="#f3efe7"/>
+        </g>
+        <text class="pl" x="322" y="280" text-anchor="middle">THE CHURCH</text>
+
+        <!-- THE HOTEL badge -->
+        <g transform="translate(200,150)">
+          <path d="M-30 22 V-8 A30 30 0 0 1 30 -8 V22 Z" fill="#efe9df" stroke="#4a443a" stroke-width="2.2" stroke-linejoin="round"/>
+          <circle cx="0" cy="0" r="19" fill="#2f4f74"/>
+          <g stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(0,1)">
+            <path d="M-11 5 V-5"/>
+            <path d="M-11 5 H11 V0 Q11 -3 8 -3 H-4"/>
+            <circle cx="-7" cy="-1" r="2.6"/>
+          </g>
+        </g>
+        <text class="pl" x="200" y="194" text-anchor="middle" style="font-size:12px;fill:#2f2b25;">THE HOTEL</text>
+      </svg>
+    </div>
+    <p class="dist"><b>1.9 mi</b> to Colva Beach · <b>45 min</b> to Dabolim Airport</p>
+
+    <h2 class="sec-h serif gtk-h">Good to know</h2>
+    <div class="acc" id="acc">
+        <div class="item">
+          <button>Check-in &amp; check-out <span class="plus">+</span></button>
+          <div class="panel"><div class="inner">
+            <p>Check-in from 2:00 PM · check-out by 12:00 noon.</p>
+            <p>Up to two children under 5 stay free using existing beds. A rollaway/extra bed is about ₹4,000 per night.</p>
+          </div></div>
+        </div>
+        <div class="item">
+          <button>Payment &amp; cancellation <span class="plus">+</span></button>
+          <div class="panel"><div class="inner">
+            <p>Cashless property — Visa, Mastercard and Amex accepted; no cash.</p>
+            <p>Rates shown are non-refundable. Add free cancellation per room at checkout for flexibility.</p>
+            <p>Buffet breakfast, if not included, runs roughly ₹1,500 for adults and ₹750 for children.</p>
+          </div></div>
+        </div>
+        <div class="item">
+          <button>House rules &amp; pets <span class="plus">+</span></button>
+          <div class="panel"><div class="inner">
+            <p>Cats and dogs under 30 lb are welcome (up to two per room) in garden-view villa categories only, for a non-refundable fee of about ₹2,000 plus taxes per pet, per night.</p>
+            <p>Pets are not permitted in restaurants, the lobby, the pool or the gym.</p>
+          </div></div>
+        </div>
+        <div class="item">
+          <button>Getting there <span class="plus">+</span></button>
+          <div class="panel"><div class="inner">
+            <p>About 45 minutes by car from Dabolim Airport, or roughly 1.5 hours from Manohar International Airport at Mopa.</p>
+            <p>7.5 miles from Madgaon (Margao) city. Free parking is available on site.</p>
+          </div></div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Taj Exotica Resort &amp; Spa, Goa · Benaulim Beach, South Goa · An IHCL luxury resort</div>
+</footer>
+
+<!-- ================= FULLSCREEN LIGHTBOX + REVIEWS ================= -->
+<div class="lbx" id="lbx" hidden>
+  <button class="lbx-close" id="lbxClose" aria-label="Close">&#10005;</button>
+  <div class="lbx-inner">
+    <div class="lbx-stage">
+      <span class="lbx-tag" id="lbxTag"></span>
+      <img id="lbxImg" src="" alt="">
+      <button class="lbx-nav lbx-prev" id="lbxPrev" aria-label="Previous photo">&#8249;</button>
+      <button class="lbx-nav lbx-next" id="lbxNext" aria-label="Next photo">&#8250;</button>
+    </div>
+    <aside class="lbx-panel" id="lbxPanel"></aside>
+  </div>
+</div>
+
+<!-- ================= ROOM DETAILS DRAWER ================= -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-modal="true" role="dialog" aria-labelledby="drTitle" aria-hidden="true">
+  <div class="dr-head">
+    <h3 id="drTitle"><span id="drName">Villa Room</span> <span class="dr-badge" id="drBadge">Best value</span></h3>
+    <button class="dr-close" id="drClose" aria-label="Close">&#10005;</button>
+  </div>
+
+  <div class="dr-body">
+    <div class="dr-main">
+      <img id="drImg" src="" alt="">
+      <button class="nav prev" id="drPrev" aria-label="Previous photo">&#8249;</button>
+      <button class="nav next" id="drNext" aria-label="Next photo">&#8250;</button>
+      <span class="counter"><span id="drNow">1</span> / <span id="drTot">4</span></span>
+    </div>
+    <div class="dr-thumbs" id="drThumbs"></div>
+
+    <div class="dr-chips" id="drChips"></div>
+    <p class="dr-desc" id="drDesc"></p>
+
+    <div class="dr-sectitle">Configure your stay</div>
+    <div class="dr-card">
+      <h4>Cancellation</h4>
+      <label class="opt">
+        <input type="radio" name="cancel" value="nonref" checked>
+        <span>Non-refundable</span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="cancel" value="flex">
+        <span>Free cancellation</span>
+        <span class="save">+₹1,800 / night</span>
+      </label>
+      <hr class="dr-sep">
+      <div class="addon">
+        <span class="ax">Breakfast <small>· +₹1,500 / night</small></span>
+        <span class="tg"><input type="checkbox" id="drBreakfast"><label for="drBreakfast"></label></span>
+      </div>
+    </div>
+
+    <button class="dr-disclose" id="drAmenToggle" aria-expanded="false">
+      In this room <span class="dc-ic">+</span>
+    </button>
+    <ul class="amen" id="drAmen" hidden></ul>
+  </div>
+
+  <div class="dr-foot">
+    <div class="pr">
+      <b id="drPrice"></b> <small>/ night</small>
+      <span class="tot" id="drTotal"></span>
+    </div>
+    <button class="book-now" id="drBook">Book now</button>
+  </div>
+</aside>
+
+<!-- ================= ALL-REVIEWS DRAWER ================= -->
+<div class="scrim" id="revScrim"></div>
+<aside class="drawer" id="revDrawer" aria-modal="true" role="dialog" aria-labelledby="revDrTitle">
+  <div class="dr-head">
+    <h3 id="revDrTitle">All reviews <span class="dr-badge" style="background:var(--navy)">8.7</span></h3>
+    <button class="dr-close" id="revDrClose" aria-label="Close">&#10005;</button>
+  </div>
+  <div class="rev-search">
+    <span class="rs-ic">&#9906;</span>
+    <input type="search" id="revSearch" placeholder="Search reviews — food, staff, beach, pool…" autocomplete="off">
+  </div>
+  <div class="dr-body" id="revListBody"></div>
+</aside>
+
+<script>
+  // ---- hero carousel ----
+  const photos = [
+    {src:"images/gv-01-bedroom.png",     alt:"Villa Room — garden-view bedroom"},
+    {src:"images/gv-02-balcony.png",     alt:"Villa Room — private balcony over the garden"},
+    {src:"images/gv-03-bathroom.png",    alt:"Villa Room — bathroom with soaking tub",  tag:"bathroom"},
+    {src:"images/gv-04-exterior.png",    alt:"Villa Room — Goan-Portuguese villa block"},
+    {src:"images/06-aerial-pool.png",    alt:"Aerial view of the main pool",            tag:"pool"},
+    {src:"images/04-pool-sunset.png",    alt:"Pool and beach at sunset",                tag:"pool"},
+    {src:"images/07-garden-view.png",    alt:"Palm gardens and grounds"},
+    {src:"images/08-villa-exterior.png", alt:"Resort villa exteriors"}
+  ];
+  const mainImg = document.getElementById('mainImg');
+  const counterNow = document.getElementById('counterNow');
+  const thumbBtns = document.querySelectorAll('#thumbs .thumb');
+  let cur = 0;
+  function show(i){
+    cur = (i + photos.length) % photos.length;
+    mainImg.src = photos[cur].src;
+    mainImg.alt = photos[cur].alt;
+    counterNow.textContent = cur + 1;
+    thumbBtns.forEach((t,k) => t.classList.toggle('active', k === cur));
+  }
+  document.getElementById('prevBtn').addEventListener('click', e => { e.stopPropagation(); show(cur - 1); });
+  document.getElementById('nextBtn').addEventListener('click', e => { e.stopPropagation(); show(cur + 1); });
+  thumbBtns.forEach(t => t.addEventListener('click', () => show(+t.dataset.i)));
+
+  // ---- CTAs: primary → checkout, secondary → wishlist ----
+  document.getElementById('bookNow').addEventListener('click',
+    () => { location.href = 'checkout.html'; });
+  document.getElementById('addTrip').addEventListener('click', function(){
+    const on = this.classList.toggle('on');
+    this.setAttribute('aria-pressed', on ? 'true' : 'false');
+    this.querySelector('.hz').innerHTML = on ? '&#10003;' : '&#43;';
+    const lbl = on ? 'Added to trip' : 'Add to trip';
+    this.setAttribute('aria-label', lbl);
+    this.setAttribute('title', lbl);
+  });
+</script>
+
+<script>
+  // ---- guests / companions personalisation → drives relevance score + reasons ----
+  (function(){
+    // Each remembered companion carries short "why it fits" pointers and a match score.
+    const COMPANIONS = [
+      {id:'you',    em:'🧍', name:'You',    sub:'beach, Goan food',   score:95, fits:[]},
+      {id:'wife',   em:'💑', name:'Priya',  sub:'spa, sunset dining', score:96, fits:["Couples’ spa","Sunset dining"]},
+      {id:'kid',    em:'🧒', name:'Aarav',  sub:"kids’ club, play",   score:92, fits:["Kids’ Club"]},
+      {id:'mother', em:'🧘', name:'Mom',    sub:'yoga, wellness',     score:88, fits:["Daily yoga","Ayurvedic spa"]},
+      {id:'father', em:'⛳', name:'Dad',    sub:'golf, sports bar',   score:90, fits:["Golf next door"]}
+    ];
+    const BASE_FITS = ["Beachfront","6 restaurants"];   // "for everyone"
+
+    const MAP = {}; COMPANIONS.forEach(c=>MAP[c.id]=c);
+    const btns = {};                 // id -> profile button
+    let people = ['you','wife','kid'];  // named travellers, in selection order
+    let extras = 0;                  // additional un-named guests
+    const MAXG = 8;
+
+    const $ = id => document.getElementById(id);
+    const pop = $('guestPop'), trigger = $('guestChip');
+    const relGroups = $('relGroups'), scoreEl = $('relScore');
+    const chipLi = (t,spot)=>'<li'+(spot?' class="spot"':'')+'>'+t+'</li>';
+    const joinNames = a => a.length<=1 ? (a[0]||'') : a.slice(0,-1).join(', ')+' & '+a[a.length-1];
+    const total = () => people.length + extras;
+
+    COMPANIONS.forEach(c=>{
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'compbtn'+(people.includes(c.id)?' on':'');
+      b.innerHTML =
+        '<span class="cb-em">'+c.em+'</span>'+
+        '<span class="cb-tx"><span class="cb-name">'+c.name+'</span>'+
+          '<span class="cb-sub">'+c.sub+'</span></span>'+
+        '<span class="cb-check">✓</span>';
+      b.addEventListener('click',()=>{
+        const i = people.indexOf(c.id);
+        if(i>=0) people.splice(i,1);                       // remove named traveller
+        else { if(total()>=MAXG) extras=Math.max(0,extras-1); people.push(c.id); }  // add; borrow from extras if at cap
+        apply();
+      });
+      btns[c.id] = b;
+      $('compList').appendChild(b);
+    });
+
+    function scoreFor(chosen, t){
+      let avg = chosen.length ? Math.round(chosen.reduce((s,c)=>s+c.score,0)/chosen.length) : 95;
+      if(t>=7) avg = Math.min(avg,83); else if(t>=5) avg = Math.min(avg,90);  // large party dampens fit
+      return avg;
+    }
+    function apply(){
+      const t = total();
+      // stepper
+      $('cNum').textContent = t;
+      $('cMinus').disabled = t<=1;
+      $('cPlus').disabled  = t>=MAXG;
+      // keep profile buttons in sync
+      COMPANIONS.forEach(c=>btns[c.id].classList.toggle('on', people.includes(c.id)));
+      // summary line
+      const nm = people.map(id=>MAP[id].name);
+      let val;
+      if(nm.length && extras) val = joinNames(nm)+' +'+extras;
+      else if(nm.length)      val = joinNames(nm);
+      else if(extras)         val = extras+' guest'+(extras>1?'s':'');
+      else                    val = 'Add guests';
+      $('guestVal').textContent = val;
+      $('guestSub').textContent = t+' guest'+(t===1?'':'s');
+
+      // ---- decision validation: score pill + validating sentence + chips grouped by traveller ----
+      const chosen = people.map(id=>MAP[id]);
+      scoreEl.textContent = scoreFor(chosen, t) + '% match for your trip';
+      const pills = [];
+      chosen.forEach(c => pills.push(...c.fits));
+      pills.push(...BASE_FITS);
+      const uniq = pills.filter((v,i,a)=>a.indexOf(v)===i);
+      relGroups.innerHTML = '<ul class="vd-chips">'+uniq.map(c=>chipLi(c)).join('')+chipLi('Cost sweet spot',true)+'</ul>';
+    }
+
+    // Minus removes an extra first, then the most-recently-added named traveller.
+    $('cMinus').addEventListener('click',()=>{
+      if(total()<=1) return;
+      if(extras>0) extras--; else if(people.length>0) people.pop();
+      apply();
+    });
+    // Plus adds an un-named extra guest.
+    $('cPlus').addEventListener('click',()=>{
+      if(total()<MAXG) extras++;
+      apply();
+    });
+
+    const openPop  = ()=>{ const cp=$('calPop'); if(cp) cp.hidden=true; pop.hidden=false; trigger.setAttribute('aria-expanded','true'); };
+    const closePop = ()=>{ pop.hidden=true; trigger.setAttribute('aria-expanded','false'); };
+    trigger.addEventListener('click',e=>{ e.stopPropagation(); pop.hidden?openPop():closePop(); });
+    pop.addEventListener('click',e=>e.stopPropagation());
+    document.addEventListener('click',e=>{ if(!pop.hidden && !pop.contains(e.target) && !trigger.contains(e.target)) closePop(); });
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !pop.hidden) closePop(); });
+
+    apply();
+  })();
+</script>
+
+<script>
+  // ---- date range picker (single trip chip) ----
+  (function(){
+    const $ = id => document.getElementById(id);
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    const RATE = 18500;  // per-night room rate — drives the 3-night total + Book now label
+    const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const MIN = startOfDay(new Date());
+    const key = d => d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
+    const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+    const nights = (a,b)=> Math.round((startOfDay(b)-startOfDay(a))/86400000);
+    const short = d => DOW[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3);
+
+    let checkIn  = new Date(2026,6,10);
+    let checkOut = new Date(2026,6,13);
+    if(checkIn < MIN){ checkIn = MIN; checkOut = addDays(MIN,3); }
+    let view = new Date(checkIn.getFullYear(), checkIn.getMonth(), 1);
+    let picking = 'in';
+
+    const pop = $('calPop'), grid = $('calGrid');
+    const chip = $('dateChip');
+
+    function renderChip(){
+      const n = nights(checkIn, checkOut);
+      // compact "Fri 10 – Mon 13 Jul" when same month, else full both dates
+      let label;
+      if(checkIn.getMonth()===checkOut.getMonth()){
+        label = DOW[checkIn.getDay()]+' '+checkIn.getDate()+' &ndash; '+DOW[checkOut.getDay()]+' '+checkOut.getDate()+' '+MONTHS[checkOut.getMonth()].slice(0,3);
+      } else {
+        label = short(checkIn)+' &ndash; '+short(checkOut);
+      }
+      $('dateVal').innerHTML = label;
+      $('nightsVal').textContent = n+' night'+(n>1?'s':'');
+      // keep booking-module total + Book now label in sync with the stay length
+      const totTxt = '₹'+(RATE*n).toLocaleString('en-IN');
+      const bt = $('bkTotal');   if(bt) bt.textContent = totTxt;
+      const bn = $('bkNights');  if(bn) bn.textContent = n+' night'+(n>1?'s':'');
+      const bk = $('bookNow');   if(bk) bk.textContent = 'Book now · '+totTxt;
+      if(window.refreshRoomPrices) window.refreshRoomPrices();
+    }
+    const inRange = d => d > startOfDay(checkIn) && d < startOfDay(checkOut);
+
+    function renderCal(){
+      $('calTitle').textContent = MONTHS[view.getMonth()]+' '+view.getFullYear();
+      $('calPrev').disabled = (view.getFullYear()===MIN.getFullYear() && view.getMonth()<=MIN.getMonth());
+      grid.innerHTML = '';
+      const startDow = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
+      const daysIn = new Date(view.getFullYear(), view.getMonth()+1, 0).getDate();
+      for(let i=0;i<startDow;i++){ const c=document.createElement('div'); c.className='cal-cell'; grid.appendChild(c); }
+      for(let day=1; day<=daysIn; day++){
+        const d = new Date(view.getFullYear(), view.getMonth(), day);
+        const isStart = key(d)===key(startOfDay(checkIn));
+        const isEnd   = key(d)===key(startOfDay(checkOut));
+        const disabled = d < MIN;
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell';
+        if(isStart || isEnd || inRange(d)){ cell.classList.add('rng'); if(isStart) cell.classList.add('start'); if(isEnd) cell.classList.add('end'); }
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'cal-day'+((isStart||isEnd)?' sel':'')+(disabled?' disabled':'')+(key(d)===key(MIN)?' today':'');
+        b.textContent = day;
+        if(!disabled) b.addEventListener('click', ()=>pick(d));
+        cell.appendChild(b);
+        grid.appendChild(cell);
+      }
+      const n = nights(checkIn, checkOut);
+      $('calFootTxt').innerHTML = n>0 ? '<b>'+n+'</b> night'+(n>1?'s':'') : 'Select check-out';
+    }
+
+    function pick(d){
+      if(picking==='in'){
+        checkIn = d;
+        if(checkOut <= d) checkOut = addDays(d,1);
+        picking = 'out';
+      } else {
+        if(d <= checkIn){ checkIn = d; checkOut = addDays(d,1); }
+        else checkOut = d;
+        picking = 'in';
+      }
+      renderChip(); renderCal();
+    }
+
+    function open(){
+      const gp = $('guestPop'); if(gp && !gp.hidden){ gp.hidden = true; $('guestChip').setAttribute('aria-expanded','false'); }
+      picking = 'in';
+      view = new Date(checkIn.getFullYear(), checkIn.getMonth(), 1);
+      pop.hidden = false;
+      renderCal();
+    }
+    function close(){ pop.hidden = true; }
+
+    chip.addEventListener('click', e=>{ e.stopPropagation(); pop.hidden ? open() : close(); });
+    $('calPrev').addEventListener('click', ()=>{ view = new Date(view.getFullYear(), view.getMonth()-1, 1); renderCal(); });
+    $('calNext').addEventListener('click', ()=>{ view = new Date(view.getFullYear(), view.getMonth()+1, 1); renderCal(); });
+    $('calDone').addEventListener('click', close);
+    pop.addEventListener('click', e=>e.stopPropagation());
+    document.addEventListener('click', e=>{ if(!pop.hidden && !pop.contains(e.target) && !chip.contains(e.target)) close(); });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !pop.hidden) close(); });
+
+    renderChip(); renderCal();
+  })();
+</script>
+
+<script>
+  // ---- fullscreen gallery + guest reality check (reviews on EVERY photo) ----
+  (function(){
+    const $ = id => document.getElementById(id);
+    // Amenity-specific "reality check" for tagged photos.
+    const TRUST = {
+      pool: {
+        label:"Swimming pool", score:92, verdict:"Photos match what guests found", count:214,
+        gphotos:["images/05-pool-day.png","images/04-pool-sunset.png","images/06-aerial-pool.png"],
+        keys:[{t:"Matches photos"},{t:"Vast & spotless"},{t:"Rarely crowded"},{t:"Sunset view"},{t:"Closes 7pm",neg:true}],
+        reviews:[
+          {name:"Ananya R.", when:"Feb 2026", stars:5, tx:"The <mark>pool</mark> is exactly like the photos — huge, spotless, and the beach view at sunset is unreal."},
+          {name:"Karan M.",  when:"Jan 2026", stars:4, tx:"Main <mark>pool</mark> is gorgeous and rarely crowded. Only downside is it closes a touch early at 7pm."},
+          {name:"Meghna T.", when:"Dec 2025", stars:5, tx:"Two <mark>pools</mark>, both warm and clean. Kids happily spent all day in the shallow one."}
+        ]
+      },
+      bathroom: {
+        label:"Bathroom", score:78, verdict:"Mostly matches — a couple of gaps", count:96,
+        gphotos:["images/03-bathroom.png","images/gv-03-bathroom.png","images/sv-03-bathroom.png"],
+        keys:[{t:"Marble & elegant"},{t:"Great rain shower"},{t:"Lovely products"},{t:"Tub smaller",neg:true},{t:"Dimmer lighting",neg:true}],
+        reviews:[
+          {name:"Rohit S.",  when:"Feb 2026", stars:4, tx:"<mark>Bathroom</mark> is marble and elegant just like the photo — though the tub is a bit smaller in person."},
+          {name:"Nisha P.",  when:"Jan 2026", stars:4, tx:"Rain shower was excellent and the products smell amazing. Lighting is dimmer than the listing shot."},
+          {name:"Devang A.", when:"Nov 2025", stars:3, tx:"Clean and well kept, but our room's <mark>bathroom</mark> felt more compact than the gallery photo suggested."}
+        ]
+      }
+    };
+    // General panel — shown for every untagged photo so reviews are always in view.
+    const GENERAL = {
+      score:"8.7", count:"1,284",
+      gphotos:["images/06-aerial-pool.png","images/07-garden-view.png","images/08-villa-exterior.png"],
+      mentions:[["Service","10"],["Food","4"],["Beachfront","3"],["Family","4"]],
+      reviews:[
+        {name:"Gaurav",  when:"May 2026", stars:5, tx:"Beautifully maintained with lush <mark>gardens</mark>, spacious rooms and direct access to Benaulim Beach. Every staff member was warm and attentive."},
+        {name:"Arne",    when:"Mar 2026", stars:5, tx:"All the <mark>staff</mark> were polite, friendly and attentive. Breakfast was excellent, especially the Indian food, and the lawns were lush."},
+        {name:"Sunil K.", when:"Jan 2026", stars:5, tx:"Sea-facing room with a private pool — awesome. A very huge property with extraordinary <mark>service</mark> and very tasty food."}
+      ]
+    };
+    const scoreClass = s => s >= 85 ? 's-good' : s >= 65 ? 's-mid' : 's-low';
+    const starRow = n => '★★★★★'.slice(0,n) + '<span style="color:#d9d2c4">' + '★★★★★'.slice(n) + '</span>';
+    const revBlock = r => '<div class="tr-rev"><div class="rv-top">'+
+      '<span class="rv-name">'+r.name+'</span>'+
+      '<span class="rv-stars">'+starRow(r.stars)+'</span>'+
+      '<span class="rv-when">'+r.when+'</span></div>'+
+      '<p class="rv-tx">'+r.tx+'</p></div>';
+
+    function matchPanel(t){
+      return ''+
+        '<div class="tr-head">'+
+          '<div class="tr-score '+scoreClass(t.score)+'"><b>'+t.score+'%</b><span>match</span></div>'+
+          '<div class="tr-headtx"><h3>Guest reality check</h3>'+
+          '<div class="tr-keys">'+t.keys.map(k=>'<span class="tr-key'+(k.neg?' neg':'')+'">'+k.t+'</span>').join('')+'</div></div>'+
+        '</div>'+
+        '<div class="tr-sec"><h4>GUEST PHOTOS</h4><div class="tr-gphotos">'+
+          t.gphotos.map(s=>'<img src="'+s+'" alt="Guest photo of the '+t.label.toLowerCase()+'">').join('')+
+          '</div><p class="tr-gcap">Uploaded by verified guests who stayed here.</p></div>'+
+        '<div class="tr-sec"><h4>WHAT '+t.count+' GUESTS SAY ABOUT THE '+t.label.toUpperCase()+'</h4>'+
+          t.reviews.map(revBlock).join('')+'</div>';
+    }
+    function generalPanel(g){
+      return ''+
+        '<div class="tr-head">'+
+          '<div class="tr-score s-rev"><b>'+g.score+'</b><span>/ 10</span></div>'+
+          '<div class="tr-headtx"><h3>What guests say</h3>'+
+          '<p>From '+g.count+' verified guest reviews of this resort.</p></div>'+
+        '</div>'+
+        '<div class="tr-sec"><h4>GUEST PHOTOS</h4><div class="tr-gphotos">'+
+          g.gphotos.map(s=>'<img src="'+s+'" alt="Guest photo of the resort">').join('')+
+          '</div><p class="tr-gcap">Uploaded by verified guests who stayed here.</p></div>'+
+        '<div class="tr-sec"><h4>MOST MENTIONED</h4><div class="tr-chips">'+
+          g.mentions.map(m=>'<span class="tc">'+m[0]+' <b>'+m[1]+'</b></span>').join('')+'</div></div>'+
+        '<div class="tr-sec"><h4>RECENT REVIEWS</h4>'+g.reviews.map(revBlock).join('')+'</div>';
+    }
+
+    const lbx = $('lbx'), lbxImg = $('lbxImg'), lbxTag = $('lbxTag'), lbxPanel = $('lbxPanel');
+    let lbi = 0;
+
+    function render(){
+      const p = photos[lbi];
+      lbxImg.src = p.src; lbxImg.alt = p.alt;
+      const t = p.tag && TRUST[p.tag];
+      if(t){ lbxTag.hidden = false; lbxTag.textContent = t.label; lbxPanel.innerHTML = matchPanel(t); }
+      else { lbxTag.hidden = false; lbxTag.textContent = 'Guest reviews'; lbxPanel.innerHTML = generalPanel(GENERAL); }
+    }
+    function open(i){ lbi = (i + photos.length) % photos.length; render(); lbx.hidden = false; document.body.style.overflow = 'hidden'; }
+    function close(){ lbx.hidden = true; document.body.style.overflow = ''; }
+    function step(d){ lbi = (lbi + d + photos.length) % photos.length; render(); }
+
+    document.querySelector('.gallery .main').addEventListener('click', e => {
+      if(e.target.closest('.nav')) return;
+      open(typeof cur === 'number' ? cur : 0);
+    });
+    $('lbxClose').addEventListener('click', close);
+    $('lbxPrev').addEventListener('click', () => step(-1));
+    $('lbxNext').addEventListener('click', () => step(1));
+    lbx.addEventListener('click', e => { if(e.target === lbx) close(); });
+    document.addEventListener('keydown', e => {
+      if(lbx.hidden) return;
+      if(e.key === 'Escape') close();
+      if(e.key === 'ArrowLeft')  step(-1);
+      if(e.key === 'ArrowRight') step(1);
+    });
+
+  })();
+</script>
+
+<script>
+  // ---- room catalogue: powers the "Choose your room" cards + the shared details drawer ----
+  (function(){
+    const $ = id => document.getElementById(id);
+    const fmt = n => '₹' + n.toLocaleString('en-IN');
+    const nightsNow = () => { const m = ($('nightsVal').textContent||'').match(/\d+/); return m ? +m[0] : 3; };
+    const FLEX_ADD = 1800;   // free cancellation, per night
+    const BREAKFAST = 1500;  // per night
+    const COMMON_AMEN = ['Mohandas Arjundas bedding & pillow menu','Forest Essentials Ayurvedic bath products',
+      'Dark-wood furnishings & Goan tiles','24-hour personalised service','Free in-room WiFi',
+      'Twice-daily housekeeping','Air-conditioning & smart TV'];
+
+    const ROOMS = [
+      {key:'villa', name:'Villa Room', badge:'Best value', meta:'Guest room · 1 King · Garden view',
+       base:18500, why:null, extra:'Private balcony / veranda',
+       chips:['Garden view','King bed','56 m²','Private balcony','Sleeps 3'],
+       desc:"Set among the resort's 56 acres of gardens, the Villa Room opens to a private balcony or veranda wrapped in greenery, with dark-wood furnishings and hand-painted Goan tiles.",
+       imgs:[{src:'images/gv-01-bedroom.png',alt:'Garden-view room with twin beds'},
+             {src:'images/gv-02-balcony.png',alt:'Private balcony overlooking the garden'},
+             {src:'images/gv-03-bathroom.png',alt:'Bathroom with soaking tub and rain shower'},
+             {src:'images/gv-04-exterior.png',alt:'Goan-Portuguese villa block exterior'}]},
+      {key:'deluxe', name:'Deluxe Room', badge:'', meta:'Guest room · 1 King · Sea view',
+       base:23500, why:{amt:5000, points:['Arabian Sea view']}, extra:'Arabian Sea view',
+       chips:['Sea view','King bed','56 m²','Veranda','Sleeps 3'],
+       desc:"A sea-facing room in the low-rise blocks, with an Arabian Sea outlook from a private veranda and the same generous 56 m² layout.",
+       imgs:[{src:'images/sv-01-bedroom.png',alt:'Deluxe Sea View Room'},
+             {src:'images/sv-02-living.png',alt:'Bedroom with lounge seating'},
+             {src:'images/sv-03-bathroom.png',alt:'Bathroom with hand-painted blue Goan tiles'},
+             {src:'images/sv-04-bath-robes.png',alt:'Marble vanity and soaking tub'}]},
+      {key:'premium', name:'Premium Room', badge:'', meta:'Guest room · 1 King · Sea view',
+       base:27000, why:{amt:3500, points:['Better sea aspect']}, extra:'Preferred sea aspect',
+       chips:['Sea view','King bed','59 m²','Balcony','Sleeps 3'],
+       desc:"A larger sea-view category on a preferred aspect, with enhanced furnishings and a private balcony framing the palms and sea.",
+       imgs:[{src:'images/pr-01-bedroom.png',alt:'Premium Room with sea-facing balcony'},
+             {src:'images/pr-02-living.png',alt:'Lounge area opening to the veranda'},
+             {src:'images/pr-03-bathroom.png',alt:'Marble bathroom with soaking tub'}]},
+      {key:'plunge', name:'Villa Room with Plunge Pool', badge:'', meta:'Villa · 1 King · Private plunge pool',
+       base:34000, why:{amt:7000, points:['Private plunge pool','Outdoor shower','Secluded villa']},
+       extra:'Private plunge pool & outdoor shower',
+       chips:['Garden view','King bed','56 m²','Private plunge pool','Sleeps 3'],
+       desc:"Part of a secluded two-room unit, this villa comes with its own private plunge pool, outdoor shower and luxurious outdoor seating.",
+       imgs:[{src:'images/pp-01-exterior.png',alt:'Villa exterior with private plunge pool'},
+             {src:'images/pp-02-bedroom.png',alt:'Bedroom with vaulted ceiling'},
+             {src:'images/pp-03-living.png',alt:'Living area opening to the pool terrace'},
+             {src:'images/pp-04-bathroom.png',alt:'Bathroom with soaking tub and rain shower'},
+             {src:'images/pp-05-pool.png',alt:'Private plunge pool at dusk'}]},
+      {key:'junior', name:'Junior Suite', badge:'', meta:'Suite · 1 King · Sea view',
+       base:42000, why:{amt:8000, points:['Much larger — 93 m²','Separate living area']}, extra:'Separate living area',
+       chips:['Sea view','King bed','93 m²','Living area','Sleeps 3'],
+       desc:"A one-bedroom suite with a separate living area, generous at 93 m² and finished with Goan-Portuguese detailing.",
+       imgs:[{src:'images/js-01-bedroom.png',alt:'Junior Suite bedroom with lounge seating'},
+             {src:'images/js-02-living.png',alt:'Separate living area with daybed'},
+             {src:'images/js-03-bathroom.png',alt:'Bathroom with soaking tub and hand-painted tiles'}]},
+      {key:'luxury', name:'Luxury Suite', badge:'', meta:'Suite · 1 King · Sea view',
+       base:58000, why:{amt:16000, points:['Larger — 115 m²','Living & dining area']}, extra:'Living & dining area',
+       chips:['Sea view','King bed','115 m²','Living + dining','Sleeps 3'],
+       desc:"An expansive 115 m² suite with a large living and dining area and sweeping sea views — top-tier finishes throughout.",
+       imgs:[{src:'images/ls-01-bedroom.png',alt:'Luxury Suite bedroom with sea-facing balcony'},
+             {src:'images/ls-02-living.png',alt:'Living and dining area with sea view'},
+             {src:'images/ls-03-bathroom.png',alt:'Twin-vanity bathroom with soaking tub'}]},
+      {key:'presidential', name:'Presidential Villa', badge:'', meta:'Villa · 2 bedrooms · Private pool',
+       base:145000, why:{amt:87000, points:['Private garden & plunge pool','Two-bedroom residence']},
+       extra:'Private garden, plunge pool & butler service',
+       chips:['Garden view','2 bedrooms','164 m²','Private pool + garden','Sleeps 4'],
+       desc:"A two-bedroom standalone residence — the most exclusive on the property — with its own private garden and plunge pool.",
+       imgs:[{src:'images/pv-01-exterior.png',alt:'Presidential Villa exterior at dusk'},
+             {src:'images/pv-02-living.png',alt:'Living and dining room'},
+             {src:'images/pv-03-bedroom-a.png',alt:'Master bedroom opening to the garden'},
+             {src:'images/pv-04-bedroom-b.png',alt:'Second bedroom with veranda'},
+             {src:'images/pv-05-bathroom.png',alt:'Hand-painted bathroom with soaking tub'},
+             {src:'images/pv-06-pool.png',alt:'Private plunge pool'}]}
+    ];
+    const ROOM_BY = {}; ROOMS.forEach(r=>ROOM_BY[r.key]=r);
+
+    /* ---------- room cards ---------- */
+    const scroll = $('roomsScroll');
+    const syncers = [];
+    ROOMS.forEach(r=>{
+      const N = nightsNow();
+      const el = document.createElement('article');
+      el.className = 'rcard';
+      el.innerHTML =
+        '<div class="rc-photo">'+
+          '<img class="rc-img" src="'+r.imgs[0].src+'" alt="'+r.imgs[0].alt+'">'+
+          (r.badge ? '<span class="rc-badge">'+r.badge+'</span>' : '')+
+          '<button class="rc-nav rc-prev" aria-label="Previous photo">&#8249;</button>'+
+          '<button class="rc-nav rc-next" aria-label="Next photo">&#8250;</button>'+
+          '<span class="rc-count"><span class="rc-now">1</span> / '+r.imgs.length+'</span>'+
+        '</div>'+
+        '<div class="rc-body">'+
+          '<h3 class="rc-name">'+r.name+'</h3>'+
+          '<div class="rc-meta">'+r.meta+'</div>'+
+          (r.why ? '<div class="rc-why"><h5>Why +'+fmt(r.why.amt)+'/night</h5><ul>'+
+             r.why.points.map(p=>'<li>'+p+'</li>').join('')+'</ul></div>' : '')+
+          '<div class="rc-foot">'+
+            '<div class="rc-price-row">'+
+              '<div class="rc-price"><b class="rc-nightly">'+fmt(r.base)+'</b> <small>/ night</small></div>'+
+              '<div class="rc-total"><b class="rc-tot">'+fmt(r.base*N)+'</b>'+
+                '<span class="rc-totlbl">total · '+N+' night'+(N>1?'s':'')+'</span></div>'+
+            '</div>'+
+            '<div class="rc-cta">'+
+              '<button class="rc-book">Book now</button>'+
+            '</div>'+
+            '<label class="rc-opt"><input type="checkbox" class="rc-flex"> Free cancellation · +₹1,800/night</label>'+
+          '</div>'+
+        '</div>';
+
+      // per-card carousel
+      let ci = 0;
+      const img = el.querySelector('.rc-img'), now = el.querySelector('.rc-now');
+      const go = n => { ci=(n+r.imgs.length)%r.imgs.length; img.src=r.imgs[ci].src; img.alt=r.imgs[ci].alt; now.textContent=ci+1; };
+      el.querySelector('.rc-prev').addEventListener('click', e=>{ e.stopPropagation(); go(ci-1); });
+      el.querySelector('.rc-next').addEventListener('click', e=>{ e.stopPropagation(); go(ci+1); });
+
+      // live price (free-cancellation toggle + stay length)
+      const nightlyEl = el.querySelector('.rc-nightly'), totEl = el.querySelector('.rc-tot'),
+            totLbl = el.querySelector('.rc-totlbl'), flex = el.querySelector('.rc-flex');
+      const sync = () => {
+        const nn = nightsNow();
+        const nightly = r.base + (flex.checked ? FLEX_ADD : 0);
+        nightlyEl.textContent = fmt(nightly);
+        totEl.textContent = fmt(nightly*nn);
+        totLbl.textContent = 'total · '+nn+' night'+(nn>1?'s':'');
+      };
+      flex.addEventListener('change', sync);
+      syncers.push(sync);
+
+      el.querySelector('.rc-name').addEventListener('click', ()=>openRoom(r.key));
+      el.querySelector('.rc-book').addEventListener('click', ()=>{ location.href='checkout.html'; });
+      scroll.appendChild(el);
+    });
+
+    /* ---------- shared details drawer (multi-room) ---------- */
+    const scrim = $('scrim'), drawer = $('drawer');
+    let dr = null;  // {r, i, flex, breakfast}
+
+    function drShow(n){
+      dr.i = (n + dr.r.imgs.length) % dr.r.imgs.length;
+      $('drImg').src = dr.r.imgs[dr.i].src; $('drImg').alt = dr.r.imgs[dr.i].alt;
+      $('drNow').textContent = dr.i + 1;
+      document.querySelectorAll('#drThumbs .dr-thumb').forEach((t,k)=>t.classList.toggle('active',k===dr.i));
+    }
+    function renderDrawerPrice(){
+      if(!dr) return;
+      const N = nightsNow();
+      const nightly = dr.r.base + (dr.flex ? FLEX_ADD : 0);
+      const total = nightly*N + (dr.breakfast ? BREAKFAST*N : 0);
+      $('drPrice').textContent = fmt(nightly);
+      $('drTotal').textContent = fmt(total) + ' total · ' + N + ' night' + (N>1?'s':'');
+    }
+    function openRoom(key){
+      const r = ROOM_BY[key]; if(!r) return;
+      dr = {r, i:0, flex:false, breakfast:false};
+      $('drName').textContent = r.name;
+      const badge = $('drBadge') || document.querySelector('#drTitle .dr-badge');
+      if(badge){ if(r.badge){ badge.hidden=false; badge.textContent=r.badge; } else badge.hidden=true; }
+      // gallery
+      $('drTot').textContent = r.imgs.length;
+      const tw = $('drThumbs'); tw.innerHTML='';
+      r.imgs.forEach((im,k)=>{
+        const b=document.createElement('button'); b.type='button'; b.className='dr-thumb'+(k===0?' active':'');
+        b.innerHTML='<img src="'+im.src+'" alt="">'; b.addEventListener('click',()=>drShow(k)); tw.appendChild(b);
+      });
+      drShow(0);
+      $('drChips').innerHTML = r.chips.map(c=>'<span class="dr-chip">'+c+'</span>').join('');
+      $('drDesc').textContent = r.desc;
+      // reset config: non-refundable, no breakfast
+      document.querySelector('input[name=cancel][value=nonref]').checked = true;
+      $('drBreakfast').checked = false;
+      $('drAmen').innerHTML = [r.extra, ...COMMON_AMEN].map(a=>'<li>'+a+'</li>').join('');
+      $('drAmen').hidden = true; $('drAmenToggle').setAttribute('aria-expanded','false');
+      renderDrawerPrice();
+      scrim.classList.add('open'); drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden'; $('drClose').focus();
+    }
+    function closeDrawer(){
+      scrim.classList.remove('open'); drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    // the booking-module "selected room" card jumps to the room choices below
+    const selCard = $('roomCard');
+    if(selCard) selCard.addEventListener('click', ()=>{
+      const t = document.getElementById('rooms');
+      if(t) t.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+
+    $('drClose').addEventListener('click', closeDrawer);
+    scrim.addEventListener('click', closeDrawer);
+    $('drPrev').addEventListener('click', ()=>drShow(dr.i-1));
+    $('drNext').addEventListener('click', ()=>drShow(dr.i+1));
+    $('drBreakfast').addEventListener('change', e=>{ if(dr){ dr.breakfast=e.target.checked; renderDrawerPrice(); } });
+    document.querySelectorAll('input[name=cancel]').forEach(radio =>
+      radio.addEventListener('change', e=>{ if(dr){ dr.flex=(e.target.value==='flex'); renderDrawerPrice(); } }));
+    $('drAmenToggle').addEventListener('click', ()=>{
+      const willOpen = $('drAmen').hidden;
+      $('drAmen').hidden = !willOpen;
+      $('drAmenToggle').setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    });
+    $('drBook').addEventListener('click', ()=>{ location.href='checkout.html'; });
+    document.addEventListener('keydown', e=>{
+      if(!drawer.classList.contains('open')) return;
+      if(e.key === 'Escape') closeDrawer();
+      if(e.key === 'ArrowLeft')  drShow(dr.i-1);
+      if(e.key === 'ArrowRight') drShow(dr.i+1);
+    });
+
+    // keep card totals + open drawer in sync when the stay length changes
+    window.refreshRoomPrices = () => { syncers.forEach(fn=>fn()); if(drawer.classList.contains('open')) renderDrawerPrice(); };
+  })();
+</script>
+
+<script>
+  // ---- reviews: filter pills, carousel arrows, see-all drawer, accordion ----
+  (function(){
+    const pills = document.querySelectorAll('#pills .pill');
+    const cards = document.querySelectorAll('#revgrid .rcard');
+    pills.forEach(p => p.addEventListener('click', () => {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      const f = p.dataset.f;
+      cards.forEach(c => {
+        const tags = (c.dataset.tags || '').split(',');
+        c.style.display = (f === 'all' || tags.includes(f)) ? '' : 'none';
+      });
+    }));
+
+    // carousel arrows
+    const revTrack = document.getElementById('revgrid');
+    const revStep = () => { const card = revTrack.querySelector('.rcard'); return card ? card.offsetWidth + 18 : 330; };
+    document.getElementById('revPrev').addEventListener('click', ()=>revTrack.scrollBy({left:-revStep()*2, behavior:'smooth'}));
+    document.getElementById('revNext').addEventListener('click', ()=>revTrack.scrollBy({left: revStep()*2, behavior:'smooth'}));
+
+    // see-all reviews drawer
+    const revScrim = document.getElementById('revScrim');
+    const revDrawer = document.getElementById('revDrawer');
+    const revListBody = document.getElementById('revListBody');
+    const revSearch = document.getElementById('revSearch');
+    const revNoResult = document.createElement('div');
+    revNoResult.className = 'rev-noresult'; revNoResult.hidden = true;
+    function filterReviews(){
+      const q = revSearch.value.trim().toLowerCase();
+      let shown = 0;
+      revListBody.querySelectorAll('.rev-list-item').forEach(it => {
+        const match = !q || it.textContent.toLowerCase().includes(q);
+        it.style.display = match ? '' : 'none';
+        if(match) shown++;
+      });
+      revNoResult.hidden = shown > 0;
+      revNoResult.textContent = 'No reviews mention “' + revSearch.value.trim() + '”';
+    }
+    function buildReviewList(){
+      revListBody.innerHTML = '';
+      cards.forEach(c => {
+        const rs = c.querySelector('.rs');
+        const stay = c.querySelector('.rstay');
+        const item = document.createElement('div');
+        item.className = 'rev-list-item';
+        item.innerHTML =
+          '<div class="rli-head"><div>'+
+            '<div class="name">'+c.querySelector('.name').textContent+'</div>'+
+            '<div class="type">'+c.querySelector('.type').textContent+'</div>'+
+          '</div><div class="rs'+(rs.classList.contains('low')?' low':'')+'">'+rs.textContent+'</div></div>'+
+          (stay ? '<div class="rstay">'+stay.innerHTML+'</div>' : '')+
+          '<p>'+c.querySelector('p').textContent+'</p>'+
+          '<div class="tags">'+c.querySelector('.tags').innerHTML+'</div>';
+        revListBody.appendChild(item);
+      });
+      revListBody.appendChild(revNoResult);
+    }
+    function openRevDrawer(){
+      buildReviewList();
+      revSearch.value = '';
+      filterReviews();
+      revScrim.classList.add('open'); revDrawer.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('revDrClose').focus();
+    }
+    function closeRevDrawer(){
+      revScrim.classList.remove('open'); revDrawer.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    revSearch.addEventListener('input', filterReviews);
+    document.getElementById('seeAll').addEventListener('click', openRevDrawer);
+    document.getElementById('revDrClose').addEventListener('click', closeRevDrawer);
+    revScrim.addEventListener('click', closeRevDrawer);
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && revDrawer.classList.contains('open')) closeRevDrawer(); });
+
+    // accordion
+    document.querySelectorAll('#acc .item button').forEach(b => {
+      b.addEventListener('click', () => b.parentElement.classList.toggle('open'));
+    });
+  })();
+</script>
+
+</body>
+</html>
