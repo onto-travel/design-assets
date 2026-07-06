@@ -711,8 +711,6 @@
 <body>
 
 <!-- hotel switcher (mockup only) -->
-<script src="tabs.js"></script>
-
 <!-- ================= TOP NAV ================= -->
 <nav class="topnav">
   <div class="topnav-in">
@@ -1359,7 +1357,9 @@
     const MAXG   = 9;
 
     // each person is {companion:id}  OR  {auto:true, em, name, custom?}
-    const party = { adults:[{companion:'you'},{companion:'wife'}], children:[{companion:'kid'}], infants:[] };
+    let party;
+    try{ party = JSON.parse(sessionStorage.getItem('searchGuests')); }catch(e){}
+    if(!party || !party.adults) party = { adults:[{companion:'you'},{companion:'wife'}], children:[{companion:'kid'}], infants:[] };
     const funN  = { adults:0, children:0, infants:0 };
 
     window.PARTY = window.PARTY || { guests: 3 };
@@ -1452,6 +1452,7 @@
     }
 
     function apply(){
+      try{ sessionStorage.setItem('searchGuests', JSON.stringify(party)); }catch(e){}
       window.PARTY.guests = occ();
       if(window.refreshPricing) window.refreshPricing();
       CATS.forEach(cat=>{ const el=$(COUNT[cat]); if(el) el.textContent = party[cat].length; });
@@ -1500,6 +1501,10 @@
 
     let checkIn  = new Date(2026,6,10);
     let checkOut = new Date(2026,6,13);
+    // shared search dates carried from the homepage (and back)
+    try{ const _sd = JSON.parse(sessionStorage.getItem('searchDates'));
+      if(_sd && _sd.ci && _sd.co){ checkIn = new Date(_sd.ci[0],_sd.ci[1],_sd.ci[2]); checkOut = new Date(_sd.co[0],_sd.co[1],_sd.co[2]); } }catch(e){}
+    if(checkOut <= checkIn){ checkOut = addDays(checkIn,1); }
     if(checkIn < MIN){ checkIn = MIN; checkOut = addDays(MIN,3); }
     let view = new Date(checkIn.getFullYear(), checkIn.getMonth(), 1);
     let picking = 'in';
@@ -1562,6 +1567,12 @@
         : 'Select check-out';
     }
 
+    function saveDates(){
+      try{ sessionStorage.setItem('searchDates', JSON.stringify({
+        ci:[checkIn.getFullYear(),checkIn.getMonth(),checkIn.getDate()],
+        co:[checkOut.getFullYear(),checkOut.getMonth(),checkOut.getDate()]
+      })); }catch(e){}
+    }
     function pick(d){
       if(picking==='in'){
         checkIn = d;
@@ -1572,7 +1583,7 @@
         else checkOut = d;
         picking = 'in';
       }
-      renderChip(); renderCal();
+      renderChip(); renderCal(); saveDates();
     }
 
     function open(){

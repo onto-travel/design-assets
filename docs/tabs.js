@@ -2,10 +2,10 @@
 // Single source of truth for all hotel tabs. Rename here once and every page updates.
 (function () {
   const HOTELS = [
-    { f: 'hotel-firstfold.html', n: 'Logged in' },
-    { f: 'hotel-firstfold-loggedout.html', n: 'Logged out' },
+    { f: 'home.html', n: 'Logged in' },
+    { f: 'home-loggedout.html', n: 'Logged out' },
   ];
-  const here = location.pathname.split('/').pop() || 'hotel-firstfold.html';
+  const here = location.pathname.split('/').pop() || 'home.html';
 
   const css = `
     .hoteltabs{position:fixed;top:0;left:0;width:112px;height:100vh;z-index:60;box-sizing:border-box;

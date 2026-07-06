@@ -606,8 +606,6 @@
 <body>
 
 <!-- hotel switcher (mockup only) -->
-<script src="tabs.js"></script>
-
 <!-- ================= TOP NAV ================= -->
 <nav class="topnav">
   <div class="topnav-in">
@@ -1129,9 +1127,24 @@
     }, 2200);
   }
 
-  // ---- CTAs: primary → checkout, secondary → wishlist ----
-  document.getElementById('bookNow').addEventListener('click',
-    () => { location.href = 'checkout.html#cart'; });
+  // ---- CTAs: primary → straight to the payment gateway (skip the review screen) ----
+  // snapshot the live booking the way the review screen used to, then go to payment
+  window.goToPayment = function(){
+    const t = sel => { const el = document.querySelector(sel); return el ? el.textContent.trim() : ''; };
+    const booking = {
+      hotel:  'Taj Exotica Resort & Spa',
+      place:  'Benaulim Beach · Goa, India',
+      dates:  t('#dateVal'),
+      nights: t('#nightsVal'),
+      guests: t('#guestVal'),
+      guestSub: t('#guestSub'),
+      room:   t('#roomCard .sr-name') || 'Villa Room',
+      amount: t('#bkTotal') || '₹55,500'
+    };
+    try { sessionStorage.setItem('booking', JSON.stringify(booking)); } catch(e){}
+    location.href = 'razorpay.html';
+  };
+  document.getElementById('bookNow').addEventListener('click', () => window.goToPayment());
   document.getElementById('addTrip').addEventListener('click', function(){
     const on = this.classList.toggle('on');
     this.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -1166,7 +1179,9 @@
     const MAXG   = 9;
 
     // each person is {companion:id}  OR  {auto:true, em, name, custom?}
-    const party = { adults:[{companion:'you'},{companion:'wife'}], children:[{companion:'kid'}], infants:[] };
+    let party;
+    try{ party = JSON.parse(sessionStorage.getItem('searchGuests')); }catch(e){}
+    if(!party || !party.adults) party = { adults:[{companion:'you'},{companion:'wife'}], children:[{companion:'kid'}], infants:[] };
     const funN  = { adults:0, children:0, infants:0 };
 
     window.PARTY = window.PARTY || { guests: 3 };
@@ -1279,6 +1294,7 @@
     }
 
     function apply(){
+      try{ sessionStorage.setItem('searchGuests', JSON.stringify(party)); }catch(e){}
       window.PARTY.guests = occ();
       if(window.refreshPricing) window.refreshPricing();
       CATS.forEach(cat=>{ const el=$(COUNT[cat]); if(el) el.textContent = party[cat].length; });
@@ -1327,6 +1343,10 @@
 
     let checkIn  = new Date(2026,6,10);
     let checkOut = new Date(2026,6,13);
+    // shared search dates carried from the homepage (and back)
+    try{ const _sd = JSON.parse(sessionStorage.getItem('searchDates'));
+      if(_sd && _sd.ci && _sd.co){ checkIn = new Date(_sd.ci[0],_sd.ci[1],_sd.ci[2]); checkOut = new Date(_sd.co[0],_sd.co[1],_sd.co[2]); } }catch(e){}
+    if(checkOut <= checkIn){ checkOut = addDays(checkIn,1); }
     if(checkIn < MIN){ checkIn = MIN; checkOut = addDays(MIN,3); }
     let view = new Date(checkIn.getFullYear(), checkIn.getMonth(), 1);
     let picking = 'in';
@@ -1389,6 +1409,12 @@
         : 'Select check-out';
     }
 
+    function saveDates(){
+      try{ sessionStorage.setItem('searchDates', JSON.stringify({
+        ci:[checkIn.getFullYear(),checkIn.getMonth(),checkIn.getDate()],
+        co:[checkOut.getFullYear(),checkOut.getMonth(),checkOut.getDate()]
+      })); }catch(e){}
+    }
     function pick(d){
       if(picking==='in'){
         checkIn = d;
@@ -1399,7 +1425,7 @@
         else checkOut = d;
         picking = 'in';
       }
-      renderChip(); renderCal();
+      renderChip(); renderCal(); saveDates();
     }
 
     function open(){
@@ -1702,7 +1728,7 @@
 
       el.dataset.key = r.key;
       el.querySelector('.rc-name').addEventListener('click', e=>{ e.stopPropagation(); openRoom(r.key); });
-      el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); location.href='checkout.html#cart'; });
+      el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); window.goToPayment(); });
       // click anywhere else on the card (beige body or photo) → preview this room in the first fold
       el.addEventListener('click', e=>{
         if(e.target.closest('.rc-book, .rc-nav, .rc-name')) return;
@@ -1791,7 +1817,7 @@
       $('drAmen').hidden = !willOpen;
       $('drAmenToggle').setAttribute('aria-expanded', willOpen ? 'true' : 'false');
     });
-    $('drBook').addEventListener('click', ()=>{ location.href='checkout.html#cart'; });
+    $('drBook').addEventListener('click', ()=>{ window.goToPayment(); });
     document.addEventListener('keydown', e=>{
       if(!drawer.classList.contains('open')) return;
       if(e.key === 'Escape') closeDrawer();

@@ -148,7 +148,7 @@
   .validate{margin-top:22px;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
   .vd-score{display:flex;align-items:baseline;flex-wrap:wrap;font-size:14px;margin:0 0 13px;}
   .vd-rev-num{font-family:Georgia,serif;font-size:23px;font-weight:700;color:#2a7d5f;line-height:1;}
-  .vd-rev-slash{font-size:13px;color:var(--muted);font-weight:600;margin:0 9px 0 2px;}
+  .vd-rev-slash{font-size:13px;color:var(--muted);font-weight:600;margin:0 9px 0 9px;}
   .vd-rev-count{font-size:13.5px;color:var(--muted);}
   .vd-rev-count::before{content:"· ";}
   .vd-chips{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0;padding:0;}
@@ -637,8 +637,6 @@
 <body>
 
 <!-- hotel switcher (mockup only) -->
-<script src="tabs.js"></script>
-
 <!-- ================= TOP NAV ================= -->
 <nav class="topnav">
   <div class="topnav-in">
@@ -760,7 +758,7 @@
 
       <!-- ===== 3. DECISION VALIDATION (reassurance) ===== -->
       <div class="validate">
-        <div class="vd-score" id="relScore"><b class="vd-rev-num">8.7</b><span class="vd-rev-slash">/10</span><span class="vd-rev-count">1,284 guest reviews</span></div>
+        <div class="vd-score" id="relScore"><b class="vd-rev-num">94%</b><span class="vd-rev-slash">of guests recommend it</span></div>
         <div id="relGroups"></div>
       </div>
     </div>
@@ -1285,8 +1283,7 @@
       $('guestSub').textContent = heads()+' guest'+(heads()===1?'':'s');
       // logged out: no personalisation yet — show the property's guest-review
       // score instead of a "% match", plus generic highlight chips
-      scoreEl.innerHTML = '<b class="vd-rev-num">8.7</b><span class="vd-rev-slash">/10</span>'
-        + '<span class="vd-rev-count">1,284 guest reviews</span>';
+      scoreEl.innerHTML = '<b class="vd-rev-num">94%</b><span class="vd-rev-slash">of guests recommend it</span>';
       relGroups.innerHTML = '<ul class="vd-chips">'
         + ['Beachfront setting','Standout service','6 restaurants','Lush gardens'].map(c=>chipLi(c)).join('')
         + '</ul>';
@@ -1954,7 +1951,24 @@
     // hand off to the (mock) Google login flow; it returns the user to the
     // destination we stash here once "authentication" completes
     document.getElementById('authGoogle').addEventListener('click', () => {
-      const dest = authIntent === 'book' ? 'checkout.html#cart' : 'hotel-firstfold.html';
+      let dest = 'hotel-firstfold.html';
+      if(authIntent === 'book'){
+        // snapshot the live booking so the confirmation page has data, then
+        // send the freshly signed-up user straight to the booking-confirmed screen
+        const t = sel => { const el = document.querySelector(sel); return el ? el.textContent.trim() : ''; };
+        const booking = {
+          hotel:  'Taj Exotica Resort & Spa',
+          place:  'Benaulim Beach · Goa, India',
+          dates:  t('#dateVal'),
+          nights: t('#nightsVal'),
+          guests: t('#guestVal'),
+          guestSub: t('#guestSub'),
+          room:   t('#roomCard .sr-name') || 'Villa Room',
+          amount: t('#bkTotal') || '₹55,500'
+        };
+        try { sessionStorage.setItem('booking', JSON.stringify(booking)); } catch(e){}
+        dest = 'confirmed.html';
+      }
       try { sessionStorage.setItem('authReturn', dest); } catch(e){}
       location.href = 'google-login.html';
     });
