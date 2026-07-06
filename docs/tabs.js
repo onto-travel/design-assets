@@ -3,7 +3,7 @@
 (function () {
   const HOTELS = [
     { f: 'hotel-firstfold.html', n: 'Taj Exotica · First fold' },
-    { f: 'hotel-firstfold-app.html', n: 'Taj Exotica · App first fold' },
+    { f: 'hotel-firstfold-loggedout.html', n: 'Taj Exotica · Logged out' },
   ];
   const here = location.pathname.split('/').pop() || 'hotel-firstfold.html';
 

@@ -106,7 +106,8 @@
   .booking{margin-top:28px;}
 
   /* --- 3. DECISION VALIDATION: reassurance, faint outlined box --- */
-  .validate{margin-top:22px;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .validate{margin-top:auto;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .booking{margin-bottom:22px;}
   .vd-score{font-size:16px;font-weight:700;color:#2f5d47;margin:0 0 12px;}
   .vd-chips{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0;padding:0;}
   .vd-chips li{font-size:12.5px;color:#37423b;background:#eef2ee;border:1px solid #e0e7e0;border-radius:20px;padding:5px 11px;}
@@ -172,7 +173,7 @@
   .btn-ghost:hover{color:var(--navy);text-decoration:underline;}
 
   /* ---------- CHOOSE YOUR ROOM: horizontal row of vertical cards ---------- */
-  .rooms-wrap{padding-top:28px;padding-bottom:64px;}
+  .rooms-wrap{padding-top:28px;padding-bottom:24px;}
   .rooms-h{font-family:Georgia,serif;font-size:26px;letter-spacing:-.01em;margin:0 0 12px;color:var(--ink);}
   .rooms-scroll{display:flex;gap:20px;overflow-x:auto;padding:4px 2px 18px;scroll-snap-type:x proximity;}
   .rooms-scroll::-webkit-scrollbar{height:8px;}
@@ -625,22 +626,36 @@
   .co-edit{align-self:flex-start;margin-top:2px;background:none;border:none;color:var(--navy);
     font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;padding:2px 0;display:inline-flex;align-items:center;gap:5px;}
   .co-edit:hover{text-decoration:underline;}
-  .sum{margin-top:20px;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
-  .sum-top{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;
-    background:#faf7f1;border-bottom:1px solid var(--line);}
+  /* summary hero image with the hotel name overlaid */
+  .sum-hero{position:relative;border-radius:16px;overflow:hidden;height:152px;box-shadow:var(--shadow);}
+  .sum-hero img{width:100%;height:100%;object-fit:cover;display:block;}
+  .sum-hero::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(to top,rgba(20,16,26,.92) 0%,rgba(20,16,26,.55) 42%,rgba(20,16,26,.40) 72%,rgba(20,16,26,.52) 100%);}
+  .sum-hero-tx{position:absolute;left:20px;right:18px;bottom:16px;z-index:2;color:#fff;}
+  .sum-hero-tx .stars{color:#f0c66a;letter-spacing:3px;font-size:14px;line-height:1;margin-bottom:6px;}
+  .sum-hero-tx h1{font-family:Georgia,serif;font-size:27px;line-height:1.08;margin:0 0 6px;color:#fff;letter-spacing:-.01em;}
+  .sum-hero-tx .place{color:rgba(255,255,255,.86);font-weight:600;font-size:11.5px;letter-spacing:.09em;}
+
+  /* your-stay summary — icon per row */
+  .sum{margin-top:14px;}
+  .sum-top{display:flex;align-items:center;justify-content:space-between;padding:0 2px 8px;}
   .sum-top .sh{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
   .sum-top .sum-edit{background:none;border:none;color:var(--navy);font-weight:600;font-size:13px;
     cursor:pointer;font-family:inherit;padding:2px 0;}
   .sum-top .sum-edit:hover{text-decoration:underline;}
-  .sum-row{display:flex;gap:14px;padding:11px 16px;}
+  .sum-row{display:flex;gap:12px;align-items:center;padding:9px 2px;}
   .sum-row+.sum-row{border-top:1px solid #f1ede5;}
-  .sum-k{flex:0 0 82px;font-size:12.5px;color:var(--muted);padding-top:1px;}
-  .sum-v{font-size:14px;color:var(--ink);font-weight:600;}
+  .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f4efe6;color:#b3893f;
+    display:flex;align-items:center;justify-content:center;}
+  .sum-ic svg{width:18px;height:18px;}
+  .sum-c{flex:1;min-width:0;display:flex;align-items:baseline;gap:12px;justify-content:space-between;}
+  .sum-k{flex:none;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-v{flex:1;min-width:0;font-size:14px;color:var(--ink);font-weight:600;text-align:right;}
   .sum-v span{display:inline;font-weight:400;color:var(--muted);}
   .sum-v span:not(.av-title)::before{content:" · ";}
   .sum-v .av-title{font-weight:600;color:var(--ink);}
   .sum-row.removed .av-title{color:var(--muted);text-decoration:line-through;}
-  .sum-toggle{background:none;border:none;padding:0;font:inherit;color:var(--navy);cursor:pointer;
+  .sum-toggle{background:none;border:none;padding:0;font:inherit;color:var(--gold);cursor:pointer;font-weight:600;
     text-decoration:underline;text-underline-offset:2px;}
   .sum-toggle:hover{opacity:.75;}
   .policy{list-style:none;margin:16px 2px 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;}
@@ -648,11 +663,15 @@
   .policy li::before{content:"✓";position:absolute;left:0;top:0;color:var(--green);font-weight:700;}
   .policy li.off{color:var(--muted);}
   .policy li.off::before{content:"–";color:var(--muted);}
-  .co-price{margin-top:auto;text-align:right;}
-  .cp-amt{font-family:Georgia,serif;font-size:34px;font-weight:600;color:var(--ink);letter-spacing:-.015em;line-height:1;}
-  .cp-nights{font-size:14.5px;color:var(--muted);margin-top:8px;}
-  .tax-ok{margin-top:10px;font-size:12.5px;color:var(--muted);}
-  .tax-ok b{color:var(--green);font-weight:700;}
+  .co-price{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:#f4efe6;border:1px solid #ece3d2;border-radius:15px;padding:14px 20px;text-align:left;}
+  .cp-left{display:flex;flex-direction:column;gap:5px;}
+  .cp-nights{font-size:13px;color:var(--muted);}
+  .tax-ok{font-size:12.5px;color:#8a6a24;font-weight:600;}
+  .tax-ok b{color:#8a6a24;font-weight:700;}
+  .cp-right{text-align:right;}
+  .cp-amt{font-family:Georgia,serif;font-size:33px;font-weight:600;color:var(--ink);letter-spacing:-.015em;line-height:1;}
+  .cp-tot{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:7px;}
 
   /* ---------- BACK-RIGHT: DETAILS FORM ---------- */
   .form-h{font-family:Georgia,serif;font-size:26px;margin:8px 0 4px;letter-spacing:-.01em;}
@@ -741,9 +760,15 @@
         </div>
         <div class="face back">
           <div class="book">
-            <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <h1>Taj Exotica Resort &amp; Spa</h1>
-            <div class="place">BENAULIM BEACH · GOA, INDIA</div>
+            <!-- hero image with the hotel name overlaid -->
+            <div class="sum-hero">
+              <img src="images/04-pool-sunset.png" alt="Taj Exotica Resort &amp; Spa at sunset">
+              <div class="sum-hero-tx">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <h1>Taj Exotica Resort &amp; Spa</h1>
+                <div class="place">BENAULIM BEACH · GOA, INDIA</div>
+              </div>
+            </div>
 
             <!-- frozen booking summary (static) -->
             <div class="sum">
@@ -752,36 +777,41 @@
                 <button type="button" class="sum-edit" data-back>Edit</button>
               </div>
               <div class="sum-row">
-                <div class="sum-k">Check-in</div>
-                <div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div>
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Check-in</div><div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div></div>
               </div>
               <div class="sum-row">
-                <div class="sum-k">Check-out</div>
-                <div class="sum-v">Mon 13 Jul · 3 nights<span>12:00 PM</span></div>
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/><path d="M9 14.5l2 2 3.5-3.5"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Check-out</div><div class="sum-v">Mon 13 Jul · 3 nights<span>12:00 PM</span></div></div>
               </div>
               <div class="sum-row">
-                <div class="sum-k">Room</div>
-                <div class="sum-v">Villa Room · Garden view<span>56 m² · Sleeps 3</span></div>
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M3 18v2.5M21 18v2.5"/><path d="M3 15h18"/><path d="M6.5 12V9.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V12"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Room</div><div class="sum-v">Villa Room · Garden view<span>56 m² · Sleeps 3</span></div></div>
               </div>
               <div class="sum-row">
-                <div class="sum-k">Guests</div>
-                <div class="sum-v">You, Partner &amp; Kid<span>3 travellers</span></div>
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.5 20c.6-3.1 3-4.8 5.5-4.8s4.9 1.7 5.5 4.8"/><path d="M16.2 5.3a3 3 0 0 1 0 5.6M21 20c-.4-2.1-1.7-3.5-3.4-4.2"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Guests</div><div class="sum-v">You, Partner &amp; Kid<span>3 travellers</span></div></div>
               </div>
               <div class="sum-row" data-addon="cancel">
-                <div class="sum-k">Cancellation</div>
-                <div class="sum-v"><span class="av-title">Free till 9 July</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹5,400</button></span></div>
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Cancellation</div><div class="sum-v"><span class="av-title">Free till 9 July</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹5,400</button></span></div></div>
               </div>
               <div class="sum-row" data-addon="breakfast">
-                <div class="sum-k">Breakfast</div>
-                <div class="sum-v"><span class="av-title">Included</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹4,500</button></span></div>
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/><path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Breakfast</div><div class="sum-v"><span class="av-title">Included</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹4,500</button></span></div></div>
               </div>
             </div>
 
-            <!-- price block -->
+            <!-- price block: total in a filled box -->
             <div class="co-price">
-              <div class="cp-amt">₹55,500</div>
-              <div class="cp-nights">3 nights</div>
-              <div class="tax-ok"><b>✓</b> Taxes &amp; fees included</div>
+              <div class="cp-left">
+                <div class="cp-nights">3 nights · all-in</div>
+                <div class="tax-ok"><b>&#10003;</b> Taxes &amp; fees included</div>
+              </div>
+              <div class="cp-right">
+                <div class="cp-amt">₹55,500</div>
+                <div class="cp-tot">Total</div>
+              </div>
             </div>
 
           </div>
@@ -2061,9 +2091,10 @@
         f.querySelector('.flip-inner').style.height = 'auto';
         f.querySelectorAll('.face').forEach(fc => fc.style.position = 'relative');
       });
+      // both cards share one height (the tallest face); bottom-anchored blocks
+      // (details form's button, booking card's match box) fill any slack
       let max = 0;
       flips.forEach(f => f.querySelectorAll('.face').forEach(fc => max = Math.max(max, fc.offsetHeight)));
-      // restore absolute stacking and lock the shared height
       flips.forEach(f => {
         f.querySelectorAll('.face').forEach(fc => fc.style.position = '');
         f.querySelector('.flip-inner').style.height = '';

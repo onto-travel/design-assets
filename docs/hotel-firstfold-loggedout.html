@@ -215,7 +215,7 @@
   .btn-ghost:hover{color:var(--navy);text-decoration:underline;}
 
   /* ---------- CHOOSE YOUR ROOM: horizontal row of vertical cards ---------- */
-  .rooms-wrap{padding-top:28px;padding-bottom:64px;}
+  .rooms-wrap{padding-top:28px;padding-bottom:24px;}
   .rooms-h{font-family:Georgia,serif;font-size:26px;letter-spacing:-.01em;margin:0 0 12px;color:var(--ink);}
   .rooms-scroll{display:flex;gap:20px;overflow-x:auto;padding:4px 2px 18px;scroll-snap-type:x proximity;}
   .rooms-scroll::-webkit-scrollbar{height:8px;}
@@ -289,10 +289,6 @@
   .rev-head-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;}
   .seeall{background:none;border:none;color:var(--navy);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;padding:6px 0;white-space:nowrap;}
   .seeall:hover{text-decoration:underline;}
-  .rev-search{flex:none;padding:14px 26px;border-bottom:1px solid var(--line);position:relative;display:flex;align-items:center;}
-  .rev-search .rs-ic{position:absolute;left:38px;color:var(--muted);font-size:16px;transform:rotate(45deg);}
-  .rev-search input{width:100%;padding:11px 14px 11px 38px;border:1px solid var(--line);border-radius:10px;font-size:14.5px;font-family:inherit;background:#faf8f4;color:var(--ink);}
-  .rev-search input:focus{outline:none;border-color:var(--navy);background:#fff;}
   .rev-noresult{padding:30px 2px;color:var(--muted);font-size:15px;text-align:center;}
   .rev-list-item{padding:20px 2px;border-bottom:1px solid var(--line);}
   .rev-list-item:last-child{border-bottom:none;}
@@ -1065,10 +1061,6 @@
     <h3 id="revDrTitle">All reviews <span class="dr-badge" style="background:var(--navy)">8.7</span></h3>
     <button class="dr-close" id="revDrClose" aria-label="Close">&#10005;</button>
   </div>
-  <div class="rev-search">
-    <span class="rs-ic">&#9906;</span>
-    <input type="search" id="revSearch" placeholder="Search reviews — food, staff, beach, pool…" autocomplete="off">
-  </div>
   <div class="dr-body" id="revListBody"></div>
 </aside>
 
@@ -1155,7 +1147,7 @@
 
   // ---- CTAs: primary → checkout, secondary → wishlist ----
   document.getElementById('bookNow').addEventListener('click',
-    () => { window.openAuth(); });
+    () => { window.openAuth('book'); });
   document.getElementById('addTrip').addEventListener('click', function(){
     const on = this.classList.toggle('on');
     this.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -1701,7 +1693,7 @@
 
       el.dataset.key = r.key;
       el.querySelector('.rc-name').addEventListener('click', e=>{ e.stopPropagation(); openRoom(r.key); });
-      el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); window.openAuth(); });
+      el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); window.openAuth('book'); });
       // click anywhere else on the card (beige body or photo) → preview this room in the first fold
       el.addEventListener('click', e=>{
         if(e.target.closest('.rc-book, .rc-nav, .rc-name')) return;
@@ -1790,7 +1782,7 @@
       $('drAmen').hidden = !willOpen;
       $('drAmenToggle').setAttribute('aria-expanded', willOpen ? 'true' : 'false');
     });
-    $('drBook').addEventListener('click', ()=>{ window.openAuth(); });
+    $('drBook').addEventListener('click', ()=>{ window.openAuth('book'); });
     document.addEventListener('keydown', e=>{
       if(!drawer.classList.contains('open')) return;
       if(e.key === 'Escape') closeDrawer();
@@ -1828,20 +1820,6 @@
     const revScrim = document.getElementById('revScrim');
     const revDrawer = document.getElementById('revDrawer');
     const revListBody = document.getElementById('revListBody');
-    const revSearch = document.getElementById('revSearch');
-    const revNoResult = document.createElement('div');
-    revNoResult.className = 'rev-noresult'; revNoResult.hidden = true;
-    function filterReviews(){
-      const q = revSearch.value.trim().toLowerCase();
-      let shown = 0;
-      revListBody.querySelectorAll('.rev-list-item').forEach(it => {
-        const match = !q || it.textContent.toLowerCase().includes(q);
-        it.style.display = match ? '' : 'none';
-        if(match) shown++;
-      });
-      revNoResult.hidden = shown > 0;
-      revNoResult.textContent = 'No reviews mention “' + revSearch.value.trim() + '”';
-    }
     function buildReviewList(){
       revListBody.innerHTML = '';
       cards.forEach(c => {
@@ -1859,12 +1837,9 @@
           '<div class="tags">'+c.querySelector('.tags').innerHTML+'</div>';
         revListBody.appendChild(item);
       });
-      revListBody.appendChild(revNoResult);
     }
     function openRevDrawer(){
       buildReviewList();
-      revSearch.value = '';
-      filterReviews();
       revScrim.classList.add('open'); revDrawer.classList.add('open');
       document.body.style.overflow = 'hidden';
       document.getElementById('revDrClose').focus();
@@ -1873,7 +1848,6 @@
       revScrim.classList.remove('open'); revDrawer.classList.remove('open');
       document.body.style.overflow = '';
     }
-    revSearch.addEventListener('input', filterReviews);
     document.getElementById('seeAll').addEventListener('click', openRevDrawer);
     document.getElementById('revDrClose').addEventListener('click', closeRevDrawer);
     revScrim.addEventListener('click', closeRevDrawer);
@@ -1965,21 +1939,29 @@
       setTimeout(() => { scrim.hidden = true; }, 240);
       if(lastFocus) lastFocus.focus();
     }
-    // logged out: booking CTAs open this instead of proceeding to checkout
-    window.openAuth = open;
+    // remember why the popup was opened so we can return the user to the
+    // right place after login: 'signup' → hotel PDP, 'book' → checkout
+    let authIntent = 'signup';
+    // logged out: booking CTAs open this (intent 'book') instead of going to checkout
+    window.openAuth = (intent) => { authIntent = intent || 'signup'; open(); };
 
-    openBtn.addEventListener('click', open);
+    openBtn.addEventListener('click', () => { authIntent = 'signup'; open(); });
     closeBtn.addEventListener('click', close);
     scrim.addEventListener('click', e => { if(e.target === scrim) close(); });
     document.addEventListener('keydown', e => {
       if(e.key === 'Escape' && scrim.classList.contains('open')) close();
     });
 
-    // option handlers — stubs for now; wire to real auth later
+    // hand off to the (mock) Google login flow; it returns the user to the
+    // destination we stash here once "authentication" completes
+    document.getElementById('authGoogle').addEventListener('click', () => {
+      const dest = authIntent === 'book' ? 'checkout.html#cart' : 'hotel-firstfold.html';
+      try { sessionStorage.setItem('authReturn', dest); } catch(e){}
+      location.href = 'google-login.html';
+    });
+    // phone sign-in — stub for now
     document.getElementById('authPhone').addEventListener('click',
       () => alert('Phone number sign-in — coming soon'));
-    document.getElementById('authGoogle').addEventListener('click',
-      () => alert('Gmail sign-in — coming soon'));
   })();
 </script>
 
