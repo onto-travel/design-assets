@@ -726,7 +726,7 @@
 
       <!-- ===== 3. DECISION VALIDATION (reassurance) ===== -->
       <div class="validate">
-        <div class="vd-score" id="relScore">94% match for your trip</div>
+        <div class="vd-score" id="relScore">94% match for this trip</div>
         <div id="relGroups"></div>
       </div>
     </div>
@@ -1255,7 +1255,7 @@
       $('guestVal').textContent = nm.length ? joinNames(nm)+(extra>0?' +'+extra:'') : composition();
       $('guestSub').textContent = heads()+' guest'+(heads()===1?'':'s');
       const chosen = knownIn();
-      scoreEl.textContent = scoreFor(chosen, heads()) + '% match for your trip';
+      scoreEl.textContent = scoreFor(chosen, heads()) + '% match for this trip';
       const pills = [];
       chosen.forEach(c => pills.push(...c.fits));
       pills.push(...BASE_FITS);

@@ -146,11 +146,11 @@
 
   /* --- 3. DECISION VALIDATION: reassurance, faint outlined box --- */
   .validate{margin-top:22px;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
-  .vd-score{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;font-size:14px;margin:0 0 13px;}
-  .vd-rev-num{font-size:19px;font-weight:800;color:var(--navy);background:#eef2f7;border-radius:8px;
-    padding:2px 9px;letter-spacing:-.01em;}
-  .vd-rev-word{font-size:14.5px;font-weight:700;color:var(--ink);}
+  .vd-score{display:flex;align-items:baseline;flex-wrap:wrap;font-size:14px;margin:0 0 13px;}
+  .vd-rev-num{font-family:Georgia,serif;font-size:23px;font-weight:700;color:#2a7d5f;line-height:1;}
+  .vd-rev-slash{font-size:13px;color:var(--muted);font-weight:600;margin:0 9px 0 2px;}
   .vd-rev-count{font-size:13.5px;color:var(--muted);}
+  .vd-rev-count::before{content:"· ";}
   .vd-chips{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0;padding:0;}
   .vd-chips li{font-size:12.5px;color:#37423b;background:#eef2ee;border:1px solid #e0e7e0;border-radius:20px;padding:5px 11px;}
   .vd-chips li.spot{color:#8a6a24;background:#f7f0e0;border-color:#ebddbf;font-weight:600;}
@@ -695,8 +695,8 @@
               <span class="tc-v" id="dateVal">Fri 10 &ndash; Mon 13 Jul</span>
             </button>
             <button type="button" class="tripchip" id="guestChip" aria-haspopup="true" aria-expanded="false">
-              <span class="tc-k">Guests <span class="tc-cnt" id="guestSub">3 guests</span></span>
-              <span class="tc-v" id="guestVal">2 adults · 1 child</span>
+              <span class="tc-k">Guests <span class="tc-cnt" id="guestSub">2 guests</span></span>
+              <span class="tc-v" id="guestVal">2 adults</span>
             </button>
           </div>
 
@@ -725,7 +725,7 @@
               <div class="gp-people" id="adPeople"></div>
             </div>
             <div class="gp-catg">
-              <div class="gp-chead"><span class="gpc-name">Children</span><span class="gpc-sub">Age 2&ndash;12</span><span class="gpc-count" id="chCount">1</span><button type="button" class="gp-add" data-cat="children" aria-label="Add child">+</button></div>
+              <div class="gp-chead"><span class="gpc-name">Children</span><span class="gpc-sub">Age 2&ndash;12</span><span class="gpc-count" id="chCount">0</span><button type="button" class="gp-add" data-cat="children" aria-label="Add child">+</button></div>
               <div class="gp-people" id="chPeople"></div>
             </div>
             <div class="gp-catg">
@@ -760,7 +760,7 @@
 
       <!-- ===== 3. DECISION VALIDATION (reassurance) ===== -->
       <div class="validate">
-        <div class="vd-score" id="relScore">94% match for your trip</div>
+        <div class="vd-score" id="relScore"><b class="vd-rev-num">8.7</b><span class="vd-rev-slash">/10</span><span class="vd-rev-count">1,284 guest reviews</span></div>
         <div id="relGroups"></div>
       </div>
     </div>
@@ -1181,8 +1181,8 @@
     // logged out: anonymous guests only — fun placeholder names in the dropdown,
     // but the guests box outside falls back to the composition ("2 adults · 1 child")
     // each person is {companion:id}  OR  {auto:true, em, name, custom?}
-    const party = { adults:[{auto:true,em:EM.adults,name:FUN.adults[0]},{auto:true,em:EM.adults,name:FUN.adults[1]}], children:[{auto:true,em:EM.children,name:FUN.children[0]}], infants:[] };
-    const funN  = { adults:2, children:1, infants:0 };
+    const party = { adults:[{auto:true,em:EM.adults,name:FUN.adults[0]},{auto:true,em:EM.adults,name:FUN.adults[1]}], children:[], infants:[] };
+    const funN  = { adults:2, children:0, infants:0 };
 
     window.PARTY = window.PARTY || { guests: 3 };
     window.roomsNeeded = cap => Math.max(1, Math.ceil((window.PARTY.guests||1)/(cap||1)));
@@ -1283,10 +1283,9 @@
       const extra = heads() - nm.length;
       $('guestVal').textContent = nm.length ? joinNames(nm)+(extra>0?' +'+extra:'') : composition();
       $('guestSub').textContent = heads()+' guest'+(heads()===1?'':'s');
-      // logged out: no personalisation yet — show the property's guest-review score
-      // and generic highlights (no "% match" / "cost sweet spot" spot chip)
-      scoreEl.innerHTML = '<span class="vd-rev-num">8.7</span>'
-        + '<span class="vd-rev-word">Excellent</span>'
+      // logged out: no personalisation yet — show the property's guest-review
+      // score instead of a "% match", plus generic highlight chips
+      scoreEl.innerHTML = '<b class="vd-rev-num">8.7</b><span class="vd-rev-slash">/10</span>'
         + '<span class="vd-rev-count">1,284 guest reviews</span>';
       relGroups.innerHTML = '<ul class="vd-chips">'
         + ['Beachfront setting','Standout service','6 restaurants','Lush gardens'].map(c=>chipLi(c)).join('')

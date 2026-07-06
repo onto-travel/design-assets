@@ -683,6 +683,9 @@
     font-size:15px;font-family:inherit;background:#fff;color:var(--ink);transition:border-color .15s;}
   .fld input:hover{border-color:#c9c0ae;}
   .fld input:focus{outline:none;border-color:var(--navy);}
+  .fld-err{display:none;margin-top:6px;font-size:12.5px;color:#b0563d;}
+  .fld.invalid input,.fld.invalid input:focus{border-color:#b0563d;}
+  .fld.invalid .fld-err{display:block;}
   .confirm{width:100%;margin-top:10px;font-size:17px;padding:17px;letter-spacing:.005em;}
   .confirm[disabled]{background:var(--green);cursor:default;}
   .form-back{margin-top:16px;background:none;border:none;color:var(--muted);font-size:13.5px;
@@ -903,7 +906,7 @@
 
       <!-- ===== 3. DECISION VALIDATION (reassurance) ===== -->
       <div class="validate">
-        <div class="vd-score" id="relScore">94% match for your trip</div>
+        <div class="vd-score" id="relScore">94% match for this trip</div>
         <div id="relGroups"></div>
       </div>
     </div>
@@ -918,9 +921,11 @@
             <label class="fld"><span>Full name</span>
               <input type="text" id="fName" value="Anuj Sharma" autocomplete="name"></label>
             <label class="fld"><span>Email</span>
-              <input type="email" id="fEmail" value="anuj.sharma@email.com" autocomplete="email"></label>
+              <input type="email" id="fEmail" value="anuj.sharma@email.com" autocomplete="email" inputmode="email">
+              <small class="fld-err">Enter a valid email address (must include @).</small></label>
             <label class="fld"><span>Phone</span>
-              <input type="tel" id="fPhone" value="+91 98XXX XXXXX" autocomplete="tel"></label>
+              <input type="tel" id="fPhone" value="+91 98765 43210" autocomplete="tel" inputmode="numeric" maxlength="17">
+              <small class="fld-err">Enter a 10-digit phone number — digits only.</small></label>
 
             <div class="form-spacer"></div>
 
@@ -1457,7 +1462,7 @@
       $('guestVal').textContent = nm.length ? joinNames(nm)+(extra>0?' +'+extra:'') : composition();
       $('guestSub').textContent = heads()+' guest'+(heads()===1?'':'s');
       const chosen = knownIn();
-      scoreEl.textContent = scoreFor(chosen, heads()) + '% match for your trip';
+      scoreEl.textContent = scoreFor(chosen, heads()) + '% match for this trip';
       const pills = [];
       chosen.forEach(c => pills.push(...c.fits));
       pills.push(...BASE_FITS);
@@ -2138,7 +2143,30 @@
     });
 
     // confirm → hand off to the payment vendor (mock Razorpay), which returns to the confirmation screen
+    // ---- email + phone validation ----
+    const fEmail = $('fEmail'), fPhone = $('fPhone');
+    const emailOK = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim());
+    // strip an optional 91 / 0 prefix, then require exactly 10 digits
+    const phoneDigits = v => {
+      const d = (v||'').replace(/\D/g,'');
+      if(d.length === 12 && d.startsWith('91')) return d.slice(2);
+      if(d.length === 11 && d.startsWith('0'))  return d.slice(1);
+      return d;
+    };
+    const phoneOK = v => /^\d{10}$/.test(phoneDigits(v));
+    const setInvalid = (input, bad) => input.closest('.fld').classList.toggle('invalid', bad);
+    // block alphabets (and stray symbols) as the user types; clear the error state
+    fPhone.addEventListener('input', () => {
+      const cleaned = fPhone.value.replace(/[^\d+\s()\-]/g, '');
+      if(cleaned !== fPhone.value) fPhone.value = cleaned;
+      setInvalid(fPhone, false);
+    });
+    fEmail.addEventListener('input', () => setInvalid(fEmail, false));
+
     $('confirmBtn').addEventListener('click', () => {
+      const eBad = !emailOK(fEmail.value), pBad = !phoneOK(fPhone.value);
+      setInvalid(fEmail, eBad); setInvalid(fPhone, pBad);
+      if(eBad || pBad){ (eBad ? fEmail : fPhone).focus(); return; }
       const t = sel => { const el = document.querySelector(sel); return el ? el.textContent.trim() : ''; };
       const booking = {
         hotel:  'Taj Exotica Resort & Spa',
