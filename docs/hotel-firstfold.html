@@ -111,6 +111,11 @@
   .vd-chips{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0;padding:0;}
   .vd-chips li{font-size:12.5px;color:#37423b;background:#eef2ee;border:1px solid #e0e7e0;border-radius:20px;padding:5px 11px;}
   .vd-chips li.spot{color:#8a6a24;background:#f7f0e0;border-color:#ebddbf;font-weight:600;}
+  .vd-chips li.shot{cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding-left:9px;
+    transition:background .15s,border-color .15s;}
+  .vd-chips li.shot:hover{background:#e2ece2;border-color:#cfe0cf;}
+  .vd-chips li.shot:focus-visible{outline:2px solid #2a7d5f;outline-offset:1px;}
+  .chip-cam{width:13px;height:13px;flex:none;opacity:.8;}
 
   /* --- "your stay": two subtle filled cards (low contrast on white) --- */
   .trip{position:relative;}
@@ -383,30 +388,33 @@
   .rp-gphotos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
   .rp-gphotos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:block;}
   .rp-readall{width:100%;margin-top:18px;background:none;border:none;color:var(--navy);font-family:inherit;
-    font-size:14.5px;font-weight:600;cursor:pointer;padding:9px;transition:opacity .15s;}
+    font-size:14.5px;font-weight:600;cursor:pointer;padding:9px 0;text-align:left;transition:opacity .15s;}
   .rp-readall:hover{text-decoration:underline;}
 
   /* ---------- compact guest-review card on the hero photo (tagged photos only) ---------- */
   .hero-rev{
-    position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;align-items:center;gap:16px;
-    background:rgba(250,248,243,.4);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);
-    border-top:1px solid rgba(255,255,255,.35);padding:10px 18px;
+    position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;flex-direction:column;gap:11px;
+    padding:58px 22px 18px;color:#fff;
+    background:linear-gradient(to top,rgba(18,16,22,.93) 0%,rgba(18,16,22,.74) 36%,rgba(18,16,22,.34) 68%,rgba(18,16,22,0) 100%);
   }
   .hero-rev[hidden]{display:none;}
-  .hr-head{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:3px;}
-  .hr-score{flex:none;display:flex;align-items:baseline;gap:2px;font-family:Georgia,serif;color:#1f6b4e;font-weight:600;}
-  .hr-score b{font-size:22px;line-height:1;}
-  .hr-score span{font-size:11.5px;color:#5f5950;font-family:-apple-system,sans-serif;font-weight:600;}
-  .hr-tx h4{margin:0;font-size:13.5px;color:#3a3733;font-family:Georgia,serif;font-weight:600;}
-  .hr-tx p{margin:1px 0 0;font-size:11px;color:#5f5950;}
-  .hr-pills{flex:1 1 auto;display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:0;}
-  .hr-pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;color:#4a463f;
-    background:rgba(42,125,95,.09);border:1px solid rgba(42,125,95,.4);}
-  .hr-pill.neg{background:rgba(150,110,30,.12);border-color:rgba(150,110,30,.4);}
-  .hr-all{margin-left:3px;padding:0;border:none;background:none;white-space:nowrap;cursor:pointer;
-    color:#4a463f;font-family:inherit;font-size:12.5px;font-weight:600;
-    text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(74,70,63,.4);}
-  .hr-all:hover{text-decoration-color:#4a463f;}
+  .hr-head{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;}
+  .hr-score{flex:none;display:flex;align-items:baseline;gap:3px;font-family:Georgia,serif;color:#fff;font-weight:700;}
+  .hr-score b{font-size:30px;line-height:1;}
+  .hr-score span{font-size:14px;color:rgba(255,255,255,.7);font-family:-apple-system,sans-serif;font-weight:600;}
+  .hr-sub{font-size:13.5px;color:rgba(255,255,255,.82);}
+  .hr-sub b{font-weight:600;color:#fff;}
+  .hr-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0;}
+  .hr-pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;padding:7px 13px;
+    border-radius:11px;color:#ece9e1;background:rgba(72,82,66,.55);border:none;cursor:pointer;font-family:inherit;
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);transition:background .15s;}
+  .hr-pill:hover{background:rgba(84,95,77,.7);}
+  .hr-pill.neg{background:rgba(92,80,54,.55);color:#eae1d2;}
+  .hr-pill.neg:hover{background:rgba(106,92,62,.7);}
+  .hr-all{margin-left:4px;padding:0;border:none;background:none;white-space:nowrap;cursor:pointer;
+    color:#fff;font-family:inherit;font-size:13px;font-weight:600;transition:opacity .15s;
+    text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.45);}
+  .hr-all:hover{opacity:.78;}
 
   /* selectable room cards — click the body/photo to preview the room up top */
   #roomsScroll .rcard{cursor:pointer;}
@@ -1069,6 +1077,12 @@
   document.getElementById('nextBtn').addEventListener('click', e => { e.stopPropagation(); show(cur + 1); });
   thumbBtns.forEach(t => t.addEventListener('click', () => show(+t.dataset.i)));
 
+  // jump the gallery to a specific photo by src (used by the "match" chips)
+  window.showHeroPhoto = function(src){
+    const i = photos.findIndex(p => p.src === src);
+    if(i >= 0) show(i);
+  };
+
   // Swap the whole hero gallery to a selected room's photos (called from the room cards).
   // Bathroom / pool shots keep their review tag so the compact review bar still fires.
   window.setHeroRoom = function(imgs){
@@ -1161,7 +1175,27 @@
     const $ = id => document.getElementById(id);
     const pop = $('guestPop'), trigger = $('guestChip');
     const relGroups = $('relGroups'), scoreEl = $('relScore');
-    const chipLi = (t,spot)=>'<li'+(spot?' class="spot"':'')+'>'+t+'</li>';
+    // a few chips are "shots" — clicking them jumps the gallery to a matching photo
+    const CAM = '<svg class="chip-cam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h3l1.4-2h7.2L17 8.5h3v10H4z"/><circle cx="12" cy="13" r="3"/></svg>';
+    const CHIP_PHOTOS = {
+      'Beachfront':    'images/06-aerial-pool.png',
+      'Sunset dining': 'images/04-pool-sunset.png',
+      '6 restaurants': 'images/07-garden-view.png'
+    };
+    const chipLi = (t,spot)=>{
+      const src = CHIP_PHOTOS[t];
+      const cls = (spot?'spot':'') + (src?(spot?' ':'')+'shot':'');
+      return '<li'+(cls?' class="'+cls+'"':'')+(src?' data-src="'+src+'" role="button" tabindex="0"':'')+'>'+(src?CAM:'')+t+'</li>';
+    };
+    // click / keyboard on a shot chip → swap the hero photo
+    relGroups.addEventListener('click', e => {
+      const li = e.target.closest('li[data-src]');
+      if(li && window.showHeroPhoto){ window.showHeroPhoto(li.dataset.src);
+        document.getElementById('top').scrollIntoView({behavior:'smooth',block:'start'}); }
+    });
+    relGroups.addEventListener('keydown', e => {
+      if((e.key==='Enter'||e.key===' ') && e.target.closest('li[data-src]')){ e.preventDefault(); e.target.click(); }
+    });
     const joinNames = a => a.length<=1 ? (a[0]||'') : a.slice(0,-1).join(', ')+' & '+a[a.length-1];
     const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const heads = () => CATS.reduce((n,c)=>n+party[c].length,0);
@@ -1397,7 +1431,7 @@
       pool: {
         label:"Swimming pool", rating:"9.2", score:92, verdict:"Photos match what guests found", count:214,
         gphotos:["images/05-pool-day.png","images/04-pool-sunset.png","images/06-aerial-pool.png"],
-        keys:[{t:"Matches photos"},{t:"Vast & spotless"},{t:"Rarely crowded"},{t:"Sunset view"},{t:"Closes 7pm",neg:true}],
+        keys:[{t:"Matches photos",c:180},{t:"Vast & spotless",c:156},{t:"Rarely crowded",c:120},{t:"Sunset view",c:98},{t:"Closes 7pm",c:22,neg:true}],
         reviews:[
           {name:"Ananya R.", when:"Feb 2026", stars:5, tx:"The <mark>pool</mark> is exactly like the photos — huge, spotless, and the beach view at sunset is unreal."},
           {name:"Karan M.",  when:"Jan 2026", stars:4, tx:"Main <mark>pool</mark> is gorgeous and rarely crowded. Only downside is it closes a touch early at 7pm."},
@@ -1407,7 +1441,7 @@
       bathroom: {
         label:"Bathroom", rating:"7.8", score:78, verdict:"Mostly matches — a couple of gaps", count:96,
         gphotos:["images/03-bathroom.png","images/gv-03-bathroom.png","images/sv-03-bathroom.png"],
-        keys:[{t:"Marble & elegant"},{t:"Great rain shower"},{t:"Lovely products"},{t:"Tub smaller",neg:true},{t:"Dimmer lighting",neg:true}],
+        keys:[{t:"Marble & elegant",c:61},{t:"Great rain shower",c:44},{t:"Lovely products",c:29},{t:"Tub smaller",c:12,neg:true},{t:"Dimmer lighting",c:6,neg:true}],
         reviews:[
           {name:"Rohit S.",  when:"Feb 2026", stars:4, tx:"<mark>Bathroom</mark> is marble and elegant just like the photo — though the tub is a bit smaller in person."},
           {name:"Nisha P.",  when:"Jan 2026", stars:4, tx:"Rain shower was excellent and the products smell amazing. Lighting is dimmer than the listing shot."},
@@ -1511,16 +1545,21 @@
       heroRev.innerHTML =
         '<div class="hr-head">'+
           '<div class="hr-score"><b>'+t.rating+'</b><span>/10</span></div>'+
-          '<div class="hr-tx"><h4>'+t.label+'</h4><p>From '+t.count+' guest reviews</p></div>'+
+          '<div class="hr-sub">'+t.label+'</div>'+
         '</div>'+
-        '<div class="hr-pills">'+t.keys.map(k=>'<span class="hr-pill'+(k.neg?' neg':'')+'">'+k.t+'</span>').join('')+
-          '<button class="hr-all" type="button">See all reviews &rarr;</button>'+
+        '<div class="hr-pills">'+t.keys.map(k=>'<button type="button" class="hr-pill'+(k.neg?' neg':'')+'">'+k.t+'</button>').join('')+
+          '<button class="hr-all" type="button">See all '+t.count+' reviews &rarr;</button>'+
         '</div>';
       heroRev.hidden = false;
     };
     heroRev.addEventListener('click', e => {
       e.stopPropagation();                                   // don't also trigger the .main → fullscreen open
-      if(e.target.closest('.hr-all')) open(typeof cur === 'number' ? cur : 0);
+      if(e.target.closest('.hr-all')){                       // "See all reviews" → jump to the reviews section
+        const rv = document.getElementById('reviews');
+        if(rv) rv.scrollIntoView({behavior:'smooth'});
+        return;
+      }
+      if(e.target.closest('.hr-pill')) open(typeof cur === 'number' ? cur : 0);
     });
     renderHeroReview(typeof cur === 'number' ? cur : 0);     // initial state
 
