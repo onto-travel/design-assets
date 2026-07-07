@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto · Trips</title>
+<style>
+  :root{
+    --bg:#efeae1; --card:#ffffff; --ink:#1c1c1c; --muted:#7c7771; --line:#e7e1d6;
+    --navy:#2f4f74; --navy-deep:#284667; --gold:#c19a4b; --green:#2a7d5f; --danger:#b23b32;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;}
+  [hidden]{display:none !important;}
+
+  /* top nav */
+  .topnav{position:sticky;top:0;z-index:80;background:rgba(250,247,241,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topnav-in{max-width:1180px;margin:0 auto;padding:0 28px;height:62px;display:flex;align-items:center;gap:26px;}
+  .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);text-decoration:none;letter-spacing:-.01em;}
+  .tn-brand span{color:var(--gold);}
+  .tn-links{display:flex;align-items:center;gap:2px;}
+  .tn-links a{font-size:14.5px;color:#5b5650;text-decoration:none;padding:8px 14px;border-radius:9px;transition:background .15s,color .15s;}
+  .tn-links a:hover{background:rgba(255,255,255,.62);color:var(--ink);}
+  .tn-links a.active{color:var(--navy);font-weight:600;}
+  .tn-right{margin-left:auto;display:flex;align-items:center;gap:9px;position:relative;}
+  .tn-profile{height:40px;border-radius:22px;border:1px solid #d9d1c1;background:#fff;display:flex;align-items:center;
+    gap:9px;padding:0 6px 0 12px;cursor:pointer;transition:border-color .15s,background .15s;}
+  .tn-profile:hover{border-color:#c2b8a4;background:#faf7f1;}
+  .tn-profile .burger{display:flex;flex-direction:column;gap:3px;}
+  .tn-profile .burger i{display:block;width:15px;height:1.7px;background:#8a857d;border-radius:2px;}
+  .tn-avatar{width:28px;height:28px;border-radius:50%;background:#f4efe6;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;}
+  .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
+    border-radius:14px;box-shadow:0 14px 40px rgba(40,30,10,.2);padding:8px;opacity:0;transform:translateY(-6px);
+    pointer-events:none;transition:opacity .15s,transform .15s;}
+  .menu.open{opacity:1;transform:none;pointer-events:auto;}
+  .menu-id{display:flex;align-items:center;gap:11px;padding:11px 12px 13px;border-bottom:1px solid var(--line);margin-bottom:6px;}
+  .menu-id .tn-avatar{width:38px;height:38px;font-size:20px;}
+  .menu-id b{font-size:14.5px;display:block;}
+  .menu-id small{font-size:12.5px;color:var(--muted);}
+  .menu .item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font-size:14px;color:var(--ink);
+    text-decoration:none;cursor:pointer;}
+  .menu .item:hover{background:#faf7f1;}
+  .menu .item svg{width:19px;height:19px;stroke:#6b655c;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .menu .item .ar{margin-left:auto;color:#b8b0a2;}
+
+  /* page */
+  .page{max-width:1180px;margin:0 auto;padding:36px 28px 64px;}
+  .h1{font-family:Georgia,serif;font-size:34px;letter-spacing:-.015em;margin:0 0 20px;}
+
+  .tabs{display:inline-flex;background:#e7e1d6;border-radius:12px;padding:4px;gap:2px;margin-bottom:24px;}
+  .tab{border:none;background:none;padding:9px 18px;border-radius:9px;font-family:inherit;font-size:14px;font-weight:600;
+    color:var(--muted);cursor:pointer;transition:background .15s,color .15s,box-shadow .15s;}
+  .tab:hover{color:var(--ink);}
+  .tab.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(40,30,10,.14);}
+  .tab .n{color:#a39c90;font-weight:600;margin-left:6px;}
+  .tab.on .n{color:#8aa;}
+
+  .list{display:flex;flex-direction:column;gap:16px;}
+  .trip{display:flex;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);}
+  .trip-pic{flex:0 0 220px;position:relative;background:#e7e1d6;min-height:180px;}
+  .trip-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .trip-tag{position:absolute;top:14px;left:14px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.02em;
+    background:rgba(255,255,255,.94);}
+  .trip-tag.upcoming{background:#eef6f1;color:#2a7d5f;}
+  .trip-tag.completed{background:#eef2f7;color:#2f4f74;}
+  .trip-tag.cancelled{background:#f3e4e2;color:#b23b32;}
+  .trip-body{flex:1;padding:20px 24px;display:flex;flex-direction:column;min-width:0;}
+  .trip-loc{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);}
+  .trip-body h3{font-family:Georgia,serif;font-size:22px;font-weight:600;margin:5px 0 0;letter-spacing:-.01em;}
+  .trip-meta{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:12px;color:#4b463f;font-size:14px;}
+  .trip-meta .m{display:flex;align-items:center;gap:8px;}
+  .trip-meta svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .trip-foot{margin-top:auto;padding-top:16px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;}
+  .trip-ref{font-size:12.5px;color:var(--muted);}
+  .trip-ref b{display:block;font-family:Georgia,serif;font-size:16px;color:var(--ink);letter-spacing:.03em;margin-top:2px;}
+  .trip-view{flex:none;border:1px solid #d9d1c1;background:#fff;color:var(--navy);border-radius:11px;padding:11px 20px;
+    font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
+  .trip-view:hover{background:#faf7f1;border-color:#c2b8a4;}
+  .trip-view.solid{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .trip-view.solid:hover{background:var(--navy-deep);}
+
+  .empty{color:var(--muted);font-size:15px;padding:30px 4px;}
+  @media(max-width:640px){ .trip{flex-direction:column;} .trip-pic{flex-basis:190px;} .tn-links{display:none;} }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <div class="topnav-in">
+      <a class="tn-brand" href="home2.html">onto<span>.</span></a>
+      <div class="tn-links">
+        <a href="home2.html">Stays</a>
+        <a href="trips.html" class="active">Trips</a>
+      </div>
+      <div class="tn-right">
+        <button type="button" class="tn-profile" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+          <span class="burger"><i></i><i></i><i></i></span>
+          <span class="tn-avatar" id="navAvatar">🙂</span>
+        </button>
+        <div class="menu" id="profileMenu" role="menu">
+          <div class="menu-id">
+            <span class="tn-avatar" id="menuAvatar">🙂</span>
+            <div><b id="menuName">You</b><small>xyz@email.com</small></div>
+          </div>
+          <div class="menu-sec">
+            <a class="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span class="ar">›</span></a>
+            <a class="item" href="home2.html"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5"/><path d="M6 10v9h12v-9"/></svg> Stays <span class="ar">›</span></a>
+            <a class="item" href="home.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page">
+    <h1 class="h1">Trips</h1>
+    <div class="tabs" id="tabs">
+      <button type="button" class="tab on" data-tab="upcoming">Upcoming <span class="n" id="cUpcoming">0</span></button>
+      <button type="button" class="tab" data-tab="completed">Completed <span class="n" id="cCompleted">0</span></button>
+      <button type="button" class="tab" data-tab="cancelled">Cancelled <span class="n" id="cCancelled">0</span></button>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+
+<script>
+  (function(){
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+    /* profile menu */
+    (function(){
+      const btn = $('profileBtn'), menu = $('profileMenu');
+      btn.addEventListener('click', e => { e.stopPropagation(); const o = menu.classList.toggle('open'); btn.setAttribute('aria-expanded', o?'true':'false'); });
+      document.addEventListener('click', e => { if(!menu.contains(e.target) && !btn.contains(e.target)){ menu.classList.remove('open'); btn.setAttribute('aria-expanded','false'); } });
+      // account holder name + emoji from the Companions store
+      try{
+        const a = JSON.parse(localStorage.getItem('onto:travellers:v3')) || [];
+        const me = a.find(t => t.relation==='Myself' || t.id==='t-you');
+        if(me){
+          if(me.name && me.name.toLowerCase()!=='you' && !me.name.includes('@')){ $('menuName').textContent = me.name; }
+          if(me.emoji){ $('navAvatar').textContent = me.emoji; $('menuAvatar').textContent = me.emoji; }
+        }
+      }catch(e){}
+    })();
+
+    /* trips: the live booking (from a real confirm) + seeded past/cancelled ones */
+    let live = null;
+    try{ live = JSON.parse(sessionStorage.getItem('booking')); }catch(e){}
+
+    const trips = [];
+    if(live && live.ref){
+      trips.push(Object.assign({}, live, {
+        status: live.status === 'cancelled' ? 'cancelled' : 'upcoming',
+        img: live.img || 'images/06-aerial-pool.png', live: true
+      }));
+    } else {
+      trips.push({ status:'upcoming', hotel:'Taj Exotica Resort & Spa', place:'Benaulim Beach · Goa, India',
+        dates:'14–17 Aug 2026', nights:'3 nights', guests:'2 guests · 1 room', room:'Villa Room',
+        amount:'₹55,500', ref:'TAJ-7QX2M9', img:'images/06-aerial-pool.png' });
+    }
+    trips.push({ status:'completed', hotel:'W Goa', place:'Vagator Beach · Goa, India',
+      dates:'6–9 Nov 2025', nights:'3 nights', guests:'2 guests · 1 room', room:'Fabulous Room',
+      amount:'₹64,200', ref:'ONT-W9G2KX', img:'images/04-pool-sunset.png' });
+    trips.push({ status:'completed', hotel:'The Westin Goa', place:'Anjuna · Goa, India',
+      dates:'21–24 Mar 2025', nights:'3 nights', guests:'3 guests · 1 room', room:'Deluxe Room',
+      amount:'₹48,900', ref:'ONT-WES7QT', img:'images/07-garden-view.png' });
+    trips.push({ status:'cancelled', hotel:'Courtyard by Marriott Goa', place:'Calangute · Goa, India',
+      dates:'2–4 Jan 2026', nights:'2 nights', guests:'2 guests · 1 room', room:'Premium Room',
+      amount:'₹31,500', ref:'ONT-CY5RM1', img:'images/05-pool-day.png' });
+
+    const CAL = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>';
+    const BED = '<svg viewBox="0 0 24 24"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4M3 18v2M21 18v2M6 12V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/></svg>';
+    const GST = '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg>';
+    const LABEL = { upcoming:'Upcoming', completed:'Completed', cancelled:'Cancelled' };
+
+    let active = 'upcoming';
+
+    function render(){
+      // counts
+      ['upcoming','completed','cancelled'].forEach(s => {
+        $('c'+s[0].toUpperCase()+s.slice(1)).textContent = trips.filter(t => t.status===s).length;
+      });
+      const rows = trips.filter(t => t.status === active);
+      if(!rows.length){
+        $('list').innerHTML = '<div class="empty">No '+active+' trips.</div>';
+        return;
+      }
+      $('list').innerHTML = rows.map((t, i) => {
+        const idx = trips.indexOf(t);
+        return '<article class="trip">'+
+          '<div class="trip-pic"><img src="'+t.img+'" alt="'+esc(t.hotel)+'"></div>'+
+          '<div class="trip-body">'+
+            '<div class="trip-loc">'+esc(t.place||'')+'</div>'+
+            '<h3>'+esc(t.hotel)+'</h3>'+
+            '<div class="trip-meta">'+
+              '<span class="m">'+CAL+esc(t.dates||'')+(t.nights?' · '+esc(t.nights):'')+'</span>'+
+              '<span class="m">'+GST+esc(t.guests||'')+'</span>'+
+              '<span class="m">'+BED+esc(t.room||'')+'</span>'+
+            '</div>'+
+            '<div class="trip-foot">'+
+              '<div class="trip-ref">Booking reference<b>'+esc(t.ref||'—')+'</b></div>'+
+              '<button type="button" class="trip-view'+(t.status==='upcoming'?' solid':'')+'" data-i="'+idx+'">'+
+                (t.status==='cancelled'?'View details':'View booking')+'</button>'+
+            '</div>'+
+          '</div>'+
+        '</article>';
+      }).join('');
+
+      $('list').querySelectorAll('.trip-view').forEach(b => b.addEventListener('click', () => {
+        const t = trips[+b.dataset.i];
+        try{ sessionStorage.setItem('booking', JSON.stringify(t)); }catch(e){}
+        location.href = 'booking-details.html';
+      }));
+    }
+
+    $('tabs').addEventListener('click', e => {
+      const t = e.target.closest('.tab'); if(!t) return;
+      active = t.dataset.tab;
+      $('tabs').querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x===t));
+      render();
+    });
+
+    render();
+  })();
+</script>
+</body>
+</html>

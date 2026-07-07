@@ -186,6 +186,7 @@
   /* guest picker (companions + age groups), ported from the hotel page */
   .gp-lab{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:2px 2px 9px;}
   .gp-reg{padding-bottom:13px;margin-bottom:4px;border-bottom:1px solid var(--line);}
+  .gp-reg:has(> .gp-chips:empty){display:none;}
   .gp-chips{display:flex;flex-wrap:wrap;gap:7px;}
   .reg-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;
     padding:6px 11px 6px 10px;font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;
@@ -307,6 +308,10 @@
 <nav class="topnav">
   <div class="topnav-in">
     <a class="tn-brand" href="home.html">onto<span>.</span></a>
+    <div class="tn-links">
+      <a href="home.html" class="active">Stays</a>
+      <a href="trips.html">Trips</a>
+    </div>
     <div class="tn-right">
       <button type="button" class="tn-profile" id="profileBtn" aria-haspopup="true" aria-expanded="false">
         <span class="burger"><i></i><i></i><i></i></span>
@@ -317,12 +322,13 @@
         <div class="menu-id">
           <span class="tn-avatar" id="menuAvatar">S</span>
           <div>
-            <b id="menuName">Saanvi</b>
-            <small id="menuEmail">saanvi@onto.travel</small>
+            <b id="menuName">You</b>
+            <small id="menuEmail">xyz@email.com</small>
           </div>
         </div>
 
         <div class="menu-sec">
+          <a class="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span class="ar">›</span></a>
           <a class="item" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M4.8 19.5c.9-3.6 3.7-5.5 7.2-5.5s6.3 1.9 7.2 5.5"/></svg> Account &amp; preferences <span class="ar">›</span></a>
           <a class="item" href="#"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span class="ar">›</span></a>
           <a class="item" href="home.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
@@ -430,11 +436,24 @@
   var $ = function(id){ return document.getElementById(id); };
   var seg = $('segGuests'), pop = $('popGuests');
 
-  var COMPANIONS = [
-    {id:'you',  em:'🧍', name:'You',   cat:'adults'},
-    {id:'wife', em:'💑', name:'Priya', cat:'adults'},
-    {id:'kid',  em:'🧒', name:'Aarav', cat:'children'}
-  ];
+  // the account holder's name lives in the Travellers store ("Myself"); default "You"
+  var TKEY = 'onto:travellers:v3';
+  function readUserName(){ try{ var a=JSON.parse(localStorage.getItem(TKEY))||[]; var me=a.find(function(t){return t.relation==='Myself'||t.id==='t-you';}); if(me&&me.name&&me.name.toLowerCase()!=='you'&&me.name.indexOf('@')<0) return me.name; }catch(e){} return 'You'; }
+  function writeUserName(n){ try{ var a=JSON.parse(localStorage.getItem(TKEY)); if(!Array.isArray(a)) a=[]; var me=a.find(function(t){return t.relation==='Myself'||t.id==='t-you';}); if(me) me.name=n; else a.unshift({id:'t-you',name:n,relation:'Myself',interests:[]}); localStorage.setItem(TKEY, JSON.stringify(a)); }catch(e){} }
+  var FUN_EMOJI = ['🦊','🐨','🐼','🦁','🐧','🐬','🦉','🐢','🐝','🦩'];
+  function emojiFor(name){ var h=0,s=String(name||''); for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; }
+  function catFor(t){ if(t.relation==='Myself') return 'adults'; if(typeof t.age==='number'){ if(t.age<2) return 'infants'; if(t.age<13) return 'children'; return 'adults'; } if(t.relation==='Child') return 'children'; return 'adults'; }
+  function loadCompanions(){
+    var arr=[]; try{ arr=JSON.parse(localStorage.getItem(TKEY))||[]; }catch(e){} if(!Array.isArray(arr)) arr=[];
+    var me=arr.filter(function(t){return t.relation==='Myself'||t.id==='t-you';})[0];
+    var list=[{id:'you', em:(me&&me.emoji)||emojiFor(readUserName()), name:readUserName(), cat:'adults'}];
+    arr.filter(function(t){return t.relation!=='Myself'&&t.id!=='t-you';}).forEach(function(t){
+      list.push({id:t.id, em:t.emoji||emojiFor(t.name), name:t.name, cat:catFor(t)});
+    });
+    return list;
+  }
+  var COMPANIONS = loadCompanions();
+  try{ var _mn=document.getElementById('menuName'); if(_mn) _mn.textContent = readUserName(); }catch(e){}
   var EM  = { adults:'🧍', children:'🧒', infants:'👶' };
   var FUN = {
     adults:  ["Captain Mango","Wanderer Kai","Skipper Reef","Sunny Coco","Palm Rover"],
@@ -452,7 +471,9 @@
   // restore the shared party (else default to the same set as the hotel page)
   var party;
   try{ party = JSON.parse(sessionStorage.getItem('searchGuests')); }catch(e){}
-  if(!party || !party.adults) party = { adults:[{companion:'you'},{companion:'wife'}], children:[{companion:'kid'}], infants:[] };
+  if(!party || !party.adults) party = { adults:[{companion:'you'}], children:[], infants:[] };
+  // drop any stale companions no longer defined (after removing seeded people)
+  CATS.forEach(function(c){ if(party[c]) party[c] = party[c].filter(function(p){ return !p.companion || MAP[p.companion]; }); });
   var funN  = { adults:0, children:0, infants:0 };
 
   var joinNames = function(a){ return a.length<=1 ? (a[0]||'') : a.slice(0,-1).join(', ')+' & '+a[a.length-1]; };
@@ -476,7 +497,7 @@
 
   var editing = null;   // {cat,i} — inline rename for extra (auto) people
   function commit(val){
-    if(editing){ var p = party[editing.cat][editing.i]; if(p){ var v=(val||'').trim(); if(v){ p.name=v; p.custom=true; } } }
+    if(editing){ var p = party[editing.cat][editing.i]; if(p){ var v=(val||'').trim(); if(v){ if(p.companion==='you'){ MAP['you'].name=v; writeUserName(v); } else { p.name=v; p.custom=true; } } } }
     editing = null; apply();
   }
 
@@ -498,7 +519,7 @@
       party[cat].forEach(function(p,i){
         if(editing && editing.cat===cat && editing.i===i){
           var inp = document.createElement('input');
-          inp.className='person-in'; inp.value=p.name; inp.maxLength=24; inp.setAttribute('aria-label','Guest name');
+          inp.className='person-in'; inp.value = p.name || (p.companion && MAP[p.companion] ? MAP[p.companion].name : '') || ''; inp.maxLength=24; inp.setAttribute('aria-label','Guest name');
           inp.addEventListener('keydown', function(e){ e.stopPropagation();
             if(e.key==='Enter') commit(inp.value);
             else if(e.key==='Escape'){ editing=null; apply(); } });
@@ -510,11 +531,13 @@
         var em = c ? c.em : p.em, name = c ? c.name : p.name;
         var chip = document.createElement('span');
         chip.className = 'person' + (p.companion ? ' is-comp' : (p.custom?' custom':''));
-        var nameHTML = p.companion ? esc(name)
-          : '<button type="button" class="person-name" aria-label="Rename">'+esc(name)+'</button>';
+        var editable = !p.companion || p.companion==='you';
+        var nameHTML = editable
+          ? '<button type="button" class="person-name" aria-label="Rename">'+esc(name)+'</button>'
+          : esc(name);
         chip.innerHTML = '<span class="person-em">'+em+'</span>'+nameHTML
           + '<button type="button" class="person-x" aria-label="Remove '+esc(name)+'">&times;</button>';
-        if(!p.companion) chip.querySelector('.person-name').addEventListener('click', function(e){ e.stopPropagation(); editing={cat:cat,i:i}; apply(); });
+        if(editable) chip.querySelector('.person-name').addEventListener('click', function(e){ e.stopPropagation(); editing={cat:cat,i:i}; apply(); });
         chip.querySelector('.person-x').addEventListener('click', function(e){ e.stopPropagation(); removePerson(cat,i); });
         box.appendChild(chip);
       });

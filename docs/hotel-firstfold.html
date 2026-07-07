@@ -442,6 +442,7 @@
   .guest-pop[hidden]{display:none;}
   .gp-lab{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:2px 2px 9px;}
   .gp-reg{padding-bottom:13px;margin-bottom:4px;border-bottom:1px solid var(--line);}
+  .gp-reg:has(> .gp-chips:empty){display:none;}
   .gp-chips{display:flex;flex-wrap:wrap;gap:7px;}
   .reg-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;
     padding:6px 11px 6px 10px;font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;
@@ -705,7 +706,7 @@
             </button>
             <button type="button" class="tripchip" id="guestChip" aria-haspopup="true" aria-expanded="false">
               <span class="tc-k">Guests <span class="tc-cnt" id="guestSub">3 guests</span></span>
-              <span class="tc-v" id="guestVal">You, Priya &amp; Aarav</span>
+              <span class="tc-v" id="guestVal">You</span>
             </button>
           </div>
 
@@ -1214,11 +1215,24 @@
 <script>
   // ---- guests: pick a regular companion → they segregate into age groups; × removes a person ----
   (function(){
-    const COMPANIONS = [
-      {id:'you',  em:'🧍', name:'You',   cat:'adults',   score:95, fits:[]},
-      {id:'wife', em:'💑', name:'Priya', cat:'adults',   score:96, fits:["Couples’ spa","Sunset dining"]},
-      {id:'kid',  em:'🧒', name:'Aarav', cat:'children', score:92, fits:["Kids’ Club"]}
-    ];
+    // the account holder's name lives in the Travellers store ("Myself"); default "You"
+    const TKEY = 'onto:travellers:v3';
+    const readUserName = () => { try { const a=JSON.parse(localStorage.getItem(TKEY))||[]; const me=a.find(t=>t.relation==='Myself'||t.id==='t-you'); if(me&&me.name&&me.name.toLowerCase()!=='you'&&!me.name.includes('@')) return me.name; } catch(e){} return 'You'; };
+    const writeUserName = n => { try { let a=JSON.parse(localStorage.getItem(TKEY)); if(!Array.isArray(a)) a=[]; let me=a.find(t=>t.relation==='Myself'||t.id==='t-you'); if(me) me.name=n; else a.unshift({id:'t-you',name:n,relation:'Myself',interests:[]}); localStorage.setItem(TKEY, JSON.stringify(a)); } catch(e){} };
+    const FUN_EMOJI = ['🦊','🐨','🐼','🦁','🐧','🐬','🦉','🐢','🐝','🦩'];
+    const emojiFor = name => { let h=0; const s=String(name||''); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; };
+    const catFor = t => { if(t.relation==='Myself') return 'adults'; if(typeof t.age==='number'){ if(t.age<2) return 'infants'; if(t.age<13) return 'children'; return 'adults'; } if(t.relation==='Child') return 'children'; return 'adults'; };
+    // build the picker's companion list from the saved Companions (account holder + everyone they've added)
+    const loadCompanions = () => {
+      let arr=[]; try{ arr=JSON.parse(localStorage.getItem(TKEY))||[]; }catch(e){} if(!Array.isArray(arr)) arr=[];
+      const me = arr.find(t=>t.relation==='Myself'||t.id==='t-you');
+      const list = [{id:'you', em:(me&&me.emoji)||emojiFor(readUserName()), name:readUserName(), cat:'adults', score:95, fits:[]}];
+      arr.filter(t=>t.relation!=='Myself'&&t.id!=='t-you').forEach(t=>{
+        list.push({id:t.id, em:t.emoji||emojiFor(t.name), name:t.name, cat:catFor(t), score:93, fits:[]});
+      });
+      return list;
+    };
+    const COMPANIONS = loadCompanions();
     const BASE_FITS = ["Beachfront","6 restaurants"];
     const EM  = { adults:'🧍', children:'🧒', infants:'👶' };
     const FUN = {
@@ -1236,7 +1250,9 @@
     // each person is {companion:id}  OR  {auto:true, em, name, custom?}
     let party;
     try{ party = JSON.parse(sessionStorage.getItem('searchGuests')); }catch(e){}
-    if(!party || !party.adults) party = { adults:[{companion:'you'},{companion:'wife'}], children:[{companion:'kid'}], infants:[] };
+    if(!party || !party.adults) party = { adults:[{companion:'you'}], children:[], infants:[] };
+    // drop any stale companions no longer defined (after removing seeded people)
+    CATS.forEach(c=>{ if(party[c]) party[c] = party[c].filter(p=> !p.companion || MAP[p.companion]); });
     const funN  = { adults:0, children:0, infants:0 };
 
     window.PARTY = window.PARTY || { guests: 3 };
@@ -1291,7 +1307,7 @@
     // inline rename for extra (auto) people
     let editing = null;   // {cat,i}
     function commit(val){
-      if(editing){ const p=party[editing.cat][editing.i]; if(p){ const v=(val||'').trim(); if(v){ p.name=v; p.custom=true; } } }
+      if(editing){ const p=party[editing.cat][editing.i]; if(p){ const v=(val||'').trim(); if(v){ if(p.companion==='you'){ MAP['you'].name=v; writeUserName(v); } else { p.name=v; p.custom=true; } } } }
       editing = null; apply();
     }
 
@@ -1313,7 +1329,7 @@
         party[cat].forEach((p,i)=>{
           if(editing && editing.cat===cat && editing.i===i){
             const inp = document.createElement('input');
-            inp.className='person-in'; inp.value=p.name; inp.maxLength=24; inp.setAttribute('aria-label','Guest name');
+            inp.className='person-in'; inp.value = p.name || (p.companion && MAP[p.companion] ? MAP[p.companion].name : '') || ''; inp.maxLength=24; inp.setAttribute('aria-label','Guest name');
             inp.addEventListener('keydown', e=>{ e.stopPropagation();
               if(e.key==='Enter') commit(inp.value);
               else if(e.key==='Escape'){ editing=null; apply(); } });
@@ -1325,11 +1341,13 @@
           const em = c ? c.em : p.em, name = c ? c.name : p.name;
           const chip = document.createElement('span');
           chip.className = 'person' + (p.companion ? ' is-comp' : (p.custom?' custom':''));
-          const nameHTML = p.companion ? esc(name)
-            : '<button type="button" class="person-name" aria-label="Rename">'+esc(name)+'</button>';
+          const editable = !p.companion || p.companion==='you';
+          const nameHTML = editable
+            ? '<button type="button" class="person-name" aria-label="Rename">'+esc(name)+'</button>'
+            : esc(name);
           chip.innerHTML = '<span class="person-em">'+em+'</span>'+nameHTML
             + '<button type="button" class="person-x" aria-label="Remove '+esc(name)+'">&times;</button>';
-          if(!p.companion) chip.querySelector('.person-name').addEventListener('click', e=>{ e.stopPropagation(); editing={cat,i}; apply(); });
+          if(editable) chip.querySelector('.person-name').addEventListener('click', e=>{ e.stopPropagation(); editing={cat,i}; apply(); });
           chip.querySelector('.person-x').addEventListener('click', e=>{ e.stopPropagation(); removePerson(cat,i); });
           box.appendChild(chip);
         });
