@@ -279,6 +279,10 @@
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .trip-meta .tm b{font-weight:600;color:var(--ink);}
   .hcard .tag.up{background:#eef6f1;color:#2a7d5f;}
+  .hcard .tag.off{background:#f3e4e2;color:#b23b32;}
+  #tripCard.cancelled .pic img{filter:grayscale(.55);opacity:.82;}
+  #tripCard.cancelled h3{text-decoration:line-through;text-decoration-color:#cabfae;}
+  #tripCard.cancelled .view{background:#8a857c;}
   .tripref{font-size:12.5px;color:var(--muted);}
   .tripref b{display:block;font-family:Georgia,serif;font-size:18px;font-weight:600;color:var(--ink);
     letter-spacing:.03em;margin-top:2px;}
@@ -305,7 +309,7 @@
 <!-- ================= TOP NAV ================= -->
 <nav class="topnav">
   <div class="topnav-in">
-    <a class="tn-brand" href="home.html">onto<span>.</span></a>
+    <a class="tn-brand" href="home2.html">onto<span>.</span></a>
     <div class="tn-right">
       <button type="button" class="tn-profile" id="profileBtn" aria-haspopup="true" aria-expanded="false">
         <span class="burger"><i></i><i></i><i></i></span>
@@ -471,7 +475,7 @@
       if(b && b.ref){
         return { hotel:b.hotel || 'Taj Exotica Resort & Spa', place:b.place || 'Goa, India',
           dates:b.dates || '', nights:b.nights || '', guests:b.guests || '', room:b.room || '',
-          amount:b.amount || '', ref:b.ref, img:'images/06-aerial-pool.png' };
+          amount:b.amount || '', ref:b.ref, status:b.status || '', img:'images/06-aerial-pool.png' };
       }
     }catch(e){}
     return null;
@@ -494,6 +498,17 @@
   document.getElementById('tripGuests').textContent = upcoming.guests || '2 guests';
   document.getElementById('tripRoom').textContent = upcoming.room || 'Villa Room';
   document.getElementById('tripRef').textContent = upcoming.ref;
+
+  // reflect a cancelled booking on the trip card
+  if((live && live.status === 'cancelled') || upcoming.status === 'cancelled'){
+    var card = document.getElementById('tripCard');
+    card.classList.add('cancelled');
+    var tag = card.querySelector('.tag');
+    if(tag){ tag.textContent = 'Cancelled'; tag.classList.remove('up'); tag.classList.add('off'); }
+    document.querySelector('.results-head h2').textContent = 'Cancelled trip';
+    var view = card.querySelector('.view');
+    if(view){ view.textContent = 'View details'; }
+  }
 })();
 
 /* =============================================================

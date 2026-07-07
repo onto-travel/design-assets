@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto · Verify your mobile</title>
+<style>
+  :root{
+    --bg:#efeae1; --card:#ffffff; --ink:#1c1c1c; --muted:#7c7771; --line:#e7e1d6;
+    --navy:#2f4f74; --navy-deep:#284667; --gold:#c19a4b; --green:#2a7d5f; --danger:#b23b32;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;padding:24px;}
+
+  .card{width:440px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
+    padding:34px 34px 30px;text-align:center;}
+  .brand{display:inline-block;font-family:Georgia,serif;font-weight:700;font-size:20px;color:var(--navy);
+    text-decoration:none;margin-bottom:24px;letter-spacing:-.01em;}
+  .brand span{color:var(--gold);}
+  .ic{width:60px;height:60px;border-radius:50%;background:#eef2f7;border:1px solid #dbe3ee;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
+  .ic svg{width:27px;height:27px;stroke:var(--navy);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .ic.ok{background:#eaf5ef;border-color:#cfe8db;}
+  .ic.ok svg{stroke:var(--green);stroke-width:2.6;}
+  .ic.pop{animation:pop .45s cubic-bezier(.22,1.2,.36,1) both;}
+  @keyframes pop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+  h1{font-family:Georgia,serif;font-size:24px;color:var(--ink);margin:0 0 9px;letter-spacing:-.01em;}
+  .lede{color:var(--muted);font-size:14.5px;margin:0 auto;max-width:344px;}
+  .lede b{color:var(--ink);font-weight:600;}
+
+  .phone-field{display:flex;gap:10px;margin-top:22px;}
+  .cc{flex:none;display:inline-flex;align-items:center;gap:7px;background:#faf7f1;border:1px solid #d9d1c1;
+    border-radius:12px;padding:0 14px;font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);}
+  .phone-field input{flex:1;min-width:0;border:1px solid #d9d1c1;border-radius:12px;padding:14px 16px;
+    font-family:inherit;font-size:16px;color:var(--ink);background:#fff;letter-spacing:.03em;}
+  .phone-field input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(47,79,116,.12);}
+
+  .otp{display:flex;gap:9px;justify-content:center;margin:24px 0 4px;}
+  .otp-in{width:46px;height:54px;text-align:center;border:1px solid #d9d1c1;border-radius:12px;
+    font-family:inherit;font-size:22px;font-weight:600;color:var(--ink);background:#fff;transition:border-color .12s,box-shadow .12s;}
+  .otp-in:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(47,79,116,.12);}
+  .otp-in.filled{border-color:#bcb3a1;background:#faf7f1;}
+  .card.err-shake .otp{animation:shake .35s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+  .btn{width:100%;border:none;background:var(--navy);color:#fff;font-size:15.5px;font-weight:600;
+    padding:15px;border-radius:12px;cursor:pointer;font-family:inherit;margin-top:22px;transition:background .15s;}
+  .btn:hover{background:var(--navy-deep);}
+  .btn:disabled{opacity:.45;cursor:default;}
+  .fine{color:var(--muted);font-size:12.5px;margin:14px 0 0;}
+  .err{color:var(--danger);font-size:13px;font-weight:600;margin:12px 0 0;min-height:0;}
+  .err[hidden]{display:none;}
+  .linkbtn{background:none;border:none;color:var(--navy);font-family:inherit;font-size:inherit;font-weight:600;
+    cursor:pointer;padding:0;text-decoration:none;}
+  .linkbtn:hover{text-decoration:underline;}
+  .linkbtn:disabled{color:var(--muted);cursor:default;text-decoration:none;}
+  [hidden]{display:none;}
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <a class="brand" href="home.html">onto<span>.</span></a>
+
+    <!-- STEP 1 · phone -->
+    <div id="phoneView">
+      <div class="ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4"/></svg>
+      </div>
+      <h1>Add your mobile number</h1>
+      <p class="lede">Signed in as <b id="acctEmail">anuj.sharma@email.com</b>. Add a mobile number so we can send booking updates and confirm it&#39;s you.</p>
+      <div class="phone-field">
+        <span class="cc">🇮🇳 +91</span>
+        <input id="phoneInput" type="tel" inputmode="numeric" maxlength="10" placeholder="98765 43210" autocomplete="tel" aria-label="Mobile number">
+      </div>
+      <p class="err" id="phoneErr" hidden>Enter a valid 10-digit mobile number.</p>
+      <button class="btn" id="sendOtp">Send code</button>
+      <p class="fine">We&#39;ll text you a 6-digit code. Standard rates may apply.</p>
+    </div>
+
+    <!-- STEP 2 · otp -->
+    <div id="otpView" hidden>
+      <div class="ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 5.5h16v13H4z"/><path d="M4 6.5l8 6 8-6"/></svg>
+      </div>
+      <h1>Enter the code</h1>
+      <p class="lede">We sent a 6-digit code to <b id="otpDest">+91 98765 43210</b>. <button class="linkbtn" id="changeNum">Change</button></p>
+      <div class="otp" id="otpBoxes">
+        <input class="otp-in" inputmode="numeric" maxlength="1" aria-label="Digit 1">
+        <input class="otp-in" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+        <input class="otp-in" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+        <input class="otp-in" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+        <input class="otp-in" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+        <input class="otp-in" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+      </div>
+      <p class="err" id="otpErr" hidden>That code doesn&#39;t look right. Try again.</p>
+      <button class="btn" id="verifyOtp" disabled>Verify &amp; continue</button>
+      <p class="fine">Didn&#39;t get it? <button class="linkbtn" id="resend" disabled>Resend code</button> <span id="timer"></span></p>
+    </div>
+
+    <!-- STEP 3 · done -->
+    <div id="doneView" hidden>
+      <div class="ic ok pop" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+      </div>
+      <h1>You&#39;re verified</h1>
+      <p class="lede">Mobile number confirmed. Taking you to your stay…</p>
+    </div>
+  </div>
+
+<script>
+  (function(){
+    const $ = id => document.getElementById(id);
+    const card = $('card');
+
+    // ---- destination the user was headed to before auth ----
+    function go(){
+      let dest = 'hotel-firstfold.html';
+      try { dest = sessionStorage.getItem('authReturn') || dest; sessionStorage.removeItem('authReturn'); } catch(e){}
+      try { sessionStorage.setItem('phoneVerified','1'); } catch(e){}
+      location.href = dest;
+    }
+
+    let phone = '';
+    const fmt = d => '+91 ' + d.slice(0,5) + ' ' + d.slice(5);
+
+    // ---- step 1: phone number ----
+    const phoneInput = $('phoneInput'), phoneErr = $('phoneErr');
+    phoneInput.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/\D/g,'').slice(0,10);
+      phoneErr.hidden = true;
+    });
+    function sendCode(){
+      const d = phoneInput.value.replace(/\D/g,'');
+      if(d.length !== 10){ phoneErr.hidden = false; phoneInput.focus(); return; }
+      phone = d;
+      try { sessionStorage.setItem('userPhone', '+91' + d); } catch(e){}
+      $('otpDest').textContent = fmt(d);
+      $('phoneView').hidden = true;
+      $('otpView').hidden = false;
+      startTimer();
+      boxes[0].focus();
+    }
+    $('sendOtp').addEventListener('click', sendCode);
+    phoneInput.addEventListener('keydown', e => { if(e.key === 'Enter') sendCode(); });
+
+    // ---- step 2: OTP boxes ----
+    const boxes = Array.from(document.querySelectorAll('.otp-in'));
+    const otpErr = $('otpErr'), verifyBtn = $('verifyOtp');
+    const codeOf = () => boxes.map(b => b.value).join('');
+    function refresh(){
+      boxes.forEach(b => b.classList.toggle('filled', b.value !== ''));
+      verifyBtn.disabled = codeOf().length !== 6;
+    }
+    boxes.forEach((b,i) => {
+      b.addEventListener('input', () => {
+        b.value = b.value.replace(/\D/g,'').slice(0,1);
+        otpErr.hidden = true;
+        if(b.value && i < boxes.length-1) boxes[i+1].focus();
+        refresh();
+      });
+      b.addEventListener('keydown', e => {
+        if(e.key === 'Backspace' && !b.value && i > 0){ boxes[i-1].focus(); }
+        if(e.key === 'Enter' && !verifyBtn.disabled) verify();
+      });
+      b.addEventListener('paste', e => {
+        e.preventDefault();
+        const digits = (e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6).split('');
+        digits.forEach((d,k) => { if(boxes[k]) boxes[k].value = d; });
+        (boxes[Math.min(digits.length, boxes.length-1)] || b).focus();
+        refresh();
+      });
+    });
+
+    // prototype: any 6-digit code verifies
+    function verify(){
+      if(codeOf().length !== 6){ return; }
+      $('otpView').hidden = true;
+      $('doneView').hidden = false;
+      setTimeout(go, 1200);
+    }
+    verifyBtn.addEventListener('click', verify);
+
+    $('changeNum').addEventListener('click', () => {
+      $('otpView').hidden = true;
+      $('phoneView').hidden = false;
+      boxes.forEach(b => { b.value=''; b.classList.remove('filled'); });
+      verifyBtn.disabled = true; otpErr.hidden = true;
+      phoneInput.focus();
+    });
+
+    // ---- resend countdown ----
+    let left = 0, tick = null;
+    function startTimer(){
+      left = 30; $('resend').disabled = true; render();
+      clearInterval(tick);
+      tick = setInterval(() => { left--; render(); if(left<=0){ clearInterval(tick); $('resend').disabled = false; } }, 1000);
+    }
+    function render(){ $('timer').textContent = left>0 ? 'in ' + left + 's' : ''; }
+    $('resend').addEventListener('click', () => { if(left<=0){ boxes.forEach(b=>{b.value='';b.classList.remove('filled');}); verifyBtn.disabled=true; startTimer(); boxes[0].focus(); } });
+  })();
+</script>
+</body>
+</html>

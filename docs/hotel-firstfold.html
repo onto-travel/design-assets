@@ -108,7 +108,9 @@
   /* --- 3. DECISION VALIDATION: reassurance, faint outlined box --- */
   .validate{margin-top:22px;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
   .vd-score{font-size:16px;font-weight:700;color:#2f5d47;margin:0 0 12px;}
-  .vd-chips{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0;padding:0;}
+  /* reserve room for up to 2 rows of pills so adding/removing companions doesn't resize the card
+     (and, since the card is height-matched to the gallery, doesn't rescale the hero image) */
+  .vd-chips{display:flex;flex-wrap:wrap;align-content:flex-start;gap:7px;list-style:none;margin:0;padding:0;min-height:69px;}
   .vd-chips li{font-size:12.5px;color:#37423b;background:#eef2ee;border:1px solid #e0e7e0;border-radius:20px;padding:5px 11px;}
   .vd-chips li.spot{color:#8a6a24;background:#f7f0e0;border-color:#ebddbf;font-weight:600;}
   .vd-chips li.shot{cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding-left:9px;
@@ -211,6 +213,12 @@
   .rc-why li{position:relative;padding-left:14px;font-size:13px;color:#3a3a3a;margin-bottom:5px;}
   .rc-why li:last-child{margin-bottom:0;}
   .rc-why li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--navy);}
+  /* baseline inclusions — plain info on the standard room (the floor every option shares) */
+  .rc-info{list-style:none;margin:2px 0;padding:0;}
+  .rc-info li{position:relative;padding-left:19px;font-size:13px;color:#3a3a3a;margin-bottom:6px;}
+  .rc-info li:last-child{margin-bottom:0;}
+  .rc-info li::before{content:"";position:absolute;left:1px;top:4px;width:9px;height:5px;
+    border-left:2px solid #2a7d5f;border-bottom:2px solid #2a7d5f;transform:rotate(-45deg);}
   .rc-foot{margin-top:auto;}
   .rc-price-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
     border-top:1px solid var(--line);padding-top:14px;margin-top:16px;margin-bottom:14px;}
@@ -465,6 +473,23 @@
     cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
   .gp-chead .gp-add:hover{border-color:var(--navy);background:#f4f7fb;}
   .gp-chead .gp-add:disabled{opacity:.4;cursor:default;}
+  /* guests / rooms toggle at the top of the popover */
+  .gp-tabs{display:flex;background:#f1ede5;border-radius:11px;padding:3px;gap:2px;margin-bottom:12px;}
+  .gp-tab{flex:1;border:none;background:none;border-radius:8px;font-family:inherit;font-size:13.5px;font-weight:600;
+    color:var(--muted);cursor:pointer;padding:8px;transition:background .15s,color .15s,box-shadow .15s;}
+  .gp-tab:hover{color:var(--ink);}
+  .gp-tab.is-on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(40,30,10,.14);}
+  .gp-panel[hidden]{display:none;}
+  .gp-roomrow{display:flex;align-items:center;gap:14px;padding:6px 2px 2px;}
+  .gp-roomrow .gpr-name{font-size:15px;font-weight:600;color:var(--ink);}
+  .gp-roomrow .gpr-sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .gp-stepper{margin-left:auto;display:inline-flex;align-items:center;gap:6px;}
+  .gp-step{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);
+    font-size:20px;line-height:1;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
+  .gp-step:hover{border-color:var(--navy);background:#f4f7fb;}
+  .gp-step:disabled{opacity:.4;cursor:default;}
+  .gp-stepval{min-width:24px;text-align:center;font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .gp-roomhint{font-size:12px;color:var(--muted);margin:13px 2px 2px;padding-top:12px;border-top:1px solid var(--line);}
 
   /* ---------- date range picker ---------- */
   .cal-pop{
@@ -609,7 +634,7 @@
 <!-- ================= TOP NAV ================= -->
 <nav class="topnav">
   <div class="topnav-in">
-    <a class="tn-brand" href="#top">onto</a>
+    <a class="tn-brand" href="home2.html">onto</a>
     <div class="tn-links">
       <a href="#top">Overview</a>
       <a href="#rooms">Rooms</a>
@@ -688,6 +713,11 @@
 
           <!-- guests popover: steppers create slots; saved people fill them, extras get a fun name you can rename -->
           <div class="guest-pop" id="guestPop" hidden>
+            <div class="gp-tabs" role="tablist">
+              <button type="button" class="gp-tab is-on" data-tab="guests">Guests</button>
+              <button type="button" class="gp-tab" data-tab="rooms">Rooms</button>
+            </div>
+            <div class="gp-panel" id="panelGuests">
             <div class="gp-reg">
               <div class="gp-lab">Regular companions</div>
               <div class="gp-chips" id="regChips"></div>
@@ -703,6 +733,19 @@
             <div class="gp-catg">
               <div class="gp-chead"><span class="gpc-name">Infants</span><span class="gpc-sub">Under 2 &middot; free</span><span class="gpc-count" id="inCount">0</span><button type="button" class="gp-add" data-cat="infants" aria-label="Add infant">+</button></div>
               <div class="gp-people" id="inPeople"></div>
+            </div>
+            </div>
+
+            <div class="gp-panel" id="panelRooms" hidden>
+              <div class="gp-roomrow">
+                <div class="gpr-lab"><div class="gpr-name">Rooms</div></div>
+                <div class="gp-stepper">
+                  <button type="button" class="gp-step" id="roomMinus" aria-label="Fewer rooms">&minus;</button>
+                  <span class="gp-stepval" id="roomVal">1</span>
+                  <button type="button" class="gp-step" id="roomPlus" aria-label="More rooms">+</button>
+                </div>
+              </div>
+              <p class="gp-roomhint">Each room sleeps up to 3 guests.</p>
             </div>
           </div>
         </div>
@@ -1185,7 +1228,9 @@
     const funN  = { adults:0, children:0, infants:0 };
 
     window.PARTY = window.PARTY || { guests: 3 };
-    window.roomsNeeded = cap => Math.max(1, Math.ceil((window.PARTY.guests||1)/(cap||1)));
+    if(!window.PARTY.rooms) window.PARTY.rooms = 1;
+    // rooms are an explicit choice now (the toggle); fall back to auto-fit only if unset
+    window.roomsNeeded = cap => window.PARTY.rooms || Math.max(1, Math.ceil((window.PARTY.guests||1)/(cap||1)));
 
     const $ = id => document.getElementById(id);
     const pop = $('guestPop'), trigger = $('guestChip');
@@ -1303,7 +1348,8 @@
       const nm = knownIn().map(c=>c.name);
       const extra = heads() - nm.length;
       $('guestVal').textContent = nm.length ? joinNames(nm)+(extra>0?' +'+extra:'') : composition();
-      $('guestSub').textContent = heads()+' guest'+(heads()===1?'':'s');
+      const rms = window.PARTY.rooms || 1;
+      $('guestSub').textContent = heads()+' guest'+(heads()===1?'':'s')+' · '+rms+' room'+(rms>1?'s':'');
       const chosen = knownIn();
       scoreEl.textContent = scoreFor(chosen, heads()) + '% match for this trip';
       const pills = [];
@@ -1314,6 +1360,27 @@
     }
 
     document.querySelectorAll('#guestPop .gp-add').forEach(b=> b.addEventListener('click', ()=>addExtra(b.dataset.cat)));
+
+    // guests / rooms toggle + rooms stepper (explicit room count drives pricing & the "N guests · M rooms" sub-label)
+    (function(){
+      const tabs = pop.querySelectorAll('.gp-tab');
+      const panels = { guests: $('panelGuests'), rooms: $('panelRooms') };
+      tabs.forEach(t=> t.addEventListener('click', ()=>{
+        tabs.forEach(x=> x.classList.toggle('is-on', x===t));
+        Object.keys(panels).forEach(k=>{ if(panels[k]) panels[k].hidden = (k !== t.dataset.tab); });
+      }));
+
+      const MINR = 1, MAXR = 5, rv = $('roomVal');
+      function renderRooms(){
+        const n = window.PARTY.rooms || 1;
+        rv.textContent = n;
+        $('roomMinus').disabled = n <= MINR;
+        $('roomPlus').disabled  = n >= MAXR;
+      }
+      $('roomMinus').addEventListener('click', ()=>{ window.PARTY.rooms = Math.max(MINR, (window.PARTY.rooms||1) - 1); renderRooms(); apply(); });
+      $('roomPlus') .addEventListener('click', ()=>{ window.PARTY.rooms = Math.min(MAXR, (window.PARTY.rooms||1) + 1); renderRooms(); apply(); });
+      renderRooms();
+    })();
 
     const openPop  = ()=>{ const cp=$('calPop'); if(cp) cp.hidden=true; pop.hidden=false; trigger.setAttribute('aria-expanded','true'); };
     const closePop = ()=>{ editing=null; pop.hidden=true; trigger.setAttribute('aria-expanded','false'); apply(); };
@@ -1605,7 +1672,7 @@
       'Twice-daily housekeeping','Air-conditioning & smart TV'];
 
     const ROOMS = [
-      {key:'villa', name:'Villa Room', badge:'Best value', meta:'Guest room · 1 King · Garden view',
+      {key:'villa', name:'Villa Room', badge:'', meta:'Guest room · 1 King · Garden view',
        base:18500, why:null, extra:'Private balcony / veranda',
        chips:['Garden view','King bed','56 m²','Private balcony','Sleeps 3'],
        desc:"Set among the resort's 56 acres of gardens, the Villa Room opens to a private balcony or veranda wrapped in greenery, with dark-wood furnishings and hand-painted Goan tiles.",
@@ -1694,7 +1761,8 @@
           '<h3 class="rc-name">'+r.name+'</h3>'+
           '<div class="rc-meta">'+descriptor(r)+'</div>'+
           (r.why ? '<div class="rc-why"><h5>Why +'+fmt(r.why.amt)+'/night</h5><ul>'+
-             r.why.points.map(p=>'<li>'+p+'</li>').join('')+'</ul></div>' : '')+
+             r.why.points.map(p=>'<li>'+p+'</li>').join('')+'</ul></div>'
+             : '<ul class="rc-info"><li>Free cancellation till 9 Jul</li><li>Breakfast for all guests</li></ul>')+
           '<div class="rc-foot">'+
             '<div class="rc-price-row">'+
               '<div class="rc-price"><b class="rc-nightly">'+fmt(r.base)+'</b> <small>/ night</small></div>'+

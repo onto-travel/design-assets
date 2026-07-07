@@ -108,13 +108,20 @@
     const card = document.getElementById('card');
     function finish(){
       card.classList.add('busy');
-      // return the user to wherever they were headed before login
-      let dest = 'hotel-firstfold.html';
-      try {
-        dest = sessionStorage.getItem('authReturn') || dest;
-        sessionStorage.removeItem('authReturn');
-      } catch(e){}
-      setTimeout(() => { location.href = dest; }, 1400);
+      // new sign-up → verify a mobile number first; returning (already verified this session) → straight through
+      let verified = false;
+      try { verified = sessionStorage.getItem('phoneVerified') === '1'; } catch(e){}
+      if(verified){
+        let dest = 'hotel-firstfold.html';
+        try {
+          dest = sessionStorage.getItem('authReturn') || dest;
+          sessionStorage.removeItem('authReturn');
+        } catch(e){}
+        setTimeout(() => { location.href = dest; }, 1400);
+      } else {
+        // phone-verify.html consumes authReturn once verified
+        setTimeout(() => { location.href = 'phone-verify.html'; }, 1400);
+      }
     }
     document.getElementById('acctBtn').addEventListener('click', finish);
     document.getElementById('useAnother').addEventListener('click', finish);

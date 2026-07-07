@@ -17,80 +17,108 @@
     display:flex;align-items:center;justify-content:center;padding:40px 20px;}
   h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
 
-  .card{width:520px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
-    overflow:hidden;}
-  .head{text-align:center;padding:40px 34px 26px;}
-  .check{width:66px;height:66px;border-radius:50%;background:#eaf5ef;border:1px solid #cfe8db;
-    display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
-  .check svg{width:32px;height:32px;stroke:var(--green);stroke-width:2.6;fill:none;
+  .card{width:520px;max-width:100%;background:#fbf8f2;border-radius:20px;box-shadow:var(--shadow);
+    overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 30px 32px;}
+  .head{text-align:center;padding:0;}
+  .check{width:66px;height:66px;border-radius:50%;background:#e7efe6;border:1px solid #d2e2ce;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
+  .check svg{width:31px;height:31px;stroke:var(--green);stroke-width:2.6;fill:none;
     stroke-linecap:round;stroke-linejoin:round;}
   .check.pop{animation:pop .45s cubic-bezier(.22,1.2,.36,1) both;}
   @keyframes pop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
-  .head h1{font-size:27px;margin-bottom:8px;}
-  .head p{color:var(--muted);font-size:15px;margin:0 auto;max-width:360px;}
-  .ref{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:#faf7f1;
-    border:1px solid var(--line);border-radius:30px;padding:8px 16px;font-size:13.5px;color:#4a4641;}
-  .ref b{color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;}
+  .head h1{font-family:Georgia,serif;font-size:34px;line-height:1.06;color:#22324f;margin:0 0 12px;letter-spacing:-.015em;}
+  .head p{color:var(--muted);font-size:15.5px;margin:0 auto;max-width:400px;}
+  .head p b{color:#22324f;font-weight:700;}
 
-  .stars{color:var(--gold);letter-spacing:3px;font-size:14px;}
-  .sum{margin:4px 34px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
-  .sum-hd{padding:18px 18px 16px;background:#faf7f1;}
-  .sum-hd .h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
-  .sum-hd .n{font-family:Georgia,serif;font-size:17px;font-weight:700;margin-top:3px;}
-  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#4a4641;margin-top:11px;}
-  .sum-hd .hd-dates span{font-weight:400;color:var(--muted);}
-  .sum-hd .hd-dates span::before{content:" · ";}
-  .sum-hd .loc{color:var(--navy);font-weight:600;font-size:11.5px;letter-spacing:.06em;margin-top:2px;}
-  .row{display:flex;gap:14px;padding:12px 18px;}
-  .row+.row{border-top:1px solid #f1ede5;}
-  .k{flex:0 0 96px;font-size:12.5px;color:var(--muted);padding-top:1px;}
-  .v{font-size:14.5px;color:var(--ink);font-weight:600;}
-  .v span{font-weight:400;color:var(--muted);}
-  .v span::before{content:" · ";}
-  .paid{display:flex;align-items:center;justify-content:space-between;margin:18px 34px 0;
-    padding:16px 18px;border:1px solid #cfe8db;background:#f2f8f5;border-radius:14px;}
-  .paid .pl{font-size:13px;color:#3a6a55;font-weight:600;}
-  .paid .pl b{display:block;color:var(--green);font-size:11.5px;letter-spacing:.04em;margin-top:2px;font-weight:700;}
-  .paid .amt{font-family:Georgia,serif;font-size:26px;font-weight:600;letter-spacing:-.01em;}
-  .cta{display:flex;gap:12px;padding:24px 34px 14px;}
-  .btn{flex:1;border:none;background:var(--navy);color:#fff;font-size:15.5px;font-weight:600;
-    padding:15px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
-    transition:background .15s;}
+  /* booking-reference panel */
+  .refbox{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:26px;
+    background:#fff;border:1px solid #efe7d8;border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(40,30,10,.05);}
+  .refbox .rk{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#b39a67;font-weight:700;}
+  .refbox .rv{font-family:Georgia,serif;font-size:22px;font-weight:600;color:#1c2b47;letter-spacing:.03em;margin-top:4px;
+    font-variant-numeric:tabular-nums;}
+  .copy{flex:none;display:inline-flex;align-items:center;gap:7px;background:#f3efe6;border:1px solid #e7e0d1;
+    border-radius:10px;padding:9px 14px;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--navy);
+    cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
+  .copy:hover{background:#ece5d7;}
+  .copy.done{color:var(--green);background:#eaf4ee;border-color:#cde3d5;}
+  .copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* paid panel */
+  .paid{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;
+    background:#e8f0e5;border:1px solid #d2e2cc;border-radius:14px;padding:15px 18px;}
+  .paid .pl{display:inline-flex;align-items:center;gap:9px;font-size:15px;color:#3a6a4d;font-weight:600;}
+  .paid .pl svg{width:17px;height:17px;stroke:var(--green);stroke-width:2.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .pl-tx{display:flex;flex-direction:column;}
+  .pl-tx em{font-style:normal;font-size:11.5px;font-weight:600;color:#3a6a4d;letter-spacing:.01em;margin-top:2px;}
+  .pl-tx em:empty{display:none;}
+  .paid .amt{font-family:Georgia,serif;font-size:23px;font-weight:600;color:#20321f;letter-spacing:-.01em;}
+
+  /* actions */
+  .actions{margin-top:40px;display:flex;flex-direction:column;gap:12px;}
+  .btnrow{display:flex;gap:12px;}
+  .btn{flex:1;border:none;background:var(--navy);color:#fff;font-size:15px;font-weight:600;
+    padding:13px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
+    display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s;}
   .btn:hover{background:var(--navy-deep);}
-  .btn.ghost{background:#fff;color:var(--navy);border:1px solid #d9d1c1;}
-  .btn.ghost:hover{background:#faf7f1;border-color:#c2b8a4;}
-  .tertiary{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;
-    background:none;border:none;color:var(--navy);font-family:inherit;font-size:14px;font-weight:600;
-    cursor:pointer;padding:0 34px 30px;}
-  .tertiary:hover{text-decoration:underline;}
-  .tertiary svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;
-    stroke-linecap:round;stroke-linejoin:round;}
-  @media(max-width:480px){ .cta{flex-direction:column;} .k{flex-basis:80px;} }
+  .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .ghostbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
+    border:1px solid #e2dac9;border-radius:12px;padding:13px;font-family:inherit;font-size:14.5px;font-weight:600;
+    color:var(--navy);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
+  .ghostbtn:hover{background:#faf7f1;border-color:#d3c9b4;}
+  .ghostbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .txtlinks{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:6px;}
+  .txtlinks a{color:var(--navy);font-size:14px;font-weight:600;text-decoration:none;}
+  .txtlinks a:hover{text-decoration:underline;}
+  .txtlinks .dot{color:#c9c1b2;}
+
+  /* cancelled state */
+  body.is-cancelled .sum-hero-tx h1{text-decoration:line-through;text-decoration-color:#c9c1b2;}
+  body.is-cancelled .paid{background:#fbeeec;border-color:#f2d5d0;}
+  body.is-cancelled .paid .pl{color:#9c332b;}
+  body.is-cancelled .paid .pl svg{stroke:#b23b32;}
+  body.is-cancelled .pl-tx em{color:#a5564e;}
+  body.is-cancelled .paid .amt{color:#7a241d;}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
+    background:#1c1c1c;color:#fff;font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;
+    display:flex;align-items:center;gap:9px;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast svg{width:16px;height:16px;stroke:#8fd6b4;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  @media(max-width:480px){ .txtlinks{flex-wrap:wrap;} }
 
   /* two-column layout: confirmation + stay details */
-  .layout{display:flex;gap:24px;align-items:flex-start;justify-content:center;flex-wrap:wrap;width:100%;}
-  .stay-card{width:420px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:20px 20px 22px;}
+  .layout{display:flex;gap:24px;align-items:stretch;justify-content:center;flex-wrap:wrap;width:100%;}
+  .stay-card{width:480px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
+    padding:20px 20px 22px;display:flex;flex-direction:column;}
 
   /* stay-detail card (ported from the checkout summary) */
-  .sum-hero{position:relative;border-radius:16px;overflow:hidden;height:152px;box-shadow:var(--shadow);}
+  .sum-hero{position:relative;border-radius:16px;overflow:hidden;height:248px;box-shadow:var(--shadow);}
   .sum-hero img{width:100%;height:100%;object-fit:cover;display:block;}
   .sum-hero::after{content:"";position:absolute;inset:0;
     background:linear-gradient(to top,rgba(20,16,26,.92) 0%,rgba(20,16,26,.55) 42%,rgba(20,16,26,.40) 72%,rgba(20,16,26,.52) 100%);}
   .sum-hero-tx{position:absolute;left:20px;right:18px;bottom:16px;z-index:2;color:#fff;}
   .sum-hero-tx .stars{color:#f0c66a;letter-spacing:3px;font-size:14px;line-height:1;margin-bottom:6px;}
-  .sum-hero-tx h1{font-family:Georgia,serif;font-size:24px;line-height:1.08;margin:0 0 6px;color:#fff;letter-spacing:-.01em;}
+  .sum-hero-tx h1{font-family:Georgia,serif;font-size:27px;line-height:1.08;margin:0 0 6px;color:#fff;letter-spacing:-.01em;}
   .sum-hero-tx .place{color:rgba(255,255,255,.86);font-weight:600;font-size:11.5px;letter-spacing:.09em;}
-  .stay-sum{margin-top:14px;}
+  .stay-sum{margin-top:16px;}
   .sum-top{display:flex;align-items:center;justify-content:space-between;padding:0 2px 8px;}
   .sum-top .sh{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-edit{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--navy);text-decoration:none;}
+  .sum-edit:hover{text-decoration:underline;}
+  .sum-edit svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .row-cancel{flex:none;display:inline-flex;align-items:center;gap:5px;color:#b23b32;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap;}
+  .row-cancel:hover{text-decoration:underline;}
+  .row-cancel svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
   .sum-row{display:flex;gap:12px;align-items:center;padding:9px 2px;}
   .sum-row+.sum-row{border-top:1px solid #f1ede5;}
   .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f4efe6;color:#b3893f;
     display:flex;align-items:center;justify-content:center;}
   .sum-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  .sum-c{flex:1;min-width:0;display:flex;align-items:baseline;gap:12px;justify-content:space-between;}
-  .sum-k{flex:none;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;}
-  .sum-v{flex:1;min-width:0;font-size:14px;color:var(--ink);font-weight:600;text-align:right;}
+  .sum-c{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+  .sum-k{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-v{min-width:0;font-size:14.5px;color:var(--ink);font-weight:600;text-align:left;}
   .sum-v span{display:inline;font-weight:400;color:var(--muted);}
   .sum-v span:not(.av-title)::before{content:" · ";}
   .sum-v .av-title{font-weight:600;color:var(--ink);}
@@ -109,37 +137,47 @@
 <body>
   <div class="layout">
   <div class="card">
+    <div class="conf-top">
     <div class="head">
-      <div class="check pop" aria-hidden="true">
+      <div class="check pop" id="statusIcon" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg>
       </div>
-      <h1>Booking confirmed</h1>
-      <p id="lede">Your stay is booked.</p>
-      <div class="ref">Booking reference&nbsp; <b id="ref">TAJ-000000</b></div>
+      <h1 id="statusTitle">You&#39;re all set for Goa</h1>
+      <p id="lede">Your stay at <b id="hotel">Taj Exotica Resort &amp; Spa</b> is confirmed.</p>
     </div>
 
-    <div class="sum">
-      <div class="sum-hd">
-        <div class="h">Your stay</div>
-        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <div class="n" id="hotel">Taj Exotica Resort &amp; Spa</div>
-        <div class="hd-dates" id="dates">Fri 10 – Mon 13 Jul<span id="nights">3 nights</span></div>
+    <div class="refbox">
+      <div>
+        <div class="rk">Booking reference</div>
+        <div class="rv" id="ref">TAJ-000000</div>
       </div>
+      <button type="button" class="copy" id="copyRef" aria-label="Copy booking reference">
+        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        <span>Copy</span>
+      </button>
     </div>
 
-    <div class="paid">
-      <div class="pl">Paid via Razorpay<b>✓ PAYMENT SUCCESSFUL</b></div>
+    <div class="paid" id="paidBox">
+      <div class="pl"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg><span class="pl-tx"><span id="paidLabel">Paid · Razorpay</span><em id="refundNote"></em></span></div>
       <div class="amt" id="amount">₹55,500</div>
     </div>
-
-    <div class="cta">
-      <a class="btn ghost" href="hotel-firstfold.html">Modify booking</a>
-      <a class="btn" href="home2.html">Back to home</a>
     </div>
-    <button type="button" class="tertiary" id="dlVoucher">
-      <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
-      Download the voucher
-    </button>
+
+    <div class="actions">
+      <div class="btnrow">
+        <a class="ghostbtn" id="shareBtn" href="#" role="button">
+          <svg viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4l4 4"/><path d="M4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>
+          <span id="shareLabel">Share booking</span>
+        </a>
+        <button type="button" class="btn" id="dlVoucher">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
+          Download voucher
+        </button>
+      </div>
+      <div class="txtlinks">
+        <a href="home2.html">Back to home</a>
+      </div>
+    </div>
   </div>
 
   <aside class="stay-card">
@@ -152,7 +190,8 @@
       </div>
     </div>
     <div class="stay-sum">
-      <div class="sum-top"><span class="sh">Your stay</span></div>
+      <div class="sum-top"><span class="sh">Your stay</span><a class="sum-edit" id="modifyBtn" href="hotel-firstfold.html">
+        <svg viewBox="0 0 24 24"><path d="M4 20h4l10.5-10.5a2 2 0 0 0-2.8-2.8L5 17.5V20z"/><path d="M13.5 6.5l4 4"/></svg>Modify</a></div>
       <div class="sum-row">
         <span class="sum-ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
         <div class="sum-c"><div class="sum-k">Check-in</div><div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div></div>
@@ -172,24 +211,17 @@
       <div class="sum-row">
         <span class="sum-ic"><svg viewBox="0 0 24 24"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg></span>
         <div class="sum-c"><div class="sum-k">Cancellation</div><div class="sum-v"><span class="av-title">Free till 9 July</span></div></div>
+        <a class="row-cancel" id="cancelLink" href="cancel-booking.html">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Cancel booking</a>
       </div>
       <div class="sum-row">
         <span class="sum-ic"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/><path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg></span>
         <div class="sum-c"><div class="sum-k">Breakfast</div><div class="sum-v"><span class="av-title">Included</span></div></div>
       </div>
     </div>
-    <div class="co-price">
-      <div class="cp-left">
-        <div class="cp-nights">3 nights · all-in</div>
-        <div class="tax-ok"><b>&#10003;</b> Taxes &amp; fees included</div>
-      </div>
-      <div class="cp-right">
-        <div class="cp-amt" id="csAmt">₹55,500</div>
-        <div class="cp-tot">Total</div>
-      </div>
-    </div>
   </aside>
   </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
   var b = {};
@@ -201,12 +233,9 @@
   set('amount', b.amount);
   // right-side stay-detail card
   set('csHotel', b.hotel);
-  set('csAmt', b.amount);
   set('csRoom', b.room);
   set('csGuests', b.guests);
   set('csGuestSub', b.guestSub);
-  // dates keeps its "· nights" sub span, so build it as HTML
-  if(b.dates){ document.getElementById('dates').innerHTML = b.dates + (b.nights ? '<span>'+b.nights+'</span>' : ''); }
 
   // booking reference — stable per confirmed booking (kept in sessionStorage)
   var ref = b.ref;
@@ -218,6 +247,74 @@
     try { sessionStorage.setItem('booking', JSON.stringify(b)); } catch(e){}
   }
   document.getElementById('ref').textContent = ref;
+
+  // ----- cancelled state -----
+  if(b.status === 'cancelled'){
+    document.body.classList.add('is-cancelled');
+    document.getElementById('statusTitle').textContent = 'Booking cancelled';
+    document.getElementById('lede').innerHTML = 'Your stay at <b>' + (b.hotel || 'Taj Exotica Resort &amp; Spa') + '</b> was cancelled.';
+    var icon = document.getElementById('statusIcon');
+    icon.style.background = '#f3efe8'; icon.style.borderColor = '#e3dccf';
+    icon.querySelector('svg').innerHTML = '<circle cx="12" cy="12" r="9"></circle><path d="M15 9l-6 6M9 9l6 6"></path>';
+    icon.querySelector('svg').style.stroke = '#7c7771';
+    // a cancelled booking can't be modified or cancelled again
+    document.getElementById('modifyBtn').style.display = 'none';
+    document.getElementById('cancelLink').style.display = 'none';
+    // surface the refund next to Razorpay instead of a separate banner
+    document.getElementById('paidLabel').textContent = 'Refund · Razorpay';
+    document.getElementById('refundNote').textContent = 'A full refund is on its way.';
+  }
+
+  // ----- toast helper -----
+  function toast(msg){
+    var t = document.getElementById('toast');
+    t.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' + msg;
+    t.classList.add('show');
+    clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  }
+
+  // ----- copy the booking reference -----
+  document.getElementById('copyRef').addEventListener('click', function(){
+    var btn = this, label = btn.querySelector('span');
+    function done(){
+      btn.classList.add('done'); label.textContent = 'Copied';
+      clearTimeout(btn._t); btn._t = setTimeout(function(){
+        btn.classList.remove('done'); label.textContent = 'Copy';
+      }, 1800);
+    }
+    if(navigator.clipboard){ navigator.clipboard.writeText(ref).then(done).catch(done); }
+    else { done(); }
+  });
+
+  // ----- share the booking (personalised to the first companion) -----
+  function firstCompanion(guests){
+    if(!guests) return null;
+    var parts = guests.split(/,|&|\band\b/i);
+    for(var i=0;i<parts.length;i++){
+      var p = parts[i].trim();
+      if(!p || /^you$/i.test(p) || /\d/.test(p)) continue;
+      if(/guest|room|adult|child|infant|travell?er/i.test(p)) continue;
+      return p.split(/\s+/)[0];
+    }
+    return null;
+  }
+  var companion = firstCompanion(b.guests);
+  if(companion){ document.getElementById('shareLabel').textContent = 'Share with ' + companion; }
+
+  document.getElementById('shareBtn').addEventListener('click', function(e){
+    e.preventDefault();
+    var data = {
+      title: (b.hotel || 'Taj Exotica Resort & Spa') + ' — booking',
+      text: 'My stay at ' + (b.hotel || 'Taj Exotica Resort & Spa') + ' (' + ref + ')' + (b.dates ? ', ' + b.dates : '') + '.',
+      url: location.href
+    };
+    if(navigator.share){ navigator.share(data).catch(function(){}); }
+    else if(navigator.clipboard){
+      navigator.clipboard.writeText(data.text + ' ' + data.url)
+        .then(function(){ toast('Booking link copied'); })
+        .catch(function(){ toast('Couldn’t copy — try again'); });
+    } else { toast('Sharing isn’t available here'); }
+  });
 
   // download a simple text voucher (prototype)
   document.getElementById('dlVoucher').addEventListener('click', function(){
