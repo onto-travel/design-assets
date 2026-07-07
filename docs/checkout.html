@@ -55,8 +55,13 @@
   #top,#rooms,#reviews,#location{scroll-margin-top:76px;}
 
   /* ---------- HERO (first fold only) ---------- */
+  .crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:16px 0 0;font-size:13px;}
+  .crumbs a{color:var(--navy);text-decoration:none;font-weight:600;}
+  .crumbs a:hover{text-decoration:underline;}
+  .crumb-sep{color:#c3bcae;font-size:14px;line-height:1;}
+  .crumb-cur{color:var(--muted);font-weight:600;}
   .hero{display:grid;grid-template-columns:1.15fr 1fr;gap:34px;
-    padding:40px 0 34px;align-items:stretch;}
+    padding:20px 0 34px;align-items:stretch;}
   .gallery{display:flex;flex-direction:column;min-height:0;}
   .gallery .main{
     position:relative;border-radius:18px;overflow:hidden;flex:1;min-height:340px;cursor:zoom-in;
@@ -759,6 +764,13 @@
 
 <!-- ================= HERO / FIRST FOLD ================= -->
 <div class="wrap" id="top">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="home2.html">Home</a>
+    <span class="crumb-sep" aria-hidden="true">&rsaquo;</span>
+    <a href="home2.html">Goa, India</a>
+    <span class="crumb-sep" aria-hidden="true">&rsaquo;</span>
+    <span class="crumb-cur" aria-current="page">Taj Exotica Resort &amp; Spa</span>
+  </nav>
   <div class="hero">
     <div class="flip flip--left" id="flipLeft">
       <div class="flip-inner">
