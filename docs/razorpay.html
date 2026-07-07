@@ -29,6 +29,14 @@
   .rzp-cancel:hover{color:#5a6180;}
   .rzp-secure{display:flex;align-items:center;justify-content:center;gap:6px;
     font-size:11.5px;color:#9aa0b6;padding:14px;border-top:1px solid #eef0f6;}
+  /* processing state after Pay */
+  .rzp-processing{padding:46px 24px 42px;text-align:center;}
+  .rzp-spin{width:44px;height:44px;border-radius:50%;border:3px solid #e7ebf5;border-top-color:#3b7cff;
+    animation:rzpspin .8s linear infinite;margin:0 auto 20px;}
+  @keyframes rzpspin{to{transform:rotate(360deg);}}
+  .rzp-ptx{font-size:16px;font-weight:700;color:#1c2440;}
+  .rzp-psub{font-size:12.5px;color:#8a90a6;margin-top:6px;}
+  [hidden]{display:none;}
 </style>
 </head>
 <body>
@@ -37,12 +45,17 @@
       <span class="rzp-logo"><span class="mark">R</span>Razorpay</span>
       <span class="rzp-flow">Razorpay flow</span>
     </div>
-    <div class="rzp-body">
+    <div class="rzp-body" id="rzpBody">
       <div class="rzp-merchant">Paying <b>Taj Exotica Resort &amp; Spa</b></div>
       <div class="rzp-amt" id="amt">₹55,500</div>
       <div class="rzp-note">Prototype only — no real payment is processed. Tap “Pay” to simulate a successful transaction and return to the booking confirmation.</div>
       <button class="rzp-pay" id="pay">Pay <span id="payAmt">₹55,500</span></button>
       <button class="rzp-cancel" id="cancel">Cancel and go back</button>
+    </div>
+    <div class="rzp-processing" id="rzpProcessing" hidden>
+      <div class="rzp-spin"></div>
+      <div class="rzp-ptx">Processing payment…</div>
+      <div class="rzp-psub">Please don’t close or refresh this window.</div>
     </div>
     <div class="rzp-secure">🔒 Secured by Razorpay · prototype</div>
   </div>
@@ -54,9 +67,12 @@
   document.getElementById('amt').textContent = amt;
   document.getElementById('payAmt').textContent = amt;
   document.getElementById('pay').addEventListener('click', function(){
-    // simulate the vendor confirming payment, then hand back to our confirmation screen
+    // show a processing state, then hand back to our confirmation screen
+    document.getElementById('rzpBody').hidden = true;
+    document.getElementById('rzpProcessing').hidden = false;
+    document.querySelector('.rzp-flow').textContent = 'Processing';
     try { booking.paid = true; sessionStorage.setItem('booking', JSON.stringify(booking)); } catch(e){}
-    location.href = 'confirmed.html';
+    setTimeout(function(){ location.href = 'confirmed.html'; }, 1600);
   });
   document.getElementById('cancel').addEventListener('click', function(){ history.back(); });
 </script>

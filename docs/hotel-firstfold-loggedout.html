@@ -1953,8 +1953,8 @@
     document.getElementById('authGoogle').addEventListener('click', () => {
       let dest = 'hotel-firstfold.html';
       if(authIntent === 'book'){
-        // snapshot the live booking so the confirmation page has data, then
-        // send the freshly signed-up user straight to the booking-confirmed screen
+        // snapshot the live booking so payment + confirmation have data, then
+        // after sign-up send the user through the payment screen (→ confirmed)
         const t = sel => { const el = document.querySelector(sel); return el ? el.textContent.trim() : ''; };
         const booking = {
           hotel:  'Taj Exotica Resort & Spa',
@@ -1967,7 +1967,7 @@
           amount: t('#bkTotal') || '₹55,500'
         };
         try { sessionStorage.setItem('booking', JSON.stringify(booking)); } catch(e){}
-        dest = 'confirmed.html';
+        dest = 'razorpay.html';
       }
       try { sessionStorage.setItem('authReturn', dest); } catch(e){}
       location.href = 'google-login.html';
