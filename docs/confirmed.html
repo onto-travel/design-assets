@@ -18,7 +18,12 @@
   h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
 
   .card{width:520px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
-    overflow:hidden;}
+    overflow:hidden;position:relative;}
+  .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
+    color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
+    transition:color .15s,background .15s;}
+  .backlink:hover{color:var(--navy);background:#faf7f1;}
+  .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
   .head{text-align:center;padding:40px 34px 26px;}
   .check{width:66px;height:66px;border-radius:50%;background:#eaf5ef;border:1px solid #cfe8db;
     display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
@@ -47,29 +52,51 @@
   .v{font-size:14.5px;color:var(--ink);font-weight:600;}
   .v span{font-weight:400;color:var(--muted);}
   .v span::before{content:" · ";}
-  .paid{display:flex;align-items:center;justify-content:space-between;margin:18px 34px 0;
-    padding:16px 18px;border:1px solid #cfe8db;background:#f2f8f5;border-radius:14px;}
+  .paid{display:flex;align-items:center;justify-content:space-between;
+    padding:15px 18px;border-top:1px solid #e4ede4;background:#f2f8f5;}
   .paid .pl{font-size:13px;color:#3a6a55;font-weight:600;}
   .paid .pl b{display:block;color:var(--green);font-size:11.5px;letter-spacing:.04em;margin-top:2px;font-weight:700;}
   .paid .amt{font-family:Georgia,serif;font-size:26px;font-weight:600;letter-spacing:-.01em;}
-  .cta{display:flex;gap:12px;padding:24px 34px 14px;}
-  .btn{flex:1;border:none;background:var(--navy);color:#fff;font-size:15.5px;font-weight:600;
-    padding:15px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
-    transition:background .15s;}
+  /* rewards nudge — shown only when the stay was booked as a guest (not logged in) */
+  .rewards{display:none;margin:18px 34px 0;padding:12px 14px;border-radius:14px;gap:12px;
+    align-items:center;background:linear-gradient(120deg,#fcf6e9,#f8efdb);border:1px solid #eaddbe;}
+  .rewards.show{display:flex;}
+  .rw-ic{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(193,154,75,.15);
+    display:flex;align-items:center;justify-content:center;color:#b8923f;}
+  .rw-ic svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .rw-tx{flex:1;min-width:0;}
+  .rw-h{font-size:13.5px;font-weight:600;color:#7c5e22;line-height:1.35;}
+  .rw-h b{font-weight:700;color:#5f4715;}
+  .rw-btn{flex:none;display:inline-flex;align-items:center;gap:5px;background:none;color:#a07d2e;
+    font-size:13px;font-weight:700;padding:7px 4px 7px 10px;border-radius:8px;cursor:pointer;
+    font-family:inherit;text-decoration:none;white-space:nowrap;border:none;transition:color .15s;}
+  .rw-btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
+  .rw-btn:hover{color:#7c5e22;}
+  .rw-btn:hover svg{transform:translateX(2px);}
+  @media(max-width:420px){ .rw-h{font-size:12.5px;} .rw-btn{padding-left:6px;} }
+  .actions{padding:22px 34px 28px;display:flex;flex-direction:column;gap:12px;}
+  .btnrow{display:flex;gap:12px;}
+  .btn{flex:1;border:none;background:var(--navy);color:#fff;font-size:15px;font-weight:600;
+    padding:14px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
+    display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s;}
   .btn:hover{background:var(--navy-deep);}
-  .btn.ghost{background:#fff;color:var(--navy);border:1px solid #d9d1c1;}
-  .btn.ghost:hover{background:#faf7f1;border-color:#c2b8a4;}
-  .tertiary{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;
-    background:none;border:none;color:var(--navy);font-family:inherit;font-size:14px;font-weight:600;
-    cursor:pointer;padding:0 34px 30px;}
-  .tertiary:hover{text-decoration:underline;}
-  .tertiary svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;
-    stroke-linecap:round;stroke-linejoin:round;}
-  @media(max-width:480px){ .cta{flex-direction:column;} .k{flex-basis:80px;} }
+  .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .ghostbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
+    border:1px solid #e2dac9;border-radius:12px;padding:14px;font-family:inherit;font-size:14.5px;font-weight:600;
+    color:var(--navy);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
+  .ghostbtn:hover{background:#faf7f1;border-color:#d3c9b4;}
+  .ghostbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .txtlinks{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:6px;}
+  .txtlinks a{color:var(--navy);font-size:14px;font-weight:600;text-decoration:none;}
+  .txtlinks a:hover{text-decoration:underline;}
+  @media(max-width:480px){ .btnrow{flex-direction:column;} .k{flex-basis:80px;} }
 </style>
 </head>
 <body>
   <div class="card">
+    <a class="backlink" href="home2.html">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to home
+    </a>
     <div class="head">
       <div class="check pop" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg>
@@ -86,21 +113,35 @@
         <div class="n" id="hotel">Taj Exotica Resort &amp; Spa</div>
         <div class="hd-dates" id="dates">Fri 10 – Mon 13 Jul<span id="nights">3 nights</span></div>
       </div>
+
+      <div class="paid">
+        <div class="pl">Paid via Razorpay<b>✓ PAYMENT SUCCESSFUL</b></div>
+        <div class="amt" id="amount">₹55,500</div>
+      </div>
     </div>
 
-    <div class="paid">
-      <div class="pl">Paid via Razorpay<b>✓ PAYMENT SUCCESSFUL</b></div>
-      <div class="amt" id="amount">₹55,500</div>
+    <div class="rewards" id="rewards">
+      <span class="rw-ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      </span>
+      <div class="rw-tx">
+        <div class="rw-h" id="rwHead">You&rsquo;ve earned <b>&#8377;2,775</b> in rewards</div>
+      </div>
+      <a class="rw-btn" id="rewardsCta" href="google-login.html">Log in to view <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a>
     </div>
 
-    <div class="cta">
-      <a class="btn ghost" href="booking-details.html">View booking</a>
-      <a class="btn" href="home2.html">Back to home</a>
+    <div class="actions">
+      <div class="btnrow">
+        <a class="ghostbtn" href="booking-details.html">
+          <svg viewBox="0 0 24 24"><path d="M2.5 12s3.4-6.8 9.5-6.8S21.5 12 21.5 12s-3.4 6.8-9.5 6.8S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          View booking
+        </a>
+        <button type="button" class="btn" id="dlVoucher">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
+          Download voucher
+        </button>
+      </div>
     </div>
-    <button type="button" class="tertiary" id="dlVoucher">
-      <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
-      Download the voucher
-    </button>
   </div>
 
 <script>
@@ -123,6 +164,25 @@
     try { sessionStorage.setItem('booking', JSON.stringify(b)); } catch(e){}
   }
   document.getElementById('ref').textContent = ref;
+
+  // guest booking (not yet logged in) → offer a rewards sign-up nudge
+  // (?guest=1 forces it on for previewing without walking the whole flow)
+  var forceGuest = new URLSearchParams(location.search).get('guest') === '1';
+  var signedIn = false;
+  try { signedIn = sessionStorage.getItem('phoneVerified') === '1'; } catch(e){}
+  if(forceGuest || (b.guest && !signedIn)){
+    var amt = parseInt(String(b.amount || '').replace(/[^\d]/g, ''), 10) || 0;
+    if(amt){
+      var pts = Math.round(amt * 0.05);   // 5% back in reward points
+      document.getElementById('rwHead').innerHTML =
+        'You&rsquo;ve earned <b>&#8377;' + pts.toLocaleString('en-IN') + '</b> in rewards';
+    }
+    document.getElementById('rewards').classList.add('show');
+    // after the mock login, return to the booking so the rewards are "attached"
+    document.getElementById('rewardsCta').addEventListener('click', function(){
+      try { sessionStorage.setItem('authReturn', 'booking-details.html'); } catch(e){}
+    });
+  }
 
   // download a simple text voucher (prototype)
   document.getElementById('dlVoucher').addEventListener('click', function(){

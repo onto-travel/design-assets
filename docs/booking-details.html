@@ -18,7 +18,12 @@
   h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
 
   .card{width:520px;max-width:100%;background:#fbf8f2;border-radius:20px;box-shadow:var(--shadow);
-    overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 30px 32px;}
+    overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 30px 32px;position:relative;}
+  .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
+    color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
+    transition:color .15s,background .15s;}
+  .backlink:hover{color:var(--navy);background:#f3ede1;}
+  .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
   .head{text-align:center;padding:0;}
   .check{width:66px;height:66px;border-radius:50%;background:#e7efe6;border:1px solid #d2e2ce;
     display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
@@ -31,21 +36,20 @@
   .head p b{color:#22324f;font-weight:700;}
 
   /* booking-reference panel */
-  .refbox{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:26px;
-    background:#fff;border:1px solid #efe7d8;border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(40,30,10,.05);}
-  .refbox .rk{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#b39a67;font-weight:700;}
-  .refbox .rv{font-family:Georgia,serif;font-size:22px;font-weight:600;color:#1c2b47;letter-spacing:.03em;margin-top:4px;
-    font-variant-numeric:tabular-nums;}
-  .copy{flex:none;display:inline-flex;align-items:center;gap:7px;background:#f3efe6;border:1px solid #e7e0d1;
-    border-radius:10px;padding:9px 14px;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--navy);
-    cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
-  .copy:hover{background:#ece5d7;}
-  .copy.done{color:var(--green);background:#eaf4ee;border-color:#cde3d5;}
-  .copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .ref{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:#f4eee2;
+    border:1px solid var(--line);border-radius:30px;padding:6px 7px 6px 16px;font-size:13.5px;
+    color:#6b6459;font-weight:600;}
+  .ref b{color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;font-weight:700;margin-left:2px;}
+  .ref-copy{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+    border-radius:50%;border:none;background:none;color:var(--muted);cursor:pointer;transition:background .15s,color .15s;}
+  .ref-copy:hover{background:#e7ded0;color:var(--navy);}
+  .ref-copy.done{color:var(--green);}
+  .ref-copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
 
   /* paid panel */
-  .paid{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;
-    background:#e8f0e5;border:1px solid #d2e2cc;border-radius:14px;padding:15px 18px;}
+  /* payment + rewards live in ONE neutral box; colour comes only from the small icons */
+  .paybox{margin-top:14px;border:1px solid #e7e0d2;border-radius:14px;overflow:hidden;background:#fff;}
+  .paid{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 17px;}
   .paid .pl{display:inline-flex;align-items:center;gap:9px;font-size:15px;color:#3a6a4d;font-weight:600;}
   .paid .pl svg{width:17px;height:17px;stroke:var(--green);stroke-width:2.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .pl-tx{display:flex;flex-direction:column;}
@@ -53,8 +57,25 @@
   .pl-tx em:empty{display:none;}
   .paid .amt{font-family:Georgia,serif;font-size:23px;font-weight:600;color:#20321f;letter-spacing:-.01em;}
 
+  /* rewards nudge — bottom row of the same box; shown only when booked as a guest */
+  .rewards{display:none;align-items:center;gap:12px;padding:13px 17px;border-top:1px solid #efe8d8;}
+  .rewards.show{display:flex;}
+  .rw-ic{flex:none;width:34px;height:34px;border-radius:50%;background:rgba(193,154,75,.15);
+    display:flex;align-items:center;justify-content:center;color:#b8923f;}
+  .rw-ic svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .rw-tx{flex:1;min-width:0;}
+  .rw-h{font-size:13.5px;font-weight:600;color:#4a4641;line-height:1.35;}
+  .rw-h b{font-weight:700;color:#8a6a2e;}
+  .rw-btn{flex:none;display:inline-flex;align-items:center;gap:5px;background:none;color:#a07d2e;
+    font-size:13px;font-weight:700;padding:7px 4px 7px 10px;border-radius:8px;cursor:pointer;
+    font-family:inherit;text-decoration:none;white-space:nowrap;border:none;transition:color .15s;}
+  .rw-btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
+  .rw-btn:hover{color:#7c5e22;}
+  .rw-btn:hover svg{transform:translateX(2px);}
+  @media(max-width:420px){ .rw-h{font-size:12.5px;} .rw-btn{padding-left:6px;} }
+
   /* actions */
-  .actions{margin-top:40px;display:flex;flex-direction:column;gap:12px;}
+  .actions{margin-top:24px;display:flex;flex-direction:column;gap:12px;}
   .btnrow{display:flex;gap:12px;}
   .btn{flex:1;border:none;background:var(--navy);color:#fff;font-size:15px;font-weight:600;
     padding:13px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
@@ -137,29 +158,37 @@
 <body>
   <div class="layout">
   <div class="card">
+    <a class="backlink" href="home2.html">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to home
+    </a>
     <div class="conf-top">
     <div class="head">
       <div class="check pop" id="statusIcon" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg>
       </div>
       <h1 id="statusTitle">You&#39;re all set for Goa</h1>
-      <p id="lede">Your stay at <b id="hotel">Taj Exotica Resort &amp; Spa</b> is confirmed.</p>
-    </div>
-
-    <div class="refbox">
-      <div>
-        <div class="rk">Booking reference</div>
-        <div class="rv" id="ref">TAJ-000000</div>
+      <div class="ref">Booking reference <b id="ref">TAJ-000000</b>
+        <button type="button" class="ref-copy" id="copyRef" aria-label="Copy booking reference">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        </button>
       </div>
-      <button type="button" class="copy" id="copyRef" aria-label="Copy booking reference">
-        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-        <span>Copy</span>
-      </button>
     </div>
 
+    <div class="paybox">
     <div class="paid" id="paidBox">
       <div class="pl"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg><span class="pl-tx"><span id="paidLabel">Paid · Razorpay</span><em id="refundNote"></em></span></div>
       <div class="amt" id="amount">₹55,500</div>
+    </div>
+
+    <div class="rewards" id="rewards">
+      <span class="rw-ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      </span>
+      <div class="rw-tx">
+        <div class="rw-h" id="rwHead">You&rsquo;ve earned <b>&#8377;2,775</b> in rewards</div>
+      </div>
+      <a class="rw-btn" id="rewardsCta" href="google-login.html">Log in to view <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a>
+    </div>
     </div>
     </div>
 
@@ -173,9 +202,6 @@
           <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
           Download voucher
         </button>
-      </div>
-      <div class="txtlinks">
-        <a href="home2.html">Back to home</a>
       </div>
     </div>
   </div>
@@ -226,7 +252,7 @@
 <script>
   var b = {};
   try { b = JSON.parse(sessionStorage.getItem('booking')) || {}; } catch(e){}
-  function set(id, val){ if(val){ document.getElementById(id).textContent = val; } }
+  function set(id, val){ var el = document.getElementById(id); if(el && val){ el.textContent = val; } }
   function setHTML(id, val){ if(val){ document.getElementById(id).innerHTML = val; } }
 
   set('hotel', b.hotel);
@@ -248,11 +274,31 @@
   }
   document.getElementById('ref').textContent = ref;
 
+  // guest booking (not yet logged in) → keep offering the rewards sign-up nudge
+  // (?guest=1 forces it on for previewing without walking the whole flow)
+  var forceGuest = new URLSearchParams(location.search).get('guest') === '1';
+  var signedIn = false;
+  try { signedIn = sessionStorage.getItem('phoneVerified') === '1'; } catch(e){}
+  if(forceGuest || (b.guest && !signedIn)){
+    var amt = parseInt(String(b.amount || '').replace(/[^\d]/g, ''), 10) || 0;
+    if(amt){
+      var pts = Math.round(amt * 0.05);   // 5% back in reward points
+      document.getElementById('rwHead').innerHTML =
+        'You&rsquo;ve earned <b>&#8377;' + pts.toLocaleString('en-IN') + '</b> in rewards';
+    }
+    document.getElementById('rewards').classList.add('show');
+    // return here after the mock login completes
+    document.getElementById('rewardsCta').addEventListener('click', function(){
+      try { sessionStorage.setItem('authReturn', 'booking-details.html'); } catch(e){}
+    });
+  }
+
   // ----- cancelled state -----
   if(b.status === 'cancelled'){
     document.body.classList.add('is-cancelled');
     document.getElementById('statusTitle').textContent = 'Booking cancelled';
-    document.getElementById('lede').innerHTML = 'Your stay at <b>' + (b.hotel || 'Taj Exotica Resort &amp; Spa') + '</b> was cancelled.';
+    var _lede = document.getElementById('lede');
+    if(_lede){ _lede.innerHTML = 'Your stay at <b>' + (b.hotel || 'Taj Exotica Resort &amp; Spa') + '</b> was cancelled.'; }
     var icon = document.getElementById('statusIcon');
     icon.style.background = '#f3efe8'; icon.style.borderColor = '#e3dccf';
     icon.querySelector('svg').innerHTML = '<circle cx="12" cy="12" r="9"></circle><path d="M15 9l-6 6M9 9l6 6"></path>';
@@ -275,12 +321,11 @@
 
   // ----- copy the booking reference -----
   document.getElementById('copyRef').addEventListener('click', function(){
-    var btn = this, label = btn.querySelector('span');
+    var btn = this;
     function done(){
-      btn.classList.add('done'); label.textContent = 'Copied';
-      clearTimeout(btn._t); btn._t = setTimeout(function(){
-        btn.classList.remove('done'); label.textContent = 'Copy';
-      }, 1800);
+      btn.classList.add('done');
+      if(typeof toast === 'function') toast('Reference copied');
+      clearTimeout(btn._t); btn._t = setTimeout(function(){ btn.classList.remove('done'); }, 1500);
     }
     if(navigator.clipboard){ navigator.clipboard.writeText(ref).then(done).catch(done); }
     else { done(); }

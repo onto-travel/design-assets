@@ -486,7 +486,10 @@
     return list;
   }
   var COMPANIONS = loadCompanions();
-  try{ var _mn=document.getElementById('menuName'); if(_mn) _mn.textContent = readUserName(); }catch(e){}
+  try{ var _un=readUserName(), _ini=(_un[0]||'Y').toUpperCase();
+       var _mn=document.getElementById('menuName'); if(_mn) _mn.textContent = _un;
+       var _na=document.getElementById('navAvatar'); if(_na) _na.textContent = _ini;
+       var _ma=document.getElementById('menuAvatar'); if(_ma) _ma.textContent = _ini; }catch(e){}
   var EM  = { adults:'🧍', children:'🧒', infants:'👶' };
   var FUN = {
     adults:  ["Captain Mango","Wanderer Kai","Skipper Reef","Sunny Coco","Palm Rover"],

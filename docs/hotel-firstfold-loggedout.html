@@ -632,6 +632,117 @@
     .rev-track .rcard{flex:0 0 80%;}
     .sec-h{font-size:32px;}
   }
+
+  /* ===== flip-to-cart scaffold + cart faces (grafted) ===== */
+  :root{--flip-dur:.56s;--flip-stag:100ms;}
+  /* ---------- 3D FLIP SCAFFOLD ---------- */
+  /* NB: the preserve-3d element must NOT be a grid/flex container — that
+     flattens the 3D context and turns the flip into a flat horizontal squash.
+     Faces are absolutely stacked; JS sets an explicit height so nothing jumps. */
+  .flip{position:relative;perspective:2200px;}
+  .flip-inner{position:relative;height:100%;transform-style:preserve-3d;
+    transition:transform var(--flip-dur) ease-in-out;}
+  .flip--right .flip-inner{transition-delay:var(--flip-stag);}
+  .flip.flipped .flip-inner{transform:rotateY(180deg);}
+  .face{position:absolute;inset:0;display:flex;min-width:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+  .face>*{flex:1;min-width:0;}
+  .face.back{transform:rotateY(180deg);}
+  /* only the forward-facing side takes clicks */
+  .flip:not(.flipped) .face.back{pointer-events:none;}
+  .flip.flipped .face.front{pointer-events:none;}
+  /* when arriving already in the cart, skip the load-time spin */
+  .flip.no-anim .flip-inner{transition:none;}
+  /* restrained shadow-lift / scale during the turn */
+  .flip.flipping{animation:lift var(--flip-dur) ease-in-out;}
+  .flip--right.flipping{animation-delay:var(--flip-stag);}
+  @keyframes lift{
+    0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 rgba(0,0,0,0));}
+    50%{transform:scale(1.02);filter:drop-shadow(0 22px 42px rgba(40,30,10,.20));}
+  }
+  /* ---------- BACK-LEFT: STAY SUMMARY ---------- */
+  .co-edit{align-self:flex-start;margin-top:2px;background:none;border:none;color:var(--navy);
+    font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;padding:2px 0;display:inline-flex;align-items:center;gap:5px;}
+  .co-edit:hover{text-decoration:underline;}
+  /* summary hero image with the hotel name overlaid */
+  .sum-hero{position:relative;border-radius:16px;overflow:hidden;height:152px;box-shadow:var(--shadow);}
+  .sum-hero img{width:100%;height:100%;object-fit:cover;display:block;}
+  .sum-hero::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(to top,rgba(20,16,26,.92) 0%,rgba(20,16,26,.55) 42%,rgba(20,16,26,.40) 72%,rgba(20,16,26,.52) 100%);}
+  .sum-hero-tx{position:absolute;left:20px;right:18px;bottom:16px;z-index:2;color:#fff;}
+  .sum-hero-tx .stars{color:#f0c66a;letter-spacing:3px;font-size:14px;line-height:1;margin-bottom:6px;}
+  .sum-hero-tx h1{font-family:Georgia,serif;font-size:27px;line-height:1.08;margin:0 0 6px;color:#fff;letter-spacing:-.01em;}
+  .sum-hero-tx .place{color:rgba(255,255,255,.86);font-weight:600;font-size:11.5px;letter-spacing:.09em;}
+
+  /* your-stay summary — icon per row */
+  .sum{margin-top:14px;}
+  .sum-top{display:flex;align-items:center;justify-content:space-between;padding:0 2px 8px;}
+  .sum-top .sh{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-top .sum-edit{background:none;border:none;color:var(--navy);font-weight:600;font-size:13px;
+    cursor:pointer;font-family:inherit;padding:2px 0;}
+  .sum-top .sum-edit:hover{text-decoration:underline;}
+  .sum-row{display:flex;gap:12px;align-items:center;padding:9px 2px;}
+  .sum-row+.sum-row{border-top:1px solid #f1ede5;}
+  .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f4efe6;color:#b3893f;
+    display:flex;align-items:center;justify-content:center;}
+  .sum-ic svg{width:18px;height:18px;}
+  .sum-c{flex:1;min-width:0;display:flex;align-items:baseline;gap:12px;justify-content:space-between;}
+  .sum-k{flex:none;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-v{flex:1;min-width:0;font-size:14px;color:var(--ink);font-weight:600;text-align:right;}
+  .sum-v span{display:inline;font-weight:400;color:var(--muted);}
+  .sum-v span:not(.av-title)::before{content:" · ";}
+  .sum-v .av-title{font-weight:600;color:var(--ink);}
+  .sum-row.removed .av-title{color:var(--muted);}
+  .sum-toggle{background:none;border:none;padding:0;font:inherit;color:var(--gold);cursor:pointer;font-weight:600;
+    text-decoration:underline;text-underline-offset:2px;}
+  .sum-toggle:hover{opacity:.75;}
+  .policy{list-style:none;margin:16px 2px 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;}
+  .policy li{position:relative;padding-left:22px;font-size:13px;color:#4a4641;}
+  .policy li::before{content:"✓";position:absolute;left:0;top:0;color:var(--green);font-weight:700;}
+  .policy li.off{color:var(--muted);}
+  .policy li.off::before{content:"–";color:var(--muted);}
+  .co-price{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:#f4efe6;border:1px solid #ece3d2;border-radius:15px;padding:14px 20px;text-align:left;}
+  .cp-left{display:flex;flex-direction:column;gap:5px;}
+  .cp-nights{font-size:13px;color:var(--muted);}
+  .tax-ok{font-size:12.5px;color:#8a6a24;font-weight:600;}
+  .tax-ok b{color:#8a6a24;font-weight:700;}
+  .cp-right{text-align:right;}
+  .cp-amt{font-family:Georgia,serif;font-size:33px;font-weight:600;color:var(--ink);letter-spacing:-.015em;line-height:1;}
+  .cp-tot{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:7px;}
+
+  /* ---------- BACK-RIGHT: DETAILS FORM ---------- */
+  .form-h{font-family:Georgia,serif;font-size:26px;margin:8px 0 4px;letter-spacing:-.01em;}
+  .form-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+  .fld{display:block;margin-bottom:15px;}
+  .fld>span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;margin-bottom:6px;}
+  .fld input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:11px;
+    font-size:15px;font-family:inherit;background:#fff;color:var(--ink);transition:border-color .15s;}
+  .fld input:hover{border-color:#c9c0ae;}
+  .fld input:focus{outline:none;border-color:var(--navy);}
+  .fld-err{display:none;margin-top:6px;font-size:12.5px;color:#b0563d;}
+  .fld.invalid input,.fld.invalid input:focus{border-color:#b0563d;}
+  .fld.invalid .fld-err{display:block;}
+  .confirm{width:100%;margin-top:10px;font-size:17px;padding:17px;letter-spacing:.005em;}
+  .confirm[disabled]{background:var(--green);cursor:default;}
+  .form-back{margin-top:16px;background:none;border:none;color:var(--muted);font-size:13.5px;
+    font-weight:600;font-family:inherit;cursor:pointer;align-self:center;padding:4px;}
+  .form-back:hover{color:var(--navy);text-decoration:underline;}
+  .form-spacer{flex:1;}
+
+  /* ---------- REDUCED MOTION: cross-fade, no rotation ---------- */
+  @media(prefers-reduced-motion:reduce){
+    .flip-inner{transition:none;transform:none !important;}
+    .face{backface-visibility:visible;-webkit-backface-visibility:visible;transition:opacity .3s ease;}
+    .face.back{transform:none;opacity:0;}
+    .face.front{opacity:1;}
+    .flip.flipped .face.front{opacity:0;}
+    .flip.flipped .face.back{opacity:1;}
+    .flip.flipping{animation:none;}
+  }
+  .face .book{align-self:stretch;}
+  #pdpFolds.pdp-hidden{display:none;}
+  @media(max-width:920px){ .flip{height:auto!important;} .face{position:relative;} .flip .face.back{display:none;} }
 </style>
 </head>
 <body>
@@ -656,6 +767,9 @@
 <!-- ================= HERO / FIRST FOLD ================= -->
 <div class="wrap" id="top">
   <div class="hero">
+    <div class="flip flip--left" id="flipLeft">
+      <div class="flip-inner">
+        <div class="face front">
     <div class="gallery" id="gallery">
       <div class="main">
         <img id="mainImg" src="images/gv-01-bedroom.png" alt="Villa Room — garden-view bedroom">
@@ -676,7 +790,71 @@
         <button class="thumb" data-i="7"><img src="images/08-villa-exterior.png" alt="Resort villa exteriors"></button>
       </div>
     </div>
+        </div>
+        <div class="face back">
+          <div class="book">
+            <!-- hero image with the hotel name overlaid -->
+            <div class="sum-hero">
+              <img src="images/04-pool-sunset.png" alt="Taj Exotica Resort &amp; Spa at sunset">
+              <div class="sum-hero-tx">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <h1>Taj Exotica Resort &amp; Spa</h1>
+                <div class="place">BENAULIM BEACH · GOA, INDIA</div>
+              </div>
+            </div>
 
+            <!-- frozen booking summary (static) -->
+            <div class="sum">
+              <div class="sum-top">
+                <span class="sh">Your stay</span>
+                <button type="button" class="sum-edit" data-back>Edit</button>
+              </div>
+              <div class="sum-row">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Check-in</div><div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div></div>
+              </div>
+              <div class="sum-row">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/><path d="M9 14.5l2 2 3.5-3.5"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Check-out</div><div class="sum-v">Mon 13 Jul · 3 nights<span>12:00 PM</span></div></div>
+              </div>
+              <div class="sum-row">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M3 18v2.5M21 18v2.5"/><path d="M3 15h18"/><path d="M6.5 12V9.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V12"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Room</div><div class="sum-v">Villa Room · Garden view<span>56 m² · Sleeps 3</span></div></div>
+              </div>
+              <div class="sum-row">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.5 20c.6-3.1 3-4.8 5.5-4.8s4.9 1.7 5.5 4.8"/><path d="M16.2 5.3a3 3 0 0 1 0 5.6M21 20c-.4-2.1-1.7-3.5-3.4-4.2"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Guests</div><div class="sum-v">You<span>1 traveller</span></div></div>
+              </div>
+              <div class="sum-row" data-addon="cancel">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Cancellation</div><div class="sum-v"><span class="av-title">Free till 9 July</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹5,400</button></span></div></div>
+              </div>
+              <div class="sum-row" data-addon="breakfast">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/><path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Breakfast</div><div class="sum-v"><span class="av-title">Included</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹4,500</button></span></div></div>
+              </div>
+            </div>
+
+            <!-- price block: total in a filled box -->
+            <div class="co-price">
+              <div class="cp-left">
+                <div class="cp-nights">3 nights · all-in</div>
+                <div class="tax-ok"><b>&#10003;</b> Taxes &amp; fees included</div>
+              </div>
+              <div class="cp-right">
+                <div class="cp-amt">₹55,500</div>
+                <div class="cp-tot">Total</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip flip--right" id="flipRight">
+      <div class="flip-inner">
+        <div class="face front">
     <div class="book">
       <!-- ===== 1. HEADER ===== -->
       <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
@@ -762,9 +940,35 @@
         <div id="relGroups"></div>
       </div>
     </div>
+        </div>
+        <div class="face back">
+          <div class="book">
+            <!-- invisible spacer matches the left card's stars line so the two headings align -->
+            <div class="stars" aria-hidden="true" style="visibility:hidden">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <h2 class="form-h">Confirm your details</h2>
+            <p class="form-sub">Enter your details to complete the booking — no account needed.</p>
+
+            <label class="fld"><span>Full name</span>
+              <input type="text" id="fName" value="" placeholder="Full name" autocomplete="name"></label>
+            <label class="fld"><span>Email</span>
+              <input type="email" id="fEmail" value="" placeholder="you@email.com" autocomplete="email" inputmode="email">
+              <small class="fld-err">Enter a valid email address (must include @).</small></label>
+            <label class="fld"><span>Phone</span>
+              <input type="tel" id="fPhone" value="" placeholder="+91 98765 43210" autocomplete="tel" inputmode="numeric" maxlength="17">
+              <small class="fld-err">Enter a 10-digit phone number — digits only.</small></label>
+
+            <div class="form-spacer"></div>
+
+            <button class="btn confirm" id="confirmBtn">Confirm booking · <span id="confirmAmt">₹55,500</span></button>
+            <button type="button" class="form-back" data-back>&#8249; Back to booking</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
+<div id="pdpFolds">
 <!-- ================= CHOOSE YOUR ROOM ================= -->
 <div class="wrap rooms-wrap" id="rooms">
   <h2 class="rooms-h">Choose your room</h2>
@@ -1002,6 +1206,7 @@
 <footer>
   <div class="wrap">Taj Exotica Resort &amp; Spa, Goa · Benaulim Beach, South Goa · An IHCL luxury resort</div>
 </footer>
+</div>
 
 <!-- ================= FULLSCREEN LIGHTBOX + REVIEWS ================= -->
 <div class="lbx" id="lbx" hidden>
@@ -1145,7 +1350,7 @@
 
   // ---- CTAs: primary → checkout, secondary → wishlist ----
   document.getElementById('bookNow').addEventListener('click',
-    () => { window.openAuth('book'); });
+    () => { window.goToCart && window.goToCart(); });
   document.getElementById('addTrip').addEventListener('click', function(){
     const on = this.classList.toggle('on');
     this.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -1689,7 +1894,7 @@
 
       el.dataset.key = r.key;
       el.querySelector('.rc-name').addEventListener('click', e=>{ e.stopPropagation(); openRoom(r.key); });
-      el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); window.openAuth('book'); });
+      el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); window.goToCart&&window.goToCart(); });
       // click anywhere else on the card (beige body or photo) → preview this room in the first fold
       el.addEventListener('click', e=>{
         if(e.target.closest('.rc-book, .rc-nav, .rc-name')) return;
@@ -1778,7 +1983,7 @@
       $('drAmen').hidden = !willOpen;
       $('drAmenToggle').setAttribute('aria-expanded', willOpen ? 'true' : 'false');
     });
-    $('drBook').addEventListener('click', ()=>{ window.openAuth('book'); });
+    $('drBook').addEventListener('click', ()=>{ closeDrawer(); window.goToCart&&window.goToCart(); });
     document.addEventListener('keydown', e=>{
       if(!drawer.classList.contains('open')) return;
       if(e.key === 'Escape') closeDrawer();
@@ -1978,5 +2183,142 @@
   })();
 </script>
 
+<script>
+  // ===== flip PDP <-> cart (grafted onto the interactive product page) =====
+  (function(){
+    const $ = id => document.getElementById(id);
+    const money = n => '₹' + n.toLocaleString('en-IN');
+  (function(){
+    const flips = [...document.querySelectorAll('.flip')];
+    function size(){
+      if(window.innerWidth <= 920){ flips.forEach(f => { f.style.height=''; }); return; }
+      // measure: drop faces into normal flow so each reports its natural height
+      flips.forEach(f => {
+        f.style.height = 'auto';
+        f.querySelector('.flip-inner').style.height = 'auto';
+        f.querySelectorAll('.face').forEach(fc => fc.style.position = 'relative');
+      });
+      // both cards share one height (the tallest face); bottom-anchored blocks
+      // (details form's button, booking card's match box) fill any slack
+      let max = 0;
+      flips.forEach(f => f.querySelectorAll('.face').forEach(fc => max = Math.max(max, fc.offsetHeight)));
+      flips.forEach(f => {
+        f.querySelectorAll('.face').forEach(fc => fc.style.position = '');
+        f.querySelector('.flip-inner').style.height = '';
+        f.style.height = max + 'px';
+      });
+    }
+    window.addEventListener('load', size);
+    window.addEventListener('resize', size);
+    size();
+  })();
+
+  (function(){
+    const flips = [$('flipLeft'), $('flipRight')];
+    const step = $('stepLabel');
+    let clearT;
+    function setFlipped(on){
+      clearTimeout(clearT);
+      flips.forEach(f => { f.classList.add('flipping'); f.classList.toggle('flipped', on); });
+      const _folds = document.getElementById('pdpFolds');
+      if(_folds) _folds.classList.toggle('pdp-hidden', on);
+      if(step) step.innerHTML = on ? 'Confirm &amp; pay' : 'Review your stay';
+      // drop the lift class once the (staggered) turn is done
+      clearT = setTimeout(() => flips.forEach(f => f.classList.remove('flipping')), 820);
+    }
+    window.goToCart = () => { setFlipped(true); window.scrollTo({top:0,behavior:'smooth'}); };
+    document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => setFlipped(false)));
+
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape' && flips[0].classList.contains('flipped')) setFlipped(false);
+    });
+
+    // confirm → hand off to the payment vendor (mock Razorpay), which returns to the confirmation screen
+    // ---- email + phone validation ----
+    const fEmail = $('fEmail'), fPhone = $('fPhone');
+    const emailOK = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim());
+    // strip an optional 91 / 0 prefix, then require exactly 10 digits
+    const phoneDigits = v => {
+      const d = (v||'').replace(/\D/g,'');
+      if(d.length === 12 && d.startsWith('91')) return d.slice(2);
+      if(d.length === 11 && d.startsWith('0'))  return d.slice(1);
+      return d;
+    };
+    const phoneOK = v => /^\d{10}$/.test(phoneDigits(v));
+    const setInvalid = (input, bad) => input.closest('.fld').classList.toggle('invalid', bad);
+    // block alphabets (and stray symbols) as the user types; clear the error state
+    fPhone.addEventListener('input', () => {
+      const cleaned = fPhone.value.replace(/[^\d+\s()\-]/g, '');
+      if(cleaned !== fPhone.value) fPhone.value = cleaned;
+      setInvalid(fPhone, false);
+    });
+    fEmail.addEventListener('input', () => setInvalid(fEmail, false));
+
+    $('confirmBtn').addEventListener('click', () => {
+      const eBad = !emailOK(fEmail.value), pBad = !phoneOK(fPhone.value);
+      setInvalid(fEmail, eBad); setInvalid(fPhone, pBad);
+      if(eBad || pBad){ (eBad ? fEmail : fPhone).focus(); return; }
+      const t = sel => { const el = document.querySelector(sel); return el ? el.textContent.trim() : ''; };
+      const booking = {
+        hotel:  'Taj Exotica Resort & Spa',
+        place:  'Benaulim Beach · Goa, India',
+        dates:  t('#dateVal'),
+        nights: t('#nightsVal'),
+        guests: t('#guestVal'),
+        guestSub: t('#guestSub'),
+        room:   t('#roomCard .sr-name') || 'Villa Room',
+        amount: t('#confirmAmt') || t('#bkTotal') || t('.cp-amt'),
+        name:   (document.getElementById('fName')||{}).value || '',
+        email:  (document.getElementById('fEmail')||{}).value || '',
+        guest:  true   // booked without logging in → booking-details.html offers a rewards sign-up nudge
+      };
+      try { sessionStorage.setItem('booking', JSON.stringify(booking)); } catch(e){}
+      location.href = 'razorpay.html';
+    });
+  })();
+  })();
+</script>
+
+<script>
+  // ===== cart summary add-ons =====
+  (function(){
+    const money = n => '₹' + n.toLocaleString('en-IN');
+    const BASE = 55500;                    // Villa Room · 3 nights, cancellation + breakfast included
+    const ADDONS = {
+      cancel:    {save:5400, on:'Free till 9 July', off:'Non-refundable', rem:'Remove to save ₹5,400', add:'Add back · +₹5,400',
+                  policyOn:'Free cancellation before Wed 9 Jul', policyOff:'Non-refundable rate'},
+      breakfast: {save:4500, on:'Included', off:'Not included', rem:'Remove to save ₹4,500', add:'Add back · +₹4,500',
+                  policyOn:'Breakfast included', policyOff:'Breakfast not included'}
+    };
+    const removed = {cancel:false, breakfast:false};
+    const totalEls = [document.querySelector('.cp-amt')];
+
+    function paint(){
+      const total = BASE - (removed.cancel?ADDONS.cancel.save:0) - (removed.breakfast?ADDONS.breakfast.save:0);
+      totalEls.forEach(el => { if(el) el.textContent = money(total); });
+      const ca = document.getElementById('confirmAmt'); if(ca) ca.textContent = money(total);
+      Object.keys(ADDONS).forEach(k => {
+        const a = ADDONS[k], out = removed[k];
+        const row = document.querySelector('.sum-row[data-addon="'+k+'"]');
+        if(row){
+          row.classList.toggle('removed', out);
+          row.querySelector('.av-title').textContent = out ? a.off : a.on;
+          row.querySelector('.sum-toggle').textContent = out ? a.add : a.rem;
+        }
+        const pol = document.querySelector('li[data-policy="'+k+'"]');
+        if(pol){ pol.textContent = out ? a.policyOff : a.policyOn; pol.classList.toggle('off', out); }
+      });
+    }
+
+    document.querySelectorAll('.sum-row[data-addon] .sum-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.closest('.sum-row').dataset.addon;
+        removed[k] = !removed[k];
+        paint();
+      });
+    });
+    paint();
+  })();
+</script>
 </body>
 </html>

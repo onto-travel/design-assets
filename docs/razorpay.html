@@ -72,7 +72,7 @@
     document.getElementById('rzpProcessing').hidden = false;
     document.querySelector('.rzp-flow').textContent = 'Processing';
     try { booking.paid = true; sessionStorage.setItem('booking', JSON.stringify(booking)); } catch(e){}
-    setTimeout(function(){ location.href = 'confirmed.html'; }, 1600);
+    setTimeout(function(){ location.href = 'booking-details.html'; }, 1600);
   });
   document.getElementById('cancel').addEventListener('click', function(){ history.back(); });
 </script>

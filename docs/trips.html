@@ -31,7 +31,7 @@
   .tn-profile:hover{border-color:#c2b8a4;background:#faf7f1;}
   .tn-profile .burger{display:flex;flex-direction:column;gap:3px;}
   .tn-profile .burger i{display:block;width:15px;height:1.7px;background:#8a857d;border-radius:2px;}
-  .tn-avatar{width:28px;height:28px;border-radius:50%;background:#f4efe6;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;}
+  .tn-avatar{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;font-family:Georgia,serif;line-height:1;}
   .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
     border-radius:14px;box-shadow:0 14px 40px rgba(40,30,10,.2);padding:8px;opacity:0;transform:translateY(-6px);
     pointer-events:none;transition:opacity .15s,transform .15s;}
@@ -49,6 +49,38 @@
   /* page */
   .page{max-width:1180px;margin:0 auto;padding:36px 28px 64px;}
   .h1{font-family:Georgia,serif;font-size:34px;letter-spacing:-.015em;margin:0 0 20px;}
+
+  /* ===== fridge hero — a magnet for every place you've been ===== */
+  .fridge-hero{display:flex;align-items:center;gap:44px;flex-wrap:wrap;
+    background:linear-gradient(135deg,#f6f2ea,#eee7db);border:1px solid var(--line);border-radius:24px;
+    padding:34px 38px;margin:0 0 26px;box-shadow:0 1px 2px rgba(40,30,10,.04);}
+  .fh-copy{flex:1 1 260px;min-width:240px;}
+  .fh-eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:11px;}
+  .fh-h1{font-family:Georgia,serif;font-size:40px;letter-spacing:-.015em;margin:0 0 12px;}
+  .trips-head{margin-bottom:24px;}
+  .trips-head .fh-h1{margin-bottom:0;}
+  .fh-sub{font-size:15px;line-height:1.55;color:var(--muted);max-width:360px;margin:0 0 18px;}
+  .fh-stat{font-size:14px;color:var(--muted);}
+  .fh-stat b{color:var(--ink);font-weight:700;}
+
+  .fridge{position:relative;flex:none;width:330px;height:236px;border-radius:26px;
+    background:linear-gradient(158deg,#eceff2 0%,#d4d9df 55%,#c3c9d0 100%);border:1px solid #b7bdc4;
+    box-shadow:inset 0 2px 3px rgba(255,255,255,.75), inset 0 -8px 16px rgba(30,40,50,.12), 0 16px 34px rgba(40,45,55,.22);}
+  .fridge::after{content:"";position:absolute;inset:10px;border-radius:20px;border:1px solid rgba(255,255,255,.4);pointer-events:none;}
+  .fridge-handle{position:absolute;left:18px;top:26%;height:48%;width:11px;border-radius:7px;
+    background:linear-gradient(90deg,#b3b9c0,#8d939b);box-shadow:0 2px 5px rgba(0,0,0,.28), inset 0 1px 1px rgba(255,255,255,.5);}
+  .magnet{position:absolute;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+    background:#fff;border-radius:12px;padding:6px 11px 6px 9px;font-size:12.5px;font-weight:800;
+    letter-spacing:.02em;color:#33302c;box-shadow:0 5px 12px rgba(20,25,35,.28);
+    transform:rotate(var(--r,0deg));transition:transform .18s ease;cursor:default;}
+  .magnet .mg-ic{font-size:16px;}
+  .magnet:hover{transform:rotate(0deg) scale(1.07);z-index:3;}
+  @media (prefers-reduced-motion:reduce){ .magnet{transition:none;} }
+  @media (max-width:720px){
+    .fridge-hero{gap:26px;padding:24px;justify-content:center;}
+    .fh-h1{font-size:32px;}
+    .fridge{margin:0 auto;}
+  }
 
   .tabs{display:inline-flex;background:#e7e1d6;border-radius:12px;padding:4px;gap:2px;margin-bottom:24px;}
   .tab{border:none;background:none;padding:9px 18px;border-radius:9px;font-family:inherit;font-size:14px;font-weight:600;
@@ -97,11 +129,11 @@
       <div class="tn-right">
         <button type="button" class="tn-profile" id="profileBtn" aria-haspopup="true" aria-expanded="false">
           <span class="burger"><i></i><i></i><i></i></span>
-          <span class="tn-avatar" id="navAvatar">🙂</span>
+          <span class="tn-avatar" id="navAvatar">Y</span>
         </button>
         <div class="menu" id="profileMenu" role="menu">
           <div class="menu-id">
-            <span class="tn-avatar" id="menuAvatar">🙂</span>
+            <span class="tn-avatar" id="menuAvatar">Y</span>
             <div><b id="menuName">You</b><small>xyz@email.com</small></div>
           </div>
           <div class="menu-sec">
@@ -115,7 +147,33 @@
   </nav>
 
   <div class="page">
-    <h1 class="h1">Trips</h1>
+    <!-- ===== STASHED: fridge-magnet hero (temporarily hidden — restore by removing this comment wrapper; CSS kept in <style>) =====
+    Fridge hero: a magnet per place you've been. Curated for now; can later
+    be derived from the unique destinations in your trip history.
+    <section class="fridge-hero">
+      <div class="fh-copy">
+        <div class="fh-eyebrow">Your travel fridge</div>
+        <h1 class="fh-h1">Trips</h1>
+        <p class="fh-sub">A magnet for every corner of the world you've checked into — and room for plenty more.</p>
+        <div class="fh-stat"><b>6</b> places · <b>4</b> stays</div>
+      </div>
+      <div class="fridge" aria-hidden="true">
+        <span class="fridge-handle"></span>
+        <span class="magnet" style="left:118px;top:28px;--r:-7deg"><span class="mg-ic">🏖️</span>Goa</span>
+        <span class="magnet" style="left:54px;top:96px;--r:5deg"><span class="mg-ic">🗼</span>Paris</span>
+        <span class="magnet" style="left:196px;top:40px;--r:-4deg"><span class="mg-ic">🗽</span>New York</span>
+        <span class="magnet" style="left:150px;top:150px;--r:6deg"><span class="mg-ic">🚌</span>London</span>
+        <span class="magnet" style="left:60px;top:170px;--r:-6deg"><span class="mg-ic">⛩️</span>Tokyo</span>
+        <span class="magnet" style="left:214px;top:120px;--r:9deg"><span class="mg-ic">🏰</span>Jaipur</span>
+      </div>
+    </section>
+    ===== end stashed ===== -->
+
+    <!-- simple heading while the fridge hero is stashed -->
+    <div class="trips-head">
+      <div class="fh-eyebrow">Your trips</div>
+      <h1 class="fh-h1">Trips</h1>
+    </div>
     <div class="tabs" id="tabs">
       <button type="button" class="tab on" data-tab="upcoming">Upcoming <span class="n" id="cUpcoming">0</span></button>
       <button type="button" class="tab" data-tab="completed">Completed <span class="n" id="cCompleted">0</span></button>
@@ -138,10 +196,10 @@
       try{
         const a = JSON.parse(localStorage.getItem('onto:travellers:v3')) || [];
         const me = a.find(t => t.relation==='Myself' || t.id==='t-you');
-        if(me){
-          if(me.name && me.name.toLowerCase()!=='you' && !me.name.includes('@')){ $('menuName').textContent = me.name; }
-          if(me.emoji){ $('navAvatar').textContent = me.emoji; $('menuAvatar').textContent = me.emoji; }
-        }
+        const nm = (me && me.name && me.name.toLowerCase()!=='you' && !me.name.includes('@')) ? me.name : 'You';
+        if(nm!=='You') $('menuName').textContent = nm;
+        const ini = (nm[0]||'Y').toUpperCase();
+        $('navAvatar').textContent = ini; $('menuAvatar').textContent = ini;
       }catch(e){}
     })();
 

@@ -448,7 +448,6 @@
   <div class="hcard" id="tripCard" role="link" tabindex="0" aria-label="View your Taj Exotica booking">
     <div class="pic">
       <img id="tripImg" src="images/06-aerial-pool.png" alt="Your booked resort">
-      <span class="tag up">Upcoming</span>
       <button type="button" class="gnav prev" id="tripPrev" aria-label="Previous photo">‹</button>
       <button type="button" class="gnav next" id="tripNext" aria-label="Next photo">›</button>
       <div class="gdots" id="tripDots"></div>
@@ -574,7 +573,10 @@
     return list;
   }
   var COMPANIONS = loadCompanions();
-  try{ var _mn=document.getElementById('menuName'); if(_mn) _mn.textContent = readUserName(); }catch(e){}
+  try{ var _un=readUserName(), _ini=(_un[0]||'Y').toUpperCase();
+       var _mn=document.getElementById('menuName'); if(_mn) _mn.textContent = _un;
+       var _na=document.getElementById('navAvatar'); if(_na) _na.textContent = _ini;
+       var _ma=document.getElementById('menuAvatar'); if(_ma) _ma.textContent = _ini; }catch(e){}
   var EM  = { adults:'🧍', children:'🧒', infants:'👶' };
   var FUN = {
     adults:  ["Captain Mango","Wanderer Kai","Skipper Reef","Sunny Coco","Palm Rover"],
