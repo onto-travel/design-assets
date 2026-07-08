@@ -128,9 +128,9 @@
   .auth-fine a:hover{text-decoration:underline;}
 
   /* ================= HERO ================= */
-  .stage{flex:1;display:flex;flex-direction:column;justify-content:center;padding:8px 0 100px;}
+  .stage{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding:44px 0 120px;}
   .hero{position:relative;width:100%;max-width:1180px;margin:0 auto;padding:0 28px;}
-  .hero-img{position:relative;height:560px;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);
+  .hero-img{position:relative;height:420px;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);
     background:#1a2830 url('images/hero-landing.jpg') no-repeat center/cover;}
   .hero-img::after{content:"";position:absolute;inset:0;
     background:
@@ -366,7 +366,7 @@
 <div class="search">
   <div class="search-card">
     <div class="seg dest" id="segDest">
-      <span class="lb">Hotel</span>
+      <span class="lb">Where</span>
       <input type="text" class="seg-input" id="hotelInput" value="Taj Exotica Resort &amp; Spa"
              placeholder="Search hotels or places" autocomplete="off" spellcheck="false">
       <div class="pop pop-dest" id="popDest"></div>
@@ -727,9 +727,14 @@ document.addEventListener('click', function(e){
 });
 
 /* search → go to the property */
-document.getElementById('searchGo').addEventListener('click', function(){
-  window.location.href = 'hotel-firstfold-loggedout.html';
-});
+// a known location → results page; anything else (a hotel name) → the PDP
+function goFromSearch(){
+  var q = (document.getElementById('hotelInput').value||'').trim(), ql = q.toLowerCase();
+  var LOCS = ['Goa','Udaipur','Mumbai','Andaman'], match = null;
+  for(var i=0;i<LOCS.length;i++){ if(LOCS[i].toLowerCase()===ql){ match = LOCS[i]; break; } }
+  window.location.href = match ? ('results.html?where='+encodeURIComponent(match)+'&auth=out') : 'hotel-firstfold-loggedout.html';
+}
+document.getElementById('searchGo').addEventListener('click', goFromSearch);
 
 /* =============================================================
    HOTEL SEARCH — typeable field with suggestions
@@ -767,7 +772,7 @@ document.getElementById('searchGo').addEventListener('click', function(){
   input.addEventListener('click', function(e){ e.stopPropagation(); open(); });
   input.addEventListener('input', function(){ render(input.value); pop.classList.add('open'); });
   input.addEventListener('keydown', function(e){
-    if(e.key === 'Enter'){ pop.classList.remove('open'); input.blur(); window.location.href = 'hotel-firstfold-loggedout.html'; }
+    if(e.key === 'Enter'){ pop.classList.remove('open'); input.blur(); goFromSearch(); }
   });
   // clicking the segment's padding/label focuses the field
   seg.addEventListener('click', function(e){ if(e.target === seg || e.target.classList.contains('lb')){ input.focus(); } });

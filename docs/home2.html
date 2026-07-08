@@ -92,7 +92,7 @@
 
   /* ================= HERO ================= */
   .hero{position:relative;width:100%;max-width:1180px;margin:22px auto 0;padding:0 28px;}
-  .hero-img{position:relative;height:560px;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);
+  .hero-img{position:relative;height:420px;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);
     background:#1a2830 url('images/hero-landing.jpg') no-repeat center/cover;}
   .hero-img::after{content:"";position:absolute;inset:0;
     background:
@@ -115,6 +115,7 @@
   .seg + .seg::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:1px;background:var(--line);}
   .seg .lb{display:block;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
     color:var(--muted);margin-bottom:4px;}
+  .lb-cnt{text-transform:none;letter-spacing:.01em;font-weight:600;}
   .seg .vl{display:block;font-size:15.5px;font-weight:600;color:var(--ink);white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis;}
   .seg .vl.ph{color:#a49d90;font-weight:500;}
@@ -222,6 +223,22 @@
     cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
   .gp-chead .gp-add:hover{border-color:var(--navy);background:#f4f7fb;}
   .gp-chead .gp-add:disabled{opacity:.4;cursor:default;}
+  /* guests / rooms toggle */
+  .gp-tabs{display:flex;background:#f1ede5;border-radius:11px;padding:3px;gap:2px;margin-bottom:12px;}
+  .gp-tab{flex:1;border:none;background:none;border-radius:8px;font-family:inherit;font-size:13.5px;font-weight:600;
+    color:var(--muted);cursor:pointer;padding:8px;transition:background .15s,color .15s,box-shadow .15s;}
+  .gp-tab:hover{color:var(--ink);}
+  .gp-tab.is-on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(40,30,10,.14);}
+  .gp-panel[hidden]{display:none;}
+  .gp-roomrow{display:flex;align-items:center;gap:14px;padding:6px 2px 2px;}
+  .gp-roomrow .gpr-name{font-size:15px;font-weight:600;color:var(--ink);}
+  .gp-stepper{margin-left:auto;display:inline-flex;align-items:center;gap:6px;}
+  .gp-step{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);
+    font-size:20px;line-height:1;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
+  .gp-step:hover:not(:disabled){border-color:var(--navy);background:#f4f7fb;}
+  .gp-step:disabled{opacity:.4;cursor:default;}
+  .gp-stepval{min-width:24px;text-align:center;font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .gp-roomhint{font-size:12px;color:var(--muted);margin:13px 2px 2px;padding-top:12px;border-top:1px solid var(--line);}
 
   /* ================= RESULTS ================= */
   .results{width:100%;max-width:1180px;margin:56px auto 80px;padding:0 28px;}
@@ -356,7 +373,7 @@
 <div class="search">
   <div class="search-card">
     <div class="seg dest" id="segDest">
-      <span class="lb">Hotel</span>
+      <span class="lb">Where</span>
       <input type="text" class="seg-input" id="hotelInput" value="Taj Exotica Resort &amp; Spa"
              placeholder="Search hotels or places" autocomplete="off" spellcheck="false">
       <div class="pop pop-dest" id="popDest"></div>
@@ -377,24 +394,41 @@
     </div>
 
     <div class="seg" id="segGuests" role="button" tabindex="0">
-      <span class="lb">Guests</span>
+      <span class="lb">Guests <span class="lb-cnt" id="guestCnt"></span></span>
       <span class="vl" id="guestsVal">You</span>
       <div class="pop pop-guests" id="popGuests">
-        <div class="gp-reg">
-          <div class="gp-lab">Regular companions</div>
-          <div class="gp-chips" id="regChips"></div>
+        <div class="gp-tabs" role="tablist">
+          <button type="button" class="gp-tab is-on" data-tab="guests">Guests</button>
+          <button type="button" class="gp-tab" data-tab="rooms">Rooms</button>
         </div>
-        <div class="gp-catg">
-          <div class="gp-chead"><span class="gpc-name">Adults</span><span class="gpc-sub">Age 13+</span><span class="gpc-count" id="adCount">1</span><button type="button" class="gp-add" data-cat="adults" aria-label="Add adult">+</button></div>
-          <div class="gp-people" id="adPeople"></div>
+        <div class="gp-panel" id="panelGuests">
+          <div class="gp-reg">
+            <div class="gp-lab">Regular companions</div>
+            <div class="gp-chips" id="regChips"></div>
+          </div>
+          <div class="gp-catg">
+            <div class="gp-chead"><span class="gpc-name">Adults</span><span class="gpc-sub">Age 13+</span><span class="gpc-count" id="adCount">1</span><button type="button" class="gp-add" data-cat="adults" aria-label="Add adult">+</button></div>
+            <div class="gp-people" id="adPeople"></div>
+          </div>
+          <div class="gp-catg">
+            <div class="gp-chead"><span class="gpc-name">Children</span><span class="gpc-sub">Age 2&ndash;12</span><span class="gpc-count" id="chCount">0</span><button type="button" class="gp-add" data-cat="children" aria-label="Add child">+</button></div>
+            <div class="gp-people" id="chPeople"></div>
+          </div>
+          <div class="gp-catg">
+            <div class="gp-chead"><span class="gpc-name">Infants</span><span class="gpc-sub">Under 2 &middot; free</span><span class="gpc-count" id="inCount">0</span><button type="button" class="gp-add" data-cat="infants" aria-label="Add infant">+</button></div>
+            <div class="gp-people" id="inPeople"></div>
+          </div>
         </div>
-        <div class="gp-catg">
-          <div class="gp-chead"><span class="gpc-name">Children</span><span class="gpc-sub">Age 2&ndash;12</span><span class="gpc-count" id="chCount">0</span><button type="button" class="gp-add" data-cat="children" aria-label="Add child">+</button></div>
-          <div class="gp-people" id="chPeople"></div>
-        </div>
-        <div class="gp-catg">
-          <div class="gp-chead"><span class="gpc-name">Infants</span><span class="gpc-sub">Under 2 &middot; free</span><span class="gpc-count" id="inCount">0</span><button type="button" class="gp-add" data-cat="infants" aria-label="Add infant">+</button></div>
-          <div class="gp-people" id="inPeople"></div>
+        <div class="gp-panel" id="panelRooms" hidden>
+          <div class="gp-roomrow">
+            <div class="gpr-lab"><div class="gpr-name">Rooms</div></div>
+            <div class="gp-stepper">
+              <button type="button" class="gp-step" id="roomMinus" aria-label="Fewer rooms">&minus;</button>
+              <span class="gp-stepval" id="roomVal">1</span>
+              <button type="button" class="gp-step" id="roomPlus" aria-label="More rooms">+</button>
+            </div>
+          </div>
+          <p class="gp-roomhint">Each room sleeps up to 3 guests.</p>
         </div>
       </div>
     </div>
@@ -648,10 +682,30 @@
     pop.querySelectorAll('.gp-add').forEach(function(b){ b.disabled = heads()>=MAXG; });
     var nm = knownIn().map(function(c){ return c.name; });
     var extra = heads() - nm.length;
+    var _n = heads();
+    var _r = (typeof roomsCount==='number'?roomsCount:1);
     $('guestsVal').textContent = nm.length ? joinNames(nm)+(extra>0?' +'+extra:'') : composition();
+    var _gc = $('guestCnt'); if(_gc) _gc.textContent = '· ' + _n + ' guest' + (_n>1?'s':'') + ' · ' + _r + ' room' + (_r>1?'s':'');
   }
 
   pop.querySelectorAll('.gp-add').forEach(function(b){ b.addEventListener('click', function(e){ e.stopPropagation(); addExtra(b.dataset.cat); }); });
+
+  // guests / rooms toggle + rooms stepper (rooms count is shown in the guests title)
+  var roomsCount = 1;
+  try{ var _pr=JSON.parse(sessionStorage.getItem('searchRooms')); if(_pr) roomsCount=Math.min(5,Math.max(1,_pr)); }catch(e){}
+  (function(){
+    var tabs = pop.querySelectorAll('.gp-tab');
+    var panels = { guests: $('panelGuests'), rooms: $('panelRooms') };
+    tabs.forEach(function(t){ t.addEventListener('click', function(e){ e.stopPropagation();
+      tabs.forEach(function(x){ x.classList.toggle('is-on', x===t); });
+      Object.keys(panels).forEach(function(k){ if(panels[k]) panels[k].hidden = (k !== t.dataset.tab); });
+    }); });
+    var MINR=1, MAXR=5, rv=$('roomVal');
+    function renderRooms(){ rv.textContent=roomsCount; $('roomMinus').disabled=roomsCount<=MINR; $('roomPlus').disabled=roomsCount>=MAXR; try{ sessionStorage.setItem('searchRooms', JSON.stringify(roomsCount)); }catch(e){} }
+    $('roomMinus').addEventListener('click', function(e){ e.stopPropagation(); roomsCount=Math.max(MINR,roomsCount-1); renderRooms(); apply(); });
+    $('roomPlus').addEventListener('click', function(e){ e.stopPropagation(); roomsCount=Math.min(MAXR,roomsCount+1); renderRooms(); apply(); });
+    renderRooms();
+  })();
 
   seg.addEventListener('click', function(e){
     if(pop.contains(e.target)) return;
@@ -786,9 +840,14 @@ document.addEventListener('click', function(e){
 });
 
 /* search → go to the property */
-document.getElementById('searchGo').addEventListener('click', function(){
-  window.location.href = 'hotel-firstfold.html';
-});
+// a known location → results page; anything else (a hotel name) → the PDP
+function goFromSearch(){
+  var q = (document.getElementById('hotelInput').value||'').trim(), ql = q.toLowerCase();
+  var LOCS = ['Goa','Udaipur','Mumbai','Andaman'], match = null;
+  for(var i=0;i<LOCS.length;i++){ if(LOCS[i].toLowerCase()===ql){ match = LOCS[i]; break; } }
+  window.location.href = match ? ('results.html?where='+encodeURIComponent(match)) : 'hotel-firstfold.html';
+}
+document.getElementById('searchGo').addEventListener('click', goFromSearch);
 
 /* =============================================================
    HOTEL SEARCH — typeable field with suggestions
@@ -826,7 +885,7 @@ document.getElementById('searchGo').addEventListener('click', function(){
   input.addEventListener('click', function(e){ e.stopPropagation(); open(); });
   input.addEventListener('input', function(){ render(input.value); pop.classList.add('open'); });
   input.addEventListener('keydown', function(e){
-    if(e.key === 'Enter'){ pop.classList.remove('open'); input.blur(); window.location.href = 'hotel-firstfold.html'; }
+    if(e.key === 'Enter'){ pop.classList.remove('open'); input.blur(); goFromSearch(); }
   });
   // clicking the segment's padding/label focuses the field
   seg.addEventListener('click', function(e){ if(e.target === seg || e.target.classList.contains('lb')){ input.focus(); } });
