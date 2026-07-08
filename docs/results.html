@@ -204,17 +204,12 @@
   .chk.pfrow .box{margin-top:1px;}
   .pop-main{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3;}
   .pop-main small{color:var(--muted);font-size:12px;font-weight:400;margin-top:2px;}
-  .pop-count{flex:none;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;margin-left:10px;
-    align-self:flex-start;margin-top:1px;}
 
   .chips{display:flex;flex-wrap:wrap;gap:7px;}
   .chip{border:1px solid var(--line);background:var(--card);color:#4a453e;border-radius:20px;
     padding:6px 13px;font-size:13px;font-weight:600;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:6px;}
   .chip:hover{border-color:#c2b8a4;background:#faf7f1;}
   .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff;}
-  .chip[aria-pressed="true"] .ck{opacity:1;}
-  .chip .ck{width:13px;height:13px;opacity:0;margin-left:-2px;transition:opacity .1s;}
-  .chip .ck svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;display:block;}
 
 
   /* checkbox amenities */
@@ -279,7 +274,7 @@
   .rating .score .out{font-size:13px;font-weight:600;color:var(--muted);margin-left:1px;}
   .rating .score-cnt{font-size:11.5px;color:var(--muted);white-space:nowrap;}
 
-  .room{margin-top:16px;align-self:flex-start;border:1px solid var(--line);background:#faf8f4;border-radius:11px;padding:11px 13px;}
+  .room{margin-top:16px;align-self:flex-start;border:1px solid #f0ebe1;background:#faf8f4;border-radius:11px;padding:11px 13px;}
   .room-main{font-size:14px;font-weight:600;color:#3a3630;}
   .room-sub{font-size:13px;color:var(--muted);margin-top:4px;}
 
@@ -361,6 +356,8 @@ const SORTS = [
 // The user's frequent filters. Hardcoded for now — structured so it can later
 // be derived from stay history / profile (frequent amenities + rating floor).
 const USUAL = { amenities:["Pool","Spa","Free breakfast"], rating:9 };
+const USUAL_EMOJI = { "Pool":"🏊", "Spa":"💆", "Free breakfast":"🍳" };
+const USUAL_LABEL = { "Free breakfast":"Breakfast incl." };
 
 // Curated "popular filters". Each row maps to one underlying filter dimension
 // so it shares state with the usual set; counts are computed per location at
@@ -635,9 +632,7 @@ function HotelCard({hotel, saved, onSave, onBook, nights}){
 /* ================= FILTER RAIL ================= */
 function Chip({active, onClick, children}){
   return (
-    <button className="chip" aria-pressed={active} onClick={onClick}>
-      <span className="ck"><Svg d={I.check}/></span>{children}
-    </button>
+    <button className="chip" aria-pressed={active} onClick={onClick}>{children}</button>
   );
 }
 
@@ -673,7 +668,6 @@ function FilterRail({all, starCat, setStarCat, types, setTypes, rating, setRatin
     else if(f.dim==="type")    toggleType(f.value);
     else toggleStar(f.value);
   };
-  const popCount = f => all.reduce((n,h)=> n + (matchPop(h,f)?1:0), 0);
 
   return (
     <aside className="rail" aria-label="Filters">
@@ -683,9 +677,9 @@ function FilterRail({all, starCat, setStarCat, types, setTypes, rating, setRatin
           <p className="fg-h">Your usual filters</p>
           <div className="chips">
             {USUAL.amenities.map(a=>(
-              <Chip key={a} active={usualAmenActive(a)} onClick={()=>toggleAmen(a)}>{a}</Chip>
+              <Chip key={a} active={usualAmenActive(a)} onClick={()=>toggleAmen(a)}>{USUAL_EMOJI[a]} {USUAL_LABEL[a] || a}</Chip>
             ))}
-            <Chip active={usualRatingActive} onClick={()=>toggleRating(USUAL.rating)}>{USUAL.rating}+ review score</Chip>
+            <Chip active={usualRatingActive} onClick={()=>toggleRating(USUAL.rating)}>⭐ {USUAL.rating}+ review score</Chip>
           </div>
           <button className={"apply-all"+(allUsualActive?" ghost":"")} onClick={applyAllUsual}>
             {allUsualActive ? "Clear all" : "Apply all"}
@@ -702,7 +696,6 @@ function FilterRail({all, starCat, setStarCat, types, setTypes, rating, setRatin
               <input type="checkbox" checked={popActive(f)} onChange={()=>popToggle(f)}/>
               <span className="box"><Svg d={I.check}/></span>
               <span className="pop-main">{f.label}</span>
-              <span className="pop-count">{popCount(f)}</span>
             </label>
           ))}
         </div>
@@ -852,7 +845,6 @@ function GuestPicker({party, setParty, rooms, setRooms}){
                 onClick={e=>{e.stopPropagation(); setRooms(r=>Math.min(5,r+1));}}>+</button>
             </div>
           </div>
-          <p className="gp-roomhint">Each room sleeps up to 3 guests.</p>
         </div>
       )}
     </React.Fragment>
