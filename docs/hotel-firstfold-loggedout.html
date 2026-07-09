@@ -198,6 +198,7 @@
     padding:16px 18px;border-radius:12px;cursor:pointer;transition:background .15s;font-family:inherit;
   }
   .btn:hover{background:var(--navy-deep);}
+  .btn:disabled{background:#cfc7b6;color:#fff;cursor:default;}
   .btn-secondary{
     display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;
     background:#fff;color:var(--navy);border:1px solid #d9d1c1;border-radius:12px;
@@ -217,6 +218,12 @@
   /* ---------- CHOOSE YOUR ROOM: horizontal row of vertical cards ---------- */
   .rooms-wrap{padding-top:28px;padding-bottom:24px;}
   .rooms-h{font-family:Georgia,serif;font-size:26px;letter-spacing:-.01em;margin:0 0 12px;color:var(--ink);}
+  /* opt-in extras toggle bar (room list + booking module) */
+  .xt-bar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:2px 0 16px;}
+  .xt-chk{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer;}
+  .xt-chk input{width:16px;height:16px;accent-color:var(--navy);cursor:pointer;margin:0;flex:none;}
+  .xt-chk em{font-style:normal;color:var(--muted);font-weight:500;}
+  .xt-bar--card{flex-direction:column;align-items:stretch;gap:8px;margin:12px 0 2px;}
   .rooms-scroll{display:flex;gap:20px;overflow-x:auto;padding:4px 2px 18px;scroll-snap-type:x proximity;}
   .rooms-scroll::-webkit-scrollbar{height:8px;}
   .rooms-scroll::-webkit-scrollbar-track{background:transparent;}
@@ -262,6 +269,14 @@
     cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap;
     background:var(--navy);color:#fff;}
   .rc-book:hover{background:var(--navy-deep);}
+  /* in-cart quantity stepper (replaces the Add button once a room is added) */
+  .rc-stepper{flex:1;display:flex;align-items:center;justify-content:space-between;
+    border:1px solid #bfe0cf;background:#eaf3ee;border-radius:10px;padding:4px;}
+  .rc-step{width:36px;height:34px;border:none;background:#fff;border-radius:8px;font-size:20px;line-height:1;
+    color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;}
+  .rc-step:hover{background:#f2f7f4;}
+  .rc-step:disabled{opacity:.4;cursor:default;background:#fff;}
+  .rc-qty{font-size:15px;font-weight:700;color:var(--ink);min-width:26px;text-align:center;font-variant-numeric:tabular-nums;}
 
   /* ---------- ported from index: sections, reviews ---------- */
   section{padding:38px 0;}
@@ -675,6 +690,10 @@
 
   /* your-stay summary — icon per row */
   .sum{margin-top:14px;}
+  /* keep the whole "Your stay" box within the card — scroll it when there are many rooms */
+  .sum{max-height:min(440px,52vh);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#e0d8c8 transparent;}
+  .sum::-webkit-scrollbar{width:6px;}
+  .sum::-webkit-scrollbar-thumb{background:#e0d8c8;border-radius:3px;}
   .sum-top{display:flex;align-items:center;justify-content:space-between;padding:0 2px 8px;}
   .sum-top .sh{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
   .sum-top .sum-edit{background:none;border:none;color:var(--navy);font-weight:600;font-size:13px;
@@ -682,6 +701,10 @@
   .sum-top .sum-edit:hover{text-decoration:underline;}
   .sum-row{display:flex;gap:12px;align-items:center;padding:9px 2px;}
   .sum-row+.sum-row{border-top:1px solid #f1ede5;}
+  /* multi-room block: solid separators top & bottom, dashed between the room rows */
+  #cartRooms{border-top:1px solid #f1ede5;}
+  #cartRooms+.sum-row{border-top:1px solid #f1ede5;}
+  #cartRooms .sum-row+.sum-row{border-top:1px dashed #d6cdba;}
   .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f4efe6;color:#b3893f;
     display:flex;align-items:center;justify-content:center;}
   .sum-ic svg{width:18px;height:18px;}
@@ -691,7 +714,8 @@
   .sum-v span{display:inline;font-weight:400;color:var(--muted);}
   .sum-v span:not(.av-title)::before{content:" · ";}
   .sum-v .av-title{font-weight:600;color:var(--ink);}
-  .sum-row.removed .av-title{color:var(--muted);}
+  .sum-row.addoff .av-title{color:var(--muted);}
+  .sum-row.addoff .sum-toggle{color:var(--navy);}
   .sum-toggle{background:none;border:none;padding:0;font:inherit;color:var(--gold);cursor:pointer;font-weight:600;
     text-decoration:underline;text-underline-offset:2px;}
   .sum-toggle:hover{opacity:.75;}
@@ -807,7 +831,6 @@
             <div class="sum">
               <div class="sum-top">
                 <span class="sh">Your stay</span>
-                <button type="button" class="sum-edit" data-back>Edit</button>
               </div>
               <div class="sum-row">
                 <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
@@ -815,16 +838,13 @@
               </div>
               <div class="sum-row">
                 <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/><path d="M9 14.5l2 2 3.5-3.5"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Check-out</div><div class="sum-v">Mon 13 Jul · 3 nights<span>12:00 PM</span></div></div>
-              </div>
-              <div class="sum-row">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M3 18v2.5M21 18v2.5"/><path d="M3 15h18"/><path d="M6.5 12V9.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V12"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Room</div><div class="sum-v">Villa Room · Garden view<span>56 m² · Sleeps 3</span></div></div>
+                <div class="sum-c"><div class="sum-k">Check-out</div><div class="sum-v">Mon 13 Jul<span>12:00 PM</span></div></div>
               </div>
               <div class="sum-row">
                 <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.5 20c.6-3.1 3-4.8 5.5-4.8s4.9 1.7 5.5 4.8"/><path d="M16.2 5.3a3 3 0 0 1 0 5.6M21 20c-.4-2.1-1.7-3.5-3.4-4.2"/></svg></span>
                 <div class="sum-c"><div class="sum-k">Guests</div><div class="sum-v">You<span>1 traveller</span></div></div>
               </div>
+              <div id="cartRooms"></div>
               <div class="sum-row" data-addon="cancel">
                 <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg></span>
                 <div class="sum-c"><div class="sum-k">Cancellation</div><div class="sum-v"><span class="av-title">Free till 9 July</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹5,400</button></span></div></div>
@@ -832,18 +852,6 @@
               <div class="sum-row" data-addon="breakfast">
                 <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/><path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg></span>
                 <div class="sum-c"><div class="sum-k">Breakfast</div><div class="sum-v"><span class="av-title">Included</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹4,500</button></span></div></div>
-              </div>
-            </div>
-
-            <!-- price block: total in a filled box -->
-            <div class="co-price">
-              <div class="cp-left">
-                <div class="cp-nights">3 nights · all-in</div>
-                <div class="tax-ok"><b>&#10003;</b> Taxes &amp; fees included</div>
-              </div>
-              <div class="cp-right">
-                <div class="cp-amt">₹55,500</div>
-                <div class="cp-tot">Total</div>
               </div>
             </div>
 
@@ -914,7 +922,6 @@
         <!-- selected room — whole card opens the details drawer -->
         <button type="button" class="selroom" id="roomCard" aria-label="See all room choices">
           <div class="sr-line"><span class="sr-name">Villa Room</span> · 1 King · Garden view · 56 m²</div>
-          <span class="sr-tag">Cancellable till 9th Jul · Breakfast included</span>
         </button>
 
         <!-- price: 3-night total primary, per-night secondary -->
@@ -1503,6 +1510,7 @@
     document.addEventListener('click', e=>{ if(!pop.hidden && !pop.contains(e.target) && !trigger.contains(e.target)) closePop(); });
     document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !pop.hidden) closePop(); });
 
+    window.syncGuestRooms = apply;   // let the room cart refresh the "N rooms" chip label
     apply();
   })();
 </script>
@@ -1544,14 +1552,19 @@
       $('nightsVal').textContent = n+' night'+(n>1?'s':'');
       // keep booking-module price in sync with stay length, party size AND the selected room.
       // A larger party than the room sleeps needs multiple rooms.
+      const cartReady = !!window.cartRooms;
+      const empty = cartReady && window.cartCount() === 0;
       const rate = window.SELECTED_RATE || RATE;
       const cap  = window.SELECTED_CAP  || 3;
-      const rooms = window.roomsNeeded ? window.roomsNeeded(cap) : 1;
-      const totTxt = '₹'+(rate*n*rooms).toLocaleString('en-IN');
-      const nb = document.querySelector('.bk-l1 b'); if(nb) nb.textContent = '₹'+rate.toLocaleString('en-IN');
-      const bt = $('bkTotal');   if(bt) bt.textContent = totTxt;
-      const bn = $('bkNights');  if(bn) bn.textContent = (rooms>1?rooms+' rooms · ':'')+n+' night'+(n>1?'s':'');
-      const bk = $('bookNow'); if(bk) bk.textContent = 'Book now · '+totTxt;
+      const rooms = cartReady ? window.cartCount() : (window.roomsNeeded ? window.roomsNeeded(cap) : 1);
+      const nightlyVal = cartReady ? window.cartNightly() : rate;
+      const total = cartReady ? window.cartTotalFor(n) : rate*n*rooms;
+      const totTxt = '₹'+total.toLocaleString('en-IN');
+      const nb = document.querySelector('.bk-l1 b'); if(nb) nb.textContent = empty ? '—' : '₹'+nightlyVal.toLocaleString('en-IN');
+      const be = document.querySelector('.bk-l1 em'); if(be) be.textContent = '· taxes incl.';
+      const bt = $('bkTotal');   if(bt) bt.textContent = empty ? '—' : totTxt;
+      const bn = $('bkNights');  if(bn) bn.textContent = empty ? 'No rooms selected' : ((rooms>1?rooms+' rooms · ':'')+n+' night'+(n>1?'s':''));
+      const bk = $('bookNow'); if(bk){ bk.textContent = empty ? 'Select a room' : 'Book now · '+totTxt; bk.disabled = empty; }
       if(window.refreshRoomPrices) window.refreshRoomPrices();
     }
     window.refreshPricing = renderChip;   // guest-count changes re-run the whole price cascade
@@ -1831,6 +1844,15 @@
              {src:'images/pv-06-pool.png',alt:'Private plunge pool'}]}
     ];
     const ROOM_BY = {}; ROOMS.forEach(r=>ROOM_BY[r.key]=r);
+    // headline price is ROOM-ONLY (competitive in search); free cancellation + breakfast are opt-in add-ons.
+    // r.base is the all-in nightly; strip the extras to get the "from" rate. Per night: cancel ₹1,800 + breakfast ₹1,500.
+    const EXTRAS_PN = 3300;
+    const roomRate = r => r.base - EXTRAS_PN;   // nightly room-only "from" rate
+    // opt-in extras (default OFF) — one shared state across room cards, the booking price and the cart
+    window.EXTRAS_ON = {cancel:false, breakfast:false};
+    const EX_PN = {cancel:1800, breakfast:1500};
+    window.extrasPN = () => (window.EXTRAS_ON.cancel?EX_PN.cancel:0) + (window.EXTRAS_ON.breakfast?EX_PN.breakfast:0);
+    const effRate = r => roomRate(r) + window.extrasPN();   // nightly with the chosen extras applied
 
     // unified room descriptor used everywhere: bed type · view · size
     const bedOf  = r => (r.meta.split('·')[1] || '').trim();      // e.g. "1 King", "2 bedrooms"
@@ -1860,15 +1882,19 @@
           '<h3 class="rc-name">'+r.name+'</h3>'+
           '<div class="rc-meta">'+descriptor(r)+'</div>'+
           (r.why ? '<div class="rc-why"><h5>Why +'+fmt(r.why.amt)+'/night</h5><ul>'+
-             r.why.points.map(p=>'<li>'+p+'</li>').join('')+'</ul></div>' : '')+
+             r.why.points.map(p=>'<li>'+p+'</li>').join('')+'</ul></div>'
+             : '<div class="xt-bar xt-bar--card">'+
+                 '<label class="xt-chk"><input type="checkbox" data-extra="cancel"> Free cancellation <em>+₹1,800/night</em></label>'+
+                 '<label class="xt-chk"><input type="checkbox" data-extra="breakfast"> Breakfast <em>+₹1,500/night</em></label>'+
+               '</div>')+
           '<div class="rc-foot">'+
             '<div class="rc-price-row">'+
-              '<div class="rc-price"><b class="rc-nightly">'+fmt(r.base)+'</b> <small>/ night</small></div>'+
-              '<div class="rc-total"><b class="rc-tot">'+fmt(r.base*N)+'</b>'+
+              '<div class="rc-price"><b class="rc-nightly">'+fmt(effRate(r))+'</b> <small class="rc-basis">/ night</small></div>'+
+              '<div class="rc-total"><b class="rc-tot">'+fmt(effRate(r)*N)+'</b>'+
                 '<span class="rc-totlbl">total · '+N+' night'+(N>1?'s':'')+'</span></div>'+
             '</div>'+
             '<div class="rc-cta">'+
-              '<button class="rc-book">Book now</button>'+
+              '<button class="rc-book">Add to cart</button>'+
             '</div>'+
           '</div>'+
         '</div>';
@@ -1882,23 +1908,24 @@
 
       // live price (stay length + party). Cancellation & breakfast are baked into the rate now.
       const nightlyEl = el.querySelector('.rc-nightly'), totEl = el.querySelector('.rc-tot'),
-            totLbl = el.querySelector('.rc-totlbl');
+            totLbl = el.querySelector('.rc-totlbl'), basisEl = el.querySelector('.rc-basis');
       const sync = () => {
         const nn = nightsNow();
         const rooms = roomsFor(r);
-        nightlyEl.textContent = fmt(r.base);
-        totEl.textContent = fmt(r.base*nn*rooms);
+        nightlyEl.textContent = fmt(effRate(r));
+        totEl.textContent = fmt(effRate(r)*nn*rooms);
         totLbl.textContent = 'total · '+(rooms>1?rooms+' rooms · ':'')+nn+' night'+(nn>1?'s':'');
+        if(basisEl) basisEl.textContent = '/ night';
       };
       syncers.push(sync);
 
       el.dataset.key = r.key;
       el.querySelector('.rc-name').addEventListener('click', e=>{ e.stopPropagation(); openRoom(r.key); });
-      el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); window.goToCart&&window.goToCart(); });
-      // click anywhere else on the card (beige body or photo) → preview this room in the first fold
+      el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); addRoom(r.key); });
+      // click anywhere else on the card (beige body or photo) → open the room details drawer
       el.addEventListener('click', e=>{
-        if(e.target.closest('.rc-book, .rc-nav, .rc-name')) return;
-        selectRoom(r.key);
+        if(e.target.closest('.rc-book, .rc-nav, .rc-name, .xt-bar')) return;
+        openRoom(r.key);
       });
       scroll.appendChild(el);
     });
@@ -1918,9 +1945,103 @@
       document.getElementById('top').scrollIntoView({behavior:'smooth', block:'start'});
     }
 
-    // Villa Room is what the first fold shows by default → mark its card selected
-    const defCard = document.querySelector('#roomsScroll .rcard[data-key="villa"]');
-    if(defCard) defCard.classList.add('selected');
+    // ---------- multi-room cart: compose room types (with quantities) into one booking ----------
+    const MAXQ = 5;
+    window.CART = [{key:'villa', qty:1}];             // [{key, qty}] — default = the room the first fold shows
+    const cartRooms = () => window.CART.map(x=>({r:ROOM_BY[x.key], qty:x.qty})).filter(x=>x.r);
+    window.cartRooms = cartRooms;
+    window.cartCount = () => window.CART.reduce((s,x)=>s+x.qty, 0);   // total rooms across all types
+    window.cartTypes = () => window.CART.length;                     // distinct room types
+    window.cartTotalFor = n => cartRooms().reduce((s,x)=> s + effRate(x.r) * n * x.qty, 0);   // room-only + chosen extras
+    window.cartNightly  = () => cartRooms().reduce((s,x)=> s + effRate(x.r) * x.qty, 0);
+    window.cartLines    = () => cartRooms().map(x=>({key:x.r.key, name:x.r.name, descriptor:descriptor(x.r), rate:effRate(x.r), qty:x.qty}));
+
+    // each room card shows "Add to cart" until it's in the cart, then a quantity stepper
+    function markCards(){
+      document.querySelectorAll('#roomsScroll .rcard').forEach(c=>{
+        const key = c.dataset.key;
+        const inCart = window.CART.find(x=>x.key===key);
+        c.classList.toggle('selected', !!inCart);
+        const cta = c.querySelector('.rc-cta'); if(!cta) return;
+        if(inCart){
+          cta.innerHTML = '<div class="rc-stepper" role="group" aria-label="Number of rooms">'+
+            '<button type="button" class="rc-step rc-minus" aria-label="One fewer">−</button>'+
+            '<span class="rc-qty">'+inCart.qty+'</span>'+
+            '<button type="button" class="rc-step rc-plus" aria-label="One more"'+(inCart.qty>=MAXQ?' disabled':'')+'>+</button></div>';
+          cta.querySelector('.rc-minus').addEventListener('click', e=>{ e.stopPropagation(); stepRoom(key,-1); });
+          cta.querySelector('.rc-plus') .addEventListener('click', e=>{ e.stopPropagation(); stepRoom(key,+1); });
+        } else {
+          cta.innerHTML = '<button type="button" class="rc-book">Add to cart</button>';
+          cta.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); addRoom(key); });
+        }
+      });
+    }
+    // reflect the cart in the first fold: single type = full detail; 2+ types = names only + a photo of each
+    function renderFirstFold(){
+      const lines = cartRooms();
+      const badge = document.querySelector('.gallery .badge');
+      const line  = document.querySelector('#roomCard .sr-line');
+      if(lines.length === 0){
+        window.SELECTED_RATE = 0; window.SELECTED_CAP = null;
+        if(window.setHeroRoom) window.setHeroRoom([]);       // fall back to generic property photos
+        if(badge) badge.textContent = 'Choose your room';
+        if(line)  line.innerHTML = '<span class="sr-name">No room selected</span> · add one below';
+      } else if(lines.length === 1){
+        const r = lines[0].r, qty = lines[0].qty;
+        window.SELECTED_RATE = r.base; window.SELECTED_CAP = capOf(r);
+        if(window.setHeroRoom) window.setHeroRoom(r.imgs);
+        const qx = qty>1 ? ' ×'+qty : '';
+        if(badge) badge.textContent = r.name + qx + ' · ' + (viewOf(r) || bedOf(r));
+        if(line)  line.innerHTML = '<span class="sr-name">'+r.name+qx+'</span> · '+descriptor(r);
+      } else {
+        window.SELECTED_RATE = null; window.SELECTED_CAP = null;
+        if(window.setHeroRoom) window.setHeroRoom(lines.map(x=>x.r.imgs[0]));   // one photo per room type
+        const names = lines.map(x=>x.r.name+(x.qty>1?' ×'+x.qty:'')).join(' + ');
+        if(badge) badge.textContent = names;
+        if(line)  line.innerHTML = '<span class="sr-name">'+names+'</span>';
+      }
+      markCards();
+      if(window.refreshPricing) window.refreshPricing();
+      if(window.syncGuestRooms) window.syncGuestRooms();   // update the "N rooms" chip at the top
+    }
+    window.renderFirstFold = renderFirstFold;
+
+    function addRoom(key){
+      if(window.CART.find(x=>x.key===key)) return;
+      window.CART.push({key, qty: Math.max(1, roomsFor(ROOM_BY[key]) || 1)});   // seed with the recommended count
+      renderFirstFold();
+      document.getElementById('top').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    function stepRoom(key, d){
+      const item = window.CART.find(x=>x.key===key); if(!item) return;
+      item.qty = Math.min(MAXQ, item.qty + d);
+      if(item.qty <= 0){ window.CART = window.CART.filter(x=>x.key!==key); }   // remove entirely — cart may be empty
+      renderFirstFold();
+    }
+
+    renderFirstFold();   // initialise the default state
+
+    // ---- shared breakfast / free-cancellation toggles: retune every room price at once ----
+    window.applyExtras = function(){
+      if(window.refreshRoomPrices) window.refreshRoomPrices();   // all room cards (apples to apples)
+      if(window.refreshPricing)    window.refreshPricing();      // first-fold Book now price
+      if(window.renderCart)        window.renderCart();          // cart rows + total
+      document.querySelectorAll('input[data-extra]').forEach(cb=>{ cb.checked = !!window.EXTRAS_ON[cb.dataset.extra]; });
+      const tag = document.querySelector('#roomCard .sr-tag');
+      if(tag){
+        const parts = [];
+        if(window.EXTRAS_ON.cancel)    parts.push('Free cancellation');
+        if(window.EXTRAS_ON.breakfast) parts.push('Breakfast included');
+        tag.textContent = parts.length ? parts.join(' · ') : 'Room-only rate';
+      }
+    };
+    document.addEventListener('change', function(e){
+      const cb = e.target && e.target.matches && e.target.matches('input[data-extra]') ? e.target : null;
+      if(!cb) return;
+      window.EXTRAS_ON[cb.dataset.extra] = cb.checked;
+      window.applyExtras();
+    });
+    window.applyExtras();   // sync initial UI (room-only)
 
     /* ---------- shared details drawer (multi-room) ---------- */
     const scrim = $('scrim'), drawer = $('drawer');
@@ -1936,8 +2057,8 @@
       if(!dr) return;
       const N = nightsNow();
       const rooms = roomsFor(dr.r);
-      const total = dr.r.base*N*rooms;   // cancellation & breakfast are included in the rate
-      $('drPrice').textContent = fmt(dr.r.base);
+      const total = effRate(dr.r)*N*rooms;   // room-only + any chosen extras
+      $('drPrice').textContent = fmt(effRate(dr.r));
       $('drTotal').textContent = fmt(total) + ' total · ' + (rooms>1?rooms+' rooms · ':'') + N + ' night' + (N>1?'s':'');
     }
     function openRoom(key){
@@ -2226,7 +2347,7 @@
       // drop the lift class once the (staggered) turn is done
       clearT = setTimeout(() => flips.forEach(f => f.classList.remove('flipping')), 820);
     }
-    window.goToCart = () => { setFlipped(true); window.scrollTo({top:0,behavior:'smooth'}); };
+    window.goToCart = () => { if(window.renderCart) window.renderCart(); setFlipped(true); };
     document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => setFlipped(false)));
 
     document.addEventListener('keydown', e => {
@@ -2267,6 +2388,7 @@
         guests: t('#guestVal'),
         guestSub: t('#guestSub'),
         room:   t('#roomCard .sr-name') || 'Villa Room',
+        rooms:  (window.cartLines ? window.cartLines() : []),
         amount: t('#confirmAmt') || t('#bkTotal') || t('.cp-amt'),
         name:   (document.getElementById('fName')||{}).value || '',
         email:  (document.getElementById('fEmail')||{}).value || '',
@@ -2283,41 +2405,59 @@
   // ===== cart summary add-ons =====
   (function(){
     const money = n => '₹' + n.toLocaleString('en-IN');
-    const BASE = 55500;                    // Villa Room · 3 nights, cancellation + breakfast included
+    // the base is the ROOM-ONLY cart total the first fold arrived at; add-ons build up from here
+    const baseNow  = () => { const t=(document.getElementById('bkTotal')||{}).textContent||''; const n=parseInt(t.replace(/[^\d]/g,''),10); return n||45600; };
+    const nightsNow = () => { const t=(document.getElementById('nightsVal')||{}).textContent||''; const n=parseInt(t.replace(/[^\d]/g,''),10); return n||3; };
+    const roomsNow  = () => (window.cartCount ? Math.max(1, window.cartCount()) : 1);
+    // opt-in extras — default OFF for the lowest price; priced per room, per night
     const ADDONS = {
-      cancel:    {save:5400, on:'Free till 9 July', off:'Non-refundable', rem:'Remove to save ₹5,400', add:'Add back · +₹5,400',
+      cancel:    {pn:1800, on:'Free till 9 July', off:'Non-refundable',
                   policyOn:'Free cancellation before Wed 9 Jul', policyOff:'Non-refundable rate'},
-      breakfast: {save:4500, on:'Included', off:'Not included', rem:'Remove to save ₹4,500', add:'Add back · +₹4,500',
+      breakfast: {pn:1500, on:'Breakfast included', off:'Not included',
                   policyOn:'Breakfast included', policyOff:'Breakfast not included'}
     };
-    const removed = {cancel:false, breakfast:false};
+    const costOf = k => ADDONS[k].pn * nightsNow() * roomsNow();
     const totalEls = [document.querySelector('.cp-amt')];
 
     function paint(){
-      const total = BASE - (removed.cancel?ADDONS.cancel.save:0) - (removed.breakfast?ADDONS.breakfast.save:0);
+      const total = baseNow();   // #bkTotal already includes any chosen extras
       totalEls.forEach(el => { if(el) el.textContent = money(total); });
       const ca = document.getElementById('confirmAmt'); if(ca) ca.textContent = money(total);
       Object.keys(ADDONS).forEach(k => {
-        const a = ADDONS[k], out = removed[k];
+        const a = ADDONS[k], on = window.EXTRAS_ON[k];
         const row = document.querySelector('.sum-row[data-addon="'+k+'"]');
         if(row){
-          row.classList.toggle('removed', out);
-          row.querySelector('.av-title').textContent = out ? a.off : a.on;
-          row.querySelector('.sum-toggle').textContent = out ? a.add : a.rem;
+          row.classList.toggle('addoff', !on);
+          row.querySelector('.av-title').textContent = on ? a.on : a.off;
+          row.querySelector('.sum-toggle').textContent = on ? 'Remove' : ('Add · +'+money(costOf(k)));
         }
-        const pol = document.querySelector('li[data-policy="'+k+'"]');
-        if(pol){ pol.textContent = out ? a.policyOff : a.policyOn; pol.classList.toggle('off', out); }
       });
     }
 
     document.querySelectorAll('.sum-row[data-addon] .sum-toggle').forEach(btn => {
       btn.addEventListener('click', () => {
         const k = btn.closest('.sum-row').dataset.addon;
-        removed[k] = !removed[k];
-        paint();
+        window.EXTRAS_ON[k] = !window.EXTRAS_ON[k];
+        if(window.applyExtras) window.applyExtras(); else paint();
       });
     });
-    paint();
+
+    // render one Room row per cart line (names + descriptor), then repaint the total
+    function renderCart(){
+      const wrap = document.getElementById('cartRooms');
+      if(!wrap || !window.cartLines){ paint(); return; }
+      const ic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M3 18v2.5M21 18v2.5"/><path d="M3 15h18"/><path d="M6.5 12V9.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V12"/></svg>';
+      const lines = window.cartLines();
+      const multi = lines.length > 1;
+      wrap.innerHTML = lines.map((l,i)=>
+        '<div class="sum-row"><span class="sum-ic">'+ic+'</span>'+
+        '<div class="sum-c"><div class="sum-k">'+(multi?('Room '+(i+1)):'Room')+'</div>'+
+        '<div class="sum-v">'+l.name+(l.qty>1?' ×'+l.qty:'')+'<span>'+l.descriptor+'</span></div></div></div>'
+      ).join('');
+      paint();
+    }
+    window.renderCart = renderCart;
+    renderCart();
   })();
 </script>
 </body>
