@@ -57,15 +57,18 @@
   .pl-tx em:empty{display:none;}
   .paid .amt{font-family:Georgia,serif;font-size:23px;font-weight:600;color:#20321f;letter-spacing:-.01em;}
 
-  /* rewards nudge — bottom row of the same box; shown only when booked as a guest */
-  .rewards{display:none;align-items:center;gap:12px;padding:13px 17px;border-top:1px solid #efe8d8;}
+  /* rewards nudge — sits just above the CTAs; shown only when booked as a guest */
+  [hidden]{display:none !important;}
+  .rewards{display:none;align-items:center;gap:12px;padding:12px 15px;
+    background:#fff;border:1px solid #e7e0d2;border-radius:14px;}
   .rewards.show{display:flex;}
-  .rw-ic{flex:none;width:34px;height:34px;border-radius:50%;background:rgba(193,154,75,.15);
+  .rw-ic{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(193,154,75,.18);
     display:flex;align-items:center;justify-content:center;color:#b8923f;}
-  .rw-ic svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .rw-ic svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;}
   .rw-tx{flex:1;min-width:0;}
   .rw-h{font-size:13.5px;font-weight:600;color:#4a4641;line-height:1.35;}
   .rw-h b{font-weight:700;color:#8a6a2e;}
+  .rw-sub{font-size:12px;color:var(--muted);margin-top:2px;}
   .rw-btn{flex:none;display:inline-flex;align-items:center;gap:5px;background:none;color:#a07d2e;
     font-size:13px;font-weight:700;padding:7px 4px 7px 10px;border-radius:8px;cursor:pointer;
     font-family:inherit;text-decoration:none;white-space:nowrap;border:none;transition:color .15s;}
@@ -87,6 +90,12 @@
     color:var(--navy);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
   .ghostbtn:hover{background:#faf7f1;border-color:#d3c9b4;}
   .ghostbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  /* tertiary — plain text link (used for Download voucher on the logged-out screen) */
+  .textbtn{display:flex;align-items:center;justify-content:center;gap:7px;background:none;border:none;
+    padding:6px;margin-top:-2px;font-family:inherit;font-size:14px;font-weight:600;color:var(--navy);
+    cursor:pointer;text-decoration:none;transition:color .15s;}
+  .textbtn:hover{color:var(--navy-deep);text-decoration:underline;}
+  .textbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
   .txtlinks{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:6px;}
   .txtlinks a{color:var(--navy);font-size:14px;font-weight:600;text-decoration:none;}
   .txtlinks a:hover{text-decoration:underline;}
@@ -119,6 +128,13 @@
   .sum-hero img{width:100%;height:100%;object-fit:cover;display:block;}
   .sum-hero::after{content:"";position:absolute;inset:0;
     background:linear-gradient(to top,rgba(20,16,26,.92) 0%,rgba(20,16,26,.55) 42%,rgba(20,16,26,.40) 72%,rgba(20,16,26,.52) 100%);}
+  .hero-share{position:absolute;top:14px;right:14px;z-index:3;width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.28);background:rgba(20,16,26,.38);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:background .15s,transform .12s;}
+  .hero-share:hover{background:rgba(20,16,26,.62);}
+  .hero-share:active{transform:scale(.93);}
+  .hero-share svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
   .sum-hero-tx{position:absolute;left:20px;right:18px;bottom:16px;z-index:2;color:#fff;}
   .sum-hero-tx .stars{color:#f0c66a;letter-spacing:3px;font-size:14px;line-height:1;margin-bottom:6px;}
   .sum-hero-tx h1{font-family:Georgia,serif;font-size:27px;line-height:1.08;margin:0 0 6px;color:#fff;letter-spacing:-.01em;}
@@ -179,36 +195,36 @@
       <div class="pl"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg><span class="pl-tx"><span id="paidLabel">Paid · Razorpay</span><em id="refundNote"></em></span></div>
       <div class="amt" id="amount">₹55,500</div>
     </div>
-
-    <div class="rewards" id="rewards">
-      <span class="rw-ic" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-      </span>
-      <div class="rw-tx">
-        <div class="rw-h" id="rwHead">You&rsquo;ve earned <b>&#8377;2,775</b> in rewards</div>
-      </div>
-      <a class="rw-btn" id="rewardsCta" href="google-login.html">Log in to view <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a>
-    </div>
     </div>
     </div>
 
     <div class="actions">
-      <div class="btnrow">
-        <a class="ghostbtn" id="shareBtn" href="#" role="button">
-          <svg viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4l4 4"/><path d="M4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>
-          <span id="shareLabel">Share booking</span>
-        </a>
-        <button type="button" class="btn" id="dlVoucher">
-          <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
-          Download voucher
-        </button>
+      <div class="rewards" id="rewards">
+        <span class="rw-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        </span>
+        <div class="rw-tx">
+          <div class="rw-h" id="rwHead">You&rsquo;ve earned <b>&#8377;2,775</b> in rewards</div>
+          <div class="rw-sub">Redeemable on your next stay</div>
+        </div>
       </div>
+      <a class="btn" id="loginBtn" href="google-login.html" hidden>
+        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+        Log in to claim
+      </a>
+      <button type="button" class="btn" id="dlVoucher">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
+        Download voucher
+      </button>
     </div>
   </div>
 
   <aside class="stay-card">
     <div class="sum-hero">
       <img src="images/04-pool-sunset.png" alt="Taj Exotica Resort &amp; Spa at sunset">
+      <button type="button" class="hero-share" id="shareBtn" aria-label="Share booking" title="Share booking">
+        <svg viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4l4 4"/><path d="M4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>
+      </button>
       <div class="sum-hero-tx">
         <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <h1 id="csHotel">Taj Exotica Resort &amp; Spa</h1>
@@ -216,8 +232,7 @@
       </div>
     </div>
     <div class="stay-sum">
-      <div class="sum-top"><span class="sh">Your stay</span><a class="sum-edit" id="modifyBtn" href="hotel-firstfold.html">
-        <svg viewBox="0 0 24 24"><path d="M4 20h4l10.5-10.5a2 2 0 0 0-2.8-2.8L5 17.5V20z"/><path d="M13.5 6.5l4 4"/></svg>Modify</a></div>
+      <div class="sum-top"><span class="sh">Your stay</span></div>
       <div class="sum-row">
         <span class="sum-ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
         <div class="sum-c"><div class="sum-k">Check-in</div><div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div></div>
@@ -287,8 +302,13 @@
         'You&rsquo;ve earned <b>&#8377;' + pts.toLocaleString('en-IN') + '</b> in rewards';
     }
     document.getElementById('rewards').classList.add('show');
+    // promote Log in to the primary CTA; demote Download voucher to secondary
+    var loginBtn = document.getElementById('loginBtn');
+    loginBtn.hidden = false;
+    var dl = document.getElementById('dlVoucher');
+    dl.classList.remove('btn'); dl.classList.add('textbtn');
     // return here after the mock login completes
-    document.getElementById('rewardsCta').addEventListener('click', function(){
+    loginBtn.addEventListener('click', function(){
       try { sessionStorage.setItem('authReturn', 'booking-details.html'); } catch(e){}
     });
   }
@@ -303,8 +323,7 @@
     icon.style.background = '#f3efe8'; icon.style.borderColor = '#e3dccf';
     icon.querySelector('svg').innerHTML = '<circle cx="12" cy="12" r="9"></circle><path d="M15 9l-6 6M9 9l6 6"></path>';
     icon.querySelector('svg').style.stroke = '#7c7771';
-    // a cancelled booking can't be modified or cancelled again
-    document.getElementById('modifyBtn').style.display = 'none';
+    // a cancelled booking can't be cancelled again
     document.getElementById('cancelLink').style.display = 'none';
     // surface the refund next to Razorpay instead of a separate banner
     document.getElementById('paidLabel').textContent = 'Refund · Razorpay';
@@ -344,7 +363,11 @@
     return null;
   }
   var companion = firstCompanion(b.guests);
-  if(companion){ document.getElementById('shareLabel').textContent = 'Share with ' + companion; }
+  if(companion){
+    var _sb = document.getElementById('shareBtn');
+    _sb.setAttribute('aria-label', 'Share with ' + companion);
+    _sb.setAttribute('title', 'Share with ' + companion);
+  }
 
   document.getElementById('shareBtn').addEventListener('click', function(e){
     e.preventDefault();

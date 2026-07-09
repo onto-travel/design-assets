@@ -2286,7 +2286,8 @@
         room:   t('#roomCard .sr-name') || 'Villa Room',
         amount: t('#confirmAmt') || t('#bkTotal') || t('.cp-amt'),
         name:   (document.getElementById('fName')||{}).value || '',
-        email:  (document.getElementById('fEmail')||{}).value || ''
+        email:  (document.getElementById('fEmail')||{}).value || '',
+        phone:  (document.getElementById('fPhone')||{}).value || ''
       };
       try { sessionStorage.setItem('booking', JSON.stringify(booking)); } catch(e){}
       location.href = 'razorpay.html';
