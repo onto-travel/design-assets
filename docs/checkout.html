@@ -950,7 +950,7 @@
         <!-- price: 3-night total primary, per-night secondary -->
         <div class="bk-price">
           <div class="bk-l1"><b>₹18,500</b><span>/ night <em>· taxes incl.</em></span></div>
-          <div class="bk-l2"><span id="bkTotal">₹55,500</span> total for <span id="bkNights">3 nights</span></div>
+          <div class="bk-l2"><span id="bkTotal">₹55,500</span><span id="bkMid"> total for </span><span id="bkNights">3 nights</span></div>
         </div>
 
         <!-- CTAs directly under price -->
@@ -1383,8 +1383,11 @@
   }
 
   // ---- CTAs: primary → checkout, secondary → wishlist ----
-  document.getElementById('bookNow').addEventListener('click',
-    () => { window.goToCart && window.goToCart(); });
+  document.getElementById('bookNow').addEventListener('click', (e) => {
+    // Empty cart still shows the standard room — Book now commits it before continuing.
+    if(e.currentTarget.classList.contains('is-empty') && window.addStandardRoom) window.addStandardRoom();
+    window.goToCart && window.goToCart();
+  });
   document.getElementById('addTrip').addEventListener('click', function(){
     const on = this.classList.toggle('on');
     this.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -1630,18 +1633,24 @@
       // keep booking-module price in sync with stay length, party size AND the selected room.
       // A larger party than the room sleeps needs multiple rooms.
       const cartReady = !!window.cartRooms;
-      const empty = cartReady && window.cartCount() === 0;
+      const empty = cartReady && window.cartCount() === 0;   // user removed every room
       const rate = window.SELECTED_RATE || RATE;
       const cap  = window.SELECTED_CAP  || 3;
-      const rooms = cartReady ? window.cartCount() : (window.roomsNeeded ? window.roomsNeeded(cap) : 1);
-      const nightlyVal = cartReady ? window.cartNightly() : rate;
-      const total = cartReady ? window.cartTotalFor(n) : rate*n*rooms;
+      // Empty cart → the fold still shows the standard room (the cheapest — set by renderFirstFold),
+      // priced as one room (more if the party needs it), just not committed to the cart.
+      const stdRooms = window.roomsNeeded ? window.roomsNeeded(cap) : 1;
+      const stdNightly = (empty && window.stdNightly) ? window.stdNightly() : rate;   // room-only ₹15,200, not the all-in base
+      const rooms = empty ? stdRooms : (cartReady ? window.cartCount() : stdRooms);
+      const nightlyVal = empty ? stdNightly*stdRooms : (cartReady ? window.cartNightly() : rate);
+      const total = empty ? stdNightly*n*stdRooms : (cartReady ? window.cartTotalFor(n) : rate*n*rooms);
       const totTxt = '₹'+total.toLocaleString('en-IN');
-      const nb = document.querySelector('.bk-l1 b'); if(nb) nb.textContent = empty ? '—' : '₹'+nightlyVal.toLocaleString('en-IN');
+      const nb = document.querySelector('.bk-l1 b'); if(nb) nb.textContent = '₹'+nightlyVal.toLocaleString('en-IN');
       const be = document.querySelector('.bk-l1 em'); if(be) be.textContent = '· taxes incl.';
-      const bt = $('bkTotal');   if(bt) bt.textContent = empty ? '—' : totTxt;
-      const bn = $('bkNights');  if(bn) bn.textContent = empty ? 'No rooms selected' : ((rooms>1?rooms+' rooms · ':'')+n+' night'+(n>1?'s':''));
-      const bk = $('bookNow'); if(bk){ bk.textContent = empty ? 'Select a room' : 'Book now · '+totTxt; bk.disabled = empty; }
+      const bt = $('bkTotal');   if(bt) bt.textContent = totTxt;
+      const bmid = $('bkMid');   if(bmid) bmid.textContent = ' total for ';
+      const bn = $('bkNights');  if(bn) bn.textContent = (rooms>1?rooms+' rooms · ':'')+n+' night'+(n>1?'s':'');
+      // Book now stays live even with an empty cart — it commits the standard room shown here (see #bookNow handler).
+      const bk = $('bookNow'); if(bk){ bk.textContent = 'Book now · '+totTxt; bk.disabled = false; bk.classList.toggle('is-empty', empty); }
       if(window.refreshRoomPrices) window.refreshRoomPrices();
     }
     window.refreshPricing = renderChip;   // guest-count changes re-run the whole price cascade
@@ -2037,6 +2046,7 @@
     window.cartTypes = () => window.CART.length;                     // distinct room types
     window.cartTotalFor = n => cartRooms().reduce((s,x)=> s + effRate(x.r) * n * x.qty, 0);   // room-only + chosen extras
     window.cartNightly  = () => cartRooms().reduce((s,x)=> s + effRate(x.r) * x.qty, 0);
+    window.stdNightly   = () => effRate(ROOMS[0]);   // room-only nightly of the standard room (matches its card; respects extras)
     window.cartLines    = () => cartRooms().map(x=>({key:x.r.key, name:x.r.name, descriptor:descriptor(x.r), rate:effRate(x.r), qty:x.qty}));
 
     // each room card shows "Add to cart" until it's in the cart, then a quantity stepper
@@ -2065,10 +2075,12 @@
       const badge = document.querySelector('.gallery .badge');
       const line  = document.querySelector('#roomCard .sr-line');
       if(lines.length === 0){
-        window.SELECTED_RATE = 0; window.SELECTED_CAP = null;
-        if(window.setHeroRoom) window.setHeroRoom([]);       // fall back to generic property photos
-        if(badge) badge.textContent = 'Choose your room';
-        if(line)  line.innerHTML = '<span class="sr-name">No room selected</span> · add one below';
+        // Nothing committed → keep the fold alive by showing the standard room (cheapest) as the default.
+        const r = ROOMS[0];
+        window.SELECTED_RATE = r.base; window.SELECTED_CAP = capOf(r);
+        if(window.setHeroRoom) window.setHeroRoom(r.imgs);
+        if(badge) badge.textContent = r.name + ' · ' + (viewOf(r) || bedOf(r));
+        if(line)  line.innerHTML = '<span class="sr-name">'+r.name+'</span> · '+descriptor(r);
       } else if(lines.length === 1){
         const r = lines[0].r, qty = lines[0].qty;
         window.SELECTED_RATE = r.base; window.SELECTED_CAP = capOf(r);
@@ -2095,6 +2107,7 @@
       renderFirstFold();
       document.getElementById('top').scrollIntoView({behavior:'smooth', block:'start'});
     }
+    window.addStandardRoom = () => addRoom(ROOMS[0].key);   // commit the standard room the empty-cart fold shows
     function stepRoom(key, d){
       const item = window.CART.find(x=>x.key===key); if(!item) return;
       item.qty = Math.min(MAXQ, item.qty + d);
