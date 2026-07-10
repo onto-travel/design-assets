@@ -105,20 +105,38 @@
 <script>
   (function(){
     const card = document.getElementById('card');
+
+    // Mock "backend": phone numbers already linked to a Google account.
+    // On sign-in we look the email up here; a match means we can skip the
+    // manual add-number + OTP step. The demo account has no number on file.
+    const PHONE_ON_FILE = {
+      'xyz@email.com': null      // e.g. '+919876543210' would skip verification
+    };
+
     function finish(){
       card.classList.add('busy');
-      // new sign-up → verify a mobile number first; returning (already verified this session) → straight through
+
+      let dest = 'hotel-firstfold.html';
+      try { dest = sessionStorage.getItem('authReturn') || dest; } catch(e){}
+
+      // returning user, already verified this session → straight through
       let verified = false;
       try { verified = sessionStorage.getItem('phoneVerified') === '1'; } catch(e){}
-      if(verified){
-        let dest = 'hotel-firstfold.html';
+
+      // backend lookup: is a phone number linked to this Google account?
+      const email = (document.querySelector('#acctBtn .acct-name') || {}).textContent || '';
+      const onFile = PHONE_ON_FILE[email.trim()] || null;
+
+      if(verified || onFile){
+        // number known (linked to account, or verified earlier) → no OTP needed
         try {
-          dest = sessionStorage.getItem('authReturn') || dest;
+          if(onFile) sessionStorage.setItem('userPhone', onFile);
+          sessionStorage.setItem('phoneVerified', '1');
           sessionStorage.removeItem('authReturn');
         } catch(e){}
         setTimeout(() => { location.href = dest; }, 1400);
       } else {
-        // phone-verify.html consumes authReturn once verified
+        // no number on file → collect + verify one (phone-verify.html consumes authReturn)
         setTimeout(() => { location.href = 'phone-verify.html'; }, 1400);
       }
     }
