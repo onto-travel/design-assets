@@ -1540,9 +1540,19 @@
       return avg;
     }
 
+    let lastGuests = 0;
     function apply(){
       try{ sessionStorage.setItem('searchGuests', JSON.stringify(party)); }catch(e){}
       window.PARTY.guests = occ();
+      // auto-fit rooms to the party: once guests grow past 2 we add a room (~2 guests each).
+      // only bumps UP on an actual guest increase — the user can always reduce it with the stepper.
+      const _g = window.PARTY.guests;
+      if(_g > lastGuests){
+        const rec = Math.max(1, Math.ceil(_g / 2));
+        const cur = (window.CART && window.CART[0]) ? window.CART[0].qty : 1;
+        if(rec > cur && window.setRoomQty) window.setRoomQty(rec);
+      }
+      lastGuests = _g;
       if(window.refreshPricing) window.refreshPricing();
       CATS.forEach(cat=>{ const el=$(COUNT[cat]); if(el) el.textContent = party[cat].length; });
       renderRegulars(); renderPeople();

@@ -6,8 +6,8 @@
 <title>Taj Exotica · Your booking</title>
 <style>
   :root{
-    --bg:#efeae1; --card:#ffffff; --ink:#1c1c1c; --muted:#7c7771; --line:#e7e1d6;
-    --navy:#2f4f74; --navy-deep:#284667; --gold:#c19a4b; --green:#2a7d5f;
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
+    --navy:#0f8a63; --navy-deep:#063f2f; --gold:#f2c14e; --green:#0f8a63;
     --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
   }
   *{box-sizing:border-box;}
@@ -17,38 +17,39 @@
     display:flex;align-items:center;justify-content:center;padding:40px 20px;}
   h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
 
-  .card{width:520px;max-width:100%;background:#fbf8f2;border-radius:20px;box-shadow:var(--shadow);
+  .card{width:520px;max-width:100%;background:#faf8f3;border-radius:20px;box-shadow:var(--shadow);
     overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 30px 32px;position:relative;}
   .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
     color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
     transition:color .15s,background .15s;}
-  .backlink:hover{color:var(--navy);background:#f3ede1;}
+  .backlink:hover{color:var(--navy);background:#faf8f3;}
   .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
   .head{text-align:center;padding:0;}
-  .check{width:66px;height:66px;border-radius:50%;background:#e7efe6;border:1px solid #d2e2ce;
-    display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
-  .check svg{width:31px;height:31px;stroke:var(--green);stroke-width:2.6;fill:none;
+  .check{width:76px;height:76px;border-radius:50%;background:#e7efe6;border:1px solid #d2e2ce;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+  .check svg{width:36px;height:36px;stroke:var(--green);stroke-width:2.4;fill:none;
     stroke-linecap:round;stroke-linejoin:round;}
   .check.pop{animation:pop .45s cubic-bezier(.22,1.2,.36,1) both;}
   @keyframes pop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
-  .head h1{font-family:Georgia,serif;font-size:34px;line-height:1.06;color:#22324f;margin:0 0 12px;letter-spacing:-.015em;}
+  .head h1{font-family:Georgia,serif;font-size:34px;line-height:1.1;color:#063f2f;margin:0 0 12px;letter-spacing:-.015em;}
   .head p{color:var(--muted);font-size:15.5px;margin:0 auto;max-width:400px;}
-  .head p b{color:#22324f;font-weight:700;}
+  .head p b{color:#063f2f;font-weight:700;}
 
   /* booking-reference panel */
-  .ref{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:#f4eee2;
-    border:1px solid var(--line);border-radius:30px;padding:6px 7px 6px 16px;font-size:13.5px;
+  .ref{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:#faf8f3;
+    border:1px solid var(--line);border-radius:30px;padding:9px 8px 9px 18px;font-size:13.5px;
     color:#6b6459;font-weight:600;}
   .ref b{color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;font-weight:700;margin-left:2px;}
   .ref-copy{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
     border-radius:50%;border:none;background:none;color:var(--muted);cursor:pointer;transition:background .15s,color .15s;}
-  .ref-copy:hover{background:#e7ded0;color:var(--navy);}
+  .ref-copy:hover{background:#f1ede3;color:var(--navy);}
   .ref-copy.done{color:var(--green);}
   .ref-copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
 
   /* paid panel */
   /* payment + rewards live in ONE neutral box; colour comes only from the small icons */
-  .paybox{margin-top:14px;border:1px solid #e7e0d2;border-radius:14px;overflow:hidden;background:#fff;}
+  .paybox{margin-top:24px;border-radius:14px;overflow:hidden;background:#fff;
+    box-shadow:0 1px 3px rgba(40,30,10,.06), 0 10px 24px -14px rgba(40,30,10,.22);}
   .paid{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 17px;}
   .paid .pl{display:inline-flex;align-items:center;gap:9px;font-size:15px;color:#3a6a4d;font-weight:600;}
   .paid .pl svg{width:17px;height:17px;stroke:var(--green);stroke-width:2.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none;}
@@ -88,7 +89,7 @@
   .ghostbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
     border:1px solid #e2dac9;border-radius:12px;padding:13px;font-family:inherit;font-size:14.5px;font-weight:600;
     color:var(--navy);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
-  .ghostbtn:hover{background:#faf7f1;border-color:#d3c9b4;}
+  .ghostbtn:hover{background:#faf8f3;border-color:#d3c9b4;}
   .ghostbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
   /* tertiary — plain text link (used for Download voucher on the logged-out screen) */
   .textbtn{display:flex;align-items:center;justify-content:center;gap:7px;background:none;border:none;
@@ -105,13 +106,13 @@
   body.is-cancelled .sum-hero-tx h1{text-decoration:line-through;text-decoration-color:#c9c1b2;}
   body.is-cancelled .paid{background:#fbeeec;border-color:#f2d5d0;}
   body.is-cancelled .paid .pl{color:#9c332b;}
-  body.is-cancelled .paid .pl svg{stroke:#b23b32;}
+  body.is-cancelled .paid .pl svg{stroke:#d64545;}
   body.is-cancelled .pl-tx em{color:#a5564e;}
   body.is-cancelled .paid .amt{color:#7a241d;}
 
   /* toast */
   .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
-    background:#1c1c1c;color:#fff;font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:12px;
+    background:#1b211e;color:#fff;font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:12px;
     box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;
     display:flex;align-items:center;gap:9px;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -145,12 +146,12 @@
   .sum-edit{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--navy);text-decoration:none;}
   .sum-edit:hover{text-decoration:underline;}
   .sum-edit svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  .row-cancel{flex:none;display:inline-flex;align-items:center;gap:5px;color:#b23b32;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap;}
+  .row-cancel{flex:none;display:inline-flex;align-items:center;gap:5px;color:#d64545;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap;}
   .row-cancel:hover{text-decoration:underline;}
   .row-cancel svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
   .sum-row{display:flex;gap:12px;align-items:center;padding:9px 2px;}
   .sum-row+.sum-row{border-top:1px solid #f1ede5;}
-  .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f4efe6;color:#b3893f;
+  .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f1ede3;color:#b3893f;
     display:flex;align-items:center;justify-content:center;}
   .sum-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
   .sum-c{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
@@ -160,7 +161,7 @@
   .sum-v span:not(.av-title)::before{content:" · ";}
   .sum-v .av-title{font-weight:600;color:var(--ink);}
   .co-price{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;
-    background:#f4efe6;border:1px solid #ece3d2;border-radius:15px;padding:14px 20px;text-align:left;}
+    background:#f1ede3;border:1px solid #ece3d2;border-radius:15px;padding:14px 20px;text-align:left;}
   .cp-left{display:flex;flex-direction:column;gap:5px;}
   .cp-nights{font-size:13px;color:var(--muted);}
   .tax-ok{font-size:12.5px;color:#8a6a24;font-weight:600;}
