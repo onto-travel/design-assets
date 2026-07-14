@@ -6,16 +6,17 @@
 <title>Taj Exotica · First fold</title>
 <style>
   :root{
-    --bg:#efeae1;
+    /* onto palette */
+    --bg:#faf8f3;        /* Paper — app background */
     --card:#ffffff;
-    --ink:#1c1c1c;
-    --muted:#7c7771;
-    --line:#e7e1d6;
-    --navy:#2f4f74;
-    --navy-deep:#284667;
-    --gold:#c19a4b;
-    --pill:#ece6db;
-    --info:#ece7dc;
+    --ink:#1b211e;       /* Ink — green-tinted near-black text */
+    --muted:#6d726c;     /* muted, green-tinted */
+    --line:#e4dfd2;      /* Sand-family divider */
+    --navy:#0f8a63;      /* Onto jade 500 — signature, CTAs, brand moments */
+    --navy-deep:#063f2f; /* Deep jade 800 — headers, corporate */
+    --gold:#f2c14e;      /* Butter — rewards, delight (use sparingly) */
+    --pill:#f1ede3;      /* Sand — quiet fills */
+    --info:#f1ede3;      /* Sand */
     --shadow:0 1px 2px rgba(0,0,0,.04), 0 12px 30px rgba(40,30,10,.06);
   }
   *{box-sizing:border-box;}
@@ -33,13 +34,14 @@
 
   /* ---------- TOP NAV ---------- */
   .topnav{position:sticky;top:0;z-index:70;
-    background:rgba(239,234,225,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    background:rgba(250,248,243,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);}
   .topnav-in{max-width:1180px;margin:0 auto;padding:0 28px;height:62px;display:flex;align-items:center;gap:26px;}
   .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);
     letter-spacing:-.01em;text-decoration:none;white-space:nowrap;}
   .tn-brand span{color:var(--gold);}
   .tn-links{display:flex;align-items:center;gap:2px;}
+.tn-links.tn-hidden{display:none;}
   .tn-links a{font-size:14.5px;color:#5b5650;text-decoration:none;padding:8px 14px;border-radius:9px;
     transition:background .15s,color .15s;}
   .tn-links a:hover{background:rgba(255,255,255,.62);color:var(--ink);}
@@ -51,15 +53,15 @@
   .tn-profile{width:40px;height:40px;border-radius:50%;border:1px solid #d9d1c1;background:#fff;
     color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;
     transition:all .15s;padding:0;}
-  .tn-profile:hover{border-color:#c2b8a4;background:#faf7f1;}
+  .tn-profile:hover{border-color:#c2b8a4;background:#faf8f3;}
   #top,#rooms,#reviews,#location{scroll-margin-top:76px;}
 
   /* ---------- HERO (first fold only) ---------- */
   .crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:16px 0 0;font-size:13px;}
-  .crumbs a{color:var(--navy);text-decoration:none;font-weight:600;}
+  .crumbs a{color:var(--muted);text-decoration:none;font-weight:600;}
   .crumbs a:hover{text-decoration:underline;}
   .crumb-sep{color:#c3bcae;font-size:14px;line-height:1;}
-  .crumb-cur{color:var(--muted);font-weight:600;}
+  .crumb-cur{color:var(--navy-deep);font-weight:600;}
   .hero{display:grid;grid-template-columns:1.15fr 1fr;gap:34px;
     padding:20px 0 34px;align-items:stretch;}
   .gallery{display:flex;flex-direction:column;min-height:0;}
@@ -104,14 +106,15 @@
   }
   .stars{color:var(--gold);letter-spacing:3px;font-size:15px;}
   .book h1{font-size:28px;margin:8px 0 5px;}
-  .place{color:var(--navy);font-weight:600;font-size:12.5px;letter-spacing:.08em;}
+  .place{color:var(--navy-deep);font-weight:600;font-size:12.5px;letter-spacing:.08em;}
 
   /* --- headline price, sits right under name/location --- */
   /* --- 2. BOOKING MODULE: the dominant block --- */
   .booking{margin-top:28px;}
 
   /* --- 3. DECISION VALIDATION: reassurance, faint outlined box --- */
-  .validate{margin-top:22px;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .validate{margin-top:auto;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .booking{margin-bottom:22px;}   /* keeps a minimum gap above the reassurance box when there's no slack to absorb */
   .vd-score{font-size:16px;font-weight:700;color:#2f5d47;margin:0 0 12px;}
   /* reserve room for up to 2 rows of pills so adding/removing companions doesn't resize the card
      (and, since the card is height-matched to the gallery, doesn't rescale the hero image) */
@@ -121,32 +124,38 @@
   .vd-chips li.shot{cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding-left:9px;
     transition:background .15s,border-color .15s;}
   .vd-chips li.shot:hover{background:#e2ece2;border-color:#cfe0cf;}
-  .vd-chips li.shot:focus-visible{outline:2px solid #2a7d5f;outline-offset:1px;}
+  .vd-chips li.shot:focus-visible{outline:2px solid #0f8a63;outline-offset:1px;}
   .chip-cam{width:13px;height:13px;flex:none;opacity:.8;}
 
   /* --- "your stay": two subtle filled cards (low contrast on white) --- */
   .trip{position:relative;}
   .trip-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   .tripchip{
-    text-align:left;background:#f6f3ee;border:none;border-radius:14px;padding:15px 17px;
+    text-align:left;background:#f1ede3;border:none;border-radius:14px;padding:15px 17px;
     cursor:pointer;font-family:inherit;display:flex;flex-direction:column;gap:6px;position:relative;transition:background .15s;
   }
-  .tripchip:hover{background:#f0ebe2;}
+  .tripchip:hover{background:#e8e2d5;}
   .tripchip .tc-k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
   .tripchip .tc-cnt{text-transform:none;letter-spacing:normal;font-weight:400;font-size:11.5px;color:var(--muted);}
   .tripchip .tc-cnt::before{content:"·";margin:0 5px;}
   .tripchip .tc-v{font-size:16.5px;font-weight:600;color:var(--ink);}
 
-  /* --- selected room: subtle filled card, opens details drawer --- */
-  .selroom{
-    width:100%;text-align:left;font-family:inherit;cursor:pointer;margin-top:12px;
-    background:#f6f3ee;border:none;border-radius:14px;padding:12px 16px;
-    display:flex;flex-direction:column;gap:9px;transition:background .15s;
-  }
-  .selroom:hover{background:#f0ebe2;}
-  .selroom .sr-line{font-size:15px;color:var(--muted);}
-  .selroom .sr-tag{align-self:flex-start;font-size:12.5px;color:#9a948c;font-weight:500;}
-  .selroom .sr-name{font-family:Georgia,serif;font-size:15.5px;font-weight:500;color:var(--ink);}
+  /* --- selected room: a Room chip matching the Dates/Guests chips, full-width below them --- */
+  .roomsel{position:relative;margin-top:12px;}
+  .roomchip{width:100%;}
+  .roomchip .sr-line{font-size:14px;color:var(--muted);line-height:1.35;}
+  .roomchip .sr-name{font-size:16.5px;font-weight:600;color:var(--ink);}
+  .roomchip .sr-tag{font-size:12.5px;color:#9a948c;font-weight:500;}
+  /* the Room chip's own dropdown — a quantity stepper, right-aligned so the price stays visible */
+  .room-pop{position:absolute;top:calc(100% + 8px);right:0;left:auto;z-index:40;width:max-content;min-width:172px;
+    background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 36px rgba(40,30,10,.18);padding:12px 14px;
+    display:flex;flex-direction:column;}
+  .room-pop[hidden]{display:none;}
+  .rp-stepper{display:flex;width:100%;align-items:center;justify-content:space-between;margin-left:0;}
+  .rp-link{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);text-align:center;}
+  .rp-link button{background:none;border:none;color:var(--navy);font-weight:600;font-size:13.5px;
+    cursor:pointer;font-family:inherit;padding:0;}
+  .rp-link button:hover{color:var(--navy-deep);}
 
   /* --- price: 3-night total primary, per-night secondary --- */
   .bk-price{margin-top:26px;}
@@ -168,13 +177,17 @@
   }
   .btn:hover{background:var(--navy-deep);}
   .btn:disabled{background:#cfc7b6;color:#fff;cursor:default;}
+  /* while the form is open, the right card freezes: details stay visible but static, and its CTAs are gone */
+  #flipRight.frozen .cta-stack{display:none;}
+  #flipRight.frozen .tripchip,
+  #flipRight.frozen .roomsel{pointer-events:none;cursor:default;}
   .btn-secondary{
     display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;
     background:#fff;color:var(--navy);border:1px solid #d9d1c1;border-radius:12px;
     font-size:14.5px;font-weight:600;padding:13px 16px;cursor:pointer;font-family:inherit;transition:all .15s;
   }
-  .btn-secondary:hover{border-color:#c2b8a4;background:#faf7f1;}
-  .btn-secondary.on{color:#2a7d5f;border-color:#bfe0cf;background:#eef6f1;}
+  .btn-secondary:hover{border-color:#c2b8a4;background:#faf8f3;}
+  .btn-secondary.on{color:#0f8a63;border-color:#bfe0cf;background:#eef6f1;}
   .btn-secondary.icon-only{width:56px;padding:0;gap:0;}
   .btn-secondary .hz{font-size:17px;font-weight:600;line-height:1;}
   .btn-secondary.icon-only .hz{font-size:22px;}
@@ -199,9 +212,9 @@
   .rooms-scroll::-webkit-scrollbar-thumb{background:#d9d1c1;border-radius:8px;}
   .rooms-scroll .rcard{flex:0 0 300px;scroll-snap-align:start;background:var(--card);border:1px solid var(--line);
     border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);}
-  .rc-photo{position:relative;aspect-ratio:4/3;background:#e9e4da;overflow:hidden;flex:none;}
+  .rc-photo{position:relative;aspect-ratio:4/3;background:#f1ede3;overflow:hidden;flex:none;}
   .rc-photo .rc-img{width:100%;height:100%;object-fit:cover;display:block;}
-  .rc-badge{position:absolute;top:0;left:0;right:0;background:#2a7d5f;color:#fff;font-size:12.5px;
+  .rc-badge{position:absolute;top:0;left:0;right:0;background:#0f8a63;color:#fff;font-size:12.5px;
     font-weight:600;letter-spacing:.03em;text-align:center;padding:8px;}
   .rc-nav{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;
     background:rgba(255,255,255,.9);border:none;cursor:pointer;font-size:18px;line-height:1;color:#222;
@@ -221,16 +234,14 @@
   .rc-opt input{width:16px;height:16px;accent-color:var(--navy);flex:none;}
   .rc-why{background:var(--info);border-radius:11px;padding:12px 14px;margin:4px 0 2px;}
   .rc-why h5{margin:0 0 8px;color:var(--navy);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;line-height:1.3;}
-  .rc-why ul{margin:0;padding:0;list-style:none;}
-  .rc-why li{position:relative;padding-left:14px;font-size:13px;color:#3a3a3a;margin-bottom:5px;}
-  .rc-why li:last-child{margin-bottom:0;}
-  .rc-why li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--navy);}
+  .rc-why-pts{font-size:13px;color:#2f3b34;line-height:1.55;}
+  .rc-why-pts i{color:#9bb7a8;font-style:normal;margin:0 9px;font-size:28px;line-height:0;vertical-align:-4px;}
   /* baseline inclusions — plain info on the standard room (the floor every option shares) */
   .rc-info{list-style:none;margin:2px 0;padding:0;}
   .rc-info li{position:relative;padding-left:19px;font-size:13px;color:#3a3a3a;margin-bottom:6px;}
   .rc-info li:last-child{margin-bottom:0;}
   .rc-info li::before{content:"";position:absolute;left:1px;top:4px;width:9px;height:5px;
-    border-left:2px solid #2a7d5f;border-bottom:2px solid #2a7d5f;transform:rotate(-45deg);}
+    border-left:2px solid #0f8a63;border-bottom:2px solid #0f8a63;transform:rotate(-45deg);}
   .rc-foot{margin-top:auto;}
   .rc-price-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
     border-top:1px solid var(--line);padding-top:14px;margin-top:16px;margin-bottom:14px;}
@@ -244,6 +255,9 @@
     cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap;
     background:var(--navy);color:#fff;}
   .rc-book:hover{background:var(--navy-deep);}
+  /* the selected room's card shows a static chosen state (count lives on the Room chip) */
+  .rc-added{flex:1;border:1px solid #bfe0cf;background:#eaf3ee;color:var(--navy-deep);border-radius:10px;
+    font-size:14px;font-weight:600;padding:13px;font-family:inherit;cursor:default;white-space:nowrap;text-align:center;}
   /* in-cart quantity stepper (replaces the Add button once a room is added) */
   .rc-stepper{flex:1;display:flex;align-items:center;justify-content:space-between;
     border:1px solid #bfe0cf;background:#eaf3ee;border-radius:10px;padding:4px;}
@@ -273,7 +287,7 @@
   .rev-track .rcard p{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
   .rev-track .rcard .tags{margin-top:auto;}
   .rev-arrow{position:absolute;top:42%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid var(--line);cursor:pointer;font-size:22px;line-height:1;color:#222;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.14);z-index:3;transition:background .15s;}
-  .rev-arrow:hover{background:#f3efe8;}
+  .rev-arrow:hover{background:#f1ede3;}
   .rev-arrow.prev{left:-14px;padding-right:3px;}
   .rev-arrow.next{right:-14px;padding-left:3px;}
   .rev-head-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;}
@@ -281,7 +295,7 @@
   .seeall:hover{text-decoration:underline;}
   .rev-search{flex:none;padding:14px 26px;border-bottom:1px solid var(--line);position:relative;display:flex;align-items:center;}
   .rev-search .rs-ic{position:absolute;left:38px;color:var(--muted);font-size:16px;transform:rotate(45deg);}
-  .rev-search input{width:100%;padding:11px 14px 11px 38px;border:1px solid var(--line);border-radius:10px;font-size:14.5px;font-family:inherit;background:#faf8f4;color:var(--ink);}
+  .rev-search input{width:100%;padding:11px 14px 11px 38px;border:1px solid var(--line);border-radius:10px;font-size:14.5px;font-family:inherit;background:#faf8f3;color:var(--ink);}
   .rev-search input:focus{outline:none;border-color:var(--navy);background:#fff;}
   .rev-noresult{padding:30px 2px;color:var(--muted);font-size:15px;text-align:center;}
   .rev-list-item{padding:20px 2px;border-bottom:1px solid var(--line);}
@@ -313,7 +327,7 @@
   .dist{grid-column:1;grid-row:3;}
   .gtk-h{grid-column:2;grid-row:1;margin-bottom:22px;font-size:28px;}
   .acc{grid-column:2;grid-row:2;}
-  .map{background:#f3efe7;border-radius:16px;min-height:340px;position:relative;overflow:hidden;border:1px solid var(--line);}
+  .map{background:#f1ede3;border-radius:16px;min-height:340px;position:relative;overflow:hidden;border:1px solid var(--line);}
   .map svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
   .map .showmap{position:absolute;top:12px;right:12px;z-index:2;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,.08);backdrop-filter:blur(4px);}
   .map .showmap:hover{background:#fff;}
@@ -371,7 +385,7 @@
     align-items:center;justify-content:center;color:#fff;line-height:1;}
   .tr-score b{font-size:23px;font-family:Georgia,serif;}
   .tr-score span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:3px;opacity:.9;}
-  .tr-score.s-good{background:#2a7d5f;}
+  .tr-score.s-good{background:#0f8a63;}
   .tr-score.s-mid{background:#c08a2d;}
   .tr-score.s-low{background:#b4483f;}
   .tr-score.s-rev{background:var(--navy);}
@@ -385,7 +399,7 @@
   .tr-summary{margin:0;font-size:14px;color:#33302a;line-height:1.6;font-weight:500;}
   .tr-keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
   .tr-key{font-size:12px;font-weight:600;padding:4px 10px;border-radius:7px;
-    background:rgba(42,125,95,.16);color:#256b51;border:1px solid rgba(42,125,95,.26);}
+    background:rgba(15,138,99,.16);color:#256b51;border:1px solid rgba(15,138,99,.26);}
   .tr-key.neg{background:rgba(176,86,45,.15);color:#a1502c;border-color:rgba(176,86,45,.28);}
   .tr-chips{display:flex;flex-wrap:wrap;gap:7px;}
   .tr-chips .tc{background:var(--pill);color:#5b5650;font-size:12.5px;padding:4px 11px;border-radius:8px;}
@@ -402,14 +416,14 @@
   /* ---------- redesigned reality panel (pool + bathroom only) ---------- */
   .lbx-panel[hidden]{display:none;}
   .rp-head{display:flex;align-items:center;gap:14px;}
-  .rp-score{flex:none;display:flex;align-items:baseline;gap:2px;font-family:Georgia,serif;color:#2a7d5f;font-weight:600;}
+  .rp-score{flex:none;display:flex;align-items:baseline;gap:2px;font-family:Georgia,serif;color:#0f8a63;font-weight:600;}
   .rp-score b{font-size:34px;line-height:1;}
   .rp-score span{font-size:15px;color:#6b6459;font-family:-apple-system,sans-serif;font-weight:600;}
   .rp-htx h3{margin:0 0 2px;font-size:17px;color:#211f1b;}
   .rp-htx p{margin:0;font-size:12.5px;color:#6b6459;}
   .rp-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
   .rp-pill{font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:20px;
-    background:#ece6db;color:#5b5650;border:none;}
+    background:#f1ede3;color:#5b5650;border:none;}
   .rp-pill.neg{background:#f7f0e0;color:#8a6a24;border:1px solid #ebddbf;font-weight:600;}
   .rp-sec{margin-top:20px;border-top:1px solid rgba(120,110,95,.28);padding-top:15px;}
   .rp-sec h4{margin:0 0 11px;font-size:11px;letter-spacing:.09em;font-weight:700;color:#6b6459;}
@@ -446,7 +460,7 @@
 
   /* selectable room cards — click the body/photo to preview the room up top */
   #roomsScroll .rcard{cursor:pointer;}
-  #roomsScroll .rcard.selected{outline:1.5px solid rgba(47,79,116,.3);outline-offset:-1px;}
+  #roomsScroll .rcard.selected{outline:1.5px solid rgba(15,138,99,.3);outline-offset:-1px;}
 
   /* ---------- guests popover: pick regulars → they segregate into age groups ---------- */
   .guest-pop{
@@ -462,7 +476,7 @@
   .reg-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;
     padding:6px 11px 6px 10px;font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;
     cursor:pointer;font-family:inherit;transition:all .15s;}
-  .reg-chip:hover{border-color:var(--navy);background:#f4f7fb;}
+  .reg-chip:hover{border-color:var(--navy);background:#eef6f1;}
   .reg-chip .rc-em{font-size:14px;}
   .reg-chip .rc-plus{color:var(--navy);font-weight:700;font-size:14px;margin-left:1px;}
   .gp-allin{font-size:12.5px;color:var(--muted);padding:2px;}
@@ -473,33 +487,28 @@
   .gp-chead .gpc-sub{font-size:12px;color:var(--muted);}
   .gp-chead .gpc-sub::before{content:"·";margin:0 6px;color:#c3bcae;}
   .gp-chead .gpc-count{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--navy);
-    min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#eef2f7;
+    min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#eef6f1;
     display:inline-flex;align-items:center;justify-content:center;}
   .gp-people{display:flex;flex-wrap:wrap;gap:6px;padding:9px 2px 4px;}
   .gp-people:empty{display:none;}
   .person{display:inline-flex;align-items:center;gap:5px;border:1px solid #cdd8e6;border-radius:20px;
-    padding:5px 5px 5px 11px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--navy);background:#f4f7fb;}
-  .person:not(.is-comp){background:#fbf7ef;border-color:#e4dcc9;color:var(--ink);}
+    padding:5px 5px 5px 11px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--navy);background:#eef6f1;}
+  .person:not(.is-comp){background:#faf8f3;border-color:#e4dcc9;color:var(--ink);}
   .person .person-em{font-size:14px;}
   .person .person-name{border:none;background:none;font:inherit;color:inherit;cursor:pointer;padding:0;
     border-bottom:1px dashed #c9c0ae;}
   .person.custom .person-name{border-bottom-color:transparent;}
   .person .person-x{border:none;background:none;cursor:pointer;color:#9a948c;font-size:17px;line-height:1;
     padding:0 3px;border-radius:50%;transition:color .15s;}
-  .person .person-x:hover{color:#b03636;}
+  .person .person-x:hover{color:#d64545;}
   .person-in{width:118px;border:1px solid var(--navy);border-radius:20px;padding:5px 12px;font-family:inherit;
     font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;outline:none;}
   .gp-chead .gp-add{margin-left:8px;flex:none;width:25px;height:25px;padding:0;border-radius:50%;
     border:1px solid var(--line);background:#fff;color:var(--navy);font-size:17px;line-height:1;
     cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
-  .gp-chead .gp-add:hover{border-color:var(--navy);background:#f4f7fb;}
+  .gp-chead .gp-add:hover{border-color:var(--navy);background:#eef6f1;}
   .gp-chead .gp-add:disabled{opacity:.4;cursor:default;}
   /* guests / rooms toggle at the top of the popover */
-  .gp-tabs{display:flex;background:#f1ede5;border-radius:11px;padding:3px;gap:2px;margin-bottom:12px;}
-  .gp-tab{flex:1;border:none;background:none;border-radius:8px;font-family:inherit;font-size:13.5px;font-weight:600;
-    color:var(--muted);cursor:pointer;padding:8px;transition:background .15s,color .15s,box-shadow .15s;}
-  .gp-tab:hover{color:var(--ink);}
-  .gp-tab.is-on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(40,30,10,.14);}
   .gp-panel[hidden]{display:none;}
   .gp-roomrow{display:flex;align-items:center;gap:14px;padding:6px 2px 2px;}
   .gp-roomrow .gpr-name{font-size:15px;font-weight:600;color:var(--ink);}
@@ -507,7 +516,7 @@
   .gp-stepper{margin-left:auto;display:inline-flex;align-items:center;gap:6px;}
   .gp-step{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);
     font-size:20px;line-height:1;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
-  .gp-step:hover{border-color:var(--navy);background:#f4f7fb;}
+  .gp-step:hover{border-color:var(--navy);background:#eef6f1;}
   .gp-step:disabled{opacity:.4;cursor:default;}
   .gp-stepval{min-width:24px;text-align:center;font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
   .gp-roomhint{font-size:12px;color:var(--muted);margin:13px 2px 2px;padding-top:12px;border-top:1px solid var(--line);}
@@ -525,13 +534,13 @@
     width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);
     font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;
   }
-  .cal-nav:hover{background:#f3efe8;}
+  .cal-nav:hover{background:#f1ede3;}
   .cal-nav:disabled{opacity:.35;cursor:default;}
   .cal-dows{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px;}
   .cal-dows span{text-align:center;font-size:11px;font-weight:600;letter-spacing:.03em;color:var(--muted);padding:5px 0;}
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
   .cal-cell{position:relative;display:flex;align-items:center;justify-content:center;padding:2px 0;}
-  .cal-cell.rng::before{content:"";position:absolute;top:2px;bottom:2px;left:0;right:0;background:#e9f0f7;z-index:0;}
+  .cal-cell.rng::before{content:"";position:absolute;top:2px;bottom:2px;left:0;right:0;background:#e2ece2;z-index:0;}
   .cal-cell.rng.start::before{left:50%;}
   .cal-cell.rng.end::before{right:50%;}
   .cal-cell.rng.start.end::before{display:none;}
@@ -540,7 +549,7 @@
     font-family:inherit;font-size:14px;color:var(--ink);cursor:pointer;
     display:flex;align-items:center;justify-content:center;transition:background .12s;
   }
-  .cal-day:hover{background:#efe9df;}
+  .cal-day:hover{background:#faf8f3;}
   .cal-day.sel{background:var(--navy);color:#fff;}
   .cal-day.sel:hover{background:var(--navy-deep);}
   .cal-day.today{font-weight:700;}
@@ -566,13 +575,13 @@
   .dr-head{display:flex;align-items:center;justify-content:space-between;gap:14px;
     padding:22px 26px;border-bottom:1px solid var(--line);flex:none;}
   .dr-head h3{font-family:Georgia,serif;font-size:24px;margin:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-  .dr-badge{background:#2a7d5f;color:#fff;font-size:11.5px;font-weight:600;letter-spacing:.04em;
+  .dr-badge{background:#0f8a63;color:#fff;font-size:11.5px;font-weight:600;letter-spacing:.04em;
     padding:5px 11px;border-radius:7px;font-family:-apple-system,sans-serif;white-space:nowrap;}
   .dr-close{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;
     font-size:18px;color:#444;display:flex;align-items:center;justify-content:center;flex:none;transition:background .15s;}
-  .dr-close:hover{background:#f3efe8;}
+  .dr-close:hover{background:#f1ede3;}
   .dr-body{flex:1;overflow-y:auto;padding:22px 26px 26px;}
-  .dr-main{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#e9e4da;}
+  .dr-main{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#f1ede3;}
   .dr-main img{width:100%;height:100%;object-fit:cover;display:block;}
   .dr-main .nav{box-shadow:0 2px 8px rgba(0,0,0,.2);}
   .dr-thumbs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin-top:8px;}
@@ -582,13 +591,13 @@
   .dr-thumb:hover{opacity:1;}
   .dr-thumb.active{opacity:1;border-color:var(--navy);}
   .dr-chips{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0 6px;}
-  .dr-chip{background:#f3efe8;border:1px solid var(--line);border-radius:20px;padding:7px 15px;font-size:14px;color:#3a3a3a;}
+  .dr-chip{background:#f1ede3;border:1px solid var(--line);border-radius:20px;padding:7px 15px;font-size:14px;color:#3a3a3a;}
   .dr-desc{color:#4a4641;font-size:15px;margin:14px 0 0;line-height:1.55;}
   .dr-sectitle{font-size:12px;letter-spacing:.1em;color:var(--muted);font-weight:700;margin:26px 0 12px;text-transform:uppercase;}
   .dr-card{border:1px solid var(--line);border-radius:14px;padding:20px 22px;}
   .dr-card h4{margin:0 0 14px;font-size:16px;}
   .opt{display:flex;align-items:center;gap:12px;padding:9px 0;font-size:15.5px;color:#2a2a2a;cursor:pointer;}
-  .opt .save{margin-left:auto;font-weight:700;font-size:14px;color:#2a7d5f;}
+  .opt .save{margin-left:auto;font-weight:700;font-size:14px;color:#0f8a63;}
   .opt input[type=radio]{width:19px;height:19px;accent-color:var(--navy);cursor:pointer;}
   .dr-sep{border:none;border-top:1px solid var(--line);margin:8px 0;}
   .addon{display:flex;align-items:center;gap:12px;padding:13px 0;font-size:15.5px;}
@@ -654,7 +663,7 @@
   /* NB: the preserve-3d element must NOT be a grid/flex container — that
      flattens the 3D context and turns the flip into a flat horizontal squash.
      Faces are absolutely stacked; JS sets an explicit height so nothing jumps. */
-  .flip{position:relative;perspective:2200px;}
+  .flip{position:relative;perspective:2200px;transition:height .5s ease;}
   .flip-inner{position:relative;height:100%;transform-style:preserve-3d;
     transition:transform var(--flip-dur) ease-in-out;}
   .flip--right .flip-inner{transition-delay:var(--flip-stag);}
@@ -705,7 +714,7 @@
   #cartRooms{border-top:1px solid #f1ede5;}
   #cartRooms+.sum-row{border-top:1px solid #f1ede5;}
   #cartRooms .sum-row+.sum-row{border-top:1px dashed #d6cdba;}
-  .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f4efe6;color:#b3893f;
+  .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f1ede3;color:#b3893f;
     display:flex;align-items:center;justify-content:center;}
   .sum-ic svg{width:18px;height:18px;}
   .sum-c{flex:1;min-width:0;display:flex;align-items:baseline;gap:12px;justify-content:space-between;}
@@ -725,7 +734,7 @@
   .policy li.off{color:var(--muted);}
   .policy li.off::before{content:"–";color:var(--muted);}
   .co-price{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;
-    background:#f4efe6;border:1px solid #ece3d2;border-radius:15px;padding:14px 20px;text-align:left;}
+    background:#f1ede3;border:1px solid #ece3d2;border-radius:15px;padding:14px 20px;text-align:left;}
   .cp-left{display:flex;flex-direction:column;gap:5px;}
   .cp-nights{font-size:13px;color:var(--muted);}
   .tax-ok{font-size:12.5px;color:#8a6a24;font-weight:600;}
@@ -744,7 +753,7 @@
     font-size:15px;font-family:inherit;background:#fff;color:var(--ink);transition:border-color .15s;}
   .fld input:hover{border-color:#c9c0ae;}
   .fld input:focus{outline:none;border-color:var(--navy);}
-  .fld-err{display:none;margin-top:6px;font-size:12.5px;color:#b0563d;}
+  .fld-err{display:none;margin-top:6px;font-size:12.5px;color:#d64545;}
   .fld.invalid input,.fld.invalid input:focus{border-color:#b0563d;}
   .fld.invalid .fld-err{display:block;}
   .confirm{width:100%;margin-top:10px;font-size:17px;padding:17px;letter-spacing:.005em;}
@@ -829,44 +838,24 @@
         </div>
         <div class="face back">
           <div class="book">
-            <!-- hero image with the hotel name overlaid -->
-            <div class="sum-hero">
-              <img src="images/04-pool-sunset.png" alt="Taj Exotica Resort &amp; Spa at sunset">
-              <div class="sum-hero-tx">
-                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                <h1>Taj Exotica Resort &amp; Spa</h1>
-                <div class="place">BENAULIM BEACH · GOA, INDIA</div>
-              </div>
-            </div>
+            <!-- invisible spacer matches the left card's stars line so the two headings align -->
+            <div class="stars" aria-hidden="true" style="visibility:hidden">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <h2 class="form-h">Confirm your details</h2>
+            <p class="form-sub">Almost there — check these over and confirm.</p>
 
-            <!-- frozen booking summary (static) -->
-            <div class="sum">
-              <div class="sum-top">
-                <span class="sh">Your stay</span>
-              </div>
-              <div class="sum-row">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Check-in</div><div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div></div>
-              </div>
-              <div class="sum-row">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/><path d="M9 14.5l2 2 3.5-3.5"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Check-out</div><div class="sum-v">Mon 13 Jul<span>12:00 PM</span></div></div>
-              </div>
-              <div class="sum-row">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.5 20c.6-3.1 3-4.8 5.5-4.8s4.9 1.7 5.5 4.8"/><path d="M16.2 5.3a3 3 0 0 1 0 5.6M21 20c-.4-2.1-1.7-3.5-3.4-4.2"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Guests</div><div class="sum-v">You<span>1 traveller</span></div></div>
-              </div>
-              <div id="cartRooms"></div>
-              <div class="sum-row" data-addon="cancel">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Cancellation</div><div class="sum-v"><span class="av-title">Free till 9 July</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹5,400</button></span></div></div>
-              </div>
-              <div class="sum-row" data-addon="breakfast">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/><path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Breakfast</div><div class="sum-v"><span class="av-title">Included</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹4,500</button></span></div></div>
-              </div>
-            </div>
+            <label class="fld"><span>Full name</span>
+              <input type="text" id="fName" value="" placeholder="Full name" autocomplete="name"></label>
+            <label class="fld"><span>Email</span>
+              <input type="email" id="fEmail" value="xyz@email.com" autocomplete="email" inputmode="email">
+              <small class="fld-err">Enter a valid email address (must include @).</small></label>
+            <label class="fld"><span>Phone</span>
+              <input type="tel" id="fPhone" value="+91 98765 43210" autocomplete="tel" inputmode="numeric" maxlength="17">
+              <small class="fld-err">Enter a 10-digit phone number — digits only.</small></label>
 
+            <div class="form-spacer"></div>
+
+            <button class="btn confirm" id="confirmBtn">Confirm booking · <span id="confirmAmt">₹55,500</span></button>
+            <button type="button" class="form-back" data-back>&#8249; Back to booking</button>
           </div>
         </div>
       </div>
@@ -912,10 +901,6 @@
 
           <!-- guests popover: steppers create slots; saved people fill them, extras get a fun name you can rename -->
           <div class="guest-pop" id="guestPop" hidden>
-            <div class="gp-tabs" role="tablist">
-              <button type="button" class="gp-tab is-on" data-tab="guests">Guests</button>
-              <button type="button" class="gp-tab" data-tab="rooms">Rooms</button>
-            </div>
             <div class="gp-panel" id="panelGuests">
             <div class="gp-reg">
               <div class="gp-lab">Regular companions</div>
@@ -934,24 +919,25 @@
               <div class="gp-people" id="inPeople"></div>
             </div>
             </div>
-
-            <div class="gp-panel" id="panelRooms" hidden>
-              <div class="gp-roomrow">
-                <div class="gpr-lab"><div class="gpr-name">Rooms</div></div>
-                <div class="gp-stepper">
-                  <button type="button" class="gp-step" id="roomMinus" aria-label="Fewer rooms">&minus;</button>
-                  <span class="gp-stepval" id="roomVal">1</span>
-                  <button type="button" class="gp-step" id="roomPlus" aria-label="More rooms">+</button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        <!-- selected room — whole card opens the details drawer -->
-        <button type="button" class="selroom" id="roomCard" aria-label="See all room choices">
-          <div class="sr-line"><span class="sr-name">Villa Room</span> · 1 King · Garden view · 56 m²</div>
-        </button>
+        <!-- selected room — a chip like Dates/Guests, with its own rooms dropdown -->
+        <div class="roomsel">
+          <button type="button" class="tripchip roomchip" id="roomCard" aria-haspopup="true" aria-expanded="false" aria-label="Rooms">
+            <span class="tc-k">Room <span class="tc-cnt" id="roomCnt">1 room</span></span>
+            <span class="sr-line"><span class="sr-name">Villa Room</span> · 1 King · Garden view · 56 m²</span>
+            <span class="sr-tag" id="roomTag" hidden></span>
+          </button>
+          <div class="room-pop" id="roomPop" hidden>
+            <div class="gp-stepper rp-stepper" role="group" aria-label="Number of rooms">
+              <button type="button" class="gp-step" id="roomPopMinus" aria-label="Fewer rooms">&minus;</button>
+              <span class="gp-stepval" id="roomPopVal">1</span>
+              <button type="button" class="gp-step" id="roomPopPlus" aria-label="More rooms">+</button>
+            </div>
+            <div class="rp-link"><button type="button" id="roomChange">Change room</button></div>
+          </div>
+        </div>
 
         <!-- price: 3-night total primary, per-night secondary -->
         <div class="bk-price">
@@ -979,24 +965,44 @@
         </div>
         <div class="face back">
           <div class="book">
-            <!-- invisible spacer matches the left card's stars line so the two headings align -->
-            <div class="stars" aria-hidden="true" style="visibility:hidden">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <h2 class="form-h">Confirm your details</h2>
-            <p class="form-sub">Almost there — check these over and confirm.</p>
+            <!-- hero image with the hotel name overlaid -->
+            <div class="sum-hero">
+              <img src="images/04-pool-sunset.png" alt="Taj Exotica Resort &amp; Spa at sunset">
+              <div class="sum-hero-tx">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <h1>Taj Exotica Resort &amp; Spa</h1>
+                <div class="place">BENAULIM BEACH · GOA, INDIA</div>
+              </div>
+            </div>
 
-            <label class="fld"><span>Full name</span>
-              <input type="text" id="fName" value="" placeholder="Full name" autocomplete="name"></label>
-            <label class="fld"><span>Email</span>
-              <input type="email" id="fEmail" value="xyz@email.com" autocomplete="email" inputmode="email">
-              <small class="fld-err">Enter a valid email address (must include @).</small></label>
-            <label class="fld"><span>Phone</span>
-              <input type="tel" id="fPhone" value="+91 98765 43210" autocomplete="tel" inputmode="numeric" maxlength="17">
-              <small class="fld-err">Enter a 10-digit phone number — digits only.</small></label>
+            <!-- frozen booking summary (static) -->
+            <div class="sum">
+              <div class="sum-top">
+                <span class="sh">Your stay</span>
+              </div>
+              <div class="sum-row">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Check-in</div><div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div></div>
+              </div>
+              <div class="sum-row">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/><path d="M9 14.5l2 2 3.5-3.5"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Check-out</div><div class="sum-v">Mon 13 Jul<span>12:00 PM</span></div></div>
+              </div>
+              <div class="sum-row">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.5 20c.6-3.1 3-4.8 5.5-4.8s4.9 1.7 5.5 4.8"/><path d="M16.2 5.3a3 3 0 0 1 0 5.6M21 20c-.4-2.1-1.7-3.5-3.4-4.2"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Guests</div><div class="sum-v">You<span>1 traveller</span></div></div>
+              </div>
+              <div id="cartRooms"></div>
+              <div class="sum-row" data-addon="cancel">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Cancellation</div><div class="sum-v"><span class="av-title">Free till 9 July</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹5,400</button></span></div></div>
+              </div>
+              <div class="sum-row" data-addon="breakfast">
+                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/><path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg></span>
+                <div class="sum-c"><div class="sum-k">Breakfast</div><div class="sum-v"><span class="av-title">Included</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹4,500</button></span></div></div>
+              </div>
+            </div>
 
-            <div class="form-spacer"></div>
-
-            <button class="btn confirm" id="confirmBtn">Confirm booking · <span id="confirmAmt">₹55,500</span></button>
-            <button type="button" class="form-back" data-back>&#8249; Back to booking</button>
           </div>
         </div>
       </div>
@@ -1192,7 +1198,7 @@
         <!-- THE HOTEL badge -->
         <g transform="translate(200,150)">
           <path d="M-30 22 V-8 A30 30 0 0 1 30 -8 V22 Z" fill="#efe9df" stroke="#4a443a" stroke-width="2.2" stroke-linejoin="round"/>
-          <circle cx="0" cy="0" r="19" fill="#2f4f74"/>
+          <circle cx="0" cy="0" r="19" fill="#0f8a63"/>
           <g stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(0,1)">
             <path d="M-11 5 V-5"/>
             <path d="M-11 5 H11 V0 Q11 -3 8 -3 H-4"/>
@@ -1577,8 +1583,7 @@
       const nm = knownIn().map(c=>c.name);
       const extra = heads() - nm.length;
       $('guestVal').textContent = nm.length ? joinNames(nm)+(extra>0?' +'+extra:'') : composition();
-      const rms = window.cartCount ? window.cartCount() : (window.PARTY.rooms || 1);
-      $('guestSub').textContent = heads()+' guest'+(heads()===1?'':'s')+' · '+(rms ? rms+' room'+(rms>1?'s':'') : 'no rooms');
+      $('guestSub').textContent = heads()+' guest'+(heads()===1?'':'s');
       const chosen = knownIn();
       scoreEl.textContent = scoreFor(chosen, heads()) + '% match for this trip';
       const pills = [];
@@ -1590,29 +1595,11 @@
 
     document.querySelectorAll('#guestPop .gp-add').forEach(b=> b.addEventListener('click', ()=>addExtra(b.dataset.cat)));
 
-    // guests / rooms toggle + rooms stepper (explicit room count drives pricing & the "N guests · M rooms" sub-label)
-    (function(){
-      const tabs = pop.querySelectorAll('.gp-tab');
-      const panels = { guests: $('panelGuests'), rooms: $('panelRooms') };
-      tabs.forEach(t=> t.addEventListener('click', ()=>{
-        tabs.forEach(x=> x.classList.toggle('is-on', x===t));
-        Object.keys(panels).forEach(k=>{ if(panels[k]) panels[k].hidden = (k !== t.dataset.tab); });
-      }));
+    // room count is driven entirely by the cart (per-category quantities) now — nothing to wire here
 
-      const MINR = 1, MAXR = 5, rv = $('roomVal');
-      function renderRooms(){
-        const n = window.PARTY.rooms || 1;
-        rv.textContent = n;
-        $('roomMinus').disabled = n <= MINR;
-        $('roomPlus').disabled  = n >= MAXR;
-      }
-      $('roomMinus').addEventListener('click', ()=>{ window.PARTY.rooms = Math.max(MINR, (window.PARTY.rooms||1) - 1); renderRooms(); apply(); });
-      $('roomPlus') .addEventListener('click', ()=>{ window.PARTY.rooms = Math.min(MAXR, (window.PARTY.rooms||1) + 1); renderRooms(); apply(); });
-      renderRooms();
-    })();
-
-    const openPop  = ()=>{ const cp=$('calPop'); if(cp) cp.hidden=true; pop.hidden=false; trigger.setAttribute('aria-expanded','true'); };
+    const openPop  = ()=>{ if(window.closeDatePop) window.closeDatePop(); if(window.closeRoomPop) window.closeRoomPop(); pop.hidden=false; trigger.setAttribute('aria-expanded','true'); };
     const closePop = ()=>{ editing=null; pop.hidden=true; trigger.setAttribute('aria-expanded','false'); apply(); };
+    window.closeGuestPop = closePop;
     trigger.addEventListener('click', e=>{ e.stopPropagation(); pop.hidden?openPop():closePop(); });
     pop.addEventListener('click', e=>e.stopPropagation());
     document.addEventListener('click', e=>{ if(!pop.hidden && !pop.contains(e.target) && !trigger.contains(e.target)) closePop(); });
@@ -1737,13 +1724,15 @@
     }
 
     function open(){
-      const gp = $('guestPop'); if(gp && !gp.hidden){ gp.hidden = true; $('guestChip').setAttribute('aria-expanded','false'); }
+      if(window.closeGuestPop) window.closeGuestPop();
+      if(window.closeRoomPop)  window.closeRoomPop();
       picking = 'in';
       view = new Date(checkIn.getFullYear(), checkIn.getMonth(), 1);
       pop.hidden = false;
       renderCal();
     }
     function close(){ pop.hidden = true; }
+    window.closeDatePop = close;
 
     chip.addEventListener('click', e=>{ e.stopPropagation(); pop.hidden ? open() : close(); });
     $('calPrev').addEventListener('click', ()=>{ view = new Date(view.getFullYear(), view.getMonth()-1, 1); renderCal(); });
@@ -1947,14 +1936,14 @@
              {src:'images/pp-04-bathroom.png',alt:'Bathroom with soaking tub and rain shower'},
              {src:'images/pp-05-pool.png',alt:'Private plunge pool at dusk'}]},
       {key:'junior', name:'Junior Suite', badge:'', meta:'Suite · 1 King · Sea view',
-       base:42000, why:{amt:8000, points:['Much larger — 93 m²','Separate living area']}, extra:'Separate living area',
+       base:42000, why:{amt:8000, points:['Much larger','Separate living area']}, extra:'Separate living area',
        chips:['Sea view','King bed','93 m²','Living area','Sleeps 3'],
        desc:"A one-bedroom suite with a separate living area, generous at 93 m² and finished with Goan-Portuguese detailing.",
        imgs:[{src:'images/js-01-bedroom.png',alt:'Junior Suite bedroom with lounge seating'},
              {src:'images/js-02-living.png',alt:'Separate living area with daybed'},
              {src:'images/js-03-bathroom.png',alt:'Bathroom with soaking tub and hand-painted tiles'}]},
       {key:'luxury', name:'Luxury Suite', badge:'', meta:'Suite · 1 King · Sea view',
-       base:58000, why:{amt:16000, points:['Larger — 115 m²','Living & dining area']}, extra:'Living & dining area',
+       base:58000, why:{amt:16000, points:['Larger','Living & dining area']}, extra:'Living & dining area',
        chips:['Sea view','King bed','115 m²','Living + dining','Sleeps 3'],
        desc:"An expansive 115 m² suite with a large living and dining area and sweeping sea views — top-tier finishes throughout.",
        imgs:[{src:'images/ls-01-bedroom.png',alt:'Luxury Suite bedroom with sea-facing balcony'},
@@ -2010,8 +1999,8 @@
         '<div class="rc-body">'+
           '<h3 class="rc-name">'+r.name+'</h3>'+
           '<div class="rc-meta">'+descriptor(r)+'</div>'+
-          (r.why ? '<div class="rc-why"><h5>Why +'+fmt(r.why.amt)+'/night</h5><ul>'+
-             r.why.points.map(p=>'<li>'+p+'</li>').join('')+'</ul></div>'
+          (r.why ? '<div class="rc-why"><h5>Why +'+fmt(r.why.amt)+'/night</h5><div class="rc-why-pts">'+
+             r.why.points.map(p=>'<span>'+p+'</span>').join('<i>·</i>')+'</div></div>'
              : '<div class="xt-bar xt-bar--card">'+
                  '<label class="xt-chk"><input type="checkbox" data-extra="cancel"> Free cancellation <em>+₹1,800/night</em></label>'+
                  '<label class="xt-chk"><input type="checkbox" data-extra="breakfast"> Breakfast <em>+₹1,500/night</em></label>'+
@@ -2094,63 +2083,51 @@
         c.classList.toggle('selected', !!inCart);
         const cta = c.querySelector('.rc-cta'); if(!cta) return;
         if(inCart){
-          cta.innerHTML = '<div class="rc-stepper" role="group" aria-label="Number of rooms">'+
-            '<button type="button" class="rc-step rc-minus" aria-label="One fewer">−</button>'+
-            '<span class="rc-qty">'+inCart.qty+'</span>'+
-            '<button type="button" class="rc-step rc-plus" aria-label="One more"'+(inCart.qty>=MAXQ?' disabled':'')+'>+</button></div>';
-          cta.querySelector('.rc-minus').addEventListener('click', e=>{ e.stopPropagation(); stepRoom(key,-1); });
-          cta.querySelector('.rc-plus') .addEventListener('click', e=>{ e.stopPropagation(); stepRoom(key,+1); });
+          // single room type — the selected card just shows it's chosen; the count lives on the Room chip
+          cta.innerHTML = '<span class="rc-added">✓ Selected</span>';
         } else {
-          cta.innerHTML = '<button type="button" class="rc-book">Add to cart</button>';
+          cta.innerHTML = '<button type="button" class="rc-book">Select room</button>';
           cta.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); addRoom(key); });
         }
       });
     }
-    // reflect the cart in the first fold: single type = full detail; 2+ types = names only + a photo of each
+    // reflect the cart in the first fold — a single room type, at some quantity
     function renderFirstFold(){
       const lines = cartRooms();
       const badge = document.querySelector('.gallery .badge');
       const line  = document.querySelector('#roomCard .sr-line');
-      if(lines.length === 0){
-        // Nothing committed → keep the fold alive by showing the standard room (cheapest) as the default.
-        const r = ROOMS[0];
-        window.SELECTED_RATE = r.base; window.SELECTED_CAP = capOf(r);
-        if(window.setHeroRoom) window.setHeroRoom(r.imgs);
-        if(badge) badge.textContent = r.name + ' · ' + (viewOf(r) || bedOf(r));
-        if(line)  line.innerHTML = '<span class="sr-name">'+r.name+'</span> · '+descriptor(r);
-      } else if(lines.length === 1){
-        const r = lines[0].r, qty = lines[0].qty;
-        window.SELECTED_RATE = r.base; window.SELECTED_CAP = capOf(r);
-        if(window.setHeroRoom) window.setHeroRoom(r.imgs);
-        const qx = qty>1 ? ' ×'+qty : '';
-        if(badge) badge.textContent = r.name + qx + ' · ' + (viewOf(r) || bedOf(r));
-        if(line)  line.innerHTML = '<span class="sr-name">'+r.name+qx+'</span> · '+descriptor(r);
-      } else {
-        window.SELECTED_RATE = null; window.SELECTED_CAP = null;
-        if(window.setHeroRoom) window.setHeroRoom(lines.map(x=>x.r.imgs[0]));   // one photo per room type
-        const names = lines.map(x=>x.r.name+(x.qty>1?' ×'+x.qty:'')).join(' + ');
-        if(badge) badge.textContent = names;
-        if(line)  line.innerHTML = '<span class="sr-name">'+names+'</span>';
-      }
+      const item  = lines[0] || {r:ROOMS[0], qty:1};   // fall back to the standard room if the cart is somehow empty
+      const r = item.r, qty = item.qty;
+      window.SELECTED_RATE = r.base; window.SELECTED_CAP = capOf(r);
+      if(window.setHeroRoom) window.setHeroRoom(r.imgs);
+      if(badge) badge.textContent = r.name + ' · ' + (viewOf(r) || bedOf(r));
+      if(line)  line.innerHTML = '<span class="sr-name">'+r.name+'</span> · '+descriptor(r);
+      // Room chip count + the dropdown stepper both reflect the quantity
+      const cntEl = document.getElementById('roomCnt'); if(cntEl) cntEl.textContent = qty+' room'+(qty===1?'':'s');
+      const pv = document.getElementById('roomPopVal');   if(pv) pv.textContent = qty;
+      const pm = document.getElementById('roomPopMinus');  if(pm) pm.disabled = qty <= 1;
+      const pp = document.getElementById('roomPopPlus');   if(pp) pp.disabled = qty >= MAXQ;
       markCards();
       if(window.refreshPricing) window.refreshPricing();
-      if(window.syncGuestRooms) window.syncGuestRooms();   // update the "N rooms" chip at the top
+      if(window.resizeCards) window.resizeCards();   // extras line can change the card height — re-fit
     }
     window.renderFirstFold = renderFirstFold;
 
     function addRoom(key){
-      if(window.CART.find(x=>x.key===key)) return;
-      window.CART.push({key, qty: Math.max(1, roomsFor(ROOM_BY[key]) || 1)});   // seed with the recommended count
+      // selecting a room replaces the current one and resets the count to one; adjust it via the Room chip stepper
+      window.CART = [{key, qty:1}];
       renderFirstFold();
       document.getElementById('top').scrollIntoView({behavior:'smooth', block:'start'});
     }
     window.addStandardRoom = () => addRoom(ROOMS[0].key);   // commit the standard room the empty-cart fold shows
-    function stepRoom(key, d){
-      const item = window.CART.find(x=>x.key===key); if(!item) return;
-      item.qty = Math.min(MAXQ, item.qty + d);
-      if(item.qty <= 0){ window.CART = window.CART.filter(x=>x.key!==key); }   // remove entirely — cart may be empty
+    // the Room chip stepper sets how many of the selected room
+    function setRoomQty(n){
+      n = Math.max(1, Math.min(MAXQ, n|0));
+      if(!window.CART.length) window.CART = [{key:ROOMS[0].key, qty:n}];
+      else window.CART[0].qty = n;
       renderFirstFold();
     }
+    window.setRoomQty = setRoomQty;
 
     renderFirstFold();   // initialise the default state
 
@@ -2165,8 +2142,10 @@
         const parts = [];
         if(window.EXTRAS_ON.cancel)    parts.push('Free cancellation');
         if(window.EXTRAS_ON.breakfast) parts.push('Breakfast included');
-        tag.textContent = parts.length ? parts.join(' · ') : 'Room-only rate';
+        tag.textContent = parts.join(' · ');
+        tag.hidden = !parts.length;   // no tag at all when it's just the room
       }
+      if(window.resizeCards) window.resizeCards();   // the extras line changes the card's content height — re-fit
     };
     document.addEventListener('change', function(e){
       const cb = e.target && e.target.matches && e.target.matches('input[data-extra]') ? e.target : null;
@@ -2194,7 +2173,10 @@
       $('drPrice').textContent = fmt(effRate(dr.r));
       $('drTotal').textContent = fmt(total) + ' total · ' + (rooms>1?rooms+' rooms · ':'') + N + ' night' + (N>1?'s':'');
     }
+    // per-room details drawer is hidden for now — flip this to false to bring it back
+    window.ROOM_DRAWERS_HIDDEN = true;
     function openRoom(key){
+      if(window.ROOM_DRAWERS_HIDDEN) return;   // drawer disabled — all markup/handlers below stay intact
       const r = ROOM_BY[key]; if(!r) return;
       dr = {r, i:0};
       $('drName').textContent = r.name;
@@ -2221,12 +2203,22 @@
       document.body.style.overflow = '';
     }
 
-    // the booking-module "selected room" card jumps to the room choices below
-    const selCard = $('roomCard');
-    if(selCard) selCard.addEventListener('click', ()=>{
-      const t = document.getElementById('rooms');
-      if(t) t.scrollIntoView({behavior:'smooth', block:'start'});
-    });
+    // the Room chip dropdown: a quantity stepper for the selected room + a "Change room" link
+    const selCard = $('roomCard'), roomPop = $('roomPop');
+    if(selCard && roomPop){
+      const openRP  = ()=>{ if(window.closeDatePop) window.closeDatePop(); if(window.closeGuestPop) window.closeGuestPop(); roomPop.hidden=false; selCard.setAttribute('aria-expanded','true'); };
+      const closeRP = ()=>{ roomPop.hidden=true;  selCard.setAttribute('aria-expanded','false'); };
+      window.closeRoomPop = closeRP;
+      selCard.addEventListener('click', (e)=>{ e.stopPropagation(); roomPop.hidden ? openRP() : closeRP(); });
+      roomPop.addEventListener('click', (e)=> e.stopPropagation());
+      document.addEventListener('click', (e)=>{ if(!roomPop.hidden && !roomPop.contains(e.target) && !selCard.contains(e.target)) closeRP(); });
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !roomPop.hidden) closeRP(); });
+      const curQty = ()=> (window.CART[0] ? window.CART[0].qty : 1);
+      const rpm=$('roomPopMinus'), rpp=$('roomPopPlus'), chg=$('roomChange');
+      if(rpm) rpm.addEventListener('click', (e)=>{ e.stopPropagation(); if(window.setRoomQty) window.setRoomQty(curQty()-1); });
+      if(rpp) rpp.addEventListener('click', (e)=>{ e.stopPropagation(); if(window.setRoomQty) window.setRoomQty(curQty()+1); });
+      if(chg) chg.addEventListener('click', (e)=>{ e.stopPropagation(); closeRP(); const t=document.getElementById('rooms'); if(t) t.scrollIntoView({behavior:'smooth', block:'start'}); });
+    }
 
     $('drClose').addEventListener('click', closeDrawer);
     scrim.addEventListener('click', closeDrawer);
@@ -2367,30 +2359,29 @@
   (function(){
     const flips = [...document.querySelectorAll('.flip')];
     function size(){
+      const L = document.getElementById('flipLeft'), R = document.getElementById('flipRight');
+      if(!L || !R) return;
       if(window.innerWidth <= 920){ flips.forEach(f => { f.style.height=''; }); return; }
-      // measure: drop faces into normal flow so each reports its natural height
-      flips.forEach(f => {
-        f.style.height = 'auto';
-        f.querySelector('.flip-inner').style.height = 'auto';
-        f.querySelectorAll('.face').forEach(fc => fc.style.position = 'relative');
-      });
-      // both cards share one height (the tallest face); bottom-anchored blocks
-      // (details form's button, booking card's match box) fill any slack
+      // only the currently-visible face of each card counts (the right never flips, so only its front;
+      // the left shows its form when flipped, otherwise the gallery) — so the flipped form doesn't inherit
+      // the taller gallery/booking height and the cards shrink to fit.
+      const flipped = L.classList.contains('flipped');
+      const faces = [ L.querySelector('.face.'+(flipped?'back':'front')), R.querySelector('.face.front') ].filter(Boolean);
+      flips.forEach(f => { f.style.height='auto'; f.querySelector('.flip-inner').style.height='auto'; });
+      faces.forEach(fc => fc.style.position = 'relative');
       let max = 0;
-      flips.forEach(f => f.querySelectorAll('.face').forEach(fc => max = Math.max(max, fc.offsetHeight)));
-      flips.forEach(f => {
-        f.querySelectorAll('.face').forEach(fc => fc.style.position = '');
-        f.querySelector('.flip-inner').style.height = '';
-        f.style.height = max + 'px';
-      });
+      faces.forEach(fc => max = Math.max(max, fc.offsetHeight));
+      faces.forEach(fc => fc.style.position = '');
+      flips.forEach(f => { f.querySelector('.flip-inner').style.height=''; f.style.height = max + 'px'; });
     }
+    window.resizeCards = size;
     window.addEventListener('load', size);
     window.addEventListener('resize', size);
     size();
   })();
 
   (function(){
-    const flips = [$('flipLeft'), $('flipRight')];
+    const flips = [$('flipLeft')];   // only the left (gallery) card flips to the form; the right keeps the booking details
     const step = $('stepLabel');
     let clearT;
     function setFlipped(on){
@@ -2398,7 +2389,20 @@
       flips.forEach(f => { f.classList.add('flipping'); f.classList.toggle('flipped', on); });
       const _folds = document.getElementById('pdpFolds');
       if(_folds) _folds.classList.toggle('pdp-hidden', on);
+      // in cart/checkout, the section links (Overview/Rooms/Reviews/Location) don't apply
+      const _tnl = document.querySelector('.tn-links');
+      if(_tnl) _tnl.classList.toggle('tn-hidden', on);
       if(step) step.innerHTML = on ? 'Confirm &amp; pay' : 'Review your stay';
+      // freeze the right card once the form is open: its details go static and its CTAs (Book now / Add to trip) hide
+      window.IN_CHECKOUT = on;
+      const _fr = document.getElementById('flipRight');
+      if(_fr) _fr.classList.toggle('frozen', on);
+      if(on){   // don't leave a chip's dropdown open behind the frozen card
+        if(window.closeDatePop)  window.closeDatePop();
+        if(window.closeGuestPop) window.closeGuestPop();
+        if(window.closeRoomPop)  window.closeRoomPop();
+      }
+      if(window.resizeCards) window.resizeCards();   // re-fit height to the now-visible face (form is shorter)
       // drop the lift class once the (staggered) turn is done
       clearT = setTimeout(() => flips.forEach(f => f.classList.remove('flipping')), 820);
     }
