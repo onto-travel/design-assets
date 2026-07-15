@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>onto — Japan, slowly in autumn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   onto — tokens
+   ============================================================ */
+:root{
+  --jade:#0f8a63;
+  --jade-deep:#063f2f;
+  --ink:#1b211e;
+  --muted:#6d726c;
+  --bg:#faf8f3;
+  --card:#ffffff;
+  --line:#e4dfd2;
+  --pill:#f1ede3;
+  --gold:#f2c14e;
+  --clay:#c26b4a; /* dining marker only */
+
+  --serif:"Fraunces",Georgia,serif;
+  --sans:"Instrument Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+
+  --shadow-sm:0 1px 2px rgba(27,33,30,.04), 0 2px 8px rgba(27,33,30,.05);
+  --shadow-md:0 4px 12px rgba(27,33,30,.06), 0 12px 34px rgba(27,33,30,.09);
+  --shadow-lg:0 10px 30px rgba(27,33,30,.10), 0 30px 80px rgba(27,33,30,.16);
+
+  --r-sm:10px; --r-md:16px; --r-lg:24px; --r-xl:32px;
+  --maxw:1180px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+:focus-visible{outline:2.5px solid var(--jade);outline-offset:3px;border-radius:4px}
+
+.mono{font-family:var(--mono);font-weight:500;letter-spacing:.02em}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--muted);
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* ============================================================
+   Top nav (thin)
+   ============================================================ */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(250,248,243,.82);
+  backdrop-filter:saturate(1.4) blur(12px);
+  -webkit-backdrop-filter:saturate(1.4) blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.topbar .wrap{display:flex;align-items:center;gap:16px;height:54px}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-size:21px;font-weight:600;letter-spacing:-.02em}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--jade);box-shadow:0 0 0 4px rgba(15,138,99,.16)}
+.topbar nav{margin-left:auto;display:flex;gap:22px}
+.topbar nav a{font-size:13.5px;color:var(--muted);text-decoration:none;transition:color .2s}
+.topbar nav a:hover{color:var(--ink)}
+@media(max-width:640px){.topbar nav{display:none}}
+
+/* ============================================================
+   1. MAP HERO  (compact first fold)
+   ============================================================ */
+.hero{padding:16px 0 6px}
+.hero-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px 32px;flex-wrap:wrap;margin-bottom:12px}
+.hero-copy{min-width:min(100%,320px)}
+.hero-title{
+  font-family:var(--serif);
+  font-weight:500;
+  font-size:clamp(24px,3vw,32px);
+  line-height:1.1;
+  letter-spacing:-.015em;
+  margin:6px 0 4px;
+}
+.hero-title i{font-style:italic;color:var(--jade)}
+.hero-sub{color:var(--muted);font-size:14.5px;max-width:52ch;margin:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{
+  font-family:var(--mono);font-size:11.5px;font-weight:500;
+  letter-spacing:.04em;color:var(--ink);
+  background:var(--pill);border:1px solid var(--line);
+  padding:6px 11px;border-radius:999px;white-space:nowrap;
+}
+.chip b{color:var(--jade);font-weight:600}
+
+.map-shell{
+  position:relative;
+  border-radius:var(--r-xl);
+  overflow:hidden;
+  box-shadow:var(--shadow-lg);
+  border:1px solid var(--line);
+  background:#cfe3dd;
+  aspect-ratio:22/9;
+  max-height:50vh;
+}
+@media(max-width:760px){.map-shell{aspect-ratio:4/5;max-height:none}}
+.map-shell svg{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation}
+
+/* map toggle */
+.map-toggle{
+  position:absolute;top:14px;left:14px;z-index:6;
+  display:flex;background:rgba(255,255,255,.9);
+  backdrop-filter:blur(8px);border:1px solid var(--line);
+  border-radius:999px;padding:4px;box-shadow:var(--shadow-sm);
+}
+.map-toggle button{
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:7px 13px;border-radius:999px;transition:.2s;
+}
+.map-toggle button[aria-pressed="true"]{background:var(--jade);color:#fff}
+
+.map-legend{
+  position:absolute;bottom:14px;left:14px;z-index:6;
+  display:flex;gap:14px;flex-wrap:wrap;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:14px;padding:9px 13px;
+  box-shadow:var(--shadow-sm);
+}
+.map-legend span{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.map-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+@media(max-width:560px){.map-legend{display:none}}
+
+/* SVG pin interaction */
+.pin{cursor:pointer}
+.pin .pin-hit{fill:transparent}
+.pin-body{transition:transform .18s var(--ease);transform-origin:center bottom;transform-box:fill-box}
+.pin:hover .pin-body,.pin:focus-visible .pin-body{transform:translateY(-3px) scale(1.06)}
+.city-label{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;fill:var(--jade-deep)}
+.city-label.bg{stroke:rgba(250,248,243,.9);stroke-width:4px;paint-order:stroke}
+
+/* popover */
+.popover{
+  position:absolute;z-index:8;width:212px;
+  background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-md);box-shadow:var(--shadow-md);
+  padding:13px 14px;
+  transform:translate(-50%,calc(-100% - 14px));
+  opacity:0;pointer-events:none;transition:opacity .16s var(--ease),transform .16s var(--ease);
+}
+.popover.show{opacity:1;pointer-events:auto}
+.popover:after{
+  content:"";position:absolute;left:50%;bottom:-7px;width:14px;height:14px;
+  background:var(--card);border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  transform:translateX(-50%) rotate(45deg);
+}
+.popover .kind{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.popover .kind i{width:8px;height:8px;border-radius:50%}
+.popover .kind span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.popover h4{font-family:var(--serif);font-weight:600;font-size:16.5px;margin:0 0 3px;letter-spacing:-.01em}
+.popover p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+.popover .go{margin-top:10px;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--jade);font-weight:600}
+
+/* ============================================================
+   2. STORY CIRCLES
+   ============================================================ */
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 14px}
+.section-head h2{font-family:var(--serif);font-weight:500;font-size:clamp(20px,2.4vw,26px);letter-spacing:-.015em;margin:0}
+.section-head h2 i{font-style:italic;color:var(--jade)}
+.stories{padding:26px 0 4px}
+.circles{
+  display:flex;gap:22px;overflow-x:auto;padding:6px 24px 20px;
+  margin:0 -24px;scroll-snap-type:x proximity;
+  scrollbar-width:none;
+}
+.circles::-webkit-scrollbar{display:none}
+.circle{
+  flex:0 0 auto;width:108px;scroll-snap-align:start;
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  background:none;text-align:center;
+}
+.circle .ring{
+  position:relative;
+  width:92px;height:92px;border-radius:50%;padding:3px;
+  background:conic-gradient(from 210deg,var(--jade),#39b98a,var(--gold),var(--jade));
+  transition:transform .22s var(--ease);
+}
+.circle:hover .ring{transform:translateY(-4px) scale(1.04)}
+.circle[aria-current="true"] .ring{transform:translateY(-2px) scale(1.03);box-shadow:0 6px 18px rgba(15,138,99,.32)}
+.circle .ring .inner{
+  display:block;
+  width:100%;height:100%;border-radius:50%;overflow:hidden;
+  border:3px solid var(--bg);background:var(--pill);
+  background-size:cover;background-position:center;
+  position:relative;
+}
+.circle .ring .badge{
+  position:absolute;top:2px;left:2px;z-index:2;
+  font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.04em;
+  color:#fff;background:var(--jade-deep);border:2px solid var(--bg);
+  padding:2px 6px;border-radius:999px;
+}
+.circle.route .ring{background:conic-gradient(from 210deg,var(--jade-deep),var(--jade),var(--jade-deep))}
+.circle.route .inner{display:flex;align-items:center;justify-content:center;background:var(--jade-deep)}
+.circle.route .inner svg{width:42px;height:42px}
+.circle .lbl{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.circle .city{font-size:12.5px;color:var(--muted);margin-top:-4px}
+
+/* ============================================================
+   3. DAY STAGE — opens inline below the circles
+   ============================================================ */
+.stage{padding:8px 0 8px;scroll-margin-top:70px}
+.stage[hidden]{display:none}
+.stage-card{
+  position:relative;border-radius:28px;overflow:hidden;
+  background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-lg);
+  animation:stageIn .4s var(--ease);
+}
+@keyframes stageIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.stage-card{animation:none}}
+
+/* hero */
+.day-hero{
+  position:relative;min-height:min(34vh,340px);
+  display:flex;align-items:flex-end;
+  background-size:cover;background-position:center;background-color:var(--jade-deep);
+}
+.day-hero:before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(6,25,20,.36) 0%,rgba(6,25,20,.10) 24%,rgba(6,25,20,.48) 60%,rgba(6,25,20,.97) 100%);
+}
+.day-hero-content{position:relative;z-index:2;width:100%;padding:34px 40px 30px;color:#fff;max-width:72%}
+@media(max-width:640px){.day-hero-content{max-width:100%;padding:28px 22px 24px}}
+.day-hero .meta{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:rgba(255,255,255,.86);margin:2px 0 0}
+.day-hero h1{
+  font-family:var(--serif);font-weight:500;letter-spacing:-.02em;
+  font-size:clamp(30px,4.6vw,54px);line-height:1.03;margin:0 0 8px;
+  text-shadow:0 2px 30px rgba(0,0,0,.28);
+}
+.day-hero h1 i{font-style:italic}
+.day-hero .lede{font-size:clamp(15px,1.6vw,18px);color:rgba(255,255,255,.9);max-width:52ch;margin:0}
+
+/* hero controls */
+.day-controls{position:absolute;right:24px;bottom:28px;z-index:4;display:flex;gap:10px}
+@media(max-width:640px){.day-controls{position:static;padding:0 22px 20px;justify-content:flex-start}}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13.5px;font-weight:600;padding:10px 16px;border-radius:999px;
+  transition:transform .16s var(--ease),background .2s,box-shadow .2s;box-shadow:var(--shadow-sm);
+}
+.btn svg{width:15px;height:15px}
+.btn:hover{transform:translateY(-1px)}
+.btn-quiet{background:rgba(255,255,255,.9);color:var(--ink);border:1px solid rgba(255,255,255,.5)}
+.btn-gold{background:var(--gold);color:#3a2c05}
+
+.day-close{
+  position:absolute;top:15px;right:15px;z-index:6;width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(6px);box-shadow:var(--shadow-md);
+  display:flex;align-items:center;justify-content:center;color:var(--ink);
+  transition:transform .18s var(--ease),background .2s;
+}
+.day-close:hover{transform:scale(1.06);background:#fff}
+.day-close svg{width:18px;height:18px}
+
+/* nav arrows (inside hero) */
+.day-nav{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(6px);box-shadow:var(--shadow-md);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;transition:transform .18s var(--ease),opacity .2s;
+}
+.day-nav:hover{transform:translateY(-50%) scale(1.07)}
+.day-nav.prev{left:15px}.day-nav.next{right:15px}
+.day-nav[disabled]{opacity:0;pointer-events:none}
+.day-nav svg{width:19px;height:19px}
+
+/* body grid */
+.day-body{padding:38px 40px 44px;display:grid;grid-template-columns:1fr 300px;gap:44px;align-items:start}
+@media(max-width:860px){.day-body{grid-template-columns:1fr;gap:28px;padding:30px 24px 34px}}
+
+/* timeline */
+.tl-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px}
+.tl-head h2{font-family:var(--serif);font-weight:500;font-size:25px;letter-spacing:-.015em;margin:0}
+.tl-head .count{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+
+.timeline{position:relative;padding-left:8px}
+.timeline:before{content:"";position:absolute;left:19px;top:6px;bottom:6px;width:1.5px;background:var(--line)}
+.event{position:relative;display:grid;grid-template-columns:40px 1fr;gap:16px;padding-bottom:28px}
+.event:last-child{padding-bottom:0}
+.knob{
+  position:relative;z-index:2;width:38px;height:38px;border-radius:50%;
+  background:var(--card);border:1.5px solid var(--line);box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;justify-content:center;color:#fff;
+}
+.knob svg{width:17px;height:17px}
+.knob.transit{background:var(--ink)}
+.knob.stay{background:var(--jade)}
+.knob.experience{background:var(--gold);color:#3a2c05}
+.knob.dining{background:var(--clay)}
+.ev-body{padding-top:1px}
+.ev-time{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink)}
+.ev-type{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-left:10px}
+.ev-title{font-weight:600;font-size:16.5px;margin:4px 0 1px;letter-spacing:-.005em}
+.ev-place{color:var(--muted);font-size:14px}
+.res-pill{
+  display:inline-flex;align-items:center;gap:8px;margin-top:10px;
+  background:var(--pill);border:1px solid var(--line);border-radius:999px;
+  padding:6px 13px 6px 11px;
+  font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.02em;color:var(--ink);
+}
+.res-pill i{width:7px;height:7px;border-radius:50%;background:var(--jade)}
+.ev-quote{margin-top:9px;font-family:var(--serif);font-style:italic;font-size:16px;color:var(--jade-deep);line-height:1.4;padding-left:13px;border-left:2px solid var(--gold)}
+
+/* sidebar — Tonight only */
+.side{display:flex;flex-direction:column;gap:20px;position:sticky;top:70px}
+@media(max-width:860px){.side{position:static}}
+.scard{border-radius:var(--r-lg);padding:22px;box-shadow:var(--shadow-sm)}
+.scard .clabel{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px}
+.scard.tonight{background:var(--jade-deep);color:#fff;border:1px solid var(--jade-deep)}
+.scard.tonight .clabel{color:rgba(255,255,255,.65)}
+.scard.tonight h3{font-family:var(--serif);font-weight:500;font-size:22px;margin:0 0 6px;letter-spacing:-.01em}
+.scard.tonight .addr{color:rgba(255,255,255,.78);font-size:14px;line-height:1.45;margin-bottom:16px}
+.scard.tonight .view{
+  display:inline-flex;align-items:center;gap:8px;width:100%;justify-content:center;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.24);
+  color:#fff;font-weight:600;font-size:13.5px;padding:11px;border-radius:999px;transition:background .2s;
+}
+.scard.tonight .view:hover{background:rgba(255,255,255,.22)}
+.scard.tonight .view svg{width:15px;height:15px}
+
+/* reservations & tickets — the day's openable docs */
+.scard.docs{background:var(--card);border:1px solid var(--line);padding:20px 22px}
+.scard.docs .clabel{color:var(--muted)}
+.doc{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  padding:13px 0;border-top:1px solid var(--line);transition:opacity .15s;
+}
+.doc:first-of-type{border-top:0;padding-top:2px}
+.doc:hover{opacity:.82}
+.doc-ic{width:32px;height:32px;border-radius:10px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff}
+.doc-ic svg{width:15px;height:15px}
+.doc-ic.transit{background:var(--ink)}
+.doc-ic.stay{background:var(--jade)}
+.doc-ic.experience{background:var(--gold);color:#3a2c05}
+.doc-ic.dining{background:var(--clay)}
+.doc-main{min-width:0;flex:1;display:flex;flex-direction:column}
+.doc-title{font-weight:600;font-size:14px;line-height:1.25}
+.doc-code{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.02em;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-go{flex:0 0 auto;color:var(--muted);display:flex;transition:color .18s,transform .18s var(--ease)}
+.doc:hover .doc-go{color:var(--jade);transform:translateX(2px)}
+.doc-go svg{width:17px;height:17px}
+
+/* ============================================================
+   FULL ITINERARY (the route, one page)
+   ============================================================ */
+.itin{padding:36px 40px 46px}
+@media(max-width:640px){.itin{padding:28px 22px 34px}}
+.itin-head{max-width:720px;margin:0 0 34px}
+.itin-head h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4vw,44px);line-height:1.05;letter-spacing:-.02em;margin:8px 0 8px}
+.itin-head h1 i{font-style:italic;color:var(--jade)}
+.itin-head p{color:var(--muted);font-size:15.5px;margin:0 0 16px}
+.itin-day{padding:30px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:200px 1fr;gap:40px;align-items:start}
+.itin-day:first-of-type{border-top:0}
+@media(max-width:760px){.itin-day{grid-template-columns:1fr;gap:16px}}
+.itin-day-head{position:sticky;top:70px}
+@media(max-width:760px){.itin-day-head{position:static}}
+.itin-day-head .dmeta{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.itin-day-head h2{font-family:var(--serif);font-weight:500;font-size:24px;line-height:1.1;letter-spacing:-.015em;margin:0 0 6px}
+.itin-day-head h2 i{font-style:italic;color:var(--jade)}
+.itin-day-head .dsub{font-size:13.5px;color:var(--muted);margin:0 0 14px}
+.itin-day-head .dstay{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--jade-deep);
+  background:var(--pill);border:1px solid var(--line);border-radius:999px;padding:6px 12px;
+}
+.itin-day-head .dstay i{width:7px;height:7px;border-radius:50%;background:var(--jade)}
+.itin-day .timeline .event{padding-bottom:22px}
+.itin-open-day{
+  margin-top:14px;display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--jade);font-weight:600;
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.foot{margin:56px 0 46px;padding-top:26px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.foot .mono{font-size:11.5px;letter-spacing:.08em}
+
+/* reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>onto</div>
+    <nav>
+      <a href="#map">Route</a>
+      <a href="#days">Days</a>
+      <a href="#" id="nav-about">About this trip</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ===================== 1. MAP HERO ===================== -->
+  <section class="hero wrap" id="map">
+    <div class="hero-head">
+      <div class="hero-copy">
+        <p class="eyebrow">The Route</p>
+        <h1 class="hero-title">Japan, <i>slowly</i> in autumn</h1>
+        <p class="hero-sub">Seven unhurried days east to west — Tokyo mornings, a night in the mountains at Hakone, then temple light in Kyoto.</p>
+      </div>
+      <div class="chips">
+        <span class="chip"><b>7</b> days</span>
+        <span class="chip"><b>4</b> stays</span>
+        <span class="chip"><b>612</b> km</span>
+        <span class="chip">Tokyo → Kyoto</span>
+      </div>
+    </div>
+
+    <div class="map-shell" id="map-shell">
+      <div class="map-toggle" role="group" aria-label="Map style">
+        <button id="tg-terrain" aria-pressed="true">Terrain</button>
+        <button id="tg-minimal" aria-pressed="false">Minimal</button>
+      </div>
+      <!-- SVG map injected by JS -->
+      <div class="map-legend" aria-hidden="true">
+        <span><i style="background:var(--jade)"></i>Stay</span>
+        <span><i style="background:var(--gold)"></i>Experience</span>
+        <span><i style="background:var(--clay)"></i>Dining</span>
+        <span><i style="background:var(--ink)"></i>Transfer</span>
+      </div>
+      <div class="popover" id="popover" role="dialog" aria-label="Location detail">
+        <div class="kind"><i></i><span></span></div>
+        <h4></h4>
+        <p></p>
+        <span class="go">Open day →</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 2. STORY CIRCLES ===================== -->
+  <section class="stories wrap" id="days">
+    <div class="section-head">
+      <h2>The trip, <i>day by day</i></h2>
+      <p class="eyebrow">Tap to open</p>
+    </div>
+    <div class="circles" id="circles" role="list" aria-label="Trip days"></div>
+  </section>
+
+  <!-- ===================== 3. DAY STAGE (inline) ===================== -->
+  <section class="stage wrap" id="stage" hidden aria-live="polite">
+    <div class="stage-card" id="stage-card"><!-- injected --></div>
+  </section>
+
+  <div class="wrap">
+    <footer class="foot">
+      <span>onto — a private itinerary.</span>
+      <span class="mono">JP · AUTUMN 2026 · 7 DAYS</span>
+    </footer>
+  </div>
+</main>
+
+<script>
+/* ============================================================
+   SEED DATA — edit here
+   ============================================================ */
+const TRIP = {
+  title:"Japan, slowly in autumn",
+  // map coordinates are in the SVG's 1000x600 viewBox space
+  cities:[
+    {name:"Tokyo",  x:812, y:250},
+    {name:"Hakone", x:690, y:322},
+    {name:"Kyoto",  x:372, y:300},
+  ],
+  // route waypoints (dips toward coast in the middle)
+  route:[
+    [812,250],[770,268],[712,300],[690,322],[604,372],[500,352],[430,318],[372,300]
+  ],
+  pins:[
+    {type:"stay",       x:812, y:250, day:0, title:"Park Hyatt Tokyo", place:"Shinjuku · Nights 1–2", note:"52nd-floor rooms over the city."},
+    {type:"experience", x:838, y:222, day:0, title:"Shibuya Crossing", place:"First morning", note:"Golden light and a thousand umbrellas."},
+    {type:"dining",     x:792, y:276, day:1, title:"Sushi Saito", place:"Omakase · Day 2", note:"Ten-seat counter, if the stars align."},
+    {type:"stay",       x:690, y:322, day:2, title:"Gōra Kadan", place:"Hakone · Night 3", note:"A ryokan with private onsen."},
+    {type:"experience", x:664, y:352, day:3, title:"Lake Ashi & Mt Fuji", place:"Day 4", note:"Fuji over the water on a clear day."},
+    {type:"transfer",   x:540, y:344, day:4, title:"Shinkansen to Kyoto", place:"Odawara → Kyoto", note:"240 km/h past the coast."},
+    {type:"stay",       x:372, y:300, day:4, title:"Hoshinoya Kyoto", place:"Kyoto · Nights 5–7", note:"Reached only by private boat."},
+    {type:"experience", x:346, y:272, day:5, title:"Fushimi Inari", place:"Day 6 · at dawn", note:"Ten thousand vermilion gates."},
+  ],
+  days:[
+    {
+      date:"Mar 12", weekday:"Wed", weather:"14° · Overcast", city:"Tokyo",
+      hero:"https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1600&q=80",
+      title:"First light in Shibuya",
+      subtitle:"Landing, then straight into the current of the city.",
+      events:[
+        {type:"transit",   time:"09:40", label:"Arrival", title:"Haneda → Shinjuku", place:"Airport Limousine bus", pill:"SEAT 4A · 55 MIN"},
+        {type:"stay",      time:"11:30", label:"Check-in", title:"Park Hyatt Tokyo", place:"Shinjuku", pill:"ROOM 5204 · KING"},
+        {type:"experience",time:"16:00", label:"Wander",   title:"Shibuya Crossing", place:"Shibuya", quote:"Golden hour and a thousand umbrellas moving at once."},
+        {type:"dining",    time:"19:30", label:"Dinner",   title:"Ichiran Ramen", place:"Shibuya", pill:"WALK-IN · SOLO BOOTH"},
+      ],
+      tonight:{name:"Park Hyatt Tokyo", addr:"3-7-1-2 Nishi-Shinjuku, Tokyo"}
+    },
+    {
+      date:"Mar 13", weekday:"Thu", weather:"16° · Sun", city:"Tokyo",
+      hero:"https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=1600&q=80",
+      title:"Old town, new town",
+      subtitle:"Temple mornings in Asakusa, an omakase counter by night.",
+      events:[
+        {type:"experience",time:"08:30", label:"Temple",  title:"Sensō-ji at opening", place:"Asakusa", quote:"Incense smoke before the crowds arrive."},
+        {type:"transit",   time:"11:00", label:"Transfer",title:"Ginza Line", place:"Asakusa → Ginza", pill:"3 STOPS · 12 MIN"},
+        {type:"experience",time:"14:00", label:"Browse",  title:"teamLab Planets", place:"Toyosu", pill:"TICKET TL-8842"},
+        {type:"dining",    time:"19:00", label:"Omakase", title:"Sushi Saito", place:"Roppongi", pill:"PNR H7X2QK · TABLE FOR 2"},
+      ],
+      tonight:{name:"Park Hyatt Tokyo", addr:"3-7-1-2 Nishi-Shinjuku, Tokyo"}
+    },
+    {
+      date:"Mar 14", weekday:"Fri", weather:"11° · Light rain", city:"Hakone",
+      hero:"https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=1600&q=80",
+      title:"Into the mountains",
+      subtitle:"Trading the city for cedar, steam and quiet.",
+      events:[
+        {type:"transit",   time:"10:15", label:"Rail",    title:"Romancecar to Hakone", place:"Shinjuku → Hakone-Yumoto", pill:"CAR 3 · SEAT 11D"},
+        {type:"stay",      time:"14:00", label:"Check-in", title:"Gōra Kadan", place:"Gōra, Hakone", pill:"SUITE 7 · PRIVATE ONSEN"},
+        {type:"experience",time:"16:30", label:"Soak",    title:"Open-air rotenburo", place:"In-room", quote:"Rain on the hot spring, mist in the cedars."},
+        {type:"dining",    time:"19:00", label:"Kaiseki", title:"Kaiseki dinner", place:"Gōra Kadan", pill:"MULTI-COURSE · 19:00"},
+      ],
+      tonight:{name:"Gōra Kadan", addr:"1300 Gōra, Hakone, Kanagawa"}
+    },
+    {
+      date:"Mar 15", weekday:"Sat", weather:"13° · Clear", city:"Hakone",
+      hero:"https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=1600&q=80",
+      title:"Fuji over the water",
+      subtitle:"A loop around Lake Ashi, chasing a clear view of the mountain.",
+      events:[
+        {type:"transit",   time:"09:30", label:"Ropeway", title:"Hakone Ropeway", place:"Sōunzan → Tōgendai", pill:"GONDOLA · 24 MIN"},
+        {type:"experience",time:"11:00", label:"Cruise",  title:"Lake Ashi pirate ship", place:"Tōgendai → Moto-Hakone", quote:"Fuji, unclouded, over the still water."},
+        {type:"experience",time:"13:30", label:"Shrine",  title:"Hakone Jinja torii", place:"Lakeside", pill:"LAKESIDE GATE"},
+        {type:"dining",    time:"18:30", label:"Dinner",  title:"Second kaiseki", place:"Gōra Kadan", pill:"MULTI-COURSE · 18:30"},
+      ],
+      tonight:{name:"Gōra Kadan", addr:"1300 Gōra, Hakone, Kanagawa"}
+    },
+    {
+      date:"Mar 16", weekday:"Sun", weather:"15° · Sun", city:"Kyoto",
+      hero:"https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1600&q=80",
+      title:"West on the bullet train",
+      subtitle:"240 km/h to the old capital, then a boat to the river's edge.",
+      events:[
+        {type:"transit",   time:"10:20", label:"Shinkansen", title:"Nozomi to Kyoto", place:"Odawara → Kyoto", pill:"PNR JR-6621 · CAR 8"},
+        {type:"stay",      time:"13:30", label:"Check-in", title:"Hoshinoya Kyoto", place:"Arashiyama", pill:"BY PRIVATE BOAT"},
+        {type:"experience",time:"16:00", label:"Walk",    title:"Bamboo grove at dusk", place:"Arashiyama", quote:"Wind moving through a ceiling of green."},
+        {type:"dining",    time:"19:30", label:"Dinner",  title:"Kaiseki by the river", place:"Hoshinoya", pill:"TABLE FOR 2 · RIVERSIDE"},
+      ],
+      tonight:{name:"Hoshinoya Kyoto", addr:"11-2 Arashiyama, Nishikyō-ku, Kyoto"}
+    },
+    {
+      date:"Mar 17", weekday:"Mon", weather:"14° · Clear", city:"Kyoto",
+      hero:"https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?auto=format&fit=crop&w=1600&q=80",
+      title:"Ten thousand gates",
+      subtitle:"Dawn at Fushimi Inari before the world wakes up.",
+      events:[
+        {type:"experience",time:"06:15", label:"Dawn",    title:"Fushimi Inari-taisha", place:"Fushimi", quote:"Ten thousand vermilion gates, and no one else."},
+        {type:"dining",    time:"09:30", label:"Breakfast",title:"Matcha & warabimochi", place:"Higashiyama", pill:"CAFÉ · WALK-IN"},
+        {type:"experience",time:"14:00", label:"Temple",  title:"Kiyomizu-dera", place:"Higashiyama", pill:"TICKET KY-3390"},
+        {type:"stay",      time:"18:00", label:"Rest",    title:"Onsen & tea ceremony", place:"Hoshinoya", quote:"Whisked matcha as the lanterns come on."},
+      ],
+      tonight:{name:"Hoshinoya Kyoto", addr:"11-2 Arashiyama, Nishikyō-ku, Kyoto"}
+    },
+    {
+      date:"Mar 18", weekday:"Tue", weather:"16° · Sun", city:"Kyoto",
+      hero:"https://images.unsplash.com/photo-1503640538573-148065ba4904?auto=format&fit=crop&w=1600&q=80",
+      title:"A slow last day",
+      subtitle:"Moss gardens, a final tea, and the long way home.",
+      events:[
+        {type:"experience",time:"08:45", label:"Garden",  title:"Saihō-ji moss temple", place:"Matsuo", pill:"RESERVED · SUTRA COPYING"},
+        {type:"dining",    time:"12:30", label:"Lunch",   title:"Tofu kaiseki", place:"Arashiyama", pill:"PNR KY-7781 · TABLE FOR 2"},
+        {type:"experience",time:"15:00", label:"Last walk",title:"Philosopher's Path", place:"Higashiyama", quote:"Petals on the canal, the trip winding down."},
+        {type:"transit",   time:"18:40", label:"Depart",  title:"Haruka to Kansai Airport", place:"Kyoto → KIX", pill:"CAR 4 · SEAT 9A"},
+      ],
+      tonight:{name:"Kansai Int'l — overnight flight", addr:"Izumisano, Osaka"}
+    },
+  ]
+};
+
+/* ============================================================
+   ICONS
+   ============================================================ */
+const ICON = {
+  transit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  stay:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>',
+  experience:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>',
+  dining:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v6a3 3 0 0 0 6 0V3M7 3v18M20 3s-3 2-3 7v4h3z"/></svg>',
+};
+const PIN_COLOR = {stay:"var(--jade)", experience:"var(--gold)", dining:"var(--clay)", transfer:"var(--ink)"};
+const PIN_KIND  = {stay:"Stay", experience:"Experience", dining:"Dining", transfer:"Transfer"};
+
+/* ============================================================
+   BUILD THE SVG MAP (offline, illustrated)
+   ============================================================ */
+function buildMap(){
+  const W=1000,H=600;
+  const routeD = TRIP.route.map((p,i)=>(i?"L":"M")+p[0]+" "+p[1]).join(" ");
+  let grat="";
+  for(let x=100;x<W;x+=100) grat+=`<line x1="${x}" y1="0" x2="${x}" y2="${H}"/>`;
+  for(let y=100;y<H;y+=100) grat+=`<line x1="0" y1="${y}" x2="${W}" y2="${y}"/>`;
+
+  let pins="";
+  TRIP.pins.forEach((p,i)=>{
+    const col=PIN_COLOR[p.type];
+    pins+=`
+    <g class="pin" data-idx="${i}" tabindex="0" role="button"
+       aria-label="${p.title}, ${PIN_KIND[p.type]}. Open day ${p.day+1}.">
+      <circle class="pin-hit" cx="${p.x}" cy="${p.y}" r="16"/>
+      <g class="pin-body">
+        <path d="M${p.x} ${p.y} C ${p.x-7.5} ${p.y-11}, ${p.x-7.5} ${p.y-21}, ${p.x} ${p.y-21}
+                 C ${p.x+7.5} ${p.y-21}, ${p.x+7.5} ${p.y-11}, ${p.x} ${p.y} Z"
+              fill="${col}" stroke="#fff" stroke-width="2"/>
+        <circle cx="${p.x}" cy="${p.y-21}" r="9.5" fill="${col}" stroke="#fff" stroke-width="2"/>
+        <circle cx="${p.x}" cy="${p.y-21}" r="3.4" fill="#fff"/>
+      </g>
+    </g>`;
+  });
+
+  let labels="";
+  TRIP.cities.forEach(c=>{
+    labels+=`<text class="city-label bg" x="${c.x}" y="${c.y+34}" text-anchor="middle">${c.name}</text>
+             <text class="city-label" x="${c.x}" y="${c.y+34}" text-anchor="middle">${c.name}</text>`;
+  });
+
+  const start=TRIP.route[0], end=TRIP.route[TRIP.route.length-1];
+
+  const svg=`
+  <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustrated route map, Tokyo to Kyoto">
+    <defs>
+      <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#cfe6df"/><stop offset="1" stop-color="#bcdcd6"/>
+      </linearGradient>
+      <linearGradient id="land" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#eef1e4"/><stop offset="1" stop-color="#e6ecd9"/>
+      </linearGradient>
+      <radialGradient id="park" cx="50%" cy="45%" r="60%">
+        <stop offset="0" stop-color="#bcd9b3"/><stop offset="1" stop-color="#bcd9b3" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="soft"><feGaussianBlur stdDeviation="7"/></filter>
+    </defs>
+
+    <rect class="m-sea" width="${W}" height="${H}" fill="url(#sea)"/>
+
+    <path class="m-land" d="M-40 250 C 120 210, 250 250, 372 250
+        C 470 250, 560 230, 660 250 C 760 268, 860 210, 1040 240
+        L 1040 640 L -40 640 Z"
+        fill="url(#land)"/>
+    <path class="m-land" d="M430 268 C 500 300, 560 300, 640 300 C 720 300, 720 360, 660 380
+        C 560 410, 470 400, 430 360 Z" fill="url(#sea)" opacity=".9"/>
+
+    <g class="m-grat" stroke="#0f8a63" stroke-opacity=".10" stroke-width="1">${grat}</g>
+
+    <g class="m-park">
+      <ellipse cx="300" cy="360" rx="120" ry="70" fill="url(#park)" filter="url(#soft)"/>
+      <ellipse cx="720" cy="430" rx="150" ry="80" fill="url(#park)" filter="url(#soft)"/>
+      <ellipse cx="880" cy="300" rx="90" ry="60" fill="url(#park)" filter="url(#soft)"/>
+    </g>
+
+    <g class="m-ridge" fill="none" stroke="#a9b79c" stroke-width="2" stroke-linecap="round" stroke-opacity=".7">
+      <path d="M120 430 l40 -34 30 24 44 -40 34 30"/>
+      <path d="M470 250 l46 -40 34 28 40 -34 30 26"/>
+      <path d="M840 400 l40 -34 30 24 40 -30"/>
+    </g>
+
+    <g class="m-fuji">
+      <path d="M636 322 L690 236 L744 322 Z" fill="#c3cbbe" stroke="#a9b79c" stroke-width="1.5"/>
+      <path d="M672 262 L690 236 L708 262 q-18 -10 -36 0 Z" fill="#fff"/>
+    </g>
+
+    <path class="m-route-casing" d="${routeD}" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path class="m-route" d="${routeD}" fill="none" stroke="var(--jade)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <g class="m-cap">
+      <circle cx="${start[0]}" cy="${start[1]}" r="7" fill="#fff" stroke="var(--jade)" stroke-width="3"/>
+      <circle cx="${end[0]}" cy="${end[1]}" r="7" fill="var(--jade)" stroke="#fff" stroke-width="3"/>
+    </g>
+
+    ${pins}
+    ${labels}
+  </svg>`;
+  document.getElementById("map-shell").insertAdjacentHTML("afterbegin", svg);
+}
+
+/* ============================================================
+   MAP INTERACTION (popover + toggle)
+   ============================================================ */
+function wireMap(){
+  const shell=document.getElementById("map-shell");
+  const pop=document.getElementById("popover");
+  let openIdx=null;
+
+  function showPop(idx, cx, cy){
+    const p=TRIP.pins[idx];
+    pop.querySelector(".kind i").style.background=PIN_COLOR[p.type];
+    pop.querySelector(".kind span").textContent=PIN_KIND[p.type];
+    pop.querySelector("h4").textContent=p.title;
+    pop.querySelector("p").textContent=(p.place?p.place+" — ":"")+p.note;
+    const rect=shell.getBoundingClientRect();
+    const scale=Math.max(rect.width/1000, rect.height/600);
+    const offX=(rect.width-1000*scale)/2, offY=(rect.height-600*scale)/2;
+    let px=cx*scale+offX, py=cy*scale+offY;
+    px=Math.max(120,Math.min(rect.width-120,px));
+    pop.style.left=px+"px"; pop.style.top=Math.max(90,py-8)+"px";
+    pop.classList.add("show");
+    pop.dataset.day=p.day;
+    openIdx=idx;
+  }
+  function hidePop(){pop.classList.remove("show");openIdx=null}
+
+  shell.addEventListener("click",e=>{
+    const g=e.target.closest(".pin");
+    if(g){
+      const idx=+g.dataset.idx;
+      if(openIdx===idx){hidePop();return}
+      const p=TRIP.pins[idx];
+      showPop(idx,p.x,p.y-21);
+      e.stopPropagation();
+    } else if(!e.target.closest(".popover")){
+      hidePop();
+    }
+  });
+  shell.addEventListener("keydown",e=>{
+    const g=e.target.closest(".pin");
+    if(g&&(e.key==="Enter"||e.key===" ")){e.preventDefault();const idx=+g.dataset.idx;const p=TRIP.pins[idx];showPop(idx,p.x,p.y-21)}
+    if(e.key==="Escape")hidePop();
+  });
+  pop.querySelector(".go").addEventListener("click",()=>{const d=+pop.dataset.day;hidePop();openDay(d)});
+  window.addEventListener("resize",hidePop);
+
+  const tT=document.getElementById("tg-terrain"), tM=document.getElementById("tg-minimal");
+  function setMode(minimal){
+    tT.setAttribute("aria-pressed",String(!minimal));
+    tM.setAttribute("aria-pressed",String(minimal));
+    ["m-park","m-ridge","m-fuji","m-grat"].forEach(c=>shell.querySelectorAll("."+c).forEach(el=>el.style.opacity=minimal?"0":""));
+    const land=shell.querySelector(".m-land");
+    if(land) land.style.filter=minimal?"saturate(.4)":"";
+  }
+  tT.addEventListener("click",()=>setMode(false));
+  tM.addEventListener("click",()=>setMode(true));
+}
+
+/* ============================================================
+   STORY CIRCLES
+   ============================================================ */
+let circleEls=[];
+function buildCircles(){
+  const row=document.getElementById("circles");
+  // route overview bubble -> opens full itinerary
+  const route=document.createElement("button");
+  route.className="circle route";route.setAttribute("role","listitem");
+  route.dataset.view="itin";
+  route.setAttribute("aria-label","The route — full itinerary on one page");
+  route.innerHTML=`<span class="ring"><span class="inner">
+    <svg viewBox="0 0 44 44" fill="none" stroke="#7fe3bd" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 30 C 16 22, 24 30, 36 14"/><circle cx="8" cy="30" r="3.2" fill="#7fe3bd" stroke="none"/><circle cx="36" cy="14" r="3.2" fill="#f2c14e" stroke="none"/>
+    </svg></span></span>
+    <span class="lbl">The route</span><span class="city">Full itinerary</span>`;
+  route.addEventListener("click",()=>openItinerary());
+  row.appendChild(route);
+
+  TRIP.days.forEach((d,i)=>{
+    const b=document.createElement("button");
+    b.className="circle";b.setAttribute("role","listitem");
+    b.dataset.day=i;
+    b.setAttribute("aria-label",`Day ${i+1}, ${d.city} — ${d.title}`);
+    b.innerHTML=`<span class="ring"><span class="badge">D${i+1}</span><span class="inner" style="background-image:url('${d.hero}')"></span></span>
+      <span class="lbl">Day ${i+1}</span><span class="city">${d.city}</span>`;
+    b.addEventListener("click",()=>openDay(i));
+    row.appendChild(b);
+  });
+  circleEls=[...row.querySelectorAll(".circle")];
+}
+function markActive(kind){ // kind = 'itin' or day index or null
+  circleEls.forEach(el=>{
+    const isDay = el.dataset.day!==undefined && +el.dataset.day===kind;
+    const isItin = el.dataset.view==="itin" && kind==="itin";
+    el.setAttribute("aria-current", (isDay||isItin)?"true":"false");
+  });
+}
+
+/* ============================================================
+   RENDER HELPERS
+   ============================================================ */
+function eventHTML(ev){
+  const detail = ev.pill?`<div class="res-pill"><i></i>${ev.pill}</div>`:"";
+  return `<div class="event">
+    <div class="knob ${ev.type}">${ICON[ev.type]}</div>
+    <div class="ev-body">
+      <div><span class="ev-time">${ev.time}</span><span class="ev-type">${ev.label||ev.type}</span></div>
+      <div class="ev-title">${ev.title}</div>
+      <div class="ev-place">${ev.place}</div>
+      ${detail}
+    </div>
+  </div>`;
+}
+function accentTitle(t){
+  const m=t.match(/\b(light|slowly|slow|Fuji|gates|water|mountains|thousand|art|island)\b/i);
+  if(m) return t.replace(m[0],`<i>${m[0]}</i>`);
+  return t.replace(/(\S+)\s*$/,'<i>$1</i>');
+}
+
+// openable docs for a day: every ticketed / booked item (excludes the stay, shown in "Tonight", and walk-ins)
+const BOOKING_RE=/PNR|TICKET|TABLE|SEAT|CAR \d|RESERVED|MULTI-COURSE/i;
+function dayDocs(d){
+  return d.events
+    .filter(e=>e.type!=="stay" && e.pill && BOOKING_RE.test(e.pill) && !/WALK-IN/i.test(e.pill))
+    .map(e=>({type:e.type,title:e.title,code:e.pill}));
+}
+// the night's stay, as a doc row (uses the check-in pill if there is one, else the address)
+function dayStayDoc(d){
+  const checkin=d.events.find(e=>e.type==="stay" && e.pill);
+  return {type:"stay", title:d.tonight.name, code:checkin?checkin.pill:d.tonight.addr};
+}
+function docHTML(doc){
+  return `<button class="doc" aria-label="View ${doc.title} reservation">
+    <span class="doc-ic ${doc.type}">${ICON[doc.type]}</span>
+    <span class="doc-main"><span class="doc-title">${doc.title}</span><span class="doc-code">${doc.code}</span></span>
+    <span class="doc-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+  </button>`;
+}
+
+/* ============================================================
+   DAY STAGE (single day, inline)
+   ============================================================ */
+const stageEl=document.getElementById("stage");
+const stageCard=document.getElementById("stage-card");
+let currentView=null; // {type:'day',i} | {type:'itin'} | null
+let lastFocused=null;
+
+function renderDay(i){
+  const d=TRIP.days[i];
+  const meta=`DAY ${i+1} · ${d.weekday.toUpperCase()} · ${d.date.toUpperCase()} · ${d.weather.toUpperCase()}`;
+  stageCard.innerHTML=`
+    <div class="day-hero" style="background-image:url('${d.hero}')">
+      <button class="day-close" id="stage-close" aria-label="Close (Esc)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <button class="day-nav prev" id="day-prev" aria-label="Previous day" ${i===0?"disabled":""}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <button class="day-nav next" id="day-next" aria-label="Next day" ${i===TRIP.days.length-1?"disabled":""}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <div class="day-controls">
+        <button class="btn btn-quiet" id="add-moment">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add activity</button>
+        <button class="btn btn-gold" id="open-map">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>Open map</button>
+      </div>
+      <div class="day-hero-content">
+        <h1>${accentTitle(d.title)}</h1>
+        <div class="meta">${meta}</div>
+      </div>
+    </div>
+
+    <div class="day-body">
+      <div class="day-main">
+        <div class="tl-head"><h2>Timeline</h2><span class="count">${d.events.length} events</span></div>
+        <div class="timeline">${d.events.map(eventHTML).join("")}</div>
+      </div>
+      <aside class="side">
+        <div class="scard docs">
+          <div class="clabel">Reservations &amp; tickets</div>
+          ${[dayStayDoc(d), ...dayDocs(d)].map(docHTML).join("")}
+        </div>
+      </aside>
+    </div>`;
+
+  document.getElementById("stage-close").addEventListener("click",closeStage);
+  document.getElementById("day-prev").addEventListener("click",()=>{if(i>0)openDay(i-1)});
+  document.getElementById("day-next").addEventListener("click",()=>{if(i<TRIP.days.length-1)openDay(i+1)});
+  document.getElementById("open-map").addEventListener("click",()=>document.getElementById("map").scrollIntoView({block:"start"}));
+}
+
+/* ============================================================
+   FULL ITINERARY (the route, one page)
+   ============================================================ */
+function renderItinerary(){
+  const daysHTML=TRIP.days.map((d,i)=>`
+    <section class="itin-day">
+      <div class="itin-day-head">
+        <div class="dmeta">Day ${i+1} · ${d.city} · ${d.weekday}, ${d.date}</div>
+        <h2>${accentTitle(d.title)}</h2>
+        <span class="dstay"><i></i>${d.tonight.name}</span>
+        <div><button class="itin-open-day" data-day="${i}">Open this day →</button></div>
+      </div>
+      <div class="timeline">${d.events.map(eventHTML).join("")}</div>
+    </section>`).join("");
+
+  stageCard.innerHTML=`
+    <button class="day-close" id="stage-close" aria-label="Close (Esc)" style="position:absolute">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="itin">
+      <div class="itin-head">
+        <p class="eyebrow">The full route</p>
+        <h1>Japan, <i>slowly</i> in autumn</h1>
+        <p>Every day of the trip on one page — Tokyo to Kyoto, east to west. Tap any day to open it on its own.</p>
+        <div class="chips">
+          <span class="chip"><b>7</b> days</span>
+          <span class="chip"><b>4</b> stays</span>
+          <span class="chip"><b>612</b> km</span>
+        </div>
+      </div>
+      ${daysHTML}
+    </div>`;
+
+  document.getElementById("stage-close").addEventListener("click",closeStage);
+  stageCard.querySelectorAll(".itin-open-day").forEach(b=>
+    b.addEventListener("click",()=>openDay(+b.dataset.day)));
+}
+
+/* ============================================================
+   OPEN / CLOSE
+   ============================================================ */
+function revealStage(){
+  const wasHidden=stageEl.hidden;
+  stageEl.hidden=false;
+  if(wasHidden && lastFocused===null) lastFocused=document.activeElement;
+}
+function openDay(i){
+  if(currentView===null) lastFocused=document.activeElement;
+  currentView={type:"day",i};
+  revealStage();
+  renderDay(i);
+  markActive(i);
+  stageEl.scrollIntoView({behavior:prefersReduced()?"auto":"smooth",block:"start"});
+  const c=document.getElementById("stage-close"); if(c) c.focus({preventScroll:true});
+}
+function openItinerary(){
+  if(currentView===null) lastFocused=document.activeElement;
+  currentView={type:"itin"};
+  revealStage();
+  renderItinerary();
+  markActive("itin");
+  stageEl.scrollIntoView({behavior:prefersReduced()?"auto":"smooth",block:"start"});
+  const c=document.getElementById("stage-close"); if(c) c.focus({preventScroll:true});
+}
+function closeStage(){
+  stageEl.hidden=true;
+  stageCard.innerHTML="";
+  currentView=null;
+  markActive(null);
+  if(lastFocused&&lastFocused.focus)lastFocused.focus();
+  lastFocused=null;
+}
+
+// keyboard
+document.addEventListener("keydown",e=>{
+  if(currentView===null)return;
+  if(e.key==="Escape"){closeStage();return}
+  if(currentView.type==="day"){
+    if(e.key==="ArrowLeft"&&currentView.i>0)openDay(currentView.i-1);
+    else if(e.key==="ArrowRight"&&currentView.i<TRIP.days.length-1)openDay(currentView.i+1);
+  }
+});
+
+/* ============================================================
+   init
+   ============================================================ */
+function prefersReduced(){return window.matchMedia("(prefers-reduced-motion:reduce)").matches}
+document.getElementById("nav-about").addEventListener("click",e=>{e.preventDefault();openItinerary()});
+
+buildMap();
+wireMap();
+buildCircles();
+</script>
+</body>
+</html>
