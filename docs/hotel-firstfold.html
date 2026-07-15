@@ -146,17 +146,6 @@
   .roomchip .sr-line{font-size:14px;color:var(--muted);line-height:1.35;}
   .roomchip .sr-name{font-size:16.5px;font-weight:600;color:var(--ink);}
   .roomchip .sr-tag{font-size:12.5px;color:#9a948c;font-weight:500;}
-  /* the Room chip's own dropdown — a quantity stepper, right-aligned so the price stays visible */
-  .room-pop{position:absolute;top:calc(100% + 8px);right:0;left:auto;z-index:40;width:max-content;min-width:172px;
-    background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 36px rgba(40,30,10,.18);padding:12px 14px;
-    display:flex;flex-direction:column;}
-  .room-pop[hidden]{display:none;}
-  .rp-stepper{display:flex;width:100%;align-items:center;justify-content:space-between;margin-left:0;}
-  .rp-link{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);text-align:center;}
-  .rp-link button{background:none;border:none;color:var(--jade);font-weight:600;font-size:13.5px;
-    cursor:pointer;font-family:inherit;padding:0;}
-  .rp-link button:hover{color:var(--jade-deep);}
-
   /* --- price: 3-night total primary, per-night secondary --- */
   .bk-price{margin-top:26px;}
   .bk-l1{display:flex;align-items:baseline;gap:8px;}
@@ -228,7 +217,6 @@
   .rc-body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;}
   .rc-name{font-family:Georgia,serif;font-size:19px;font-weight:600;margin:0 0 4px;color:var(--ink);
     cursor:pointer;display:inline-block;}
-  .rc-name:hover{text-decoration:underline;}
   .rc-meta{font-size:13px;color:var(--muted);margin-bottom:13px;}
   .rc-opt{display:flex;align-items:center;gap:9px;font-size:13px;color:#444;margin-top:13px;cursor:pointer;}
   .rc-opt input{width:16px;height:16px;accent-color:var(--jade);flex:none;}
@@ -510,6 +498,11 @@
   .gp-chead .gp-add:disabled{opacity:.4;cursor:default;}
   /* guests / rooms toggle at the top of the popover */
   .gp-panel[hidden]{display:none;}
+  .gp-seg{display:flex;gap:4px;background:#f2efe7;border-radius:10px;padding:3px;margin-bottom:12px;}
+  .gp-seg-btn{flex:1;border:none;background:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);
+    padding:7px 0;border-radius:8px;cursor:pointer;transition:all .15s;}
+  .gp-seg-btn:hover{color:var(--ink);}
+  .gp-seg-btn.is-on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(40,30,10,.12);}
   .gp-roomrow{display:flex;align-items:center;gap:14px;padding:6px 2px 2px;}
   .gp-roomrow .gpr-name{font-size:15px;font-weight:600;color:var(--ink);}
   .gp-roomrow .gpr-sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
@@ -836,28 +829,6 @@
       </div>
     </div>
         </div>
-        <div class="face back">
-          <div class="book">
-            <!-- invisible spacer matches the left card's stars line so the two headings align -->
-            <div class="stars" aria-hidden="true" style="visibility:hidden">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <h2 class="form-h">Confirm your details</h2>
-            <p class="form-sub">Almost there — check these over and confirm.</p>
-
-            <label class="fld"><span>Full name</span>
-              <input type="text" id="fName" value="" placeholder="Full name" autocomplete="name"></label>
-            <label class="fld"><span>Email</span>
-              <input type="email" id="fEmail" value="xyz@email.com" autocomplete="email" inputmode="email">
-              <small class="fld-err">Enter a valid email address (must include @).</small></label>
-            <label class="fld"><span>Phone</span>
-              <input type="tel" id="fPhone" value="+91 98765 43210" autocomplete="tel" inputmode="numeric" maxlength="17">
-              <small class="fld-err">Enter a 10-digit phone number — digits only.</small></label>
-
-            <div class="form-spacer"></div>
-
-            <button class="btn confirm" id="confirmBtn">Confirm booking · <span id="confirmAmt">₹55,500</span></button>
-            <button type="button" class="form-back" data-back>&#8249; Back to booking</button>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -901,6 +872,10 @@
 
           <!-- guests popover: steppers create slots; saved people fill them, extras get a fun name you can rename -->
           <div class="guest-pop" id="guestPop" hidden>
+            <div class="gp-seg" role="tablist" aria-label="Guests or rooms">
+              <button type="button" class="gp-seg-btn is-on" id="segGuests" role="tab" aria-selected="true">Guests</button>
+              <button type="button" class="gp-seg-btn" id="segRooms" role="tab" aria-selected="false">Rooms</button>
+            </div>
             <div class="gp-panel" id="panelGuests">
             <div class="gp-reg">
               <div class="gp-lab">Regular companions</div>
@@ -919,24 +894,26 @@
               <div class="gp-people" id="inPeople"></div>
             </div>
             </div>
+            <div class="gp-panel" id="panelRooms" hidden>
+              <div class="gp-roomrow">
+                <div class="gpr-name">Rooms</div>
+                <div class="gp-stepper" role="group" aria-label="Number of rooms">
+                  <button type="button" class="gp-step" id="roomPopMinus" aria-label="Fewer rooms">&minus;</button>
+                  <span class="gp-stepval" id="roomPopVal">1</span>
+                  <button type="button" class="gp-step" id="roomPopPlus" aria-label="More rooms">+</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- selected room — a chip like Dates/Guests, with its own rooms dropdown -->
         <div class="roomsel">
-          <button type="button" class="tripchip roomchip" id="roomCard" aria-haspopup="true" aria-expanded="false" aria-label="Rooms">
+          <button type="button" class="tripchip roomchip" id="roomCard" aria-label="Choose your room">
             <span class="tc-k">Room <span class="tc-cnt" id="roomCnt">1 room</span></span>
             <span class="sr-line"><span class="sr-name">Villa Room</span> · 1 King · Garden view · 56 m²</span>
             <span class="sr-tag" id="roomTag" hidden></span>
           </button>
-          <div class="room-pop" id="roomPop" hidden>
-            <div class="gp-stepper rp-stepper" role="group" aria-label="Number of rooms">
-              <button type="button" class="gp-step" id="roomPopMinus" aria-label="Fewer rooms">&minus;</button>
-              <span class="gp-stepval" id="roomPopVal">1</span>
-              <button type="button" class="gp-step" id="roomPopPlus" aria-label="More rooms">+</button>
-            </div>
-            <div class="rp-link"><button type="button" id="roomChange">Change room</button></div>
-          </div>
         </div>
 
         <!-- price: 3-night total primary, per-night secondary -->
@@ -965,44 +942,24 @@
         </div>
         <div class="face back">
           <div class="book">
-            <!-- hero image with the hotel name overlaid -->
-            <div class="sum-hero">
-              <img src="images/04-pool-sunset.png" alt="Taj Exotica Resort &amp; Spa at sunset">
-              <div class="sum-hero-tx">
-                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                <h1>Taj Exotica Resort &amp; Spa</h1>
-                <div class="place">BENAULIM BEACH · GOA, INDIA</div>
-              </div>
-            </div>
+            <!-- invisible spacer matches the left card's stars line so the two headings align -->
+            <div class="stars" aria-hidden="true" style="visibility:hidden">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <h2 class="form-h">Confirm your details</h2>
+            <p class="form-sub">Almost there — check these over and confirm.</p>
 
-            <!-- frozen booking summary (static) -->
-            <div class="sum">
-              <div class="sum-top">
-                <span class="sh">Your stay</span>
-              </div>
-              <div class="sum-row">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Check-in</div><div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div></div>
-              </div>
-              <div class="sum-row">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/><path d="M9 14.5l2 2 3.5-3.5"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Check-out</div><div class="sum-v">Mon 13 Jul<span>12:00 PM</span></div></div>
-              </div>
-              <div class="sum-row">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.5 20c.6-3.1 3-4.8 5.5-4.8s4.9 1.7 5.5 4.8"/><path d="M16.2 5.3a3 3 0 0 1 0 5.6M21 20c-.4-2.1-1.7-3.5-3.4-4.2"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Guests</div><div class="sum-v">You<span>1 traveller</span></div></div>
-              </div>
-              <div id="cartRooms"></div>
-              <div class="sum-row" data-addon="cancel">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Cancellation</div><div class="sum-v"><span class="av-title">Free till 9 July</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹5,400</button></span></div></div>
-              </div>
-              <div class="sum-row" data-addon="breakfast">
-                <span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/><path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg></span>
-                <div class="sum-c"><div class="sum-k">Breakfast</div><div class="sum-v"><span class="av-title">Included</span><span class="av-sub"><button type="button" class="sum-toggle">Remove to save ₹4,500</button></span></div></div>
-              </div>
-            </div>
+            <label class="fld"><span>Full name</span>
+              <input type="text" id="fName" value="" placeholder="Full name" autocomplete="name"></label>
+            <label class="fld"><span>Email</span>
+              <input type="email" id="fEmail" value="xyz@email.com" autocomplete="email" inputmode="email">
+              <small class="fld-err">Enter a valid email address (must include @).</small></label>
+            <label class="fld"><span>Phone</span>
+              <input type="tel" id="fPhone" value="+91 98765 43210" autocomplete="tel" inputmode="numeric" maxlength="17">
+              <small class="fld-err">Enter a 10-digit phone number — digits only.</small></label>
 
+            <div class="form-spacer"></div>
+
+            <button class="btn confirm" id="confirmBtn">Confirm booking · <span id="confirmAmt">₹55,500</span></button>
+            <button type="button" class="form-back" data-back>&#8249; Back to booking</button>
           </div>
         </div>
       </div>
@@ -1607,7 +1564,24 @@
 
     // room count is driven entirely by the cart (per-category quantities) now — nothing to wire here
 
-    const openPop  = ()=>{ if(window.closeDatePop) window.closeDatePop(); if(window.closeRoomPop) window.closeRoomPop(); pop.hidden=false; trigger.setAttribute('aria-expanded','true'); };
+    // Guests / Rooms toggle: two panels share the popover; Guests is the default view
+    const segG=$('segGuests'), segR=$('segRooms'), panelG=$('panelGuests'), panelR=$('panelRooms');
+    function showPanel(which){
+      const rooms = which==='rooms';
+      if(panelG) panelG.hidden = rooms;
+      if(panelR) panelR.hidden = !rooms;
+      if(segG){ segG.classList.toggle('is-on',!rooms); segG.setAttribute('aria-selected', String(!rooms)); }
+      if(segR){ segR.classList.toggle('is-on', rooms); segR.setAttribute('aria-selected', String(rooms)); }
+    }
+    if(segG) segG.addEventListener('click', e=>{ e.stopPropagation(); showPanel('guests'); });
+    if(segR) segR.addEventListener('click', e=>{ e.stopPropagation(); showPanel('rooms'); });
+    // room stepper (lives on the Rooms panel) drives the cart quantity
+    const rpm=$('roomPopMinus'), rpp=$('roomPopPlus');
+    const curQty = ()=> (window.CART && window.CART[0]) ? window.CART[0].qty : 1;
+    if(rpm) rpm.addEventListener('click', e=>{ e.stopPropagation(); if(window.setRoomQty) window.setRoomQty(curQty()-1); });
+    if(rpp) rpp.addEventListener('click', e=>{ e.stopPropagation(); if(window.setRoomQty) window.setRoomQty(curQty()+1); });
+
+    const openPop  = ()=>{ if(window.closeDatePop) window.closeDatePop(); if(window.closeRoomPop) window.closeRoomPop(); showPanel('guests'); pop.hidden=false; trigger.setAttribute('aria-expanded','true'); };
     const closePop = ()=>{ editing=null; pop.hidden=true; trigger.setAttribute('aria-expanded','false'); apply(); };
     window.closeGuestPop = closePop;
     trigger.addEventListener('click', e=>{ e.stopPropagation(); pop.hidden?openPop():closePop(); });
@@ -2124,8 +2098,9 @@
     window.renderFirstFold = renderFirstFold;
 
     function addRoom(key){
-      // selecting a room replaces the current one and resets the count to one; adjust it via the Room chip stepper
-      window.CART = [{key, qty:1}];
+      // selecting a room swaps the type but keeps the current quantity; adjust it via the Guests/Rooms stepper
+      const qty = (window.CART && window.CART[0]) ? window.CART[0].qty : 1;
+      window.CART = [{key, qty}];
       renderFirstFold();
       document.getElementById('top').scrollIntoView({behavior:'smooth', block:'start'});
     }
@@ -2213,22 +2188,12 @@
       document.body.style.overflow = '';
     }
 
-    // the Room chip dropdown: a quantity stepper for the selected room + a "Change room" link
-    const selCard = $('roomCard'), roomPop = $('roomPop');
-    if(selCard && roomPop){
-      const openRP  = ()=>{ if(window.closeDatePop) window.closeDatePop(); if(window.closeGuestPop) window.closeGuestPop(); roomPop.hidden=false; selCard.setAttribute('aria-expanded','true'); };
-      const closeRP = ()=>{ roomPop.hidden=true;  selCard.setAttribute('aria-expanded','false'); };
-      window.closeRoomPop = closeRP;
-      selCard.addEventListener('click', (e)=>{ e.stopPropagation(); roomPop.hidden ? openRP() : closeRP(); });
-      roomPop.addEventListener('click', (e)=> e.stopPropagation());
-      document.addEventListener('click', (e)=>{ if(!roomPop.hidden && !roomPop.contains(e.target) && !selCard.contains(e.target)) closeRP(); });
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !roomPop.hidden) closeRP(); });
-      const curQty = ()=> (window.CART[0] ? window.CART[0].qty : 1);
-      const rpm=$('roomPopMinus'), rpp=$('roomPopPlus'), chg=$('roomChange');
-      if(rpm) rpm.addEventListener('click', (e)=>{ e.stopPropagation(); if(window.setRoomQty) window.setRoomQty(curQty()-1); });
-      if(rpp) rpp.addEventListener('click', (e)=>{ e.stopPropagation(); if(window.setRoomQty) window.setRoomQty(curQty()+1); });
-      if(chg) chg.addEventListener('click', (e)=>{ e.stopPropagation(); closeRP(); const t=document.getElementById('rooms'); if(t) t.scrollIntoView({behavior:'smooth', block:'start'}); });
+    // the Room box scrolls to the room list; quantity now lives in the Guests/Rooms popover stepper
+    const selCard = $('roomCard');
+    if(selCard){
+      selCard.addEventListener('click', (e)=>{ e.stopPropagation(); const t=document.getElementById('rooms'); if(t) t.scrollIntoView({behavior:'smooth', block:'start'}); });
     }
+    window.closeRoomPop = ()=>{};   // no-op stub kept for the date/guest pickers' defensive calls
 
     $('drClose').addEventListener('click', closeDrawer);
     scrim.addEventListener('click', closeDrawer);
@@ -2368,21 +2333,24 @@
     const money = n => '₹' + n.toLocaleString('en-IN');
   (function(){
     const flips = [...document.querySelectorAll('.flip')];
+    let foldH = 0;   // cached first-fold height (gallery + booking fronts) — the confirm card matches it
     function size(){
       const L = document.getElementById('flipLeft'), R = document.getElementById('flipRight');
       if(!L || !R) return;
       if(window.innerWidth <= 920){ flips.forEach(f => { f.style.height=''; }); return; }
-      // only the currently-visible face of each card counts (the right never flips, so only its front;
-      // the left shows its form when flipped, otherwise the gallery) — so the flipped form doesn't inherit
-      // the taller gallery/booking height and the cards shrink to fit.
       const flipped = L.classList.contains('flipped');
-      const faces = [ L.querySelector('.face.'+(flipped?'back':'front')), R.querySelector('.face.front') ].filter(Boolean);
       flips.forEach(f => { f.style.height='auto'; f.querySelector('.flip-inner').style.height='auto'; });
-      faces.forEach(fc => fc.style.position = 'relative');
-      let max = 0;
-      faces.forEach(fc => max = Math.max(max, fc.offsetHeight));
-      faces.forEach(fc => fc.style.position = '');
-      flips.forEach(f => { f.querySelector('.flip-inner').style.height=''; f.style.height = max + 'px'; });
+      // measure the first-fold height from the front faces while the PDP is showing; cache it so the
+      // solo confirm card (right card hidden) can adopt the same height and bottom-align its CTAs.
+      if(!flipped){
+        const faces = [ L.querySelector('.face.front'), R.querySelector('.face.front') ].filter(Boolean);
+        faces.forEach(fc => fc.style.position = 'relative');
+        let max = 0;
+        faces.forEach(fc => max = Math.max(max, fc.offsetHeight));
+        faces.forEach(fc => fc.style.position = '');
+        foldH = max;
+      }
+      flips.forEach(f => { f.querySelector('.flip-inner').style.height=''; f.style.height = foldH + 'px'; });
     }
     window.resizeCards = size;
     window.addEventListener('load', size);
@@ -2391,30 +2359,19 @@
   })();
 
   (function(){
-    const flips = [$('flipLeft')];   // only the left (gallery) card flips to the form; the right keeps the booking details
+    const flips = [$('flipRight')];   // Book now flips only the right (booking) card to the details form; the PDP stays put
     const step = $('stepLabel');
-    let clearT;
     function setFlipped(on){
-      clearTimeout(clearT);
-      flips.forEach(f => { f.classList.add('flipping'); f.classList.toggle('flipped', on); });
-      const _folds = document.getElementById('pdpFolds');
-      if(_folds) _folds.classList.toggle('pdp-hidden', on);
-      // in cart/checkout, the section links (Overview/Rooms/Reviews/Location) don't apply
-      const _tnl = document.querySelector('.tn-links');
-      if(_tnl) _tnl.classList.toggle('tn-hidden', on);
+      // flip the right booking card to reveal the name/email form; the rest of the PDP is untouched
+      flips.forEach(f => { f.classList.toggle('flipped', on); });
       if(step) step.innerHTML = on ? 'Confirm &amp; pay' : 'Review your stay';
-      // freeze the right card once the form is open: its details go static and its CTAs (Book now / Add to trip) hide
       window.IN_CHECKOUT = on;
-      const _fr = document.getElementById('flipRight');
-      if(_fr) _fr.classList.toggle('frozen', on);
-      if(on){   // don't leave a chip's dropdown open behind the frozen card
+      if(on){   // don't leave a chip's dropdown open behind the flipping card
         if(window.closeDatePop)  window.closeDatePop();
         if(window.closeGuestPop) window.closeGuestPop();
         if(window.closeRoomPop)  window.closeRoomPop();
       }
-      if(window.resizeCards) window.resizeCards();   // re-fit height to the now-visible face (form is shorter)
-      // drop the lift class once the (staggered) turn is done
-      clearT = setTimeout(() => flips.forEach(f => f.classList.remove('flipping')), 820);
+      if(window.resizeCards) window.resizeCards();
     }
     window.goToCart = () => { if(window.renderCart) window.renderCart(); setFlipped(true); };
     document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => setFlipped(false)));
