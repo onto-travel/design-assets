@@ -138,7 +138,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   display:block;text-align:left;padding:0;overflow:hidden;
 }
 .dc-header img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.dc-header .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,25,20,.14) 0%,rgba(6,25,20,0) 26%,rgba(6,25,20,.36) 56%,rgba(6,25,20,.93) 100%)}
+.dc-header .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,25,20,.22) 0%,rgba(6,25,20,.06) 22%,rgba(6,25,20,.52) 52%,rgba(6,25,20,.98) 100%)}
 .dc-cap{position:absolute;left:24px;right:24px;bottom:16px;color:#fff;z-index:1}
 .dc-cap h3{font-family:var(--serif);font-weight:500;font-size:clamp(22px,2.6vw,29px);line-height:1.08;letter-spacing:-.015em;margin:0 0 5px;text-shadow:0 2px 20px rgba(0,0,0,.35)}
 .dc-cap h3 i{font-style:italic}
@@ -243,6 +243,25 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .scard.packed .clabel{color:var(--muted)}
 .tags{display:flex;flex-wrap:wrap;gap:8px}
 .tag{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13px;color:var(--ink)}
+
+/* reservations & tickets — the day's openable docs */
+.scard.docs{background:var(--card);border:1px solid var(--line);padding:20px 22px}
+.scard.docs .clabel{color:var(--muted)}
+.doc{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 0;border-top:1px solid var(--line);transition:opacity .15s}
+.doc:first-of-type{border-top:0;padding-top:2px}
+.doc:hover{opacity:.82}
+.doc-ic{width:32px;height:32px;border-radius:10px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff}
+.doc-ic svg{width:15px;height:15px}
+.doc-ic.transit{background:var(--ink)}
+.doc-ic.stay{background:var(--jade)}
+.doc-ic.experience{background:var(--gold);color:#3a2c05}
+.doc-ic.dining{background:var(--clay)}
+.doc-main{min-width:0;flex:1;display:flex;flex-direction:column}
+.doc-title{font-weight:600;font-size:14px;line-height:1.25}
+.doc-code{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.02em;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-go{flex:0 0 auto;color:var(--muted);display:flex;transition:color .18s,transform .18s var(--ease)}
+.doc:hover .doc-go{color:var(--jade);transform:translateX(2px)}
+.doc-go svg{width:17px;height:17px}
 
 /* ============================================================
    Footer
@@ -610,6 +629,25 @@ function eventHTML(ev){
   </div>`;
 }
 
+// openable docs for a day: the stay + every ticketed / booked item (excludes walk-ins)
+const BOOKING_RE=/PNR|TICKET|TABLE|SEAT|CAR \d|RESERVED|MULTI-COURSE/i;
+function dayDocs(d){
+  return d.events
+    .filter(e=>e.type!=="stay" && e.pill && BOOKING_RE.test(e.pill) && !/WALK-IN/i.test(e.pill))
+    .map(e=>({type:e.type,title:e.title,code:e.pill}));
+}
+function dayStayDoc(d){
+  const checkin=d.events.find(e=>e.type==="stay" && e.pill);
+  return {type:"stay", title:d.tonight.name, code:checkin?checkin.pill:d.tonight.addr};
+}
+function docHTML(doc){
+  return `<button class="doc" aria-label="View ${doc.title} reservation">
+    <span class="doc-ic ${doc.type}">${ICON[doc.type]}</span>
+    <span class="doc-main"><span class="doc-title">${doc.title}</span><span class="doc-code">${doc.code}</span></span>
+    <span class="doc-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+  </button>`;
+}
+
 /* ============================================================
    BUILD accordion stack (grouped by city)
    ============================================================ */
@@ -681,21 +719,9 @@ function dayCard(i){
           <div class="timeline">${d.events.map(eventHTML).join("")}</div>
         </div>
         <aside class="side">
-          <div class="scard tonight">
-            <div class="clabel">Tonight</div>
-            <h3>${d.tonight.name}</h3>
-            <div class="addr">${d.tonight.addr}</div>
-            <button class="view">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-              View reservation</button>
-          </div>
-          <div class="scard moments">
-            <div class="clabel">Memorable moments</div>
-            <ul>${d.moments.map(m=>`<li>${m}</li>`).join("")}</ul>
-          </div>
-          <div class="scard packed">
-            <div class="clabel">Packed for today</div>
-            <div class="tags">${d.packed.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+          <div class="scard docs">
+            <div class="clabel">Reservations &amp; tickets</div>
+            ${[dayStayDoc(d), ...dayDocs(d)].map(docHTML).join("")}
           </div>
         </aside>
       </div>
