@@ -520,6 +520,12 @@
   }
 
   var live = readLive();
+  // a cancelled booking should not surface as an upcoming trip — hide the whole section
+  if(live && live.status === 'cancelled'){
+    var _sec = document.querySelector('.results');
+    if(_sec) _sec.style.display = 'none';
+    return;
+  }
   if(!live){
     // seed so "View booking" resolves to a matching confirmation page
     try{ sessionStorage.setItem('booking', JSON.stringify(upcomingSeed)); }catch(e){}
@@ -537,16 +543,6 @@
   document.getElementById('tripRoom').textContent = upcoming.room || 'Villa Room';
   document.getElementById('tripRef').textContent = upcoming.ref;
 
-  // reflect a cancelled booking on the trip card
-  if((live && live.status === 'cancelled') || upcoming.status === 'cancelled'){
-    var card = document.getElementById('tripCard');
-    card.classList.add('cancelled');
-    var tag = card.querySelector('.tag');
-    if(tag){ tag.textContent = 'Cancelled'; tag.classList.remove('up'); tag.classList.add('off'); }
-    document.querySelector('.results-head h2').textContent = 'Cancelled trip';
-    var view = card.querySelector('.view');
-    if(view){ view.textContent = 'View details'; }
-  }
 })();
 
 /* =============================================================
