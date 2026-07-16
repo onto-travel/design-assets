@@ -253,6 +253,7 @@
     color:var(--jade);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;}
   .rc-step:hover{background:#f2f7f4;}
   .rc-step:disabled{opacity:.4;cursor:default;background:#fff;}
+  .rc-step svg{width:15px;height:15px;display:block;}
   .rc-qty{font-size:15px;font-weight:700;color:var(--ink);min-width:26px;text-align:center;font-variant-numeric:tabular-nums;}
 
   /* ---------- ported from index: sections, reviews ---------- */
@@ -474,9 +475,9 @@
   .gp-chead .gpc-name{font-size:14.5px;font-weight:600;color:var(--ink);}
   .gp-chead .gpc-sub{font-size:12px;color:var(--muted);}
   .gp-chead .gpc-sub::before{content:"·";margin:0 6px;color:#c3bcae;}
-  .gp-chead .gpc-count{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--jade);
-    min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#eef6f1;
-    display:inline-flex;align-items:center;justify-content:center;}
+  .gp-chead .gpc-count{margin:0 3px;font-size:12.5px;font-weight:700;color:var(--jade);
+    min-width:26px;height:22px;padding:0 7px;border-radius:11px;background:#eef6f1;
+    display:inline-flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums;}
   .gp-people{display:flex;flex-wrap:wrap;gap:6px;padding:9px 2px 4px;}
   .gp-people:empty{display:none;}
   .person{display:inline-flex;align-items:center;gap:5px;border:1px solid #cdd8e6;border-radius:20px;
@@ -491,11 +492,15 @@
   .person .person-x:hover{color:#d64545;}
   .person-in{width:118px;border:1px solid var(--jade);border-radius:20px;padding:5px 12px;font-family:inherit;
     font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;outline:none;}
-  .gp-chead .gp-add{margin-left:8px;flex:none;width:25px;height:25px;padding:0;border-radius:50%;
+  .gp-chead .gp-add,.gp-chead .gp-minus{flex:none;width:25px;height:25px;padding:0;border-radius:50%;
     border:1px solid var(--line);background:#fff;color:var(--jade);font-size:17px;line-height:1;
     cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
-  .gp-chead .gp-add:hover{border-color:var(--jade);background:#eef6f1;}
-  .gp-chead .gp-add:disabled{opacity:.4;cursor:default;}
+  .gp-chead .gp-minus{margin-left:auto;}
+  .gp-chead .gp-add:hover,.gp-chead .gp-minus:hover{border-color:var(--jade);background:#eef6f1;}
+  .gp-chead .gp-add:disabled,.gp-chead .gp-minus:disabled{opacity:.4;cursor:default;}
+  /* draw +/- as centred strokes — font glyphs never optically centre in a small circle */
+  .gp-ic{display:block;width:13px;height:13px;}
+  .gp-step .gp-ic{width:15px;height:15px;}
   /* guests / rooms toggle at the top of the popover */
   .gp-panel[hidden]{display:none;}
   .gp-seg{display:flex;gap:4px;background:#f2efe7;border-radius:10px;padding:3px;margin-bottom:12px;}
@@ -737,7 +742,7 @@
   .cp-tot{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:7px;}
 
   /* ---------- BACK-RIGHT: DETAILS FORM ---------- */
-  .form-h{font-family:Georgia,serif;font-size:26px;margin:8px 0 4px;letter-spacing:-.01em;}
+  .form-h{font-family:Georgia,serif;font-size:26px;margin:8px 0 24px;letter-spacing:-.01em;}
   .form-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
   .fld{display:block;margin-bottom:15px;}
   .fld>span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
@@ -767,6 +772,33 @@
     .flip.flipping{animation:none;}
   }
   .face .book{align-self:stretch;}
+
+  /* ---------- post-payment confirmation card (right slot, returned from razorpay) ---------- */
+  .confcard{position:absolute;top:0;left:0;right:0;bottom:0;z-index:5;justify-content:flex-start;text-align:center;}
+  .confcard[hidden]{display:none;}   /* .book sets display:flex, which would otherwise beat the hidden attr */
+  .cf-check{width:72px;height:72px;border-radius:50%;background:#e7efe6;border:1px solid #d2e2ce;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
+  .cf-check svg{width:34px;height:34px;stroke:var(--jade);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .cf-check.pop{animation:cfpop .5s cubic-bezier(.22,1.2,.36,1) both;}
+  @keyframes cfpop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+  .cf-title{font-family:Georgia,serif;font-size:30px;line-height:1.1;color:var(--jade-deep);margin:0 0 16px;letter-spacing:-.015em;}
+  .cf-ref{display:inline-flex;align-items:center;gap:6px;align-self:center;background:#faf8f3;border:1px solid var(--line);
+    border-radius:30px;padding:8px 8px 8px 16px;font-size:13.5px;color:#6b6459;font-weight:600;}
+  .cf-ref b{color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;font-weight:700;margin-left:2px;}
+  .cf-copy{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;
+    border:none;background:none;color:var(--muted);cursor:pointer;transition:background .15s,color .15s;}
+  .cf-copy:hover{background:#f1ede3;color:var(--jade);}
+  .cf-copy.done{color:var(--jade);}
+  .cf-copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .cf-paid{margin-top:24px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:#f1f7f3;border:1px solid #dfeae3;border-radius:14px;padding:15px 18px;}
+  .cf-pl{display:inline-flex;align-items:center;gap:9px;font-size:15px;color:#3a6a4d;font-weight:600;}
+  .cf-pl svg{width:17px;height:17px;stroke:var(--jade);stroke-width:2.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .cf-amt{font-family:Georgia,serif;font-size:23px;font-weight:600;color:#20321f;letter-spacing:-.01em;}
+  .cf-actions{margin-top:auto;padding-top:26px;display:flex;gap:12px;align-items:stretch;}
+  .cf-actions .btn,.cf-actions .btn-secondary{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;}
+  .cf-actions .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+
   #pdpFolds.pdp-hidden{display:none;}
   @media(max-width:920px){ .flip{height:auto!important;} .face{position:relative;} .flip .face.back{display:none;} }
 </style>
@@ -882,15 +914,15 @@
               <div class="gp-chips" id="regChips"></div>
             </div>
             <div class="gp-catg">
-              <div class="gp-chead"><span class="gpc-name">Adults</span><span class="gpc-sub">Age 13+</span><span class="gpc-count" id="adCount">2</span><button type="button" class="gp-add" data-cat="adults" aria-label="Add adult">+</button></div>
+              <div class="gp-chead"><span class="gpc-name">Adults</span><span class="gpc-sub">Age 13+</span><button type="button" class="gp-minus" data-cat="adults" aria-label="Remove adult"><svg class="gp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 12h12"/></svg></button><span class="gpc-count" id="adCount">2</span><button type="button" class="gp-add" data-cat="adults" aria-label="Add adult"><svg class="gp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div>
               <div class="gp-people" id="adPeople"></div>
             </div>
             <div class="gp-catg">
-              <div class="gp-chead"><span class="gpc-name">Children</span><span class="gpc-sub">Age 2&ndash;12</span><span class="gpc-count" id="chCount">1</span><button type="button" class="gp-add" data-cat="children" aria-label="Add child">+</button></div>
+              <div class="gp-chead"><span class="gpc-name">Children</span><span class="gpc-sub">Age 2&ndash;12</span><button type="button" class="gp-minus" data-cat="children" aria-label="Remove child"><svg class="gp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 12h12"/></svg></button><span class="gpc-count" id="chCount">1</span><button type="button" class="gp-add" data-cat="children" aria-label="Add child"><svg class="gp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div>
               <div class="gp-people" id="chPeople"></div>
             </div>
             <div class="gp-catg">
-              <div class="gp-chead"><span class="gpc-name">Infants</span><span class="gpc-sub">Under 2 &middot; free</span><span class="gpc-count" id="inCount">0</span><button type="button" class="gp-add" data-cat="infants" aria-label="Add infant">+</button></div>
+              <div class="gp-chead"><span class="gpc-name">Infants</span><span class="gpc-sub">Under 2</span><button type="button" class="gp-minus" data-cat="infants" aria-label="Remove infant"><svg class="gp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 12h12"/></svg></button><span class="gpc-count" id="inCount">0</span><button type="button" class="gp-add" data-cat="infants" aria-label="Add infant"><svg class="gp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div>
               <div class="gp-people" id="inPeople"></div>
             </div>
             </div>
@@ -898,9 +930,9 @@
               <div class="gp-roomrow">
                 <div class="gpr-name">Rooms</div>
                 <div class="gp-stepper" role="group" aria-label="Number of rooms">
-                  <button type="button" class="gp-step" id="roomPopMinus" aria-label="Fewer rooms">&minus;</button>
+                  <button type="button" class="gp-step" id="roomPopMinus" aria-label="Fewer rooms"><svg class="gp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 12h12"/></svg></button>
                   <span class="gp-stepval" id="roomPopVal">1</span>
-                  <button type="button" class="gp-step" id="roomPopPlus" aria-label="More rooms">+</button>
+                  <button type="button" class="gp-step" id="roomPopPlus" aria-label="More rooms"><svg class="gp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button>
                 </div>
               </div>
             </div>
@@ -911,7 +943,7 @@
         <div class="roomsel">
           <button type="button" class="tripchip roomchip" id="roomCard" aria-label="Choose your room">
             <span class="tc-k">Room <span class="tc-cnt" id="roomCnt">1 room</span></span>
-            <span class="sr-line"><span class="sr-name">Villa Room</span> · 1 King · Garden view · 56 m²</span>
+            <span class="sr-line"><span class="sr-name">Villa Room</span></span>
             <span class="sr-tag" id="roomTag" hidden></span>
           </button>
         </div>
@@ -942,10 +974,7 @@
         </div>
         <div class="face back">
           <div class="book">
-            <!-- invisible spacer matches the left card's stars line so the two headings align -->
-            <div class="stars" aria-hidden="true" style="visibility:hidden">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
             <h2 class="form-h">Confirm your details</h2>
-            <p class="form-sub">Almost there — check these over and confirm.</p>
 
             <label class="fld"><span>Full name</span>
               <input type="text" id="fName" value="" placeholder="Full name" autocomplete="name"></label>
@@ -962,6 +991,30 @@
             <button type="button" class="form-back" data-back>&#8249; Back to booking</button>
           </div>
         </div>
+      </div>
+
+      <!-- shown after payment (returned from razorpay with ?paid=1); overlays the booking card's slot so the height matches -->
+      <div class="book confcard" id="confCard" hidden>
+      <div class="cf-check pop" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+      </div>
+      <h2 class="cf-title">You&#39;re all set for Goa</h2>
+      <div class="cf-ref">Booking reference <b id="cfRef">TAJ-000000</b>
+        <button type="button" class="cf-copy" id="cfCopy" aria-label="Copy booking reference">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        </button>
+      </div>
+      <div class="cf-paid">
+        <div class="cf-pl"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg><span>Paid &middot; Razorpay</span></div>
+        <div class="cf-amt" id="cfAmt">&#8377;45,600</div>
+      </div>
+      <div class="cf-actions">
+        <button type="button" class="btn-secondary" id="cfDetails">See details</button>
+        <button type="button" class="btn" id="cfVoucher">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
+          Download voucher
+        </button>
+      </div>
       </div>
     </div>
   </div>
@@ -1361,6 +1414,12 @@
   document.getElementById('bookNow').addEventListener('click', (e) => {
     // Empty cart still shows the standard room — Book now commits it before continuing.
     if(e.currentTarget.classList.contains('is-empty') && window.addStandardRoom) window.addStandardRoom();
+    // Account holder is travelling → their details are already on file; skip the confirm form
+    // and hand straight off to payment. (Falls back to the form if that somehow can't submit.)
+    if(window.userInParty && window.userInParty()){
+      if(window.renderCart) window.renderCart();          // refresh the amount handed to payment
+      if(window.submitBooking && window.submitBooking()) return;
+    }
     window.goToCart && window.goToCart();
   });
   document.getElementById('addTrip').addEventListener('click', function(){
@@ -1452,6 +1511,9 @@
     const occ   = () => party.adults.length + party.children.length;
     const usedIds = () => new Set(CATS.flatMap(c=>party[c]).filter(p=>p.companion).map(p=>p.companion));
     const knownIn = () => CATS.flatMap(c=>party[c]).filter(p=>p.companion).map(p=>MAP[p.companion]);
+    // index of the last auto-added (non-companion) person — the only kind the "−" removes;
+    // saved companions only leave via their own × chip.
+    const lastExtraIdx = cat => { const a=party[cat]; for(let i=a.length-1;i>=0;i--){ if(!a[i].companion) return i; } return -1; };
 
     function addCompanion(id){
       const c = MAP[id]; if(!c || heads()>=MAXG || usedIds().has(id)) return;
@@ -1539,7 +1601,7 @@
       const _g = window.PARTY.guests;
       if(_g > lastGuests){
         const rec = Math.max(1, Math.ceil(_g / 2));
-        const cur = (window.CART && window.CART[0]) ? window.CART[0].qty : 1;
+        const cur = window.cartCount ? window.cartCount() : 1;
         if(rec > cur && window.setRoomQty) window.setRoomQty(rec);
       }
       lastGuests = _g;
@@ -1547,6 +1609,7 @@
       CATS.forEach(cat=>{ const el=$(COUNT[cat]); if(el) el.textContent = party[cat].length; });
       renderRegulars(); renderPeople();
       document.querySelectorAll('#guestPop .gp-add').forEach(b=> b.disabled = heads()>=MAXG);
+      document.querySelectorAll('#guestPop .gp-minus').forEach(b=>{ const cat=b.dataset.cat; b.disabled = lastExtraIdx(cat) < 0 || party[cat].length <= MIN[cat]; });
       const nm = knownIn().map(c=>c.name);
       const extra = heads() - nm.length;
       $('guestVal').textContent = nm.length ? joinNames(nm)+(extra>0?' +'+extra:'') : composition();
@@ -1561,6 +1624,8 @@
     }
 
     document.querySelectorAll('#guestPop .gp-add').forEach(b=> b.addEventListener('click', ()=>addExtra(b.dataset.cat)));
+    // minus removes only the last auto-added extra; companions stay until their × is clicked
+    document.querySelectorAll('#guestPop .gp-minus').forEach(b=> b.addEventListener('click', ()=>{ const i=lastExtraIdx(b.dataset.cat); if(i>=0) removePerson(b.dataset.cat, i); }));
 
     // room count is driven entirely by the cart (per-category quantities) now — nothing to wire here
 
@@ -1577,7 +1642,7 @@
     if(segR) segR.addEventListener('click', e=>{ e.stopPropagation(); showPanel('rooms'); });
     // room stepper (lives on the Rooms panel) drives the cart quantity
     const rpm=$('roomPopMinus'), rpp=$('roomPopPlus');
-    const curQty = ()=> (window.CART && window.CART[0]) ? window.CART[0].qty : 1;
+    const curQty = ()=> window.cartCount ? window.cartCount() : 1;
     if(rpm) rpm.addEventListener('click', e=>{ e.stopPropagation(); if(window.setRoomQty) window.setRoomQty(curQty()-1); });
     if(rpp) rpp.addEventListener('click', e=>{ e.stopPropagation(); if(window.setRoomQty) window.setRoomQty(curQty()+1); });
 
@@ -1590,6 +1655,7 @@
     document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !pop.hidden) closePop(); });
 
     window.syncGuestRooms = apply;   // let the room cart refresh the "N rooms" chip label
+    window.userInParty = () => usedIds().has('you');   // is the account holder among the travellers?
     apply();
   })();
 </script>
@@ -1659,10 +1725,15 @@
     window.refreshPricing = renderChip;   // guest-count changes re-run the whole price cascade
     const inRange = d => d > startOfDay(checkIn) && d < startOfDay(checkOut);
 
+    // footer nightly mirrors the live booking price so the calendar never contradicts
+    // the headline (falls back to RATE before the cart is wired).
+    const nightlyRate = () => (window.cartNightly ? window.cartNightly() : RATE);
+
     function renderCal(){
       $('calTitle').textContent = MONTHS[view.getMonth()]+' '+view.getFullYear();
       $('calPrev').disabled = (view.getFullYear()===MIN.getFullYear() && view.getMonth()<=MIN.getMonth());
       grid.innerHTML = '';
+      const npn = nightlyRate();
       const startDow = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
       const daysIn = new Date(view.getFullYear(), view.getMonth()+1, 0).getDate();
       for(let i=0;i<startDow;i++){ const c=document.createElement('div'); c.className='cal-cell'; grid.appendChild(c); }
@@ -1684,7 +1755,7 @@
       }
       const n = nights(checkIn, checkOut);
       $('calFootTxt').innerHTML = n>0
-        ? '<b>'+n+'</b> night'+(n>1?'s':'')+' · ₹'+(RATE*n).toLocaleString('en-IN')
+        ? '<b>'+n+'</b> night'+(n>1?'s':'')+' · ₹'+npn.toLocaleString('en-IN')+'/night'
         : 'Select check-out';
     }
 
@@ -2059,15 +2130,31 @@
     window.stdNightly   = () => effRate(ROOMS[0]);   // room-only nightly of the standard room (matches its card; respects extras)
     window.cartLines    = () => cartRooms().map(x=>({key:x.r.key, name:x.r.name, descriptor:descriptor(x.r), rate:effRate(x.r), qty:x.qty}));
 
-    // each room card shows "Add to cart" until it's in the cart, then a quantity stepper
+    // stepper glyphs (match the guests popover)
+    const STEP_MINUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 12h12"/></svg>';
+    const STEP_PLUS  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg>';
+
+    // room-card CTA: "Select room" until chosen. With a single room total the chosen card reads
+    // "✓ Selected"; once the trip holds more than one room, each chosen card becomes a quantity stepper.
     function markCards(){
+      const total = window.cartCount();
+      const multi = total > 1;
       document.querySelectorAll('#roomsScroll .rcard').forEach(c=>{
         const key = c.dataset.key;
-        const inCart = window.CART.find(x=>x.key===key);
-        c.classList.toggle('selected', !!inCart);
+        const entry = window.CART.find(x=>x.key===key);
+        c.classList.toggle('selected', !!entry);
         const cta = c.querySelector('.rc-cta'); if(!cta) return;
-        if(inCart){
-          // single room type — the selected card just shows it's chosen; the count lives on the Room chip
+        if(entry && multi){
+          const nm = (ROOM_BY[key]||{}).name || 'room';
+          cta.innerHTML =
+            '<div class="rc-stepper">'+
+              '<button type="button" class="rc-step rc-minus" aria-label="One fewer '+nm+'"'+(total>1?'':' disabled')+'>'+STEP_MINUS+'</button>'+
+              '<span class="rc-qty">'+entry.qty+'</span>'+
+              '<button type="button" class="rc-step rc-plus" aria-label="One more '+nm+'"'+(total<MAXQ?'':' disabled')+'>'+STEP_PLUS+'</button>'+
+            '</div>';
+          cta.querySelector('.rc-minus').addEventListener('click', e=>{ e.stopPropagation(); decRoom(key); });
+          cta.querySelector('.rc-plus').addEventListener('click', e=>{ e.stopPropagation(); incRoom(key); });
+        } else if(entry){
           cta.innerHTML = '<span class="rc-added">✓ Selected</span>';
         } else {
           cta.innerHTML = '<button type="button" class="rc-book">Select room</button>';
@@ -2075,41 +2162,81 @@
         }
       });
     }
-    // reflect the cart in the first fold — a single room type, at some quantity
+    // reflect the cart in the first fold — hero shows the primary (first) room; the chip shows the total
     function renderFirstFold(){
       const lines = cartRooms();
       const badge = document.querySelector('.gallery .badge');
       const line  = document.querySelector('#roomCard .sr-line');
       const item  = lines[0] || {r:ROOMS[0], qty:1};   // fall back to the standard room if the cart is somehow empty
-      const r = item.r, qty = item.qty;
+      const r = item.r;
+      const total = window.cartCount();
       window.SELECTED_RATE = r.base; window.SELECTED_CAP = capOf(r);
       if(window.setHeroRoom) window.setHeroRoom(r.imgs);
       if(badge) badge.textContent = r.name + ' · ' + (viewOf(r) || bedOf(r));
-      if(line)  line.innerHTML = '<span class="sr-name">'+r.name+'</span> · '+descriptor(r);
-      // Room chip count + the dropdown stepper both reflect the quantity
-      const cntEl = document.getElementById('roomCnt'); if(cntEl) cntEl.textContent = qty+' room'+(qty===1?'':'s');
-      const pv = document.getElementById('roomPopVal');   if(pv) pv.textContent = qty;
-      const pm = document.getElementById('roomPopMinus');  if(pm) pm.disabled = qty <= 1;
-      const pp = document.getElementById('roomPopPlus');   if(pp) pp.disabled = qty >= MAXQ;
+      // show the selected room name(s) — with ×qty when a type has more than one — instead of the bed/view/size line
+      if(line){
+        const names = lines.map(x => x.r.name + (x.qty>1 ? ' ×'+x.qty : ''));
+        line.innerHTML = '<span class="sr-name">'+ names.join(', ') +'</span>';
+      }
+      // Room chip count + the dropdown stepper both reflect the TOTAL number of rooms
+      const cntEl = document.getElementById('roomCnt'); if(cntEl) cntEl.textContent = total+' room'+(total===1?'':'s');
+      const pv = document.getElementById('roomPopVal');   if(pv) pv.textContent = total;
+      const pm = document.getElementById('roomPopMinus');  if(pm) pm.disabled = total <= 1;
+      const pp = document.getElementById('roomPopPlus');   if(pp) pp.disabled = total >= MAXQ;
       markCards();
       if(window.refreshPricing) window.refreshPricing();
       if(window.resizeCards) window.resizeCards();   // extras line can change the card height — re-fit
     }
     window.renderFirstFold = renderFirstFold;
 
+    // selecting a NEW room type keeps the total fixed: it takes one room from the oldest existing type
+    // (the recommendation is the oldest, so it drops first). Selecting a type already in the cart is a no-op.
     function addRoom(key){
-      // selecting a room swaps the type but keeps the current quantity; adjust it via the Guests/Rooms stepper
-      const qty = (window.CART && window.CART[0]) ? window.CART[0].qty : 1;
-      window.CART = [{key, qty}];
+      if(!ROOM_BY[key]) return;
+      if(window.CART.find(x=>x.key===key)){ renderFirstFold(); return; }
+      window.CART.push({key, qty:1});
+      // free a slot for the new room by removing one from the oldest other type (keeps total constant)
+      for(let i=0;i<window.CART.length;i++){
+        if(window.CART[i].key===key) continue;
+        window.CART[i].qty -= 1;
+        if(window.CART[i].qty<=0) window.CART.splice(i,1);
+        break;
+      }
       renderFirstFold();
       document.getElementById('top').scrollIntoView({behavior:'smooth', block:'start'});
     }
     window.addStandardRoom = () => addRoom(ROOMS[0].key);   // commit the standard room the empty-cart fold shows
-    // the Room chip stepper sets how many of the selected room
+
+    // per-card stepper: change how many of THIS room — grows/shrinks the total room count
+    function incRoom(key){
+      const e = window.CART.find(x=>x.key===key); if(!e) return;
+      if(window.cartCount() >= MAXQ) return;
+      e.qty += 1; renderFirstFold();
+    }
+    function decRoom(key){
+      const e = window.CART.find(x=>x.key===key); if(!e) return;
+      if(window.cartCount() <= 1) return;          // always keep at least one room
+      e.qty -= 1;
+      if(e.qty <= 0) window.CART = window.CART.filter(x=>x.key!==key);
+      renderFirstFold();
+    }
+
+    // set the TOTAL room count (Guests/Rooms stepper, or auto-fit from party size):
+    // growing adds rooms to the primary type; shrinking trims from the newest types first.
     function setRoomQty(n){
       n = Math.max(1, Math.min(MAXQ, n|0));
-      if(!window.CART.length) window.CART = [{key:ROOMS[0].key, qty:n}];
-      else window.CART[0].qty = n;
+      if(!window.CART.length){ window.CART = [{key:ROOMS[0].key, qty:n}]; renderFirstFold(); return; }
+      const cur = window.cartCount();
+      if(n > cur){ window.CART[0].qty += (n - cur); }
+      else if(n < cur){
+        let remove = cur - n;
+        while(remove > 0 && window.cartCount() > 1){
+          const last = window.CART[window.CART.length-1];
+          const take = Math.min(last.qty, remove, window.cartCount()-1);
+          last.qty -= take; remove -= take;
+          if(last.qty <= 0) window.CART.pop();
+        }
+      }
       renderFirstFold();
     }
     window.setRoomQty = setRoomQty;
@@ -2401,10 +2528,12 @@
     });
     fEmail.addEventListener('input', () => setInvalid(fEmail, false));
 
-    $('confirmBtn').addEventListener('click', () => {
+    // build the booking + hand off to payment. Returns false (without navigating) if the
+    // details don't validate, so callers can fall back to showing the form.
+    function submitBooking(){
       const eBad = !emailOK(fEmail.value), pBad = !phoneOK(fPhone.value);
       setInvalid(fEmail, eBad); setInvalid(fPhone, pBad);
-      if(eBad || pBad){ (eBad ? fEmail : fPhone).focus(); return; }
+      if(eBad || pBad){ (eBad ? fEmail : fPhone).focus(); return false; }
       const t = sel => { const el = document.querySelector(sel); return el ? el.textContent.trim() : ''; };
       const booking = {
         hotel:  'Taj Exotica Resort & Spa',
@@ -2420,8 +2549,13 @@
         email:  (document.getElementById('fEmail')||{}).value || ''
       };
       try { sessionStorage.setItem('booking', JSON.stringify(booking)); } catch(e){}
+      // come back to this PDP after payment and show the confirmation in the right-hand card
+      try { sessionStorage.setItem('payReturn', 'hotel-firstfold.html?paid=1'); } catch(e){}
       location.href = 'razorpay.html';
-    });
+      return true;
+    }
+    window.submitBooking = submitBooking;
+    $('confirmBtn').addEventListener('click', submitBooking);
   })();
   })();
 </script>
@@ -2483,6 +2617,94 @@
     }
     window.renderCart = renderCart;
     renderCart();
+  })();
+</script>
+
+<script>
+  // ---- returned from payment (?paid=1): show the confirmation card in the right-hand slot ----
+  (function(){
+    if(new URLSearchParams(location.search).get('paid') !== '1') return;
+    var b = {};
+    try { b = JSON.parse(sessionStorage.getItem('booking')) || {}; } catch(e){}
+
+    // booking reference — generate once per booking, then persist
+    var ref = b.ref;
+    if(!ref){
+      var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s = '';
+      for(var i=0;i<6;i++){ s += chars.charAt(Math.floor(Math.random()*chars.length)); }
+      ref = 'TAJ-' + s; b.ref = ref;
+      try { sessionStorage.setItem('booking', JSON.stringify(b)); } catch(e){}
+    }
+
+    var card = document.getElementById('confCard');
+    var right = document.getElementById('flipRight');
+    if(!card) return;
+    document.getElementById('cfRef').textContent = ref;
+    if(b.amount) document.getElementById('cfAmt').textContent = b.amount;
+
+    // overlay the confirmation on the booking card's slot — keep the slot in flow so its
+    // (gallery-matched) height is preserved; just hide the booking card underneath.
+    var inner = right && right.querySelector('.flip-inner');
+    if(inner) inner.style.visibility = 'hidden';
+    card.hidden = false;
+
+    // pin the card's height to the ACTUAL rendered photos (#gallery), not the flip's box —
+    // the gallery renders taller than its foldH box, so measure the gallery itself.
+    function fitConf(){
+      if(!right) return;
+      if(window.innerWidth <= 920){ right.style.height = ''; card.style.height = ''; return; }
+      var gal = document.getElementById('gallery');
+      var h = gal ? gal.getBoundingClientRect().height : 0;
+      // set the card's height explicitly — inside the flip's 3D context, top/bottom:0 won't auto-stretch it
+      if(h){ right.style.height = h + 'px'; card.style.height = h + 'px'; }
+    }
+    fitConf();
+    requestAnimationFrame(fitConf);
+    window.addEventListener('load', function(){ fitConf(); setTimeout(fitConf, 80); });
+    window.addEventListener('resize', fitConf);
+    // the flip's own resize (window.resizeCards === size) resets flipRight — re-fit right after it
+    var _rc = window.resizeCards;
+    window.resizeCards = function(){ if(typeof _rc === 'function') _rc(); fitConf(); };
+    if(window.closeDatePop)  window.closeDatePop();
+    if(window.closeGuestPop) window.closeGuestPop();
+    window.scrollTo(0, 0);
+    // drop ?paid=1 from the URL so a manual reload returns to the standard PDP
+    try { history.replaceState(null, '', location.pathname); } catch(e){}
+
+    // copy reference
+    var copy = document.getElementById('cfCopy');
+    if(copy) copy.addEventListener('click', function(){
+      var btn = this;
+      function done(){ btn.classList.add('done'); if(window.showToast) window.showToast('Reference copied');
+        clearTimeout(btn._t); btn._t = setTimeout(function(){ btn.classList.remove('done'); }, 1500); }
+      if(navigator.clipboard){ navigator.clipboard.writeText(ref).then(done).catch(done); } else done();
+    });
+
+    // see full booking details
+    var details = document.getElementById('cfDetails');
+    if(details) details.addEventListener('click', function(){ location.href = 'booking-details.html'; });
+
+    // download a simple text voucher (prototype)
+    var dl = document.getElementById('cfVoucher');
+    if(dl) dl.addEventListener('click', function(){
+      var lines = [
+        'TAJ EXOTICA RESORT & SPA — BOOKING VOUCHER',
+        '==========================================','',
+        'Booking reference : ' + ref,
+        'Hotel             : ' + (b.hotel || 'Taj Exotica Resort & Spa'),
+        'Dates             : ' + (b.dates || '') + (b.nights ? ' (' + b.nights + ')' : ''),
+        'Room              : ' + (b.room || 'Villa Room'),
+        'Guests            : ' + (b.guests || ''),
+        'Amount paid       : ' + (b.amount || '') + '  · paid via Razorpay','',
+        'Present this voucher at check-in. Prototype — not a real booking.'
+      ];
+      var blob = new Blob([lines.join('\n')], {type:'text/plain'});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'Taj-Exotica-voucher-' + ref + '.txt';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 0);
+    });
   })();
 </script>
 </body>
