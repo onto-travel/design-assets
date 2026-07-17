@@ -2256,10 +2256,16 @@
       window.SELECTED_RATE = r.base; window.SELECTED_CAP = capOf(r);
       if(window.setHeroRoom) window.setHeroRoom(r.imgs);
       if(badge) badge.textContent = r.name + ' · ' + (viewOf(r) || bedOf(r));
-      // show the selected room name(s) — with ×qty when a type has more than one — instead of the bed/view/size line
+      // one room type → show its size · bed · view (still valid at ×qty, all rooms identical);
+      // more than one type → a single descriptor would be misleading, so just list the names
       if(line){
-        const names = lines.map(x => x.r.name + (x.qty>1 ? ' ×'+x.qty : ''));
-        line.innerHTML = '<span class="sr-name">'+ names.join(', ') +'</span>';
+        if(lines.length === 1){
+          const qx = item.qty>1 ? ' ×'+item.qty : '';
+          line.innerHTML = '<span class="sr-name">'+r.name+qx+'</span> · '+descriptor(r);
+        } else {
+          const names = lines.map(x => x.r.name + (x.qty>1 ? ' ×'+x.qty : ''));
+          line.innerHTML = '<span class="sr-name">'+ names.join(', ') +'</span>';
+        }
       }
       // Room chip count + the dropdown stepper both reflect the TOTAL number of rooms
       const cntEl = document.getElementById('roomCnt'); if(cntEl) cntEl.textContent = total+' room'+(total===1?'':'s');
