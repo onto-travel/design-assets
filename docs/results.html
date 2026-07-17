@@ -6,9 +6,9 @@
 <title>onto — Search results</title>
 <style>
   :root{
-    --bg:#efeae1; --card:#ffffff; --ink:#1c1c1c; --muted:#7c7771;
-    --line:#e7e1d6; --jade:#2f4f74; --jade-deep:#284667; --gold:#c19a4b;
-    --pill:#ece6db; --info:#ece7dc;
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c;
+    --line:#e4dfd2; --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e;
+    --pill:#f1ede3; --info:#f1ede3;
     --shadow:0 1px 2px rgba(0,0,0,.04), 0 12px 30px rgba(40,30,10,.06);
     --stick:150px;
   }
@@ -26,7 +26,7 @@
 
   /* ============ TOP NAV ============ */
   .topnav{position:sticky;top:0;z-index:90;
-    background:rgba(239,234,225,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    background:rgba(250,248,243,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);}
   .topnav-in{max-width:1240px;margin:0 auto;padding:0 28px;height:60px;display:flex;align-items:center;gap:26px;}
   .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);
@@ -77,7 +77,7 @@
 
   /* ============ STICKY SEARCH BAR ============ */
   .searchbar{position:sticky;top:60px;z-index:80;
-    background:rgba(239,234,225,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    background:rgba(250,248,243,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);}
   .searchbar-in{max-width:1240px;margin:0 auto;padding:12px 28px;}
   .search-card{background:var(--card);border:1px solid var(--line);border-radius:16px;
@@ -116,7 +116,7 @@
     color:var(--ink);border-radius:9px;font-family:inherit;transition:background .1s;}
   .cal-d:hover:not(:disabled){background:#f0eadd;}
   .cal-d:disabled{color:#cfc8bb;cursor:default;}
-  .cal-d.in-range{background:#e9eff5;border-radius:0;}
+  .cal-d.in-range{background:#e7efe6;border-radius:0;}
   .cal-d.edge{background:var(--jade);color:#fff;border-radius:9px;}
   .cal-hint{margin-top:11px;font-size:12px;color:var(--muted);text-align:center;}
   /* guest picker (companions + age groups) */
@@ -130,7 +130,7 @@
   .gp-stepper{margin-left:auto;display:inline-flex;align-items:center;gap:6px;}
   .gp-step{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--jade);
     font-size:20px;line-height:1;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
-  .gp-step:hover:not(:disabled){border-color:var(--jade);background:#f4f7fb;}
+  .gp-step:hover:not(:disabled){border-color:var(--jade);background:#eef6f1;}
   .gp-step:disabled{opacity:.4;cursor:default;}
   .gp-stepval{min-width:24px;text-align:center;font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
   .gp-roomhint{font-size:12px;color:var(--muted);margin:13px 2px 2px;padding-top:12px;border-top:1px solid var(--line);}
@@ -140,7 +140,7 @@
   .reg-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;
     padding:6px 11px 6px 10px;font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;
     cursor:pointer;font-family:inherit;transition:all .15s;}
-  .reg-chip:hover{border-color:var(--jade);background:#f4f7fb;}
+  .reg-chip:hover{border-color:var(--jade);background:#eef6f1;}
   .reg-chip .rc-em{font-size:14px;}
   .reg-chip .rc-plus{color:var(--jade);font-weight:700;font-size:14px;margin-left:1px;}
   .gp-allin{font-size:12.5px;color:var(--muted);padding:2px;}
@@ -151,11 +151,11 @@
   .gp-chead .gpc-sub{font-size:12px;color:var(--muted);}
   .gp-chead .gpc-sub::before{content:"·";margin:0 6px;color:#c3bcae;}
   .gp-chead .gpc-count{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--jade);
-    min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#eef2f7;
+    min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#e7efe6;
     display:inline-flex;align-items:center;justify-content:center;}
   .gp-people{display:flex;flex-wrap:wrap;gap:6px;padding:9px 2px 4px;}
-  .person{display:inline-flex;align-items:center;gap:5px;border:1px solid #cdd8e6;border-radius:20px;
-    padding:5px 5px 5px 11px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--jade);background:#f4f7fb;}
+  .person{display:inline-flex;align-items:center;gap:5px;border:1px solid #cfe6da;border-radius:20px;
+    padding:5px 5px 5px 11px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--jade);background:#eef6f1;}
   .person:not(.is-comp){background:#fbf7ef;border-color:#e4dcc9;color:var(--ink);}
   .person .person-em{font-size:14px;}
   .person .person-name{border:none;background:none;font:inherit;color:inherit;cursor:pointer;padding:0;
@@ -169,7 +169,7 @@
   .gp-chead .gp-add{margin-left:8px;flex:none;width:25px;height:25px;padding:0;border-radius:50%;
     border:1px solid var(--line);background:#fff;color:var(--jade);font-size:17px;line-height:1;
     cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
-  .gp-chead .gp-add:hover:not(:disabled){border-color:var(--jade);background:#f4f7fb;}
+  .gp-chead .gp-add:hover:not(:disabled){border-color:var(--jade);background:#eef6f1;}
   .gp-chead .gp-add:disabled{opacity:.4;cursor:default;}
 
   /* ============ SHELL ============ */
@@ -191,6 +191,8 @@
   /* filter groups */
   .fgroup{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;}
   .fg-h{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 9px;}
+  .fg-h .fg-note{text-transform:none;letter-spacing:0;font-weight:500;color:#a49d90;}
+  .fg-h .fg-note::before{content:"·";margin:0 6px;color:#c3bcae;}
 
   /* usual filters apply button */
   .apply-all{margin-top:14px;width:100%;background:var(--jade);color:#fff;border:1px solid var(--jade);
@@ -228,6 +230,34 @@
     cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:2px;align-self:flex-start;}
   .clear-link:hover{color:var(--jade-deep);}
 
+  /* three filters sharing one box */
+  .fsub + .fsub{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);}
+
+  /* ---- price range ---- */
+  .pr-vals{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px;}
+  .pr-vals .pv{font-family:Georgia,serif;font-size:16px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .pr-slider{position:relative;height:26px;margin:2px 0 2px;}
+  .pr-track{position:absolute;top:11px;left:0;right:0;height:4px;border-radius:2px;background:var(--line);}
+  .pr-fill{position:absolute;top:11px;height:4px;border-radius:2px;background:var(--jade);}
+  .pr-slider input[type=range]{position:absolute;top:3px;left:0;width:100%;height:20px;margin:0;
+    -webkit-appearance:none;appearance:none;background:none;pointer-events:none;}
+  .pr-slider input[type=range]:focus{outline:none;}
+  .pr-slider input[type=range]::-webkit-slider-runnable-track{height:20px;background:none;}
+  .pr-slider input[type=range]::-moz-range-track{height:20px;background:none;}
+  .pr-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:20px;height:20px;
+    border-radius:50%;background:#fff;border:2px solid var(--jade);cursor:pointer;box-shadow:0 1px 4px rgba(40,30,10,.28);}
+  .pr-slider input[type=range]::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;
+    border-radius:50%;background:#fff;border:2px solid var(--jade);cursor:pointer;box-shadow:0 1px 4px rgba(40,30,10,.28);}
+
+  /* ---- guest + star rating pills ---- */
+  .star-row{display:flex;flex-wrap:wrap;gap:7px;}
+  .star-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:#fff;
+    border-radius:20px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;
+    font-family:inherit;transition:all .13s;}
+  .star-chip:hover{border-color:#c2b8a4;background:#faf7f1;}
+  .star-chip .star-ic{width:12px;height:12px;fill:var(--gold);stroke:none;}
+  .star-chip.is-on{border-color:var(--jade);background:#eef6f1;color:var(--jade-deep);}
+
   /* ============ HOTEL LIST / CARDS ============ */
   .list{display:flex;flex-direction:column;gap:20px;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
@@ -237,7 +267,7 @@
   .card:focus-visible{outline:2px solid var(--jade);outline-offset:2px;}
 
   /* carousel */
-  .car{position:relative;background:#20303a;overflow:hidden;min-height:300px;}
+  .car{position:relative;background:#20321f;overflow:hidden;min-height:300px;}
   .car-track{position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
     scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;}
   .car-track::-webkit-scrollbar{display:none;}
@@ -245,7 +275,7 @@
   .car-slide::after{content:"";position:absolute;inset:0;
     background:radial-gradient(120% 80% at 30% 15%, rgba(255,255,255,.18), transparent 55%),
       linear-gradient(180deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.28) 100%);}
-  img.car-slide{object-fit:cover;height:100%;display:block;background:#20303a;}
+  img.car-slide{object-fit:cover;height:100%;display:block;background:#20321f;}
   .car-count{position:absolute;bottom:12px;right:12px;z-index:3;background:rgba(20,22,20,.62);color:#fff;
     font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:20px;font-variant-numeric:tabular-nums;
     backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
@@ -358,25 +388,6 @@ const SORTS = [
 const USUAL = { amenities:["Pool","Spa","Free breakfast"], rating:9 };
 const USUAL_EMOJI = { "Pool":"🏊", "Spa":"💆", "Free breakfast":"🍳" };
 const USUAL_LABEL = { "Free breakfast":"Breakfast incl." };
-
-// Curated "popular filters". Each row maps to one underlying filter dimension
-// so it shares state with the usual set; counts are computed per location at
-// render. Could later be ranked from real booking data / history.
-const POPULAR = [
-  {label:"8+ review score", dim:"rating", value:8},
-  {label:"Free cancellation", dim:"amenity", value:"Free cancellation"},
-  {label:"Breakfast included", dim:"amenity", value:"Free breakfast"},
-  {label:"Villas", dim:"type", value:"Villa"},
-  {label:"Resorts", dim:"type", value:"Resort"},
-  {label:"Hotels", dim:"type", value:"Hotel"},
-  {label:"5 stars", dim:"star", value:5},
-  {label:"Beach", dim:"amenity", value:"Beachfront"},
-];
-const matchPop = (h,f) =>
-  f.dim==="rating"  ? h.score >= f.value :
-  f.dim==="amenity" ? h.amenities.includes(f.value) :
-  f.dim==="type"    ? h.type === f.value :
-  f.dim==="star"    ? h.stars === f.value : false;
 
 const H = (id,name,type,stars,area,place,dist,score,reviews,price,amenities,room,restaurants)=>
   ({id,name,type,stars,area,place,dist,score,reviews,price,amenities,room,restaurants});
@@ -636,9 +647,74 @@ function Chip({active, onClick, children}){
   );
 }
 
-function FilterRail({all, starCat, setStarCat, types, setTypes, rating, setRating, amenities, setAmenities, loggedOut}){
-  const toggleStar = s => setStarCat(p => p.includes(s) ? p.filter(x=>x!==s) : [...p,s]);
-  const toggleType = t => setTypes(p => p.includes(t) ? p.filter(x=>x!==t) : [...p,t]);
+const STAR_PATH = <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 18.9 5 21.4l1.4-6.8L1.3 9.9l6.9-.8L12 2z"/>;
+
+/* price range — dual-handle per-night slider */
+function PriceFilter({all, value, setValue}){
+  const prices = all.map(h => h.price);
+  const step = 500;
+  const lo = Math.min(...prices), hi = Math.max(...prices);
+  const min = Math.floor(lo/step)*step;
+  const max = Math.ceil(hi/step)*step;
+  const curMin = value ? Math.max(min, Math.min(value.min, max)) : min;
+  const curMax = value ? Math.min(max, Math.max(value.max, min)) : max;
+  const pct = v => max===min ? 0 : ((v-min)/(max-min))*100;
+  const setMinV = v => setValue({min: Math.min(v, curMax), max: curMax});
+  const setMaxV = v => setValue({min: curMin, max: Math.max(v, curMin)});
+  return (
+    <div className="fsub">
+      <p className="fg-h">Price range<span className="fg-note">per night</span></p>
+      <div className="pr-vals">
+        <span className="pv">{inr(curMin)}</span>
+        <span className="pv">{inr(curMax)}{curMax>=max?"+":""}</span>
+      </div>
+      <div className="pr-slider">
+        <div className="pr-track"/>
+        <div className="pr-fill" style={{left:pct(curMin)+"%", right:(100-pct(curMax))+"%"}}/>
+        <input type="range" min={min} max={max} step={step} value={curMin}
+          aria-label="Minimum price" onChange={e=>setMinV(+e.target.value)}/>
+        <input type="range" min={min} max={max} step={step} value={curMax}
+          aria-label="Maximum price" onChange={e=>setMaxV(+e.target.value)}/>
+      </div>
+    </div>
+  );
+}
+
+/* guest rating — score floor (shares the `rating` state) */
+function GuestRatingFilter({rating, setRating}){
+  return (
+    <div className="fsub">
+      <p className="fg-h">Guest rating</p>
+      <div className="star-row">
+        {[9,8,7].map(v=>(
+          <button type="button" key={v} className={"star-chip"+(rating===v?" is-on":"")}
+            aria-pressed={rating===v} onClick={()=>setRating(p=>p===v?null:v)}>{v}+</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* star rating — 3 to 5 stars (shares the `starCat` state) */
+function StarFilter({starCat, setStarCat}){
+  const toggle = s => setStarCat(p => p.includes(s) ? p.filter(x=>x!==s) : [...p,s]);
+  return (
+    <div className="fsub">
+      <p className="fg-h">Star rating</p>
+      <div className="star-row">
+        {[5,4,3].map(s=>(
+          <button type="button" key={s} className={"star-chip"+(starCat.includes(s)?" is-on":"")}
+            aria-pressed={starCat.includes(s)} onClick={()=>toggle(s)}>
+            {s} <Svg className="star-ic" d={STAR_PATH}/>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FilterRail({all, starCat, setStarCat, types, setTypes, rating, setRating, amenities, setAmenities,
+  price, setPrice, loggedOut}){
   const toggleAmen = a => setAmenities(p => p.includes(a) ? p.filter(x=>x!==a) : [...p,a]);
   const toggleRating = v => setRating(p => p===v ? null : v);
 
@@ -654,19 +730,6 @@ function FilterRail({all, starCat, setStarCat, types, setTypes, rating, setRatin
       setAmenities(p => Array.from(new Set([...p, ...USUAL.amenities])));
       setRating(USUAL.rating);
     }
-  };
-
-  // popular
-  const popActive = f =>
-    f.dim==="rating"  ? rating===f.value :
-    f.dim==="amenity" ? amenities.includes(f.value) :
-    f.dim==="type"    ? types.includes(f.value) :
-                        starCat.includes(f.value);
-  const popToggle = f => {
-    if(f.dim==="rating")  toggleRating(f.value);
-    else if(f.dim==="amenity") toggleAmen(f.value);
-    else if(f.dim==="type")    toggleType(f.value);
-    else toggleStar(f.value);
   };
 
   return (
@@ -687,18 +750,10 @@ function FilterRail({all, starCat, setStarCat, types, setTypes, rating, setRatin
         </div>
       )}
 
-      {/* popular filters */}
       <div className="fgroup">
-        <p className="fg-h">Popular filters</p>
-        <div className="checks">
-          {POPULAR.map(f=>(
-            <label className="chk pfrow" key={f.label}>
-              <input type="checkbox" checked={popActive(f)} onChange={()=>popToggle(f)}/>
-              <span className="box"><Svg d={I.check}/></span>
-              <span className="pop-main">{f.label}</span>
-            </label>
-          ))}
-        </div>
+        <PriceFilter all={all} value={price} setValue={setPrice}/>
+        <GuestRatingFilter rating={rating} setRating={setRating}/>
+        <StarFilter starCat={starCat} setStarCat={setStarCat}/>
       </div>
     </aside>
   );
@@ -975,6 +1030,7 @@ function App(){
   const [types, setTypes]       = useState([]);
   const [rating, setRating]     = useState(null);
   const [amenities, setAmen]    = useState([]);
+  const [price, setPrice]       = useState(null); // {min,max} per night, or null = full range
   const [sort, setSort]         = useState("recommended");
   const [saved, setSaved]       = useState(()=>({}));
 
@@ -988,23 +1044,25 @@ function App(){
     const next = match || raw;
     if(next === loc) return;
     setLoc(next);
-    setStarCat([]); setTypes([]); setRating(null); setAmen([]); setSort("recommended");
+    setStarCat([]); setTypes([]); setRating(null); setAmen([]); setPrice(null); setSort("recommended");
   }, [loc]);
 
-  const clearAll = () => { setStarCat([]); setTypes([]); setRating(null); setAmen([]); };
+  const clearAll = () => { setStarCat([]); setTypes([]); setRating(null); setAmen([]); setPrice(null); };
 
   const results = useMemo(()=>{
+    const inPrice = h => !price || (h.price >= price.min && h.price <= price.max);
     let r = all.filter(h =>
       (starCat.length===0 || starCat.includes(h.stars)) &&
       (types.length===0 || types.includes(h.type)) &&
       amenities.every(a => h.amenities.includes(a)) &&
-      (rating==null || h.score >= rating)
+      (rating==null || h.score >= rating) &&
+      inPrice(h)
     );
     if(sort==="price-asc")  r = [...r].sort((a,b)=>a.price-b.price);
     if(sort==="price-desc") r = [...r].sort((a,b)=>b.price-a.price);
     if(sort==="rating")     r = [...r].sort((a,b)=>b.score-a.score);
     return r;
-  }, [all, starCat, types, rating, amenities, sort]);
+  }, [all, starCat, types, rating, amenities, price, sort]);
 
   const [authOpen, setAuthOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -1094,6 +1152,7 @@ function App(){
               types={types} setTypes={setTypes}
               rating={rating} setRating={setRating}
               amenities={amenities} setAmenities={setAmen}
+              price={price} setPrice={setPrice}
               loggedOut={LOGGED_OUT}/>
             <div>
               {results.length>0 ? (

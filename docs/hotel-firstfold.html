@@ -214,16 +214,18 @@
   .rc-prev{left:10px;} .rc-next{right:10px;}
   .rc-count{position:absolute;bottom:10px;right:10px;background:rgba(20,18,16,.72);color:#fff;
     font-size:12px;font-weight:600;padding:3px 9px;border-radius:12px;backdrop-filter:blur(4px);}
-  .rc-body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;}
-  .rc-name{font-family:Georgia,serif;font-size:19px;font-weight:600;margin:0 0 4px;color:var(--ink);
-    cursor:pointer;display:inline-block;}
-  .rc-meta{font-size:13px;color:var(--muted);margin-bottom:13px;}
+  .rc-body{padding:19px 18px 20px;display:flex;flex-direction:column;flex:1;}
+  .rc-name{font-family:Georgia,serif;font-size:19px;font-weight:600;margin:0 0 5px;color:var(--ink);
+    cursor:pointer;display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rc-meta{font-size:13px;color:var(--muted);margin-bottom:16px;}
   .rc-opt{display:flex;align-items:center;gap:9px;font-size:13px;color:#444;margin-top:13px;cursor:pointer;}
   .rc-opt input{width:16px;height:16px;accent-color:var(--jade);flex:none;}
-  .rc-why{background:var(--info);border-radius:11px;padding:12px 14px;margin:4px 0 2px;}
-  .rc-why h5{margin:0 0 8px;color:var(--jade);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;line-height:1.3;}
-  .rc-why-pts{font-size:13px;color:#2f3b34;line-height:1.55;}
-  .rc-why-pts i{color:#9bb7a8;font-style:normal;margin:0 9px;font-size:28px;line-height:0;vertical-align:-4px;}
+  .rc-why{margin:10px 0 2px;}
+  .rc-whychips{display:flex;flex-wrap:wrap;gap:8px;}
+  .wchip{display:inline-flex;align-items:center;gap:5px;background:var(--pill);border-radius:16px;
+    padding:4px 10px;font-size:11.5px;font-weight:600;color:var(--ink);}
+  .wchip svg{width:12px;height:12px;stroke:var(--jade);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .wchip.wchip-lead{color:var(--jade);font-weight:700;}
   /* baseline inclusions — plain info on the standard room (the floor every option shares) */
   .rc-info{list-style:none;margin:2px 0;padding:0;}
   .rc-info li{position:relative;padding-left:19px;font-size:13px;color:#3a3a3a;margin-bottom:6px;}
@@ -232,7 +234,7 @@
     border-left:2px solid #0f8a63;border-bottom:2px solid #0f8a63;transform:rotate(-45deg);}
   .rc-foot{margin-top:auto;}
   .rc-price-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
-    border-top:1px solid var(--line);padding-top:14px;margin-top:16px;margin-bottom:14px;}
+    border-top:1px solid var(--line);padding-top:18px;margin-top:20px;margin-bottom:16px;}
   .rc-price b{font-family:Georgia,serif;font-size:22px;font-weight:600;color:var(--ink);}
   .rc-price small{font-size:12.5px;color:var(--muted);}
   .rc-total{text-align:right;}
@@ -412,8 +414,14 @@
   .rp-htx p{margin:0;font-size:12.5px;color:#6b6459;}
   .rp-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
   .rp-pill{font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:20px;
-    background:#f1ede3;color:#5b5650;border:none;}
+    background:#f1ede3;color:#5b5650;border:1px solid transparent;cursor:pointer;font-family:inherit;transition:all .13s;}
+  .rp-pill:hover{background:#e9e3d5;}
   .rp-pill.neg{background:#f7f0e0;color:#8a6a24;border:1px solid #ebddbf;font-weight:600;}
+  .rp-pill.active{background:var(--jade);color:#fff;border-color:var(--jade);font-weight:600;}
+  .rp-pill.neg.active{background:#8a6a24;border-color:#8a6a24;color:#fff;}
+  .rv-tx mark.rp-hit{background:#cdeadd;color:inherit;padding:1px 3px;border-radius:3px;
+    box-shadow:0 0 0 1px rgba(15,138,99,.35);animation:hitflash .6s ease;}
+  @keyframes hitflash{0%{background:#8fd6b4;}100%{background:#cdeadd;}}
   .rp-sec{margin-top:20px;border-top:1px solid rgba(120,110,95,.28);padding-top:15px;}
   .rp-sec h4{margin:0 0 11px;font-size:11px;letter-spacing:.09em;font-weight:700;color:#6b6459;}
   .rp-gphotos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
@@ -1809,7 +1817,7 @@
       pool: {
         label:"Swimming pool", rating:"9.2", score:92, verdict:"Photos match what guests found", count:214,
         gphotos:["images/05-pool-day.png","images/04-pool-sunset.png","images/06-aerial-pool.png"],
-        keys:[{t:"Matches photos",c:180},{t:"Vast & spotless",c:156},{t:"Rarely crowded",c:120},{t:"Sunset view",c:98},{t:"Closes 7pm",c:22,neg:true}],
+        keys:[{t:"Matches photos",c:180,hl:"exactly like the photos"},{t:"Vast & spotless",c:156,hl:"huge, spotless"},{t:"Rarely crowded",c:120,hl:"rarely crowded"},{t:"Sunset view",c:98,hl:"beach view at sunset"},{t:"Closes 7pm",c:22,neg:true,hl:"closes a touch early at 7pm"}],
         reviews:[
           {name:"Ananya R.", when:"Feb 2026", stars:5, tx:"The <mark>pool</mark> is exactly like the photos — huge, spotless, and the beach view at sunset is unreal."},
           {name:"Karan M.",  when:"Jan 2026", stars:4, tx:"Main <mark>pool</mark> is gorgeous and rarely crowded. Only downside is it closes a touch early at 7pm."},
@@ -1819,7 +1827,7 @@
       bathroom: {
         label:"Bathroom", rating:"7.8", score:78, verdict:"Mostly matches — a couple of gaps", count:96,
         gphotos:["images/03-bathroom.png","images/gv-03-bathroom.png","images/sv-03-bathroom.png"],
-        keys:[{t:"Marble & elegant",c:61},{t:"Great rain shower",c:44},{t:"Lovely products",c:29},{t:"Tub smaller",c:12,neg:true},{t:"Dimmer lighting",c:6,neg:true}],
+        keys:[{t:"Marble & elegant",c:61,hl:"marble and elegant"},{t:"Great rain shower",c:44,hl:"Rain shower was excellent"},{t:"Lovely products",c:29,hl:"products smell amazing"},{t:"Tub smaller",c:12,neg:true,hl:"tub is a bit smaller"},{t:"Dimmer lighting",c:6,neg:true,hl:"Lighting is dimmer"}],
         reviews:[
           {name:"Rohit S.",  when:"Feb 2026", stars:4, tx:"<mark>Bathroom</mark> is marble and elegant just like the photo — though the tub is a bit smaller in person."},
           {name:"Nisha P.",  when:"Jan 2026", stars:4, tx:"Rain shower was excellent and the products smell amazing. Lighting is dimmer than the listing shot."},
@@ -1840,26 +1848,38 @@
     };
     const scoreClass = s => s >= 85 ? 's-good' : s >= 65 ? 's-mid' : 's-low';
     const starRow = n => '★★★★★'.slice(0,n) + '<span style="color:#d9d2c4">' + '★★★★★'.slice(n) + '</span>';
-    const revBlock = r => '<div class="tr-rev"><div class="rv-top">'+
+    // wrap the first occurrence of `phrase` in the review text with a highlight mark
+    const hlText = (tx, phrase) => {
+      if(!phrase || typeof phrase !== 'string') return tx;
+      const i = tx.toLowerCase().indexOf(phrase.toLowerCase());
+      if(i < 0) return tx;
+      return tx.slice(0,i) + '<mark class="rp-hit">' + tx.slice(i, i+phrase.length) + '</mark>' + tx.slice(i+phrase.length);
+    };
+    const revBlock = (r, phrase) => '<div class="tr-rev"><div class="rv-top">'+
       '<span class="rv-name">'+r.name+'</span>'+
       '<span class="rv-stars">'+starRow(r.stars)+'</span>'+
       '<span class="rv-when">'+r.when+'</span></div>'+
-      '<p class="rv-tx">'+r.tx+'</p></div>';
+      '<p class="rv-tx">'+hlText(r.tx, phrase)+'</p></div>';
 
-    function matchPanel(t){
+    function matchPanel(t, activeKey){
+      const active = activeKey ? t.keys.find(k=>k.t===activeKey) : null;
+      const phrase = active ? active.hl : null;
+      const revs = phrase
+        ? t.reviews.filter(r => r.tx.toLowerCase().indexOf(phrase.toLowerCase()) >= 0)
+        : t.reviews.slice(0,2);
       return ''+
         '<div class="rp-head">'+
           '<div class="rp-score"><b>'+t.rating+'</b><span>/10</span></div>'+
           '<div class="rp-htx"><h3>'+t.label+'</h3><p>From '+t.count+' guest reviews</p></div>'+
         '</div>'+
         '<div class="rp-pills">'+
-          t.keys.map(k=>'<span class="rp-pill'+(k.neg?' neg':'')+'">'+k.t+'</span>').join('')+
+          t.keys.map(k=>'<button type="button" class="rp-pill'+(k.neg?' neg':'')+(k.t===activeKey?' active':'')+'" data-key="'+k.t+'">'+k.t+'</button>').join('')+
         '</div>'+
         '<div class="rp-sec"><h4>GUEST PHOTOS</h4><div class="rp-gphotos">'+
           t.gphotos.map(s=>'<img src="'+s+'" alt="Guest photo of the '+t.label.toLowerCase()+'">').join('')+
           '</div></div>'+
-        '<div class="rp-sec"><h4>LATEST REVIEWS</h4>'+
-          t.reviews.slice(0,2).map(revBlock).join('')+'</div>'+
+        '<div class="rp-sec"><h4>'+(active?'MATCHING REVIEW':'LATEST REVIEWS')+'</h4>'+
+          revs.map(r=>revBlock(r, phrase)).join('')+'</div>'+
         '<button class="rp-readall" type="button">Read all '+t.count+' reviews &rarr;</button>';
     }
     function generalPanel(g){
@@ -1878,7 +1898,7 @@
     }
 
     const lbx = $('lbx'), lbxImg = $('lbxImg'), lbxTag = $('lbxTag'), lbxPanel = $('lbxPanel');
-    let lbi = 0;
+    let lbi = 0, activeKey = null;
 
     function render(){
       const p = photos[lbi];
@@ -1886,17 +1906,29 @@
       const t = p.tag && TRUST[p.tag];
       if(t){
         lbx.classList.add('has-panel');
-        lbxPanel.hidden = false; lbxPanel.innerHTML = matchPanel(t);
+        lbxPanel.hidden = false; lbxPanel.innerHTML = matchPanel(t, activeKey);
         lbxTag.hidden = false; lbxTag.textContent = t.label;
+        if(activeKey){
+          const hit = lbxPanel.querySelector('.rp-hit');
+          if(hit){ const rev = hit.closest('.tr-rev'); (rev||hit).scrollIntoView({block:'center', behavior:'smooth'}); }
+        } else {
+          lbxPanel.scrollTop = 0;
+        }
       } else {
         lbx.classList.remove('has-panel');
         lbxPanel.hidden = true; lbxPanel.innerHTML = '';
         lbxTag.hidden = true;
       }
     }
-    function open(i){ lbi = (i + photos.length) % photos.length; render(); lbx.hidden = false; document.body.style.overflow = 'hidden'; }
+    function open(i, key){ lbi = (i + photos.length) % photos.length; activeKey = key || null; render(); lbx.hidden = false; document.body.style.overflow = 'hidden'; }
     function close(){ lbx.hidden = true; document.body.style.overflow = ''; }
-    function step(d){ lbi = (lbi + d + photos.length) % photos.length; render(); }
+    function step(d){ lbi = (lbi + d + photos.length) % photos.length; activeKey = null; render(); }
+
+    // clicking a keyword pill inside the panel highlights its matching review
+    lbxPanel.addEventListener('click', e => {
+      const pill = e.target.closest('.rp-pill');
+      if(pill){ activeKey = (activeKey === pill.dataset.key) ? null : pill.dataset.key; render(); }
+    });
 
     document.querySelector('.gallery .main').addEventListener('click', e => {
       if(e.target.closest('.nav')) return;
@@ -1925,7 +1957,7 @@
           '<div class="hr-score"><b>'+t.rating+'</b><span>/10</span></div>'+
           '<div class="hr-sub">'+t.label+'</div>'+
         '</div>'+
-        '<div class="hr-pills">'+t.keys.map(k=>'<button type="button" class="hr-pill'+(k.neg?' neg':'')+'">'+k.t+'</button>').join('')+
+        '<div class="hr-pills">'+t.keys.map(k=>'<button type="button" class="hr-pill'+(k.neg?' neg':'')+'" data-key="'+k.t+'">'+k.t+'</button>').join('')+
           '<button class="hr-all" type="button">See all '+t.count+' reviews &rarr;</button>'+
         '</div>';
       heroRev.hidden = false;
@@ -1937,7 +1969,8 @@
         if(rv) rv.scrollIntoView({behavior:'smooth'});
         return;
       }
-      if(e.target.closest('.hr-pill')) open(typeof cur === 'number' ? cur : 0);
+      const hp = e.target.closest('.hr-pill');
+      if(hp) open(typeof cur === 'number' ? cur : 0, hp.dataset.key);
     });
     renderHeroReview(typeof cur === 'number' ? cur : 0);     // initial state
 
@@ -2036,6 +2069,47 @@
     const capOf = r => { const m = (r.chips.find(c => /sleeps/i.test(c)) || '').match(/\d+/); return m ? +m[0] : 2; };
     const roomsFor = r => window.roomsNeeded ? window.roomsNeeded(capOf(r)) : 1;
 
+    /* ---------- "why +₹x" icon pills ---------- */
+    const WHY_ICON = {
+      wave:'<path d="M2 8c2-2.2 4.5-2.2 6.5 0s4.5 2.2 6.5 0 4.5-2.2 6.5 0"/><path d="M2 13c2-2.2 4.5-2.2 6.5 0s4.5 2.2 6.5 0 4.5-2.2 6.5 0"/>',
+      expand:'<path d="M14 4h6v6"/><path d="M20 4l-7 7"/><path d="M10 20H4v-6"/><path d="M4 20l7-7"/>',
+      drop:'<path d="M12 3s6 6.4 6 10.5A6 6 0 0 1 6 13.5C6 9.4 12 3 12 3z"/>',
+      sofa:'<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 12a2 2 0 0 1 2 2v3h16v-3a2 2 0 0 1 2-2"/><path d="M5 17v2M19 17v2"/>',
+      leaf:'<path d="M4 20c0-8 6-14 16-15C19 14 13 20 4 20z"/><path d="M9 15c3-3 6-4 9-5"/>',
+      home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>',
+      spark:'<path d="M12 4l1.6 4.8L18 10l-4.4 1.2L12 16l-1.6-4.8L6 10l4.4-1.2z"/>'
+    };
+    const whyIconFor = text => {
+      const t = String(text).toLowerCase();
+      if(/sea|ocean|aspect|view/.test(t)) return WHY_ICON.wave;
+      if(/pool|plunge|shower/.test(t))    return WHY_ICON.drop;
+      if(/living|dining|lounge|separate/.test(t)) return WHY_ICON.sofa;
+      if(/larg|bigger|much/.test(t))      return WHY_ICON.expand;
+      if(/garden|veranda|balcony|outdoor/.test(t)) return WHY_ICON.leaf;
+      if(/villa|secluded|bedroom|residence|private/.test(t)) return WHY_ICON.home;
+      return WHY_ICON.spark;
+    };
+    const roomSqm = r => { const c=(r.chips||[]).find(x=>/m²/.test(x)); return c?parseInt(c,10):null; };
+    // the "+₹x" and "+X m²" are always measured against the standard room (the one with no upgrade premium)
+    const STD_ROOM = ROOMS.find(r=>!r.why) || ROOMS[0];
+    const STD_BASE = STD_ROOM.base;
+    const BASE_SQM = roomSqm(STD_ROOM) || 56;
+    const whyChip = (icon,label) => '<span class="wchip"><svg viewBox="0 0 24 24">'+icon+'</svg>'+label+'</span>';
+    function whyBlock(r){
+      const amt = r.base - STD_BASE;   // premium over the standard room, not the previous tier
+      const sq = roomSqm(r);
+      const bigger = sq && sq>BASE_SQM;
+      // when we show a "+X m²" pill, drop the redundant size-word point ("Much larger", "Larger")
+      const isSizeWord = p => /^(much |slightly )?(larger|bigger)$/i.test(String(p).trim());
+      // lead chip is always the price premium vs the standard room
+      const lead = '<span class="wchip wchip-lead">+'+fmt(amt)+'/night vs '+STD_ROOM.name+'</span>';
+      const chips = r.why.points
+        .filter(p => !(bigger && isSizeWord(p)))
+        .map(p=>whyChip(whyIconFor(p), p));
+      if(bigger) chips.push(whyChip(WHY_ICON.expand, '+'+(sq-BASE_SQM)+' m²'));
+      return '<div class="rc-why"><div class="rc-whychips">'+lead+chips.join('')+'</div></div>';
+    }
+
     /* ---------- room cards ---------- */
     const scroll = $('roomsScroll');
     const syncers = [];
@@ -2052,10 +2126,9 @@
           '<span class="rc-count"><span class="rc-now">1</span> / '+r.imgs.length+'</span>'+
         '</div>'+
         '<div class="rc-body">'+
-          '<h3 class="rc-name">'+r.name+'</h3>'+
+          '<h3 class="rc-name" title="'+r.name+'">'+r.name+'</h3>'+
           '<div class="rc-meta">'+descriptor(r)+'</div>'+
-          (r.why ? '<div class="rc-why"><h5>Why +'+fmt(r.why.amt)+'/night</h5><div class="rc-why-pts">'+
-             r.why.points.map(p=>'<span>'+p+'</span>').join('<i>·</i>')+'</div></div>'
+          (r.why ? whyBlock(r)
              : '<div class="xt-bar xt-bar--card">'+
                  '<label class="xt-chk"><input type="checkbox" data-extra="cancel"> Free cancellation <em>+₹1,800/night</em></label>'+
                  '<label class="xt-chk"><input type="checkbox" data-extra="breakfast"> Breakfast <em>+₹1,500/night</em></label>'+
@@ -2120,7 +2193,17 @@
 
     // ---------- multi-room cart: compose room types (with quantities) into one booking ----------
     const MAXQ = 5;
-    window.CART = [{key:'villa', qty:1}];             // [{key, qty}] — default = the room the first fold shows
+    // arriving from the logged-out → Google flow (?confirm=1): restore the room selection the
+    // guest made before signing in, so the confirm card shows the same rooms + amount
+    window.CART = (function(){
+      try{
+        if(new URLSearchParams(location.search).get('confirm')==='1'){
+          var c = JSON.parse(sessionStorage.getItem('pdpCart'));
+          if(Array.isArray(c) && c.length) return c;
+        }
+      }catch(e){}
+      return [{key:'villa', qty:1}];                  // [{key, qty}] — default = the room the first fold shows
+    })();
     const cartRooms = () => window.CART.map(x=>({r:ROOM_BY[x.key], qty:x.qty})).filter(x=>x.r);
     window.cartRooms = cartRooms;
     window.cartCount = () => window.CART.reduce((s,x)=>s+x.qty, 0);   // total rooms across all types
@@ -2705,6 +2788,21 @@
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function(){ URL.revokeObjectURL(url); }, 0);
     });
+  })();
+
+  // ---- arrived from the logged-out → Google sign-in flow (?confirm=1): flip the booking card
+  //      straight to "Confirm your details" — the same card the logged-in Book now reveals ----
+  (function(){
+    if(new URLSearchParams(location.search).get('confirm') !== '1') return;
+    function go(){
+      if(window.goToCart) window.goToCart();          // render cart (amount) + flip to the details form
+      if(window.resizeCards) window.resizeCards();
+    }
+    if(document.readyState === 'complete') go(); else window.addEventListener('load', go);
+    requestAnimationFrame(go);
+    // consume the carried selection + drop ?confirm=1 so a manual reload returns to the standard PDP
+    try { sessionStorage.removeItem('pdpCart'); } catch(e){}
+    try { history.replaceState(null, '', location.pathname); } catch(e){}
   })();
 </script>
 </body>
