@@ -784,25 +784,36 @@
   /* ---------- post-payment confirmation card (right slot, returned from razorpay) ---------- */
   .confcard{position:absolute;top:0;left:0;right:0;bottom:0;z-index:5;justify-content:flex-start;text-align:center;}
   .confcard[hidden]{display:none;}   /* .book sets display:flex, which would otherwise beat the hidden attr */
-  .cf-check{width:72px;height:72px;border-radius:50%;background:#e7efe6;border:1px solid #d2e2ce;
-    display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
-  .cf-check svg{width:34px;height:34px;stroke:var(--jade);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .cf-head{text-align:left;padding-bottom:20px;border-bottom:1px solid var(--line);}
+  /* fenced centre hero — the rule above (cf-head) + the rule below scope it as its own module */
+  .cf-hero{text-align:center;padding:26px 0 24px;}
+  .cf-check{width:56px;height:56px;border-radius:50%;background:#e7efe6;border:1px solid #d2e2ce;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+  .cf-check svg{width:27px;height:27px;stroke:var(--jade);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round;}
   .cf-check.pop{animation:cfpop .5s cubic-bezier(.22,1.2,.36,1) both;}
   @keyframes cfpop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
-  .cf-title{font-family:Georgia,serif;font-size:30px;line-height:1.1;color:var(--jade-deep);margin:0 0 16px;letter-spacing:-.015em;}
-  .cf-ref{display:inline-flex;align-items:center;gap:6px;align-self:center;background:#faf8f3;border:1px solid var(--line);
-    border-radius:30px;padding:8px 8px 8px 16px;font-size:13.5px;color:#6b6459;font-weight:600;}
-  .cf-ref b{color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;font-weight:700;margin-left:2px;}
-  .cf-copy{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;
+  .cf-title{font-family:Georgia,serif;font-size:24px;line-height:1.15;color:var(--jade-deep);margin:0;letter-spacing:-.01em;font-weight:600;}
+
+  /* ledger — icon tile + eyebrow + value, hairline dividers (matches "Your stay") */
+  .cf-ledger{padding-top:12px;}
+  .cf-row{display:flex;gap:12px;align-items:center;padding:11px 2px;text-align:left;}
+  .cf-row+.cf-row{border-top:1px solid #f1ede5;}
+  .cf-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f1ede3;color:#b3893f;
+    display:flex;align-items:center;justify-content:center;}
+  .cf-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .cf-c{flex:1;min-width:0;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:14px;}
+  .cf-k{flex:none;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .cf-v{min-width:0;font-size:14.5px;color:var(--ink);font-weight:600;text-align:right;
+    display:flex;align-items:center;justify-content:flex-end;gap:8px;font-variant-numeric:tabular-nums;}
+  .cf-mono{font-family:inherit;font-size:14.5px;letter-spacing:.02em;font-weight:600;}
+  .cf-copy{flex:none;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;
     border:none;background:none;color:var(--muted);cursor:pointer;transition:background .15s,color .15s;}
   .cf-copy:hover{background:#f1ede3;color:var(--jade);}
   .cf-copy.done{color:var(--jade);}
   .cf-copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
-  .cf-paid{margin-top:24px;display:flex;align-items:center;justify-content:space-between;gap:14px;
-    background:#f1f7f3;border:1px solid #dfeae3;border-radius:14px;padding:15px 18px;}
-  .cf-pl{display:inline-flex;align-items:center;gap:9px;font-size:15px;color:#3a6a4d;font-weight:600;}
-  .cf-pl svg{width:17px;height:17px;stroke:var(--jade);stroke-width:2.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  .cf-amt{font-family:Georgia,serif;font-size:23px;font-weight:600;color:#20321f;letter-spacing:-.01em;}
+  /* total row — a touch heavier with a stronger rule to close the ledger */
+  .cf-row--total{margin-top:2px;border-top:1px solid var(--line);}
+  .cf-total{font-family:Georgia,serif;font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-.01em;}
   .cf-actions{margin-top:auto;padding-top:26px;display:flex;gap:12px;align-items:stretch;}
   .cf-actions .btn,.cf-actions .btn-secondary{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;}
   .cf-actions .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
@@ -1003,18 +1014,40 @@
 
       <!-- shown after payment (returned from razorpay with ?paid=1); overlays the booking card's slot so the height matches -->
       <div class="book confcard" id="confCard" hidden>
-      <div class="cf-check pop" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+      <!-- keep the resort identity, same chunk as the booking card — confirmation sits below it -->
+      <div class="cf-head">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h1>Taj Exotica Resort &amp; Spa</h1>
+        <div class="place">BENAULIM BEACH &middot; GOA, INDIA</div>
       </div>
-      <h2 class="cf-title">You&#39;re all set for Goa</h2>
-      <div class="cf-ref">Booking reference <b id="cfRef">TAJ-000000</b>
-        <button type="button" class="cf-copy" id="cfCopy" aria-label="Copy booking reference">
-          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-        </button>
+      <!-- fenced centre hero: fenced by cf-head's rule above and cf-hero's rule below -->
+      <div class="cf-hero">
+        <div class="cf-check pop" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+        </div>
+        <h2 class="cf-title">You&#39;re all set for Goa</h2>
       </div>
-      <div class="cf-paid">
-        <div class="cf-pl"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg><span>Paid &middot; Razorpay</span></div>
-        <div class="cf-amt" id="cfAmt">&#8377;45,600</div>
+      <!-- ledger — icon tile + eyebrow + value rows, matching the "Your stay" list -->
+      <div class="cf-ledger">
+        <div class="cf-row">
+          <span class="cf-ic"><svg viewBox="0 0 24 24"><path d="M20.5 13.3 12.7 21a1.5 1.5 0 0 1-2.1 0l-7-7a1.5 1.5 0 0 1-.4-1V4.5A1.5 1.5 0 0 1 4.5 3h8.4a1.5 1.5 0 0 1 1 .4l6.6 6.6a1.5 1.5 0 0 1 0 2.3Z"/><circle cx="7.6" cy="7.6" r="1.2"/></svg></span>
+          <div class="cf-c">
+            <div class="cf-k">Booking reference</div>
+            <div class="cf-v"><span class="cf-mono" id="cfRef">TAJ-000000</span>
+              <button type="button" class="cf-copy" id="cfCopy" aria-label="Copy booking reference">
+                <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cf-row">
+          <span class="cf-ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
+          <div class="cf-c"><div class="cf-k">Dates</div><div class="cf-v" id="cfDates">Fri 10 &ndash; Mon 13 Jul</div></div>
+        </div>
+        <div class="cf-row cf-row--total">
+          <span class="cf-ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.2"/><path d="M3 10h18"/><path d="M7 14.5h4"/></svg></span>
+          <div class="cf-c"><div class="cf-k">Paid &middot; Razorpay</div><div class="cf-v cf-total" id="cfAmt">&#8377;45,600</div></div>
+        </div>
       </div>
       <div class="cf-actions">
         <button type="button" class="btn-secondary" id="cfDetails">See details</button>
@@ -2730,6 +2763,9 @@
     if(!card) return;
     document.getElementById('cfRef').textContent = ref;
     if(b.amount) document.getElementById('cfAmt').textContent = b.amount;
+    // fill the ledger rows from the booking snapshot
+    var setTx = function(id, val){ var el = document.getElementById(id); if(el && val) el.textContent = val; };
+    setTx('cfDates',  b.dates ? b.dates + (b.nights ? ' · ' + b.nights : '') : '');
 
     // overlay the confirmation on the booking card's slot — keep the slot in flow so its
     // (gallery-matched) height is preserved; just hide the booking card underneath.

@@ -6,8 +6,8 @@
 <title>onto · Trips</title>
 <style>
   :root{
-    --bg:#efeae1; --card:#ffffff; --ink:#1c1c1c; --muted:#7c7771; --line:#e7e1d6;
-    --jade:#2f4f74; --jade-deep:#284667; --gold:#c19a4b; --green:#2a7d5f; --danger:#b23b32;
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
+    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --pill:#f1ede3; --green:#0f8a63; --danger:#b23b32;
     --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
   }
   *{box-sizing:border-box;}
@@ -88,7 +88,7 @@
   .tab:hover{color:var(--ink);}
   .tab.on{background:#fff;color:var(--jade);box-shadow:0 1px 3px rgba(40,30,10,.14);}
   .tab .n{color:#a39c90;font-weight:600;margin-left:6px;}
-  .tab.on .n{color:#8aa;}
+  .tab.on .n{color:#7db39c;}
 
   .list{display:flex;flex-direction:column;gap:16px;}
   .trip{display:flex;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);}
@@ -96,8 +96,8 @@
   .trip-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
   .trip-tag{position:absolute;top:14px;left:14px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.02em;
     background:rgba(255,255,255,.94);}
-  .trip-tag.upcoming{background:#eef6f1;color:#2a7d5f;}
-  .trip-tag.completed{background:#eef2f7;color:#2f4f74;}
+  .trip-tag.upcoming{background:#e7f3ec;color:var(--jade);}
+  .trip-tag.completed{background:#eef1ea;color:var(--jade-deep);}
   .trip-tag.cancelled{background:#f3e4e2;color:#b23b32;}
   .trip-body{flex:1;padding:20px 24px;display:flex;flex-direction:column;min-width:0;}
   .trip-loc{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);}
