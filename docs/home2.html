@@ -49,9 +49,10 @@
   .tn-profile:hover{border-color:#c2b8a4;background:#faf8f3;}
   .tn-profile .burger{display:flex;flex-direction:column;gap:3px;}
   .tn-profile .burger i{display:block;width:15px;height:1.7px;background:#8a857d;border-radius:2px;}
-  .tn-avatar{width:30px;height:30px;border-radius:50%;background:var(--jade);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;
-    font-family:Georgia,serif;}
+  .tn-avatar{width:34px;height:34px;border:none;padding:0;border-radius:50%;background:var(--jade);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;
+    font-family:Georgia,serif;line-height:1;text-decoration:none;cursor:pointer;transition:box-shadow .12s;}
+  .tn-avatar:hover{box-shadow:0 0 0 3px rgba(15,138,99,.15);}
 
   /* profile dropdown */
   .menu{position:absolute;top:calc(100% + 10px);right:0;width:320px;background:var(--card);
@@ -59,7 +60,9 @@
     padding:8px;z-index:90;opacity:0;transform:translateY(-6px) scale(.98);pointer-events:none;
     transition:opacity .16s,transform .16s;transform-origin:top right;}
   .menu.open{opacity:1;transform:none;pointer-events:auto;}
-  .menu-id{display:flex;align-items:center;gap:12px;padding:12px 12px 14px;}
+  .menu-id{display:flex;align-items:center;gap:12px;padding:12px 12px 14px;text-decoration:none;color:inherit;cursor:pointer;border-radius:10px;transition:background .15s;}
+  .menu-id:hover{background:#faf7f1;}
+  .menu-id-ar{margin-left:auto;color:#b8b0a2;font-size:17px;}
   .menu-id .tn-avatar{width:42px;height:42px;font-size:17px;}
   .menu-id b{display:block;font-size:15px;font-weight:600;}
   .menu-id small{display:block;color:var(--muted);font-size:13px;margin-top:1px;}
@@ -291,6 +294,7 @@
   .results-head .seeall:hover{text-decoration:underline;}
 
   /* upcoming-trip card specifics (reuses .hcard) */
+  #tripCard .pic{min-height:320px;}
   .trip-meta{display:flex;flex-wrap:wrap;gap:9px 24px;margin:16px 0 0;}
   .trip-meta .tm{display:flex;align-items:center;gap:8px;font-size:14.5px;color:#4b463f;}
   .trip-meta .tm svg{width:17px;height:17px;stroke:var(--gold);fill:none;stroke-width:1.8;
@@ -333,25 +337,20 @@
       <a href="trips.html">Trips</a>
     </div>
     <div class="tn-right">
-      <button type="button" class="tn-profile" id="profileBtn" aria-haspopup="true" aria-expanded="false">
-        <span class="burger"><i></i><i></i><i></i></span>
-        <span class="tn-avatar" id="navAvatar">S</span>
-      </button>
-
+      <button type="button" class="tn-avatar" id="profileBtn" aria-haspopup="true" aria-expanded="false">S</button>
       <div class="menu" id="profileMenu" role="menu">
-        <div class="menu-id">
+        <a class="menu-id" href="profile.html">
           <span class="tn-avatar" id="menuAvatar">S</span>
           <div>
             <b id="menuName">You</b>
             <small id="menuEmail">xyz@email.com</small>
           </div>
-        </div>
-
+          <span class="menu-id-ar">›</span>
+        </a>
         <div class="menu-sec">
           <a class="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span class="ar">›</span></a>
-          <a class="item" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M4.8 19.5c.9-3.6 3.7-5.5 7.2-5.5s6.3 1.9 7.2 5.5"/></svg> Account &amp; preferences <span class="ar">›</span></a>
-          <a class="item" href="#"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span class="ar">›</span></a>
-          <a class="item" href="home.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
+          <a class="item" href="help.html"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span class="ar">›</span></a>
+          <a class="item" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
         </div>
       </div>
     </div>
@@ -487,18 +486,12 @@
    PROFILE MENU + ORDERS
    ============================================================= */
 (function(){
-  var btn = document.getElementById('profileBtn');
-  var menu = document.getElementById('profileMenu');
-  btn.addEventListener('click', function(e){
-    e.stopPropagation();
-    var open = menu.classList.toggle('open');
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-  document.addEventListener('click', function(e){
-    if(!menu.contains(e.target) && !btn.contains(e.target)){
-      menu.classList.remove('open'); btn.setAttribute('aria-expanded','false');
-    }
-  });
+  var pBtn = document.getElementById('profileBtn');
+  var pMenu = document.getElementById('profileMenu');
+  if(pBtn && pMenu){
+    pBtn.addEventListener('click', function(e){ e.stopPropagation(); var o=pMenu.classList.toggle('open'); pBtn.setAttribute('aria-expanded', o?'true':'false'); });
+    document.addEventListener('click', function(e){ if(!pMenu.contains(e.target) && !pBtn.contains(e.target)){ pMenu.classList.remove('open'); pBtn.setAttribute('aria-expanded','false'); } });
+  }
 
   // The upcoming trip: a live booking from the confirmed flow if present,
   // otherwise a seeded demo trip so the homepage always has one to show.
@@ -571,7 +564,7 @@
   var COMPANIONS = loadCompanions();
   try{ var _un=readUserName(), _ini=(_un[0]||'Y').toUpperCase();
        var _mn=document.getElementById('menuName'); if(_mn) _mn.textContent = _un;
-       var _na=document.getElementById('navAvatar'); if(_na) _na.textContent = _ini;
+       var _na=document.getElementById('profileBtn'); if(_na) _na.textContent = _ini;
        var _ma=document.getElementById('menuAvatar'); if(_ma) _ma.textContent = _ini; }catch(e){}
   var EM  = { adults:'🧍', children:'🧒', infants:'👶' };
   var FUN = {
