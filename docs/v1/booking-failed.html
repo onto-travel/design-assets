@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taj Exotica · Payment failed</title>
+<style>
+  :root{
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
+    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --green:#0f8a63; --danger:#c0442f;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+  h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+
+  .card{width:520px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;position:relative;}
+  .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
+    color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
+    transition:color .15s,background .15s;}
+  .backlink:hover{color:var(--jade);background:#faf8f3;}
+  .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+
+  .head{text-align:center;padding:40px 34px 24px;}
+  .mark{width:66px;height:66px;border-radius:50%;background:#fbeeea;border:1px solid #f2d5cc;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+  .mark svg{width:32px;height:32px;stroke:var(--danger);stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .mark.pop{animation:pop .45s cubic-bezier(.22,1.2,.36,1) both;}
+  @keyframes pop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+  .head h1{font-size:27px;margin-bottom:8px;}
+  .head p{color:var(--muted);font-size:15px;margin:0 auto;max-width:380px;}
+
+  .stars{color:var(--gold);letter-spacing:3px;font-size:14px;}
+  .sum{margin:8px 34px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .sum-hd{padding:18px 18px 16px;background:#faf8f3;}
+  .sum-hd .h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-hd .n{font-family:Georgia,serif;font-size:17px;font-weight:700;margin-top:3px;}
+  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#4a4641;margin-top:11px;}
+  .sum-hd .hd-dates span{font-weight:400;color:var(--muted);}
+  .sum-hd .hd-dates span::before{content:" · ";}
+
+  .status{display:flex;align-items:center;justify-content:space-between;
+    padding:15px 18px;border-top:1px solid #f1d9d2;background:#fdf3f0;}
+  .status .pl{font-size:13px;color:#a83b28;font-weight:600;}
+  .status .pl b{display:block;color:var(--danger);font-size:11.5px;letter-spacing:.04em;margin-top:2px;font-weight:700;}
+  .status .amt{font-family:Georgia,serif;font-size:22px;font-weight:600;letter-spacing:-.01em;color:#4a4641;}
+
+  .note{margin:16px 34px 0;display:flex;gap:11px;align-items:flex-start;
+    padding:13px 15px;border-radius:12px;background:#faf8f3;border:1px solid var(--line);}
+  .note svg{flex:none;width:18px;height:18px;stroke:var(--muted);stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-top:1px;}
+  .note p{margin:0;font-size:13px;color:var(--muted);line-height:1.45;}
+  .note b{color:#4a4641;font-weight:600;}
+
+  .actions{padding:22px 34px 28px;display:flex;flex-direction:column;gap:12px;}
+  .btn{border:none;background:var(--jade);color:#fff;font-size:15.5px;font-weight:600;
+    padding:15px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
+    display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s;}
+  .btn:hover{background:var(--jade-deep);}
+  .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .ghostbtn{display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
+    border:1px solid #e2dac9;border-radius:12px;padding:14px;font-family:inherit;font-size:14.5px;font-weight:600;
+    color:var(--jade);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
+  .ghostbtn:hover{background:#faf8f3;border-color:#d3c9b4;}
+  .txtlink{display:block;text-align:center;margin-top:4px;color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;}
+  .txtlink:hover{color:var(--jade);text-decoration:underline;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <a class="backlink" href="home2.html">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to home
+    </a>
+    <div class="head">
+      <div class="mark pop" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16.5v0"/></svg>
+      </div>
+      <h1>Payment didn&rsquo;t go through</h1>
+      <p id="lede">We couldn&rsquo;t confirm your stay. Nothing has been charged &mdash; your room is still held, so you can try the payment again.</p>
+    </div>
+
+    <div class="sum">
+      <div class="sum-hd">
+        <div class="h">Your stay</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="n" id="hotel">Taj Exotica Resort &amp; Spa</div>
+        <div class="hd-dates" id="dates">Fri 10 &ndash; Mon 13 Jul<span id="nights">3 nights</span></div>
+      </div>
+      <div class="status">
+        <div class="pl">Payment via Razorpay<b>&times; PAYMENT FAILED &middot; NOT CHARGED</b></div>
+        <div class="amt" id="amount">&#8377;55,500</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8v0"/></svg>
+      <p>If any amount was debited, it will be <b>auto-reversed within 5&ndash;7 business days</b>. Common reasons: bank declined the charge, insufficient balance, or the payment window timed out.</p>
+    </div>
+
+    <div class="actions">
+      <a class="btn" id="retry" href="razorpay.html">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/></svg>
+        Retry payment
+      </a>
+      <a class="ghostbtn" href="checkout.html">Change room or dates</a>
+      <a class="txtlink" href="help.html">Need help? Contact support</a>
+    </div>
+  </div>
+
+<script>
+  var b = {};
+  try { b = JSON.parse(sessionStorage.getItem('booking')) || {}; } catch(e){}
+  function set(id, val){ if(val){ document.getElementById(id).textContent = val; } }
+
+  set('hotel', b.hotel);
+  set('amount', b.amount);
+  if(b.dates){ document.getElementById('dates').innerHTML = b.dates + (b.nights ? '<span>'+b.nights+'</span>' : ''); }
+
+  // record the failed status (payment failed before the booking was created)
+  if(b.status !== 'failed'){
+    b.status = 'failed'; b.paid = false;
+    try { sessionStorage.setItem('booking', JSON.stringify(b)); } catch(e){}
+  }
+
+  // retry re-opens the payment gateway and returns to the confirmation on success
+  document.getElementById('retry').addEventListener('click', function(){
+    try { sessionStorage.setItem('payReturn', 'booking-details.html'); } catch(e){}
+  });
+</script>
+</body>
+</html>

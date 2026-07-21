@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taj Exotica · Booking confirmed</title>
+<style>
+  :root{
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
+    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --green:#0f8a63;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+  h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+
+  .card{width:520px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
+    overflow:hidden;position:relative;}
+  .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
+    color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
+    transition:color .15s,background .15s;}
+  .backlink:hover{color:var(--jade);background:#faf8f3;}
+  .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .head{text-align:center;padding:40px 34px 26px;}
+  .check{width:66px;height:66px;border-radius:50%;background:#eaf5ef;border:1px solid #cfe8db;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+  .check svg{width:32px;height:32px;stroke:var(--green);stroke-width:2.6;fill:none;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .check.pop{animation:pop .45s cubic-bezier(.22,1.2,.36,1) both;}
+  @keyframes pop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+  .head h1{font-size:27px;margin-bottom:8px;}
+  .head p{color:var(--muted);font-size:15px;margin:0 auto;max-width:360px;}
+  .ref{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:#faf8f3;
+    border:1px solid var(--line);border-radius:30px;padding:8px 16px;font-size:13.5px;color:#4a4641;}
+  .ref b{color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;}
+
+  .stars{color:var(--gold);letter-spacing:3px;font-size:14px;}
+  .sum{margin:4px 34px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .sum-hd{padding:18px 18px 16px;background:#faf8f3;}
+  .sum-hd .h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-hd .n{font-family:Georgia,serif;font-size:17px;font-weight:700;margin-top:3px;}
+  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#4a4641;margin-top:11px;}
+  .sum-hd .hd-dates span{font-weight:400;color:var(--muted);}
+  .sum-hd .hd-dates span::before{content:" · ";}
+  .sum-hd .loc{color:var(--jade);font-weight:600;font-size:11.5px;letter-spacing:.06em;margin-top:2px;}
+  .row{display:flex;gap:14px;padding:12px 18px;}
+  .row+.row{border-top:1px solid #f1ede5;}
+  .k{flex:0 0 96px;font-size:12.5px;color:var(--muted);padding-top:1px;}
+  .v{font-size:14.5px;color:var(--ink);font-weight:600;}
+  .v span{font-weight:400;color:var(--muted);}
+  .v span::before{content:" · ";}
+  .paid{display:flex;align-items:center;justify-content:space-between;
+    padding:15px 18px;border-top:1px solid #e4ede4;background:#f2f8f5;}
+  .paid .pl{font-size:13px;color:#0f8a63;font-weight:600;}
+  .paid .pl b{display:block;color:var(--green);font-size:11.5px;letter-spacing:.04em;margin-top:2px;font-weight:700;}
+  .paid .amt{font-family:Georgia,serif;font-size:26px;font-weight:600;letter-spacing:-.01em;}
+  /* rewards nudge — shown only when the stay was booked as a guest (not logged in) */
+  .rewards{display:none;margin:18px 34px 0;padding:12px 14px;border-radius:14px;gap:12px;
+    align-items:center;background:linear-gradient(120deg,#fcf6e9,#f8efdb);border:1px solid #eaddbe;}
+  .rewards.show{display:flex;}
+  .rw-ic{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(193,154,75,.15);
+    display:flex;align-items:center;justify-content:center;color:#b8923f;}
+  .rw-ic svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .rw-tx{flex:1;min-width:0;}
+  .rw-h{font-size:13.5px;font-weight:600;color:#7c5e22;line-height:1.35;}
+  .rw-h b{font-weight:700;color:#5f4715;}
+  .rw-btn{flex:none;display:inline-flex;align-items:center;gap:5px;background:none;color:#a07d2e;
+    font-size:13px;font-weight:700;padding:7px 4px 7px 10px;border-radius:8px;cursor:pointer;
+    font-family:inherit;text-decoration:none;white-space:nowrap;border:none;transition:color .15s;}
+  .rw-btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
+  .rw-btn:hover{color:#7c5e22;}
+  .rw-btn:hover svg{transform:translateX(2px);}
+  @media(max-width:420px){ .rw-h{font-size:12.5px;} .rw-btn{padding-left:6px;} }
+  .actions{padding:22px 34px 28px;display:flex;flex-direction:column;gap:12px;}
+  .btnrow{display:flex;gap:12px;}
+  .btn{flex:1;border:none;background:var(--jade);color:#fff;font-size:15px;font-weight:600;
+    padding:14px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
+    display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s;}
+  .btn:hover{background:var(--jade-deep);}
+  .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .ghostbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
+    border:1px solid #e2dac9;border-radius:12px;padding:14px;font-family:inherit;font-size:14.5px;font-weight:600;
+    color:var(--jade);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
+  .ghostbtn:hover{background:#faf8f3;border-color:#d3c9b4;}
+  .ghostbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .txtlinks{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:6px;}
+  .txtlinks a{color:var(--jade);font-size:14px;font-weight:600;text-decoration:none;}
+  .txtlinks a:hover{text-decoration:underline;}
+  @media(max-width:480px){ .btnrow{flex-direction:column;} .k{flex-basis:80px;} }
+</style>
+</head>
+<body>
+  <div class="card">
+    <a class="backlink" href="home2.html">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to home
+    </a>
+    <div class="head">
+      <div class="check pop" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+      </div>
+      <h1>Booking confirmed</h1>
+      <p id="lede">Your stay is booked.</p>
+      <div class="ref">Booking reference&nbsp; <b id="ref">TAJ-000000</b></div>
+    </div>
+
+    <div class="sum">
+      <div class="sum-hd">
+        <div class="h">Your stay</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="n" id="hotel">Taj Exotica Resort &amp; Spa</div>
+        <div class="hd-dates" id="dates">Fri 10 – Mon 13 Jul<span id="nights">3 nights</span></div>
+      </div>
+
+      <div class="paid">
+        <div class="pl">Paid via Razorpay<b>✓ PAYMENT SUCCESSFUL</b></div>
+        <div class="amt" id="amount">₹55,500</div>
+      </div>
+    </div>
+
+    <div class="rewards" id="rewards">
+      <span class="rw-ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      </span>
+      <div class="rw-tx">
+        <div class="rw-h" id="rwHead">You&rsquo;ve earned <b>&#8377;2,775</b> in rewards</div>
+      </div>
+      <a class="rw-btn" id="rewardsCta" href="google-login.html">Log in to view <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a>
+    </div>
+
+    <div class="actions">
+      <div class="btnrow">
+        <a class="ghostbtn" href="booking-details.html">
+          <svg viewBox="0 0 24 24"><path d="M2.5 12s3.4-6.8 9.5-6.8S21.5 12 21.5 12s-3.4 6.8-9.5 6.8S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          View booking
+        </a>
+        <button type="button" class="btn" id="dlVoucher">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
+          Download voucher
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var b = {};
+  try { b = JSON.parse(sessionStorage.getItem('booking')) || {}; } catch(e){}
+  function set(id, val){ if(val){ document.getElementById(id).textContent = val; } }
+
+  set('hotel', b.hotel);
+  set('amount', b.amount);
+  // dates keeps its "· nights" sub span, so build it as HTML
+  if(b.dates){ document.getElementById('dates').innerHTML = b.dates + (b.nights ? '<span>'+b.nights+'</span>' : ''); }
+
+  // booking reference — stable per confirmed booking (kept in sessionStorage)
+  var ref = b.ref;
+  if(!ref){
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s = '';
+    for(var i=0;i<6;i++){ s += chars.charAt(Math.floor(Math.random()*chars.length)); }
+    ref = 'TAJ-' + s;
+    b.ref = ref;
+    try { sessionStorage.setItem('booking', JSON.stringify(b)); } catch(e){}
+  }
+  document.getElementById('ref').textContent = ref;
+
+  // guest booking (not yet logged in) → offer a rewards sign-up nudge
+  // (?guest=1 forces it on for previewing without walking the whole flow)
+  var forceGuest = new URLSearchParams(location.search).get('guest') === '1';
+  var signedIn = false;
+  try { signedIn = sessionStorage.getItem('phoneVerified') === '1'; } catch(e){}
+  if(forceGuest || (b.guest && !signedIn)){
+    var amt = parseInt(String(b.amount || '').replace(/[^\d]/g, ''), 10) || 0;
+    if(amt){
+      var pts = Math.round(amt * 0.05);   // 5% back in reward points
+      document.getElementById('rwHead').innerHTML =
+        'You&rsquo;ve earned <b>&#8377;' + pts.toLocaleString('en-IN') + '</b> in rewards';
+    }
+    document.getElementById('rewards').classList.add('show');
+    // after the mock login, return to the booking so the rewards are "attached"
+    document.getElementById('rewardsCta').addEventListener('click', function(){
+      try { sessionStorage.setItem('authReturn', 'booking-details.html'); } catch(e){}
+    });
+  }
+
+  // download a simple text voucher (prototype)
+  document.getElementById('dlVoucher').addEventListener('click', function(){
+    var lines = [
+      'TAJ EXOTICA RESORT & SPA — BOOKING VOUCHER',
+      '==========================================',
+      '',
+      'Booking reference : ' + ref,
+      'Hotel             : ' + (b.hotel || 'Taj Exotica Resort & Spa'),
+      'Dates             : ' + (b.dates || '') + (b.nights ? ' (' + b.nights + ')' : ''),
+      'Room              : ' + (b.room || 'Villa Room'),
+      'Guests            : ' + (b.guests || ''),
+      'Amount paid       : ' + (b.amount || '') + '  · paid via Razorpay',
+      '',
+      'Present this voucher at check-in. Prototype — not a real booking.'
+    ];
+    var blob = new Blob([lines.join('\n')], {type:'text/plain'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'Taj-Exotica-voucher-' + ref + '.txt';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 0);
+  });
+</script>
+</body>
+</html>

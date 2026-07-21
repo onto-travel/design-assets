@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Razorpay · Payment</title>
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:#f4f5f7;color:#1c2440;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  .rzp{width:380px;max-width:92vw;background:#fff;border-radius:16px;overflow:hidden;
+    box-shadow:0 20px 60px rgba(20,28,64,.22);}
+  .rzp-top{background:#0b1e5b;color:#fff;padding:22px 24px;display:flex;align-items:center;gap:12px;}
+  .rzp-logo{font-size:20px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;}
+  .rzp-logo .mark{width:26px;height:26px;border-radius:6px;background:#3b7cff;
+    display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;}
+  .rzp-flow{margin-left:auto;font-size:12px;font-weight:600;opacity:.8;letter-spacing:.04em;text-transform:uppercase;}
+  .rzp-body{padding:26px 24px 28px;}
+  .rzp-merchant{font-size:13px;color:#6a7290;margin-bottom:4px;}
+  .rzp-amt{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-bottom:22px;}
+  .rzp-note{font-size:13px;color:#6a7290;line-height:1.5;background:#f4f6fb;border:1px solid #e7ebf5;
+    border-radius:12px;padding:13px 15px;margin-bottom:16px;}
+  /* prototype scenario toggle — walk the post-payment failure path */
+  .rzp-sim{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:#8a90a6;line-height:1.4;
+    margin-bottom:20px;cursor:pointer;user-select:none;}
+  .rzp-sim input{margin:2px 0 0;accent-color:#3b7cff;flex:none;cursor:pointer;}
+  .rzp-sel{width:100%;margin:-8px 0 20px;padding:9px 11px;font-family:inherit;font-size:12.5px;color:#4a5170;
+    border:1px solid #e7ebf5;border-radius:8px;background:#f4f6fb;cursor:pointer;}
+  .rzp-pay{width:100%;border:none;background:#3b7cff;color:#fff;font-size:16px;font-weight:700;
+    padding:16px;border-radius:12px;cursor:pointer;font-family:inherit;transition:background .15s;}
+  .rzp-pay:hover{background:#2f6bea;}
+  .rzp-cancel{display:block;width:100%;text-align:center;margin-top:14px;background:none;border:none;
+    color:#8a90a6;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;padding:6px;}
+  .rzp-cancel:hover{color:#5a6180;}
+  .rzp-secure{display:flex;align-items:center;justify-content:center;gap:6px;
+    font-size:11.5px;color:#9aa0b6;padding:14px;border-top:1px solid #eef0f6;}
+  /* processing state after Pay */
+  .rzp-processing{padding:46px 24px 42px;text-align:center;}
+  .rzp-spin{width:44px;height:44px;border-radius:50%;border:3px solid #e7ebf5;border-top-color:#3b7cff;
+    animation:rzpspin .8s linear infinite;margin:0 auto 20px;}
+  @keyframes rzpspin{to{transform:rotate(360deg);}}
+  .rzp-ptx{font-size:16px;font-weight:700;color:#1c2440;}
+  .rzp-psub{font-size:12.5px;color:#8a90a6;margin-top:6px;}
+  [hidden]{display:none;}
+</style>
+</head>
+<body>
+  <div class="rzp">
+    <div class="rzp-top">
+      <span class="rzp-logo"><span class="mark">R</span>Razorpay</span>
+      <span class="rzp-flow">Razorpay flow</span>
+    </div>
+    <div class="rzp-body" id="rzpBody">
+      <div class="rzp-merchant">Paying <b>Taj Exotica Resort &amp; Spa</b></div>
+      <div class="rzp-amt" id="amt">₹55,500</div>
+      <div class="rzp-note">Prototype only — no real payment is processed. Tap “Pay” to simulate a successful transaction and return to the booking confirmation.</div>
+      <label class="rzp-sim"><input type="checkbox" id="simPending"> Simulate settlement pending (money received, awaiting the hotel&rsquo;s confirmation)</label>
+      <select id="pendOutcome" class="rzp-sel" hidden>
+        <option value="confirmed">Late confirmation</option>
+        <option value="noinv">Refund + upgrade</option>
+        <option value="sameroom">Refund + rebook</option>
+      </select>
+      <label class="rzp-sim"><input type="checkbox" id="simPayfail"> Simulate payment failure (bank declines &amp; instantly reverses the charge)</label>
+      <button class="rzp-pay" id="pay">Pay <span id="payAmt">₹55,500</span></button>
+      <button class="rzp-cancel" id="cancel">Cancel and go back</button>
+    </div>
+    <div class="rzp-processing" id="rzpProcessing" hidden>
+      <div class="rzp-spin"></div>
+      <div class="rzp-ptx">Processing payment…</div>
+      <div class="rzp-psub">Please don’t close or refresh this window.</div>
+    </div>
+    <div class="rzp-secure">🔒 Secured by Razorpay · prototype</div>
+  </div>
+
+<script>
+  var booking = {};
+  try { booking = JSON.parse(sessionStorage.getItem('booking')) || {}; } catch(e){}
+  var amt = booking.amount || '₹55,500';
+  document.getElementById('amt').textContent = amt;
+  document.getElementById('payAmt').textContent = amt;
+  // reveal the resolution picker only when "settlement pending" is simulated
+  var simPend = document.getElementById('simPending'), pendSel = document.getElementById('pendOutcome');
+  if(simPend && pendSel) simPend.addEventListener('change', function(){ pendSel.hidden = !simPend.checked; });
+  document.getElementById('pay').addEventListener('click', function(){
+    // show a processing state, then hand back to our confirmation screen
+    document.getElementById('rzpBody').hidden = true;
+    document.getElementById('rzpProcessing').hidden = false;
+    document.querySelector('.rzp-flow').textContent = 'Processing';
+    var payfail = (document.getElementById('simPayfail') && document.getElementById('simPayfail').checked)
+      || new URLSearchParams(location.search).get('outcome') === 'payfail';
+    var pending = (document.getElementById('simPending') && document.getElementById('simPending').checked)
+      || new URLSearchParams(location.search).get('outcome') === 'pending';
+    try {
+      if(payfail){
+        // charge failed at the bank and was instantly reversed → no booking, no money held
+        booking.paid = false;
+        sessionStorage.setItem('booking', JSON.stringify(booking));
+        sessionStorage.setItem('payFailed','1');
+        sessionStorage.removeItem('settlePending'); sessionStorage.removeItem('settleOutcome');
+        var ptx = document.querySelector('.rzp-ptx'), psub = document.querySelector('.rzp-psub');
+        if(ptx) ptx.textContent = 'Payment declined';
+        if(psub) psub.textContent = 'Your bank reversed the charge.';
+      } else {
+        // payment succeeded; if settlement isn't confirmed yet, flag it (and how it resolves)
+        booking.paid = true;
+        sessionStorage.setItem('booking', JSON.stringify(booking));
+        if(pending){
+          sessionStorage.setItem('settlePending','1');
+          sessionStorage.setItem('settleOutcome', (document.getElementById('pendOutcome')||{}).value || 'confirmed');
+        } else { sessionStorage.removeItem('settlePending'); sessionStorage.removeItem('settleOutcome'); }
+      }
+    } catch(e){}
+    // callers can route the post-payment return (default: the standalone confirmation page)
+    var dest = 'booking-details.html';
+    try { var r = sessionStorage.getItem('payReturn'); if(r){ dest = r; sessionStorage.removeItem('payReturn'); } } catch(e){}
+    setTimeout(function(){ location.href = dest; }, 1600);
+  });
+  document.getElementById('cancel').addEventListener('click', function(){ history.back(); });
+</script>
+</body>
+</html>

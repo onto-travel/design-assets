@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>onto — Search results</title>
+<style>
+  :root{
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c;
+    --line:#e4dfd2; --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e;
+    --pill:#f1ede3; --info:#f1ede3;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 12px 30px rgba(40,30,10,.06);
+    --stick:150px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh;
+  }
+  h1,h2,h3{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+  button,input,select{font-family:inherit;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:4px;}
+
+  /* ============ TOP NAV ============ */
+  .topnav{position:sticky;top:0;z-index:90;
+    background:rgba(250,248,243,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);}
+  .topnav-in{max-width:1240px;margin:0 auto;padding:0 28px;height:60px;display:flex;align-items:center;gap:26px;}
+  .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);
+    letter-spacing:-.01em;text-decoration:none;white-space:nowrap;}
+  .tn-brand span{color:var(--gold);}
+  .tn-links{display:flex;align-items:center;gap:2px;}
+  .tn-links a{font-size:14.5px;color:#5b5650;text-decoration:none;padding:8px 14px;border-radius:9px;transition:background .15s,color .15s;}
+  .tn-links a:hover{background:rgba(255,255,255,.62);color:var(--ink);}
+  .tn-links a.active{color:var(--jade);font-weight:600;}
+  .tn-right{margin-left:auto;display:flex;align-items:center;gap:9px;position:relative;}
+  .tn-avatar{width:34px;height:34px;border:none;padding:0;border-radius:50%;background:var(--jade);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:Georgia,serif;
+    line-height:1;text-decoration:none;cursor:pointer;transition:box-shadow .12s;}
+  .tn-avatar:hover{box-shadow:0 0 0 3px rgba(15,138,99,.15);}
+  .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
+    border-radius:14px;box-shadow:0 14px 40px rgba(40,30,10,.2);padding:8px;opacity:0;transform:translateY(-6px);
+    pointer-events:none;transition:opacity .15s,transform .15s;z-index:90;}
+  .tn-right:focus-within .menu{opacity:1;transform:none;pointer-events:auto;}
+  .menu-id{display:flex;align-items:center;gap:11px;padding:11px 12px 13px;border-bottom:1px solid var(--line);margin-bottom:6px;
+    text-decoration:none;color:inherit;cursor:pointer;border-radius:10px 10px 0 0;transition:background .15s;}
+  .menu-id:hover{background:#faf7f1;}
+  .menu-id-ar{margin-left:auto;color:#b8b0a2;font-size:17px;}
+  .menu-id .tn-avatar{width:38px;height:38px;font-size:20px;}
+  .menu-id b{font-size:14.5px;display:block;}
+  .menu-id small{font-size:12.5px;color:var(--muted);}
+  .menu .item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font-size:14px;color:var(--ink);
+    text-decoration:none;cursor:pointer;}
+  .menu .item:hover{background:#faf7f1;}
+  .menu .item svg{width:19px;height:19px;stroke:#6b655c;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .menu .item .ar{margin-left:auto;color:#b8b0a2;}
+  .tn-signup{font-family:inherit;font-size:14.5px;font-weight:600;color:#fff;background:var(--jade);
+    border:1px solid var(--jade);border-radius:10px;padding:9px 18px;cursor:pointer;letter-spacing:.01em;
+    transition:background .15s,transform .12s;box-shadow:0 1px 2px rgba(40,30,10,.12);}
+  .tn-signup:hover{background:var(--jade-deep);}
+  .tn-signup:active{transform:translateY(1px);}
+
+  /* ============ LOGIN / SIGN-UP MODAL ============ */
+  .auth-scrim{position:fixed;inset:0;background:rgba(20,18,16,.45);opacity:0;visibility:hidden;
+    transition:opacity .22s;z-index:210;display:flex;align-items:center;justify-content:center;padding:24px;
+    backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+  .auth-scrim.open{opacity:1;visibility:visible;}
+  .auth-card{background:var(--card);border-radius:20px;width:400px;max-width:100%;
+    padding:34px 34px 30px;box-shadow:0 24px 70px rgba(30,22,6,.28);position:relative;
+    transform:translateY(10px) scale(.98);transition:transform .24s ease;}
+  .auth-scrim.open .auth-card{transform:none;}
+  .auth-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;
+    border:1px solid var(--line);background:#fff;cursor:pointer;font-size:17px;color:#555;
+    display:flex;align-items:center;justify-content:center;transition:background .15s;}
+  .auth-close:hover{background:#f3efe8;}
+  .auth-brand{font-family:Georgia,serif;font-size:21px;font-weight:600;color:var(--ink);margin:0 0 2px;}
+  .auth-brand span{color:var(--gold);}
+  .auth-h{font-family:Georgia,serif;font-size:25px;line-height:1.15;margin:14px 0 6px;letter-spacing:-.01em;}
+  .auth-sub{color:var(--muted);font-size:14.5px;margin:0 0 22px;}
+  .auth-opts{display:flex;flex-direction:column;gap:11px;}
+  .auth-btn{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;
+    font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);background:#fff;
+    border:1px solid #d9d1c1;border-radius:13px;padding:13px 16px;cursor:pointer;
+    transition:background .15s,border-color .15s,transform .12s;}
+  .auth-btn:hover{background:#faf7f1;border-color:#c2b8a4;}
+  .auth-btn:active{transform:translateY(1px);}
+  .auth-btn svg{flex:none;}
+  .auth-btn .ab-g{width:19px;height:19px;}
+  .auth-fine{color:var(--muted);font-size:12px;line-height:1.5;margin:20px 0 0;text-align:center;}
+  .auth-fine a{color:var(--jade);text-decoration:none;}
+  .auth-fine a:hover{text-decoration:underline;}
+
+  /* ============ STICKY SEARCH BAR ============ */
+  .searchbar{position:sticky;top:60px;z-index:80;
+    background:rgba(250,248,243,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);}
+  .searchbar-in{max-width:1240px;margin:0 auto;padding:12px 28px;}
+  .search-card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:7px;display:flex;align-items:stretch;gap:2px;}
+  .seg{position:relative;flex:1;text-align:left;padding:8px 16px;border-radius:11px;min-width:0;}
+  .seg.dest{flex:1.6;}
+  .seg + .seg::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:1px;background:var(--line);}
+  .seg .lb{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+  .seg-cnt{text-transform:none;letter-spacing:.01em;font-weight:600;}
+  .seg .vl{display:block;font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .seg-input{display:block;width:100%;border:none;background:none;padding:0;margin:0;
+    font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);outline:none;}
+  .seg-input::placeholder{color:#a49d90;font-weight:500;}
+  .search-go{flex:none;align-self:stretch;display:flex;align-items:center;gap:8px;
+    background:var(--jade);color:#fff;border:none;border-radius:12px;padding:0 24px;margin-left:4px;
+    font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;}
+  .search-go:hover{background:var(--jade-deep);}
+  .search-go svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
+  .seg-btn{display:block;width:100%;text-align:left;background:none;border:none;padding:0;margin:0;cursor:pointer;font-family:inherit;}
+  .seg.active{background:#f6f1e8;}
+
+  /* dates + guests popovers */
+  .pop{position:absolute;top:calc(100% + 12px);background:var(--card);border:1px solid var(--line);
+    border-radius:16px;box-shadow:0 16px 44px rgba(40,30,10,.18);z-index:60;padding:16px;}
+  .pop-dates{left:0;width:300px;}
+  .pop-guests{right:0;width:322px;}
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .cal-head b{font-size:14px;font-family:Georgia,serif;font-weight:600;}
+  .cal-nav{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;
+    cursor:pointer;color:var(--ink);font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .13s;}
+  .cal-nav:hover:not(:disabled){border-color:#c2b8a4;background:#faf7f1;}
+  .cal-nav:disabled{opacity:.3;cursor:default;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+  .cal-dow{font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;padding:3px 0;text-transform:uppercase;}
+  .cal-d{aspect-ratio:1;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;
+    color:var(--ink);border-radius:9px;font-family:inherit;transition:background .1s;}
+  .cal-d:hover:not(:disabled){background:#f0eadd;}
+  .cal-d:disabled{color:#cfc8bb;cursor:default;}
+  .cal-d.in-range{background:#e7efe6;border-radius:0;}
+  .cal-d.edge{background:var(--jade);color:#fff;border-radius:9px;}
+  .cal-hint{margin-top:11px;font-size:12px;color:var(--muted);text-align:center;}
+  /* guest picker (companions + age groups) */
+  .gp-tabs{display:flex;background:#f1ede5;border-radius:11px;padding:3px;gap:2px;margin-bottom:12px;}
+  .gp-tab{flex:1;border:none;background:none;border-radius:8px;font-family:inherit;font-size:13.5px;font-weight:600;
+    color:var(--muted);cursor:pointer;padding:8px;transition:background .15s,color .15s,box-shadow .15s;}
+  .gp-tab:hover{color:var(--ink);}
+  .gp-tab.is-on{background:#fff;color:var(--jade);box-shadow:0 1px 3px rgba(40,30,10,.14);}
+  .gp-roomrow{display:flex;align-items:center;gap:14px;padding:6px 2px 2px;}
+  .gp-roomrow .gpr-name{font-size:15px;font-weight:600;color:var(--ink);}
+  .gp-stepper{margin-left:auto;display:inline-flex;align-items:center;gap:6px;}
+  .gp-step{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--jade);
+    font-size:20px;line-height:1;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
+  .gp-step:hover:not(:disabled){border-color:var(--jade);background:#eef6f1;}
+  .gp-step:disabled{opacity:.4;cursor:default;}
+  .gp-stepval{min-width:24px;text-align:center;font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .gp-roomhint{font-size:12px;color:var(--muted);margin:13px 2px 2px;padding-top:12px;border-top:1px solid var(--line);}
+  .gp-lab{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:2px 2px 9px;}
+  .gp-reg{padding-bottom:13px;margin-bottom:4px;border-bottom:1px solid var(--line);}
+  .gp-chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .reg-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;
+    padding:6px 11px 6px 10px;font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;
+    cursor:pointer;font-family:inherit;transition:all .15s;}
+  .reg-chip:hover{border-color:var(--jade);background:#eef6f1;}
+  .reg-chip .rc-em{font-size:14px;}
+  .reg-chip .rc-plus{color:var(--jade);font-weight:700;font-size:14px;margin-left:1px;}
+  .gp-allin{font-size:12.5px;color:var(--muted);padding:2px;}
+  .gp-catg{padding:11px 0 4px;}
+  .gp-catg + .gp-catg{border-top:1px solid var(--line);}
+  .gp-chead{display:flex;align-items:center;padding:0 2px 2px;}
+  .gp-chead .gpc-name{font-size:14.5px;font-weight:600;color:var(--ink);}
+  .gp-chead .gpc-sub{font-size:12px;color:var(--muted);}
+  .gp-chead .gpc-sub::before{content:"·";margin:0 6px;color:#c3bcae;}
+  .gp-chead .gpc-count{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--jade);
+    min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#e7efe6;
+    display:inline-flex;align-items:center;justify-content:center;}
+  .gp-people{display:flex;flex-wrap:wrap;gap:6px;padding:9px 2px 4px;}
+  .person{display:inline-flex;align-items:center;gap:5px;border:1px solid #cfe6da;border-radius:20px;
+    padding:5px 5px 5px 11px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--jade);background:#eef6f1;}
+  .person:not(.is-comp){background:#fbf7ef;border-color:#e4dcc9;color:var(--ink);}
+  .person .person-em{font-size:14px;}
+  .person .person-name{border:none;background:none;font:inherit;color:inherit;cursor:pointer;padding:0;
+    border-bottom:1px dashed #c9c0ae;}
+  .person.custom .person-name{border-bottom-color:transparent;}
+  .person .person-x{border:none;background:none;cursor:pointer;color:#9a948c;font-size:17px;line-height:1;
+    padding:0 3px;border-radius:50%;transition:color .15s;}
+  .person .person-x:hover{color:#b03636;}
+  .person-in{width:118px;border:1px solid var(--jade);border-radius:20px;padding:5px 12px;font-family:inherit;
+    font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;outline:none;}
+  .gp-chead .gp-add{margin-left:8px;flex:none;width:25px;height:25px;padding:0;border-radius:50%;
+    border:1px solid var(--line);background:#fff;color:var(--jade);font-size:17px;line-height:1;
+    cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
+  .gp-chead .gp-add:hover:not(:disabled){border-color:var(--jade);background:#eef6f1;}
+  .gp-chead .gp-add:disabled{opacity:.4;cursor:default;}
+
+  /* ============ SHELL ============ */
+  .wrap{max-width:1240px;margin:0 auto;padding:0 28px 80px;}
+
+  /* results header */
+  .res-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:26px 0 18px;flex-wrap:wrap;}
+  .res-head h1{font-size:32px;line-height:1.1;margin-top:6px;}
+  .sortwrap{display:flex;align-items:center;gap:9px;}
+  .sortwrap label{font-size:13px;color:var(--muted);font-weight:600;}
+  .sort{appearance:none;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237c7771' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
+    border:1px solid var(--line);border-radius:11px;padding:9px 34px 9px 14px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;transition:border-color .15s;}
+  .sort:hover{border-color:#c2b8a4;}
+
+  /* ============ TWO-COLUMN ============ */
+  .grid{display:grid;grid-template-columns:264px 1fr;gap:28px;align-items:start;}
+  .rail{position:sticky;top:var(--stick);display:flex;flex-direction:column;gap:16px;}
+
+  /* filter groups */
+  .fgroup{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;}
+  .fg-h{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 9px;}
+  .fg-h .fg-note{text-transform:none;letter-spacing:0;font-weight:500;color:#a49d90;}
+  .fg-h .fg-note::before{content:"·";margin:0 6px;color:#c3bcae;}
+
+  /* usual filters apply button */
+  .apply-all{margin-top:14px;width:100%;background:var(--jade);color:#fff;border:1px solid var(--jade);
+    border-radius:11px;padding:9px 16px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .13s;}
+  .apply-all:hover{background:var(--jade-deep);border-color:var(--jade-deep);}
+  .apply-all.ghost{background:transparent;color:var(--jade);}
+  .apply-all.ghost:hover{background:#f2ede3;}
+
+  /* popular filters list */
+  .chk.pfrow{align-items:flex-start;}
+  .chk.pfrow .box{margin-top:1px;}
+  .pop-main{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3;}
+  .pop-main small{color:var(--muted);font-size:12px;font-weight:400;margin-top:2px;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{border:1px solid var(--line);background:var(--card);color:#4a453e;border-radius:20px;
+    padding:6px 13px;font-size:13px;font-weight:600;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:6px;}
+  .chip:hover{border-color:#c2b8a4;background:#faf7f1;}
+  .chip[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:#fff;}
+
+
+  /* checkbox amenities */
+  .checks{display:flex;flex-direction:column;gap:2px;}
+  .chk{display:flex;align-items:center;gap:10px;padding:6px 4px;border-radius:9px;cursor:pointer;font-size:14px;transition:background .1s;}
+  .chk:hover{background:#f6f1e8;}
+  .chk input{position:absolute;opacity:0;width:0;height:0;}
+  .chk .box{width:19px;height:19px;border:1.6px solid #c9c1b2;border-radius:6px;flex:none;
+    display:flex;align-items:center;justify-content:center;background:#fff;transition:all .12s;}
+  .chk .box svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;opacity:0;}
+  .chk input:checked + .box{background:var(--jade);border-color:var(--jade);}
+  .chk input:checked + .box svg{opacity:1;}
+  .chk input:focus-visible + .box{outline:2px solid var(--jade);outline-offset:2px;}
+
+  .clear-link{background:none;border:none;color:var(--jade);font-size:13.5px;font-weight:600;
+    cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:2px;align-self:flex-start;}
+  .clear-link:hover{color:var(--jade-deep);}
+
+  /* three filters sharing one box */
+  .fsub + .fsub{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);}
+
+  /* ---- price range ---- */
+  .pr-vals{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px;}
+  .pr-vals .pv{font-family:Georgia,serif;font-size:16px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .pr-slider{position:relative;height:26px;margin:2px 0 2px;}
+  .pr-track{position:absolute;top:11px;left:0;right:0;height:4px;border-radius:2px;background:var(--line);}
+  .pr-fill{position:absolute;top:11px;height:4px;border-radius:2px;background:var(--jade);}
+  .pr-slider input[type=range]{position:absolute;top:3px;left:0;width:100%;height:20px;margin:0;
+    -webkit-appearance:none;appearance:none;background:none;pointer-events:none;}
+  .pr-slider input[type=range]:focus{outline:none;}
+  .pr-slider input[type=range]::-webkit-slider-runnable-track{height:20px;background:none;}
+  .pr-slider input[type=range]::-moz-range-track{height:20px;background:none;}
+  .pr-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:20px;height:20px;
+    border-radius:50%;background:#fff;border:2px solid var(--jade);cursor:pointer;box-shadow:0 1px 4px rgba(40,30,10,.28);}
+  .pr-slider input[type=range]::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;
+    border-radius:50%;background:#fff;border:2px solid var(--jade);cursor:pointer;box-shadow:0 1px 4px rgba(40,30,10,.28);}
+
+  /* ---- guest + star rating pills ---- */
+  .star-row{display:flex;flex-wrap:wrap;gap:7px;}
+  .star-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:#fff;
+    border-radius:20px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;
+    font-family:inherit;transition:all .13s;}
+  .star-chip:hover{border-color:#c2b8a4;background:#faf7f1;}
+  .star-chip .star-ic{width:12px;height:12px;fill:var(--gold);stroke:none;}
+  .star-chip.is-on{border-color:var(--jade);background:#eef6f1;color:var(--jade-deep);}
+
+  /* ============ HOTEL LIST / CARDS ============ */
+  .list{display:flex;flex-direction:column;gap:20px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    box-shadow:0 1px 2px rgba(40,30,10,.04),0 8px 22px rgba(40,30,10,.05);
+    display:grid;grid-template-columns:40% 60%;transition:box-shadow .2s;cursor:pointer;}
+  .card:hover{box-shadow:0 4px 26px rgba(40,30,10,.10);}
+  .card:focus-visible{outline:2px solid var(--jade);outline-offset:2px;}
+
+  /* carousel */
+  .car{position:relative;background:#20321f;overflow:hidden;min-height:300px;}
+  .car-track{position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+    scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;}
+  .car-track::-webkit-scrollbar{display:none;}
+  .car-slide{flex:0 0 100%;scroll-snap-align:start;position:relative;}
+  .car-slide::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(120% 80% at 30% 15%, rgba(255,255,255,.18), transparent 55%),
+      linear-gradient(180deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.28) 100%);}
+  img.car-slide{object-fit:cover;height:100%;display:block;background:#20321f;}
+  .car-count{position:absolute;bottom:12px;right:12px;z-index:3;background:rgba(20,22,20,.62);color:#fff;
+    font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:20px;font-variant-numeric:tabular-nums;
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .car-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:34px;height:34px;
+    border-radius:50%;border:none;background:rgba(255,255,255,.94);color:var(--ink);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.22);
+    opacity:0;transition:opacity .16s,background .13s;}
+  .car:hover .car-arrow,.car:focus-within .car-arrow{opacity:1;}
+  .car-arrow:hover{background:#fff;}
+  .car-arrow:disabled{opacity:0!important;pointer-events:none;}
+  .car-arrow.prev{left:10px;}
+  .car-arrow.next{right:10px;}
+  .car-arrow svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* details */
+  .det{padding:22px 24px 20px;display:flex;flex-direction:column;min-width:0;}
+  .det-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;}
+  .det-head{min-width:0;}
+  .stars{display:flex;gap:2px;margin-bottom:8px;}
+  .stars svg{width:13px;height:13px;fill:var(--gold);stroke:none;}
+  .det h3{font-size:20px;line-height:1.22;}
+  .eyebrow{font-size:13px;color:var(--muted);margin-top:6px;}
+  .rating{flex:none;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+  .rating .score{font-family:Georgia,"Times New Roman",serif;color:var(--ink);display:inline-flex;align-items:baseline;line-height:1;}
+  .rating .score b{font-size:21px;font-weight:600;letter-spacing:-.02em;}
+  .rating .score .out{font-size:13px;font-weight:600;color:var(--muted);margin-left:1px;}
+  .rating .score-cnt{font-size:11.5px;color:var(--muted);white-space:nowrap;}
+
+  .room{margin-top:16px;align-self:flex-start;border:1px solid #f0ebe1;background:#faf8f4;border-radius:11px;padding:11px 13px;}
+  .room-main{font-size:14px;font-weight:600;color:#3a3630;}
+  .room-sub{font-size:13px;color:var(--muted);margin-top:4px;}
+
+  .priceblock{margin-top:auto;padding-top:20px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .price .pn{font-size:15px;color:var(--muted);}
+  .price .pn b{font-family:Georgia,serif;font-size:24px;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
+  .price .pt{font-size:12.5px;color:var(--muted);margin-top:3px;}
+  .cta{display:flex;align-items:center;gap:8px;}
+  .view-btn{background:var(--jade);color:#fff;border:none;border-radius:12px;height:46px;padding:0 22px;
+    font-size:14.5px;font-weight:600;cursor:pointer;transition:background .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
+  .view-btn:hover{background:var(--jade-deep);}
+  .save-sq{width:46px;height:46px;flex:none;border:1px solid var(--line);background:#fff;border-radius:12px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .13s;}
+  .save-sq:hover{border-color:#c2b8a4;background:#faf7f1;}
+  .save-sq svg{width:20px;height:20px;stroke:#3a3630;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:all .13s;}
+  .save-sq.saved{border-color:#bcdcc9;background:#eef6f1;}
+  .save-sq.saved svg{stroke:#3f8163;}
+
+  /* empty state */
+  .empty{padding:44px 0 56px;text-align:center;}
+  .empty .em-ic{width:56px;height:56px;border-radius:50%;background:#f2ece1;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+  .empty .em-ic svg{width:26px;height:26px;stroke:var(--muted);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .empty h3{font-size:20px;margin-bottom:0;}
+  .empty p{font-size:14.5px;color:var(--muted);max-width:420px;margin:0 auto 18px;line-height:1.55;}
+  .empty .em-sug{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+  .em-sug button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:7px 15px;font-size:13.5px;font-weight:600;color:var(--jade);cursor:pointer;transition:all .13s;}
+  .em-sug button:hover{border-color:#c2b8a4;background:#faf7f1;}
+  /* empty state → travel postcard */
+  .postcard{position:relative;max-width:600px;margin:0 auto;padding:10px;
+    background:linear-gradient(160deg,#fdfbf6,#faf6ee);border-radius:6px;
+    box-shadow:0 2px 5px rgba(40,30,10,.06), 0 18px 38px -20px rgba(40,30,10,.38);}
+  .postcard::after{content:"";position:absolute;inset:9px;border:1.5px dashed #d9d1c0;border-radius:3px;pointer-events:none;}
+  .pc-inner{position:relative;display:flex;gap:28px;padding:30px 32px;text-align:left;}
+  .pc-left{flex:1;display:flex;align-items:center;}
+  .pc-note{font-family:Georgia,serif;font-size:20px;line-height:1.5;color:var(--ink);letter-spacing:-.005em;margin:0;}
+  .pc-right{width:128px;flex:none;padding-left:24px;border-left:1.5px dashed #d9d1c0;
+    display:flex;flex-direction:column;gap:16px;}
+  .pc-stamp{position:relative;align-self:flex-end;width:52px;height:62px;padding:4px;background:#fff;border-radius:2px;
+    box-shadow:0 1px 3px rgba(40,30,10,.18);}
+  .pc-stamp-in{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:100%;
+    background:linear-gradient(#eef5f0,#e3eee7);border:1px dashed #a9cbb7;border-radius:1px;}
+  .pc-stamp-in svg{width:26px;height:26px;stroke:var(--jade);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .pc-stamp-in em{font-style:normal;font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--jade-deep);}
+  .pc-mark{position:absolute;left:-15px;top:-11px;width:44px;height:44px;border-radius:50%;
+    border:1.5px dashed rgba(109,114,108,.45);transform:rotate(-12deg);}
+  .pc-lines{display:flex;flex-direction:column;gap:11px;margin-top:2px;}
+  .pc-lines span{height:0;border-bottom:1.5px solid #e7e0d1;}
+  @media(max-width:560px){
+    .pc-inner{flex-direction:column;gap:16px;padding:20px;}
+    .pc-right{width:auto;border-left:none;border-top:1.5px dashed #d9d1c0;padding-left:0;padding-top:16px;
+      flex-direction:row;align-items:center;justify-content:space-between;}
+    .pc-stamp{align-self:auto;order:2;}
+    .pc-lines{flex:1;margin-top:0;order:1;}
+  }
+
+  /* ============ TOAST ============ */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:300;
+    display:flex;align-items:center;gap:10px;background:#1c1c1c;color:#fff;
+    padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;
+    box-shadow:0 10px 34px rgba(0,0,0,.28);animation:toast-in .22s ease;}
+  .toast-ic{width:20px;height:20px;border-radius:50%;background:#2a7d5f;flex:none;
+    display:flex;align-items:center;justify-content:center;}
+  .toast-ic svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+  @keyframes toast-in{from{opacity:0;transform:translate(-50%,10px);}to{opacity:1;transform:translate(-50%,0);}}
+
+  /* ============ RESPONSIVE ============ */
+  .rail-toggle{display:none;}
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr;gap:18px;}
+    .rail{position:static;max-height:none;overflow:visible;}
+    .card{grid-template-columns:1fr;}
+    .car,.car-slide{min-height:240px;}
+    .res-head h1{font-size:26px;}
+    .searchbar-in{padding:10px 16px;}
+    .wrap{padding:0 16px 60px;}
+    .search-card{flex-wrap:wrap;}
+    .seg{flex:1 1 40%;}
+    .seg.dest{flex:1 1 100%;}
+    .seg + .seg::before{display:none;}
+    .search-go{flex:1 1 100%;justify-content:center;margin-left:0;padding:12px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{scroll-behavior:auto!important;transition:none!important;animation:none!important;}
+    .car-track{scroll-behavior:auto!important;}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const {useState, useRef, useMemo, useCallback, useEffect} = React;
+
+/* ================= DATA ================= */
+const SORTS = [
+  {id:"recommended", label:"Recommended"},
+  {id:"price-asc",   label:"Price: low to high"},
+  {id:"price-desc",  label:"Price: high to low"},
+  {id:"rating",      label:"Top rated"},
+];
+
+// The user's frequent filters. Hardcoded for now — structured so it can later
+// be derived from stay history / profile (frequent amenities + rating floor).
+const USUAL = { amenities:["Pool","Spa","Free breakfast"], rating:9 };
+const USUAL_EMOJI = { "Pool":"🏊", "Spa":"💆", "Free breakfast":"🍳" };
+const USUAL_LABEL = { "Free breakfast":"Breakfast incl." };
+
+const H = (id,name,type,stars,area,place,dist,score,reviews,price,amenities,room,restaurants)=>
+  ({id,name,type,stars,area,place,dist,score,reviews,price,amenities,room,restaurants});
+
+const LOCATIONS = {
+  "Goa":[
+    H("taj-exotica","Taj Exotica Resort & Spa","Resort",5,"Benaulim","South Goa","On the beach",9.2,1840,15200,
+      ["Pool","Spa","Beachfront","Airport transfer","Gym","Scenic view"],
+      "Deluxe Villa · King bed · Garden view · 48 m²",6),
+    H("w-goa","W Goa","Resort",5,"Vagator","North Goa","2 min to beach",8.9,2210,21800,
+      ["Pool","Spa","Beachfront","Gym","Wi-Fi","Free breakfast","Scenic view"],
+      "Marvelous Suite · King bed · Sea view · 55 m²",5),
+    H("ahilya","Ahilya by the Sea","Villa",5,"Nerul","North Goa","Waterfront",9.4,210,32000,
+      ["Pool","Beachfront","Free breakfast","Scenic view","Airport transfer","Free cancellation"],
+      "Private Villa · King bed · Sea view · 70 m²",1),
+    H("postcard","The Postcard, Cuelim","Hotel",4,"Cansaulim","South Goa","Hillside",9.1,640,15200,
+      ["Pool","Spa","Free breakfast","Free cancellation","Wi-Fi"],
+      "Garden Room · Queen bed · Courtyard view · 34 m²",2),
+    H("vivenda","Vivenda dos Palhaços","Homestay",3,"Majorda","South Goa","5 min to beach",9.0,380,8800,
+      ["Free breakfast","Wi-Fi","Pool","Pet friendly"],
+      "Colonial Room · Queen bed · Garden view · 28 m²",1),
+    H("novotel","Novotel Goa Candolim","Hotel",4,"Candolim","North Goa","Beachfront",8.2,3120,11400,
+      ["Pool","Gym","Wi-Fi","Free breakfast","Beachfront"],
+      "Superior Room · Twin beds · Pool view · 30 m²",3),
+  ],
+  "Udaipur":[
+    H("udaivilas","The Oberoi Udaivilas","Resort",5,"Haridasji Ki Magri","Udaipur","Lakefront",9.6,1980,48000,
+      ["Pool","Spa","Free breakfast","Gym","Airport transfer","Scenic view","Free cancellation"],
+      "Premier Room · King bed · Pool view · 52 m²",3),
+    H("lake-palace","Taj Lake Palace","Resort",5,"Lake Pichola","Udaipur","Island palace",9.5,2900,42000,
+      ["Pool","Spa","Free breakfast","Airport transfer","Scenic view"],
+      "Luxury Room · King bed · Lake view · 42 m²",4),
+    H("amet","Amet Haveli","Homestay",3,"Hanuman Ghat","Udaipur","Lakeside",8.7,720,6200,
+      ["Free breakfast","Wi-Fi","Scenic view","Free cancellation"],
+      "Heritage Room · Queen bed · Lake view · 26 m²",1),
+    H("radisson-udr","Radisson Blu Udaipur","Hotel",4,"Fatehpura","Udaipur","City centre",8.1,2400,7600,
+      ["Pool","Gym","Wi-Fi","Free breakfast"],
+      "Superior Room · King bed · City view · 32 m²",2),
+  ],
+  "Mumbai":[
+    H("taj-palace","The Taj Mahal Palace","Hotel",5,"Colaba","Mumbai","Gateway of India",9.3,5400,28000,
+      ["Pool","Spa","Gym","Free breakfast","Wi-Fi","Airport transfer","Scenic view"],
+      "Luxury Grande · King bed · Harbour view · 40 m²",8),
+    H("trident-np","Trident Nariman Point","Hotel",5,"Nariman Point","Mumbai","Marine Drive",8.8,4100,16500,
+      ["Pool","Gym","Wi-Fi","Free breakfast","Scenic view","Free cancellation"],
+      "Deluxe Room · King bed · Sea view · 34 m²",4),
+    H("jw-juhu","JW Marriott Juhu","Resort",5,"Juhu Beach","Mumbai","Beachfront",8.4,3800,19800,
+      ["Pool","Spa","Gym","Beachfront","Free breakfast"],
+      "Deluxe Room · King bed · Pool view · 42 m²",6),
+    H("abode","Abode Bombay","Homestay",3,"Colaba","Mumbai","Boutique",8.6,560,9200,
+      ["Wi-Fi","Free breakfast","Free cancellation"],
+      "Luxe Room · Queen bed · City view · 24 m²",0),
+  ],
+  "Andaman":[
+    H("taj-havelock","Taj Exotica Resort & Spa, Havelock","Resort",5,"Radhanagar","Havelock Island","Beachfront",9.4,480,38000,
+      ["Pool","Spa","Beachfront","Free breakfast","Scenic view","Airport transfer"],
+      "Beach Villa · King bed · Sea view · 66 m²",3),
+    H("barefoot","Barefoot at Havelock","Villa",4,"Beach No. 7","Havelock Island","Rainforest",9.0,390,14500,
+      ["Beachfront","Free breakfast","Wi-Fi","Pet friendly","Free cancellation"],
+      "Nicobari Villa · King bed · Garden view · 40 m²",1),
+  ],
+};
+const KNOWN = Object.keys(LOCATIONS);
+
+/* ================= HELPERS ================= */
+const inr = n => "₹" + n.toLocaleString("en-IN");
+const hashHue = str => { let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))%360; return h; };
+
+/* dates + guests */
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DOW = ["S","M","T","W","T","F","S"];
+const DAY_MS = 86400000;
+const startOfDay = d => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+const addMonths = (d,n) => new Date(d.getFullYear(), d.getMonth()+n, 1);
+const sameDay = (a,b) => !!a && !!b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+const fmtDay = d => d ? MONTHS[d.getMonth()]+" "+d.getDate() : "";
+const nightsBetween = (a,b) => (a&&b) ? Math.max(1, Math.round((startOfDay(b)-startOfDay(a))/DAY_MS)) : 1;
+const datesLabel = (a,b) => a&&b ? fmtDay(a)+" → "+fmtDay(b) : a ? fmtDay(a)+" → …" : "Add dates";
+/* ---- guest picker (companions + age groups), shared with the rest of the app ---- */
+const TKEY = "onto:travellers:v3";
+function readUserName(){ try{ const a=JSON.parse(localStorage.getItem(TKEY))||[]; const me=a.find(t=>t.relation==="Myself"||t.id==="t-you"); if(me&&me.name&&me.name.toLowerCase()!=="you"&&me.name.indexOf("@")<0) return me.name; }catch(e){} return "You"; }
+function writeUserName(n){ try{ let a=JSON.parse(localStorage.getItem(TKEY)); if(!Array.isArray(a)) a=[]; const me=a.find(t=>t.relation==="Myself"||t.id==="t-you"); if(me) me.name=n; else a.unshift({id:"t-you",name:n,relation:"Myself",interests:[]}); localStorage.setItem(TKEY, JSON.stringify(a)); }catch(e){} }
+const FUN_EMOJI = ["🦊","🐨","🐼","🦁","🐧","🐬","🦉","🐢","🐝","🦩"];
+function emojiFor(name){ let h=0,s=String(name||""); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; }
+function catFor(t){ if(t.relation==="Myself") return "adults"; if(typeof t.age==="number"){ if(t.age<2) return "infants"; if(t.age<13) return "children"; return "adults"; } if(t.relation==="Child") return "children"; return "adults"; }
+function loadCompanions(){
+  let arr=[]; try{ arr=JSON.parse(localStorage.getItem(TKEY))||[]; }catch(e){} if(!Array.isArray(arr)) arr=[];
+  const me=arr.filter(t=>t.relation==="Myself"||t.id==="t-you")[0];
+  const list=[{id:"you", em:(me&&me.emoji)||emojiFor(readUserName()), name:readUserName(), cat:"adults"}];
+  arr.filter(t=>t.relation!=="Myself"&&t.id!=="t-you").forEach(t=>{ list.push({id:t.id, em:t.emoji||emojiFor(t.name), name:t.name, cat:catFor(t)}); });
+  return list;
+}
+const COMPANIONS = loadCompanions();
+const MAP = {}; COMPANIONS.forEach(c=>{ MAP[c.id]=c; });
+const G_EM = { adults:"🧍", children:"🧒", infants:"👶" };
+const G_NAME = { adults:"Adults", children:"Children", infants:"Infants" };
+const G_SUB  = { adults:"Age 13+", children:"Age 2–12", infants:"Under 2 · free" };
+const FUN = {
+  adults:  ["Captain Mango","Wanderer Kai","Skipper Reef","Sunny Coco","Palm Rover"],
+  children:["Little Tiger","Coco Pop","Captain Nemo","Sandy Toes","Mango Bean"],
+  infants: ["Little Pebble","Baby Sprout","Tiny Coco","Wee Mango","Baby Reef"],
+};
+const CATS = ["adults","children","infants"];
+const MIN = { adults:1, children:0, infants:0 };
+const MAXG = 9;
+const cloneParty = p => ({adults:[...p.adults], children:[...p.children], infants:[...p.infants]});
+const heads = p => CATS.reduce((n,c)=>n+p[c].length, 0);
+const usedIds = p => { const s=new Set(); CATS.forEach(c=>p[c].forEach(x=>{ if(x.companion) s.add(x.companion); })); return s; };
+const knownIn = p => { const r=[]; CATS.forEach(c=>p[c].forEach(x=>{ if(x.companion) r.push(MAP[x.companion]); })); return r; };
+const joinNames = a => a.length<=1 ? (a[0]||"") : a.slice(0,-1).join(", ")+" & "+a[a.length-1];
+const plural = (n,w) => n+" "+w+(n===1?"":"s");
+function composition(p){
+  const out=[];
+  if(p.adults.length)   out.push(plural(p.adults.length,"adult"));
+  if(p.children.length) out.push(p.children.length+(p.children.length===1?" child":" children"));
+  if(p.infants.length)  out.push(plural(p.infants.length,"infant"));
+  return out.join(" · ") || "Add guests";
+}
+function guestsLabel(p){
+  const nm = knownIn(p).map(c=>c.name);
+  const extra = heads(p) - nm.length;
+  return nm.length ? joinNames(nm)+(extra>0?" +"+extra:"") : composition(p);
+}
+function loadParty(){
+  let party; try{ party=JSON.parse(sessionStorage.getItem("searchGuests")); }catch(e){}
+  if(!party || !party.adults) party = { adults:[{companion:"you"}], children:[], infants:[] };
+  CATS.forEach(c=>{ if(party[c]) party[c]=party[c].filter(x=>!x.companion||MAP[x.companion]); });
+  return party;
+}
+
+// Real photography for the hotels we have shot; others fall back to gradients.
+const PHOTOS = {
+  "taj-exotica":[
+    {src:"images/gv-01-bedroom.png", label:"Bedroom"},
+    {src:"images/gv-02-balcony.png", label:"Balcony"},
+    {src:"images/gv-04-exterior.png",label:"Villa exterior"},
+    {src:"images/gv-03-bathroom.png",label:"Bathroom"},
+  ],
+  "w-goa":[
+    {src:"w-goa-rooms/suite-sleeping.jpg",label:"Bedroom"},
+    {src:"w-goa-rooms/suite-patio.jpg",   label:"Patio"},
+    {src:"w-goa-rooms/chalet-sea.jpg",    label:"Sea view"},
+    {src:"w-goa-rooms/suite-bathroom.jpg",label:"Bathroom"},
+  ],
+};
+function photosFor(hotel){
+  if(PHOTOS[hotel.id]) return PHOTOS[hotel.id];
+  const base = hashHue(hotel.id);
+  const labels = ["Arrival & lobby","Signature suite","Pool & deck","Dining","The grounds"];
+  if(hotel.amenities.includes("Beachfront")) labels[4] = "Private beach";
+  if(hotel.amenities.includes("Spa")) labels.splice(3,0,"Spa sanctuary");
+  return labels.map((label,i)=>({ label, hue:(base + i*29)%360 }));
+}
+const REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ================= ICONS ================= */
+const I = {
+  search:  <path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-4.3-4.3"/>,
+  chevL:   <path d="M15 18l-6-6 6-6"/>,
+  chevR:   <path d="M9 6l6 6-6 6"/>,
+  check:   <path d="M20 6L9 17l-5-5"/>,
+  plus:    <path d="M12 5v14M5 12h14"/>,
+  pin:     <g><path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></g>,
+  compass: <g><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></g>,
+  filter:  <path d="M4 6h16M7 12h10M10 18h4"/>,
+};
+const Svg = ({d, vb="0 0 24 24", ...p}) => <svg viewBox={vb} {...p}>{d}</svg>;
+
+/* ================= CAROUSEL ================= */
+function Carousel({photos, name}){
+  const track = useRef(null);
+  const [idx, setIdx] = useState(0);
+  const onScroll = () => {
+    const el = track.current; if(!el) return;
+    setIdx(Math.round(el.scrollLeft / el.clientWidth));
+  };
+  const go = dir => {
+    const el = track.current; if(!el) return;
+    el.scrollBy({ left: dir*el.clientWidth, behavior: REDUCED ? "auto":"smooth" });
+  };
+  const total = photos.length;
+  return (
+    <div className="car">
+      <div className="car-track" ref={track} onScroll={onScroll} tabIndex={-1}>
+        {photos.map((p,i)=> p.src ? (
+          <img className="car-slide" key={i} src={p.src} alt={`${name} — ${p.label}`} loading="lazy" draggable={false}/>
+        ) : (
+          <div className="car-slide" key={i}
+            style={{background:`linear-gradient(140deg, hsl(${p.hue} 42% 52%), hsl(${(p.hue+20)%360} 40% 26%))`}}
+            role="img" aria-label={`${name} — ${p.label}`}/>
+        ))}
+      </div>
+      <span className="car-count" aria-hidden="true">{idx+1} / {total}</span>
+      <button className="car-arrow prev" onClick={e=>{e.stopPropagation(); go(-1);}} disabled={idx===0} aria-label="Previous photo">
+        <Svg d={I.chevL}/></button>
+      <button className="car-arrow next" onClick={e=>{e.stopPropagation(); go(1);}} disabled={idx===total-1} aria-label="Next photo">
+        <Svg d={I.chevR}/></button>
+    </div>
+  );
+}
+
+/* ================= HOTEL CARD ================= */
+function HotelCard({hotel, saved, onSave, onBook, nights}){
+  const photos = useMemo(()=>photosFor(hotel), [hotel.id]);
+  const cancel = hotel.amenities.includes("Free cancellation");
+  const bfast = hotel.amenities.includes("Free breakfast");
+  const total = hotel.price * nights;
+  const openPdp = () => { location.href = PDP_HREF; };
+  return (
+    <article className="card" onClick={openPdp} role="link" tabIndex={0}
+      aria-label={`${hotel.name} — view details`}
+      onKeyDown={e=>{ if(e.key==="Enter"){ e.preventDefault(); openPdp(); } }}>
+      <Carousel photos={photos} name={hotel.name}/>
+      <div className="det">
+        <div className="det-top">
+          <div className="det-head">
+            <div className="stars" aria-label={hotel.stars+"-star property"}>
+              {Array.from({length:hotel.stars}).map((_,i)=><Svg key={i} d={<path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 18.9 5 21.4l1.4-6.8L1.3 9.9l6.9-.8L12 2z"/>}/>)}
+            </div>
+            <h3>{hotel.name}</h3>
+            <div className="eyebrow">{hotel.area} · {hotel.place} · {hotel.dist}</div>
+          </div>
+          <div className="rating">
+            <span className="score"><b>{hotel.score.toFixed(1)}</b><span className="out">/10</span></span>
+            <span className="score-cnt">{hotel.reviews.toLocaleString("en-IN")} reviews</span>
+          </div>
+        </div>
+
+        <div className="room">
+          <div className="room-main">{hotel.room}</div>
+          <div className="room-sub">
+            {cancel ? "Free cancellation" : "Non-refundable"} · {bfast ? "Breakfast included" : "Room only"}
+          </div>
+        </div>
+
+        <div className="priceblock">
+          <div className="price">
+            <div className="pn"><b>{inr(hotel.price)}</b> / night</div>
+            <div className="pt">{inr(total)} total · {nights} {nights===1?"night":"nights"}</div>
+          </div>
+          <div className="cta">
+            <button className="view-btn" onClick={e=>{e.stopPropagation(); onBook();}}>Book now</button>
+            <button className={"save-sq"+(saved?" saved":"")} onClick={e=>{e.stopPropagation(); onSave();}}
+              aria-pressed={saved} aria-label={saved?"Remove from shortlist":"Add to shortlist"}>
+              <Svg d={saved ? I.check : I.plus}/></button>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/* ================= FILTER RAIL ================= */
+function Chip({active, onClick, children}){
+  return (
+    <button className="chip" aria-pressed={active} onClick={onClick}>{children}</button>
+  );
+}
+
+const STAR_PATH = <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 18.9 5 21.4l1.4-6.8L1.3 9.9l6.9-.8L12 2z"/>;
+
+/* price range — dual-handle per-night slider */
+function PriceFilter({all, value, setValue}){
+  const prices = all.map(h => h.price);
+  const step = 500;
+  const lo = Math.min(...prices), hi = Math.max(...prices);
+  const min = Math.floor(lo/step)*step;
+  const max = Math.ceil(hi/step)*step;
+  const curMin = value ? Math.max(min, Math.min(value.min, max)) : min;
+  const curMax = value ? Math.min(max, Math.max(value.max, min)) : max;
+  const pct = v => max===min ? 0 : ((v-min)/(max-min))*100;
+  const setMinV = v => setValue({min: Math.min(v, curMax), max: curMax});
+  const setMaxV = v => setValue({min: curMin, max: Math.max(v, curMin)});
+  return (
+    <div className="fsub">
+      <p className="fg-h">Price range<span className="fg-note">per night</span></p>
+      <div className="pr-vals">
+        <span className="pv">{inr(curMin)}</span>
+        <span className="pv">{inr(curMax)}{curMax>=max?"+":""}</span>
+      </div>
+      <div className="pr-slider">
+        <div className="pr-track"/>
+        <div className="pr-fill" style={{left:pct(curMin)+"%", right:(100-pct(curMax))+"%"}}/>
+        <input type="range" min={min} max={max} step={step} value={curMin}
+          aria-label="Minimum price" onChange={e=>setMinV(+e.target.value)}/>
+        <input type="range" min={min} max={max} step={step} value={curMax}
+          aria-label="Maximum price" onChange={e=>setMaxV(+e.target.value)}/>
+      </div>
+    </div>
+  );
+}
+
+/* guest rating — score floor (shares the `rating` state) */
+function GuestRatingFilter({rating, setRating}){
+  return (
+    <div className="fsub">
+      <p className="fg-h">Guest rating</p>
+      <div className="star-row">
+        {[9,8,7].map(v=>(
+          <button type="button" key={v} className={"star-chip"+(rating===v?" is-on":"")}
+            aria-pressed={rating===v} onClick={()=>setRating(p=>p===v?null:v)}>{v}+</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* star rating — 3 to 5 stars (shares the `starCat` state) */
+function StarFilter({starCat, setStarCat}){
+  const toggle = s => setStarCat(p => p.includes(s) ? p.filter(x=>x!==s) : [...p,s]);
+  return (
+    <div className="fsub">
+      <p className="fg-h">Star rating</p>
+      <div className="star-row">
+        {[5,4,3].map(s=>(
+          <button type="button" key={s} className={"star-chip"+(starCat.includes(s)?" is-on":"")}
+            aria-pressed={starCat.includes(s)} onClick={()=>toggle(s)}>
+            {s} <Svg className="star-ic" d={STAR_PATH}/>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FilterRail({all, starCat, setStarCat, types, setTypes, rating, setRating, amenities, setAmenities,
+  price, setPrice, loggedOut}){
+  const toggleAmen = a => setAmenities(p => p.includes(a) ? p.filter(x=>x!==a) : [...p,a]);
+  const toggleRating = v => setRating(p => p===v ? null : v);
+
+  // usual
+  const usualAmenActive = a => amenities.includes(a);
+  const usualRatingActive = rating === USUAL.rating;
+  const allUsualActive = USUAL.amenities.every(usualAmenActive) && usualRatingActive;
+  const applyAllUsual = () => {
+    if(allUsualActive){
+      setAmenities(p => p.filter(a => !USUAL.amenities.includes(a)));
+      if(usualRatingActive) setRating(null);
+    } else {
+      setAmenities(p => Array.from(new Set([...p, ...USUAL.amenities])));
+      setRating(USUAL.rating);
+    }
+  };
+
+  return (
+    <aside className="rail" aria-label="Filters">
+      <div className="fgroup">
+        <PriceFilter all={all} value={price} setValue={setPrice}/>
+        <GuestRatingFilter rating={rating} setRating={setRating}/>
+        <StarFilter starCat={starCat} setStarCat={setStarCat}/>
+      </div>
+    </aside>
+  );
+}
+
+/* ================= SEARCH BAR ================= */
+function Calendar({checkIn, checkOut, onPick}){
+  const today = startOfDay(new Date());
+  const [month, setMonth] = useState(()=> new Date((checkIn||today).getFullYear(), (checkIn||today).getMonth(), 1));
+  const startDow = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
+  const dim = new Date(month.getFullYear(), month.getMonth()+1, 0).getDate();
+  const cells = [];
+  for(let i=0;i<startDow;i++) cells.push(null);
+  for(let d=1; d<=dim; d++) cells.push(startOfDay(new Date(month.getFullYear(), month.getMonth(), d)));
+  const prevDisabled = new Date(month.getFullYear(), month.getMonth(), 1) <= new Date(today.getFullYear(), today.getMonth(), 1);
+  const inRange = d => checkIn && checkOut && d>startOfDay(checkIn) && d<startOfDay(checkOut);
+  const edge = d => sameDay(d,checkIn) || sameDay(d,checkOut);
+  return (
+    <div>
+      <div className="cal-head">
+        <button type="button" className="cal-nav" onClick={()=>setMonth(addMonths(month,-1))} disabled={prevDisabled} aria-label="Previous month">‹</button>
+        <b>{MONTHS[month.getMonth()]} {month.getFullYear()}</b>
+        <button type="button" className="cal-nav" onClick={()=>setMonth(addMonths(month,1))} aria-label="Next month">›</button>
+      </div>
+      <div className="cal-grid">
+        {DOW.map((d,i)=><div className="cal-dow" key={"dow"+i}>{d}</div>)}
+        {cells.map((d,i)=> d ? (
+          <button type="button" key={i} disabled={d<today} onClick={()=>onPick(d)}
+            className={"cal-d"+(inRange(d)?" in-range":"")+(edge(d)?" edge":"")}>{d.getDate()}</button>
+        ) : <span key={i}/>)}
+      </div>
+      <div className="cal-hint">{checkIn && !checkOut ? "Pick a check-out date" : "Select your dates"}</div>
+    </div>
+  );
+}
+
+function PersonInput({initial, onCommit, onCancel}){
+  const [v, setV] = useState(initial);
+  const ref = useRef(null);
+  useEffect(()=>{ if(ref.current){ ref.current.focus(); ref.current.select(); } }, []);
+  return (
+    <input ref={ref} className="person-in" value={v} maxLength={24} aria-label="Guest name"
+      onChange={e=>setV(e.target.value)} onClick={e=>e.stopPropagation()}
+      onKeyDown={e=>{ e.stopPropagation(); if(e.key==="Enter") onCommit(v); else if(e.key==="Escape") onCancel(); }}
+      onBlur={()=>onCommit(v)}/>
+  );
+}
+
+function GuestPicker({party, setParty, rooms, setRooms}){
+  const [editing, setEditing] = useState(null); // {cat,i}
+  const [tab, setTab] = useState("guests");
+  const funN = useRef({adults:0, children:0, infants:0});
+  const commit = np => { try{ sessionStorage.setItem("searchGuests", JSON.stringify(np)); }catch(e){} setParty(np); };
+
+  const addCompanion = id => {
+    const c = MAP[id]; if(!c || heads(party)>=MAXG || usedIds(party).has(id)) return;
+    const np = cloneParty(party); np[c.cat] = [...np[c.cat], {companion:id}]; commit(np);
+  };
+  const addExtra = cat => {
+    if(heads(party)>=MAXG) return;
+    const np = cloneParty(party);
+    const name = FUN[cat][funN.current[cat]++ % FUN[cat].length];
+    np[cat] = [...np[cat], {auto:true, em:G_EM[cat], name}]; commit(np);
+  };
+  const removePerson = (cat,i) => {
+    if(party[cat].length<=MIN[cat]) return;
+    const np = cloneParty(party); np[cat] = np[cat].filter((_,j)=>j!==i); commit(np);
+  };
+  const commitName = val => {
+    if(!editing){ return; }
+    const np = cloneParty(party); const arr = [...np[editing.cat]]; const p = {...arr[editing.i]};
+    const v = (val||"").trim();
+    if(v){ if(p.companion==="you"){ MAP["you"].name = v; writeUserName(v); } else { p.name=v; p.custom=true; } }
+    arr[editing.i] = p; np[editing.cat] = arr; setEditing(null); commit(np);
+  };
+
+  const avail = COMPANIONS.filter(c=>!usedIds(party).has(c.id));
+  const full = heads(party) >= MAXG;
+  return (
+    <React.Fragment>
+      <div className="gp-tabs" role="tablist">
+        <button type="button" className={"gp-tab"+(tab==="guests"?" is-on":"")}
+          onClick={e=>{e.stopPropagation(); setTab("guests");}}>Guests</button>
+        <button type="button" className={"gp-tab"+(tab==="rooms"?" is-on":"")}
+          onClick={e=>{e.stopPropagation(); setTab("rooms");}}>Rooms</button>
+      </div>
+
+      {tab==="guests" ? (
+        <div className="gp-panel">
+          <div className="gp-reg">
+            <div className="gp-lab">Regular companions</div>
+            <div className="gp-chips">
+              {avail.length ? avail.map(c=>(
+                <button type="button" className="reg-chip" key={c.id} onClick={e=>{e.stopPropagation(); addCompanion(c.id);}}>
+                  <span className="rc-em">{c.em}</span>{c.name}<span className="rc-plus">+</span>
+                </button>
+              )) : <span className="gp-allin">Everyone’s added ✓</span>}
+            </div>
+          </div>
+          {CATS.map(cat=>(
+            <div className="gp-catg" key={cat}>
+              <div className="gp-chead">
+                <span className="gpc-name">{G_NAME[cat]}</span>
+                <span className="gpc-sub">{G_SUB[cat]}</span>
+                <span className="gpc-count">{party[cat].length}</span>
+                <button type="button" className="gp-add" disabled={full} aria-label={"Add "+G_NAME[cat]}
+                  onClick={e=>{e.stopPropagation(); addExtra(cat);}}>+</button>
+              </div>
+              {party[cat].length>0 && (
+                <div className="gp-people">
+                  {party[cat].map((p,i)=>{
+                    if(editing && editing.cat===cat && editing.i===i){
+                      const init = p.name || (p.companion && MAP[p.companion] ? MAP[p.companion].name : "") || "";
+                      return <PersonInput key={i} initial={init} onCommit={commitName} onCancel={()=>setEditing(null)}/>;
+                    }
+                    const c = p.companion ? MAP[p.companion] : null;
+                    const em = c ? c.em : p.em, name = c ? c.name : p.name;
+                    const editable = !p.companion || p.companion==="you";
+                    return (
+                      <span className={"person"+(p.companion?" is-comp":(p.custom?" custom":""))} key={i}>
+                        <span className="person-em">{em}</span>
+                        {editable
+                          ? <button type="button" className="person-name" onClick={e=>{e.stopPropagation(); setEditing({cat,i});}}>{name}</button>
+                          : name}
+                        <button type="button" className="person-x" aria-label={"Remove "+name}
+                          onClick={e=>{e.stopPropagation(); removePerson(cat,i);}}>×</button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="gp-panel">
+          <div className="gp-roomrow">
+            <div className="gpr-lab"><div className="gpr-name">Rooms</div></div>
+            <div className="gp-stepper">
+              <button type="button" className="gp-step" disabled={rooms<=1} aria-label="Fewer rooms"
+                onClick={e=>{e.stopPropagation(); setRooms(r=>Math.max(1,r-1));}}>−</button>
+              <span className="gp-stepval">{rooms}</span>
+              <button type="button" className="gp-step" disabled={rooms>=5} aria-label="More rooms"
+                onClick={e=>{e.stopPropagation(); setRooms(r=>Math.min(5,r+1));}}>+</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
+function SearchBar({location, onSearch, checkIn, checkOut, onPickDate, party, setParty, rooms, setRooms}){
+  const [draft, setDraft] = useState(location);
+  const [open, setOpen] = useState(null); // 'dates' | 'guests' | null
+  const wrapRef = useRef(null);
+  useEffect(()=>{ setDraft(location); }, [location]);
+  useEffect(()=>{
+    if(!open) return;
+    const onDoc = e => { if(wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(null); };
+    const onKey = e => { if(e.key==="Escape") setOpen(null); };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return ()=>{ document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onKey); };
+  }, [open]);
+  const submit = e => { e && e.preventDefault(); onSearch(draft.trim()); };
+  return (
+    <div className="searchbar">
+      <div className="searchbar-in">
+        <form className="search-card" onSubmit={submit} role="search" ref={wrapRef}>
+          <div className="seg dest">
+            <label className="lb" htmlFor="whereInput">Where</label>
+            <input id="whereInput" className="seg-input" value={draft} list="known-locations"
+              placeholder="Search a destination" autoComplete="off"
+              onChange={e=>setDraft(e.target.value)} onFocus={()=>setOpen(null)}/>
+            <datalist id="known-locations">
+              {KNOWN.map(k=><option key={k} value={k}/>)}
+            </datalist>
+          </div>
+
+          <div className={"seg"+(open==="dates"?" active":"")}>
+            <button type="button" className="seg-btn" aria-expanded={open==="dates"}
+              onClick={()=>setOpen(open==="dates"?null:"dates")}>
+              <span className="lb">Dates</span>
+              <span className="vl">{datesLabel(checkIn,checkOut)}</span>
+            </button>
+            {open==="dates" && (
+              <div className="pop pop-dates open" onClick={e=>e.stopPropagation()}>
+                <Calendar checkIn={checkIn} checkOut={checkOut} onPick={d=>onPickDate(d, ()=>setOpen(null))}/>
+              </div>
+            )}
+          </div>
+
+          <div className={"seg"+(open==="guests"?" active":"")}>
+            <button type="button" className="seg-btn" aria-expanded={open==="guests"}
+              onClick={()=>setOpen(open==="guests"?null:"guests")}>
+              <span className="lb">Guests <span className="seg-cnt">· {heads(party)} {heads(party)===1?"guest":"guests"} · {rooms} {rooms===1?"room":"rooms"}</span></span>
+              <span className="vl">{guestsLabel(party)}</span>
+            </button>
+            {open==="guests" && (
+              <div className="pop pop-guests open" onClick={e=>e.stopPropagation()}>
+                <GuestPicker party={party} setParty={setParty} rooms={rooms} setRooms={setRooms}/>
+              </div>
+            )}
+          </div>
+
+          <button className="search-go" type="submit">
+            <Svg d={I.search}/> Search
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* ================= AUTH MODAL (logged-out) ================= */
+function AuthModal({open, onClose, returnTo}){
+  useEffect(()=>{
+    if(!open) return;
+    const onKey = e => { if(e.key==="Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return ()=>{ document.removeEventListener("keydown", onKey); document.body.style.overflow=""; };
+  }, [open, onClose]);
+  const google = ()=>{ try{ sessionStorage.setItem("authReturn", returnTo); }catch(e){} location.href = "google-login.html"; };
+  return (
+    <div className={"auth-scrim"+(open?" open":"")} role="dialog" aria-modal="true" aria-labelledby="authTitle"
+         onClick={e=>{ if(e.target===e.currentTarget) onClose(); }}>
+      <div className="auth-card">
+        <button className="auth-close" onClick={onClose} aria-label="Close">×</button>
+        <div className="auth-brand">on<span>to</span></div>
+        <h2 className="auth-h" id="authTitle">Log in or sign up</h2>
+        <p className="auth-sub">Save trips, manage bookings and check out faster.</p>
+        <div className="auth-opts">
+          <button className="auth-btn" onClick={google}>
+            <svg className="ab-g" viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            Continue with Gmail
+          </button>
+        </div>
+        <p className="auth-fine">By continuing you agree to our <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a>.</p>
+      </div>
+    </div>
+  );
+}
+
+/* ================= APP ================= */
+const params = new URLSearchParams(location.search);
+const LOGGED_OUT = params.get("auth") === "out";
+const PDP_HREF = LOGGED_OUT ? "hotel-firstfold-loggedout.html" : "hotel-firstfold.html";
+
+function App(){
+  const [loc, setLoc]           = useState(params.get("where") || "Goa");
+  const [checkIn, setCheckIn]   = useState(()=> new Date(2026,6,10));
+  const [checkOut, setCheckOut] = useState(()=> new Date(2026,6,13));
+  const [party, setParty]       = useState(loadParty);
+  const [rooms, setRooms]       = useState(1);
+  const nights   = nightsBetween(checkIn, checkOut);
+  const datesStr = datesLabel(checkIn, checkOut);
+  const guestsStr = guestsLabel(party);
+
+  // date-range picker: first click (or after a full range) starts a new range
+  const pickDate = (d, close) => {
+    if(!checkIn || checkOut){ setCheckIn(d); setCheckOut(null); }
+    else if(startOfDay(d) > startOfDay(checkIn)){ setCheckOut(d); close && close(); }
+    else { setCheckIn(d); }
+  };
+
+  const [starCat, setStarCat]   = useState([]);
+  const [types, setTypes]       = useState([]);
+  const [rating, setRating]     = useState(null);
+  const [amenities, setAmen]    = useState([]);
+  const [price, setPrice]       = useState(null); // {min,max} per night, or null = full range
+  const [sort, setSort]         = useState("recommended");
+  const [saved, setSaved]       = useState(()=>({}));
+
+  const covered = Object.prototype.hasOwnProperty.call(LOCATIONS, loc);
+  const all = covered ? LOCATIONS[loc] : [];
+
+  // changing the location resets the filters + swaps the result set
+  const runSearch = useCallback(raw=>{
+    if(!raw) return;
+    const match = KNOWN.find(k => k.toLowerCase() === raw.toLowerCase());
+    const next = match || raw;
+    if(next === loc) return;
+    setLoc(next);
+    setStarCat([]); setTypes([]); setRating(null); setAmen([]); setPrice(null); setSort("recommended");
+  }, [loc]);
+
+  const clearAll = () => { setStarCat([]); setTypes([]); setRating(null); setAmen([]); setPrice(null); };
+
+  const results = useMemo(()=>{
+    const inPrice = h => !price || (h.price >= price.min && h.price <= price.max);
+    let r = all.filter(h =>
+      (starCat.length===0 || starCat.includes(h.stars)) &&
+      (types.length===0 || types.includes(h.type)) &&
+      amenities.every(a => h.amenities.includes(a)) &&
+      (rating==null || h.score >= rating) &&
+      inPrice(h)
+    );
+    if(sort==="price-asc")  r = [...r].sort((a,b)=>a.price-b.price);
+    if(sort==="price-desc") r = [...r].sort((a,b)=>b.price-a.price);
+    if(sort==="rating")     r = [...r].sort((a,b)=>b.score-a.score);
+    return r;
+  }, [all, starCat, types, rating, amenities, price, sort]);
+
+  const [authOpen, setAuthOpen] = useState(false);
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
+  const showToast = msg => {
+    setToast(msg);
+    if(toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(()=>setToast(null), 2200);
+  };
+  // logged out: saving requires an account → prompt sign-in instead of toggling
+  const onSave = id => {
+    if(LOGGED_OUT){ setAuthOpen(true); return; }
+    const adding = !saved[id];
+    setSaved(p=>({...p, [id]:!p[id]}));
+    showToast(adding ? "Added to trip" : "Removed from trip");
+  };
+
+  // Book now: logged out → prompt sign-in; logged in → seed the booking snapshot
+  // (same shape checkout writes) and hand off to the payment screen.
+  const bookNow = h => {
+    if(LOGGED_OUT){ setAuthOpen(true); return; }
+    const booking = {
+      hotel: h.name,
+      place: `${h.area} · ${h.place}, India`,
+      dates: datesStr, nights: `${nights} ${nights===1?"night":"nights"}`, guests: guestsStr,
+      room: h.room,
+      rooms: rooms + " room" + (rooms>1?"s":""),
+      amount: inr(h.price * nights),
+      name: "You", email: "xyz@email.com",
+    };
+    try{ sessionStorage.setItem("booking", JSON.stringify(booking)); }catch(e){}
+    location.href = "razorpay.html";
+  };
+
+  return (
+    <div>
+      <nav className="topnav">
+        <div className="topnav-in">
+          <a className="tn-brand" href={LOGGED_OUT ? "home-loggedout.html" : "home.html"}>onto<span>.</span></a>
+          {LOGGED_OUT ? (
+            <div className="tn-right">
+              <button type="button" className="tn-signup" onClick={()=>setAuthOpen(true)}>Sign up</button>
+            </div>
+          ) : (
+            <>
+              <div className="tn-links">
+                <a href="home.html" className="active">Stays</a>
+                <a href="trips.html">Trips</a>
+              </div>
+              <div className="tn-right">
+                <button type="button" className="tn-avatar" aria-haspopup="true">{(readUserName()[0]||"Y").toUpperCase()}</button>
+                <div className="menu" role="menu">
+                  <a className="menu-id" href="profile.html">
+                    <span className="tn-avatar">{(readUserName()[0]||"Y").toUpperCase()}</span>
+                    <div><b>{readUserName()}</b><small>xyz@email.com</small></div>
+                    <span className="menu-id-ar">›</span>
+                  </a>
+                  <div className="menu-sec">
+                    <a className="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span className="ar">›</span></a>
+                    <a className="item" href="help.html"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span className="ar">›</span></a>
+                    <a className="item" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </nav>
+
+      <SearchBar location={loc} onSearch={runSearch}
+        checkIn={checkIn} checkOut={checkOut} onPickDate={pickDate}
+        party={party} setParty={setParty} rooms={rooms} setRooms={setRooms}/>
+
+      <div className="wrap">
+        <div className="res-head">
+          {covered && <h1>Stays in {loc}</h1>}
+          {covered && all.length>0 && (
+            <div className="sortwrap">
+              <label htmlFor="sortSel">Sort</label>
+              <select id="sortSel" className="sort" value={sort} onChange={e=>setSort(e.target.value)}>
+                {SORTS.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}
+              </select>
+            </div>
+          )}
+        </div>
+
+        {!covered ? (
+          <div className="empty">
+            <div className="postcard">
+              <div className="pc-inner">
+                <div className="pc-left">
+                  <p className="pc-note">We don't have any available properties for your search.</p>
+                </div>
+                <div className="pc-right">
+                  <div className="pc-stamp">
+                    <span className="pc-stamp-in">
+                      <svg viewBox="0 0 40 46" aria-hidden="true"><circle cx="20" cy="15" r="6.5"/><path d="M5 29c3-2.6 5 2.6 8 0s5 2.6 8 0 5 2.6 8 0"/><path d="M5 36c3-2.6 5 2.6 8 0s5 2.6 8 0 5 2.6 8 0"/></svg>
+                      <em>onto</em>
+                    </span>
+                    <span className="pc-mark" aria-hidden="true"/>
+                  </div>
+                  <div className="pc-lines"><span/><span/><span/></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid">
+            <FilterRail
+              all={all}
+              starCat={starCat} setStarCat={setStarCat}
+              types={types} setTypes={setTypes}
+              rating={rating} setRating={setRating}
+              amenities={amenities} setAmenities={setAmen}
+              price={price} setPrice={setPrice}
+              loggedOut={LOGGED_OUT}/>
+            <div>
+              {results.length>0 ? (
+                <div className="list">
+                  {results.map(h=>(
+                    <HotelCard key={h.id} hotel={h} saved={!!saved[h.id]} nights={nights}
+                      onSave={()=>onSave(h.id)} onBook={()=>bookNow(h)}/>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty">
+                  <div className="em-ic"><Svg d={I.filter}/></div>
+                  <h3>No stays match these filters</h3>
+                  <p>We have {all.length} stays in {loc}, but none fit every filter you've set. Loosen a filter to see more.</p>
+                  <div className="em-sug"><button onClick={clearAll}>Clear all filters</button></div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {LOGGED_OUT && (
+        <AuthModal open={authOpen} onClose={()=>setAuthOpen(false)}
+          returnTo={"results.html?where=" + encodeURIComponent(loc)}/>
+      )}
+
+      {toast && (
+        <div className="toast" role="status" aria-live="polite">
+          <span className="toast-ic"><Svg d={I.check}/></span>{toast}
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taj Exotica · App first fold</title>
+<style>
+  :root{
+    --bg:#efeae1;
+    --card:#ffffff;
+    --ink:#1c1c1c;
+    --muted:#7c7771;
+    --line:#e7e1d6;
+    --jade:#2f4f74;
+    --jade-deep:#284667;
+    --gold:#c19a4b;
+    --green:#2a7d5f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+  }
+
+  /* ---------- phone frame ---------- */
+  .phone{
+    position:relative;width:390px;height:844px;background:#000;border-radius:54px;
+    padding:12px;box-shadow:0 40px 90px rgba(30,22,10,.28),0 0 0 2px rgba(0,0,0,.15);
+    flex:none;
+  }
+  .screen{
+    position:relative;width:100%;height:100%;background:var(--card);border-radius:42px;
+    overflow:hidden;display:flex;flex-direction:column;
+  }
+  /* notch */
+  .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:30px;
+    background:#000;border-radius:20px;z-index:40;}
+
+  /* ---------- status bar ---------- */
+  .statusbar{position:absolute;top:0;left:0;right:0;height:52px;z-index:35;
+    display:flex;align-items:center;justify-content:space-between;padding:20px 30px 0;
+    font-size:14px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.35);pointer-events:none;}
+  .sb-right{display:flex;align-items:center;gap:6px;font-size:13px;}
+
+  /* ---------- app header (floating over hero) ---------- */
+  .appbar{position:absolute;top:52px;left:0;right:0;z-index:35;
+    display:flex;align-items:center;justify-content:space-between;padding:8px 16px;}
+  .ab-btn{width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(20,18,16,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:#fff;font-size:19px;line-height:1;display:flex;align-items:center;justify-content:center;
+    transition:background .15s;}
+  .ab-btn:hover{background:rgba(20,18,16,.62);}
+  .ab-btn.on{background:var(--jade);color:#fff;}
+
+  /* ---------- full-screen hero ---------- */
+  .hero{position:absolute;inset:0;z-index:1;background:#c9b48c;}
+  .gal{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;}
+  .gal::-webkit-scrollbar{display:none;}
+  .gal img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:start;display:block;}
+  .hero::after{content:"";position:absolute;left:0;right:0;top:0;height:150px;pointer-events:none;
+    background:linear-gradient(180deg,rgba(20,18,16,.28),transparent);}
+  /* room badge + counter ride just above the panel's top edge */
+  .galui{position:absolute;left:0;right:0;bottom:100%;z-index:6;
+    padding:0 16px 13px;transition:opacity .28s;}
+  .galui-row{display:flex;align-items:center;justify-content:space-between;}
+  .roombadge{background:rgba(20,18,16,.6);color:#fff;font-size:12.5px;font-weight:600;padding:6px 13px;
+    border-radius:20px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+  .infopanel.expanded .galui{opacity:0;pointer-events:none;}
+
+  /* photo-slider dots, centered on the header row */
+  .topdots{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:35;display:flex;gap:6px;}
+  .topdots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.55);
+    box-shadow:0 1px 3px rgba(0,0,0,.35);transition:all .2s;}
+  .topdots i.on{background:#fff;width:18px;border-radius:4px;}
+
+  /* ---------- draggable info panel ---------- */
+  .infopanel{position:absolute;left:0;right:0;bottom:92px;height:500px;z-index:20;background:#fff;
+    border-radius:24px 24px 0 0;box-shadow:0 -14px 40px rgba(0,0,0,.16);
+    padding:0 20px 16px;display:flex;flex-direction:column;
+    transform:translateY(78%);touch-action:none;will-change:transform;}
+  .ip-handle{flex:none;display:flex;justify-content:center;padding:11px 0 10px;cursor:grab;}
+  .ip-handle:active{cursor:grabbing;}
+  .ip-handle span{width:40px;height:4px;border-radius:3px;background:#ddd5c7;}
+  .ip-peek{flex:none;padding-bottom:8px;cursor:grab;}
+  .ip-rest{flex:1;min-height:0;overflow:hidden;padding-top:4px;}
+
+  .stars{color:var(--gold);letter-spacing:2px;font-size:13px;}
+  .name{font-family:Georgia,"Times New Roman",serif;font-size:25px;letter-spacing:-.01em;margin:6px 0 4px;line-height:1.15;}
+  .place{color:var(--jade);font-weight:600;font-size:11.5px;letter-spacing:.07em;}
+
+  /* your-stay chips */
+  .trip-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
+  .tripchip{text-align:left;background:#f6f3ee;border:none;border-radius:14px;padding:13px 15px;
+    cursor:pointer;font-family:inherit;display:flex;flex-direction:column;gap:5px;transition:background .15s;}
+  .tripchip:active{background:#efe9df;}
+  .tc-k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .tc-v{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tc-cnt{font-size:11px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:normal;}
+  .tc-cnt::before{content:"·";margin:0 5px;}
+
+  /* selected room */
+  .selroom{width:100%;text-align:left;font-family:inherit;cursor:pointer;margin-top:10px;
+    background:#f6f3ee;border:none;border-radius:14px;padding:12px 15px;
+    display:flex;flex-direction:column;gap:8px;transition:background .15s;}
+  .selroom:active{background:#efe9df;}
+  .sr-line{font-size:13.5px;color:var(--muted);}
+  .sr-tag{align-self:flex-start;font-size:11.5px;color:#9a948c;font-weight:500;}
+  .sr-name{font-family:Georgia,serif;font-size:15px;font-weight:500;color:var(--ink);}
+
+  /* match validation */
+  .validate{margin-top:16px;border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+  .vd-score{font-size:14.5px;font-weight:700;color:var(--green);margin:0 0 10px;}
+  .vd-chips{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0;}
+  .vd-chips li{font-size:11.5px;color:#37423b;background:#eef2ee;border:1px solid #e0e7e0;
+    border-radius:20px;padding:4px 10px;}
+  .vd-chips li.spot{color:#8a6a24;background:#f7f0e0;border-color:#ebddbf;font-weight:600;}
+
+  /* ---------- sticky book bar ---------- */
+  .bookbar{position:absolute;left:0;right:0;bottom:0;z-index:30;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);padding:14px 20px 26px;
+    display:flex;align-items:center;gap:16px;}
+  .bb-price b{font-family:Georgia,serif;font-size:23px;font-weight:600;color:var(--ink);}
+  .bb-price span{font-size:13px;color:var(--muted);}
+  .bb-price small{display:block;font-size:12px;color:var(--muted);margin-top:1px;}
+  .bookbtn{margin-left:auto;flex:none;border:none;background:var(--jade);color:#fff;
+    font-size:16px;font-weight:600;padding:15px 30px;border-radius:14px;cursor:pointer;
+    font-family:inherit;transition:background .15s;}
+  .bookbtn:active{background:var(--jade-deep);}
+  .homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:31;
+    width:134px;height:5px;border-radius:3px;background:rgba(0,0,0,.32);}
+
+  /* ---------- bottom sheets (date + guests) ---------- */
+  .msheet-scrim{position:absolute;inset:0;background:rgba(20,18,16,.38);
+    backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+    opacity:0;visibility:hidden;transition:opacity .34s ease,visibility .34s;z-index:50;border-radius:42px;}
+  .msheet-scrim.open{opacity:1;visibility:visible;}
+  .msheet{position:absolute;left:0;right:0;bottom:0;z-index:51;background:#fff;
+    border-radius:24px 24px 0 0;transform:translateY(101%);
+    transition:transform .42s cubic-bezier(.22,1,.36,1);
+    padding:6px 20px 42px;height:458px;overflow:hidden;box-shadow:0 -12px 40px rgba(0,0,0,.22);
+    display:flex;flex-direction:column;}
+  .msheet.open{transform:translateY(0);}
+  .msheet-grab{flex:none;width:40px;height:4px;border-radius:3px;background:#ddd5c7;margin:8px auto 16px;}
+
+  /* calendar */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .cal-title{font-family:Georgia,serif;font-size:18px;font-weight:600;}
+  .cal-nav{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--jade);
+    font-size:19px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .cal-nav:disabled{opacity:.35;cursor:default;}
+  .cal-dows{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px;}
+  .cal-dows span{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:6px 0;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);min-height:252px;align-content:start;}
+  .cal-cell{position:relative;display:flex;align-items:center;justify-content:center;padding:2px 0;}
+  .cal-cell.rng::before{content:"";position:absolute;top:2px;bottom:2px;left:0;right:0;background:#e9f0f7;z-index:0;}
+  .cal-cell.rng.start::before{left:50%;}
+  .cal-cell.rng.end::before{right:50%;}
+  .cal-cell.rng.start.end::before{display:none;}
+  .cal-day{position:relative;z-index:1;width:38px;height:38px;border:none;background:none;border-radius:50%;
+    font-family:inherit;font-size:14.5px;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;}
+  .cal-day:hover{background:#efe9df;}
+  .cal-day.sel{background:var(--jade);color:#fff;}
+  .cal-day.sel:hover{background:var(--jade-deep);}
+  .cal-day.today{font-weight:700;}
+  .cal-day.disabled{color:#cbc4b7;cursor:default;}
+  .cal-day.disabled:hover{background:none;}
+  .cal-foot{flex:none;display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);}
+  .cf-tx{font-size:15.5px;color:var(--muted);}
+  .cf-tx b{color:var(--ink);font-weight:700;font-size:18px;}
+  .cf-tx .cf-cost{color:var(--ink);font-weight:600;font-size:18px;}
+  .sheet-done{background:var(--jade);color:#fff;border:none;padding:11px 26px;border-radius:11px;font-size:15px;
+    font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s;}
+  .sheet-done:active{background:var(--jade-deep);}
+
+  /* guests */
+  .gp-count{flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 2px 14px;
+    border-bottom:1px solid var(--line);margin-bottom:14px;}
+  #compList{flex:1;min-height:0;overflow-y:auto;margin:0 -4px;padding:0 4px;}
+  #compList::-webkit-scrollbar{display:none;}
+  .gc-lab{font-size:16px;font-weight:600;}
+  .stepper{display:flex;align-items:center;gap:16px;}
+  .stepper button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:17px;
+    line-height:1;color:var(--jade);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .stepper button:disabled{opacity:.4;cursor:default;}
+  .gc-n{font-size:17px;font-weight:700;min-width:22px;text-align:center;}
+  .compbtn{width:100%;display:flex;align-items:center;gap:12px;padding:12px 13px;margin-bottom:9px;
+    border:1px solid var(--line);border-radius:13px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;}
+  .compbtn:last-child{margin-bottom:0;}
+  .compbtn:active{border-color:#c9c0ae;}
+  .compbtn.on{border-color:var(--jade);background:#f4f7fb;}
+  .cb-em{font-size:20px;flex:none;width:26px;text-align:center;}
+  .cb-tx{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .cb-name{font-size:15px;font-weight:600;color:var(--ink);}
+  .cb-sub{font-size:12.5px;color:var(--muted);margin-top:1px;}
+  .cb-check{flex:none;width:24px;height:24px;border-radius:50%;border:1.5px solid #cfc8bb;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;transition:all .15s;}
+  .compbtn.on .cb-check{background:var(--jade);border-color:var(--jade);}
+
+  /* ---------- room options sheet ---------- */
+  .roomscrim{position:absolute;inset:0;background:rgba(20,18,16,.42);
+    backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+    opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;z-index:60;border-radius:42px;}
+  .roomscrim.open{opacity:1;visibility:visible;}
+  .roomsheet{position:absolute;left:0;right:0;bottom:0;height:93%;z-index:61;background:var(--bg);
+    border-radius:24px 24px 0 0;transform:translateY(101%);
+    transition:transform .42s cubic-bezier(.22,1,.36,1);
+    display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -14px 40px rgba(0,0,0,.22);}
+  .roomsheet.open{transform:translateY(0);}
+  .rs-head{flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:18px 18px 12px;}
+  .rs-grab{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:40px;height:4px;border-radius:3px;background:#ddd5c7;}
+  .rs-head h3{font-family:Georgia,serif;font-size:21px;margin:0;}
+  .rs-x{width:34px;height:34px;border-radius:50%;border:none;background:#e2dccf;color:#4a4641;font-size:14px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .rs-list{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 30px;display:flex;flex-direction:column;gap:12px;}
+  .rs-list::-webkit-scrollbar{display:none;}
+
+  /* expanded card */
+  .ro-card{flex:0 0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.05),0 12px 28px rgba(40,30,10,.07);}
+  .ro-badge{background:var(--green);color:#fff;text-align:center;font-size:13px;font-weight:600;padding:9px;}
+  .ro-photo{position:relative;aspect-ratio:16/11;background:#e9e4da;}
+  .ro-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .ro-count{position:absolute;bottom:10px;right:10px;background:rgba(20,18,16,.66);color:#fff;
+    font-size:12px;font-weight:600;padding:4px 10px;border-radius:13px;}
+  .ro-nav{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;
+    background:rgba(255,255,255,.9);border:none;font-size:18px;line-height:1;color:#222;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .ro-prev{left:10px;} .ro-next{right:10px;}
+  .ro-close{position:absolute;top:9px;right:9px;z-index:2;width:22px;height:22px;border-radius:50%;
+    border:none;background:rgba(20,18,16,.55);color:#fff;font-size:10px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .ro-close:hover{background:rgba(20,18,16,.8);}
+  .ro-body{padding:18px;}
+  .ro-name{font-family:Georgia,serif;font-size:23px;font-weight:600;margin:0 0 5px;line-height:1.1;}
+  .ro-meta{color:var(--muted);font-size:14px;margin-bottom:16px;}
+  .ro-opt{display:flex;align-items:center;gap:11px;font-size:14.5px;color:#333;cursor:pointer;user-select:none;position:relative;}
+  .ro-opt input{position:absolute;opacity:0;pointer-events:none;}
+  .ro-radio{flex:none;width:22px;height:22px;border-radius:50%;border:1.6px solid #cfc8bb;
+    display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .ro-opt input:checked + .ro-radio{border-color:var(--jade);background:var(--jade);}
+  .ro-opt input:checked + .ro-radio::after{content:"";width:8px;height:8px;border-radius:50%;background:#fff;}
+  .ro-why{margin-top:13px;font-size:12.5px;color:var(--jade);background:#f4f7fb;border-radius:10px;padding:9px 12px;line-height:1.4;}
+  .ro-priced{border-top:1px solid var(--line);margin-top:18px;padding-top:15px;display:flex;align-items:flex-end;justify-content:space-between;}
+  .ro-nightly b{font-family:Georgia,serif;font-size:26px;font-weight:600;}
+  .ro-nightly small{font-size:13px;color:var(--muted);}
+  .ro-tot{text-align:right;font-size:12px;color:var(--muted);}
+  .ro-tot b{display:block;font-size:15px;color:#4a4641;font-weight:700;}
+  .ro-cta{display:flex;gap:12px;margin-top:16px;}
+  .ro-details{flex:1;background:#fff;border:1px solid #d9d1c1;color:var(--jade);font-weight:600;font-size:15px;
+    padding:13px;border-radius:12px;cursor:pointer;font-family:inherit;}
+  .ro-details:active{background:#faf7f1;}
+  .ro-book{flex:1;background:var(--jade);color:#fff;border:none;font-weight:600;font-size:15px;
+    padding:13px;border-radius:12px;cursor:pointer;font-family:inherit;}
+  .ro-book:active{background:var(--jade-deep);}
+
+  /* collapsed row */
+  .ro-row{flex:0 0 auto;display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:12px;
+    cursor:pointer;border:none;text-align:left;font-family:inherit;width:100%;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .ro-row:active{background:#faf7f1;}
+  .ro-thumb{flex:none;width:72px;height:72px;border-radius:12px;object-fit:cover;background:#e9e4da;}
+  .ro-rowtx{flex:1;min-width:0;}
+  .ro-rowtx h4{font-family:Georgia,serif;font-size:17px;margin:0 0 3px;font-weight:400;}
+  .ro-rowtx .m{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ro-rowtx .p{font-size:14px;margin-top:5px;color:var(--ink);}
+  .ro-rowtx .p b{font-weight:700;}
+  .ro-chev{flex:none;color:#bcb4a6;font-size:22px;}
+
+  /* keep the left hotel-switcher rail from covering the phone */
+  @media(min-width:761px){ body{padding-left:194px;} }
+</style>
+</head>
+<body>
+
+
+<div class="phone">
+  <div class="screen">
+    <div class="notch"></div>
+
+    <!-- status bar -->
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-right">&#9679;&#9679;&#9679; &nbsp;&#128246;&nbsp; &#128267;</span>
+    </div>
+
+    <!-- floating app header -->
+    <div class="appbar">
+      <button class="ab-btn" aria-label="Back">&#8249;</button>
+      <div class="topdots" id="dots"></div>
+      <button class="ab-btn" id="addBtn" aria-label="Add to trip" aria-pressed="false">&#43;</button>
+    </div>
+
+    <!-- full-screen hero -->
+    <div class="hero">
+      <div class="gal" id="gal">
+        <img src="images/gv-01-bedroom.png" alt="Villa Room — garden-view bedroom">
+        <img src="images/gv-02-balcony.png" alt="Private balcony">
+        <img src="images/gv-03-bathroom.png" alt="Bathroom">
+        <img src="images/gv-04-exterior.png" alt="Villa exterior">
+        <img src="images/07-garden-view.png" alt="Garden and grounds">
+      </div>
+    </div>
+
+    <!-- draggable info panel -->
+    <div class="infopanel" id="infopanel">
+      <!-- gallery indicators hug the panel's top edge -->
+      <div class="galui">
+        <div class="galui-row">
+          <span class="roombadge">Villa Room · Garden View</span>
+        </div>
+      </div>
+      <div class="ip-handle" id="ipHandle"><span></span></div>
+      <div class="ip-peek" id="ipPeek">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h1 class="name">Taj Exotica Resort &amp; Spa</h1>
+        <div class="place">BENAULIM BEACH · GOA, INDIA</div>
+      </div>
+      <div class="ip-rest">
+        <!-- your stay -->
+        <div class="trip-row">
+          <button type="button" class="tripchip" id="dateChip">
+            <span class="tc-k">Dates<span class="tc-cnt" id="nightsVal">3 nights</span></span>
+            <span class="tc-v" id="dateVal">Fri 10 &ndash; Mon 13 Jul</span>
+          </button>
+          <button type="button" class="tripchip" id="guestChip" aria-expanded="false">
+            <span class="tc-k">Guests<span class="tc-cnt" id="guestSub">3 guests</span></span>
+            <span class="tc-v" id="guestVal">You, Priya &amp; Aarav</span>
+          </button>
+        </div>
+
+        <!-- selected room -->
+        <button type="button" class="selroom" id="selRoom">
+          <div class="sr-line"><span class="sr-name" id="srName">Villa Room</span><span id="srMeta"> · 1 King · Garden view · 56 m²</span></div>
+          <span class="sr-tag" id="srTag">Cancellable till 9th Jul · Breakfast included</span>
+        </button>
+
+        <!-- match validation -->
+        <div class="validate">
+          <div class="vd-score" id="relScore">94% match for your trip</div>
+          <div id="relGroups"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- bottom-sheet scrim -->
+    <div class="msheet-scrim" id="scrim"></div>
+
+    <!-- date bottom sheet -->
+    <div class="msheet" id="dateSheet">
+      <div class="msheet-grab"></div>
+      <div class="cal-head">
+        <button type="button" class="cal-nav" id="calPrev" aria-label="Previous month">&#8249;</button>
+        <span class="cal-title" id="calTitle"></span>
+        <button type="button" class="cal-nav" id="calNext" aria-label="Next month">&#8250;</button>
+      </div>
+      <div class="cal-dows"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-foot">
+        <span class="cf-tx" id="calFootTxt"></span>
+      </div>
+    </div>
+
+    <!-- guests bottom sheet -->
+    <div class="msheet" id="guestSheet">
+      <div class="msheet-grab"></div>
+      <div class="gp-count">
+        <span class="gc-lab">Guests</span>
+        <div class="stepper">
+          <button type="button" id="cMinus" aria-label="Fewer guests">&#8722;</button>
+          <span class="gc-n" id="cNum">3</span>
+          <button type="button" id="cPlus" aria-label="More guests">&#43;</button>
+        </div>
+      </div>
+      <div id="compList"></div>
+    </div>
+
+    <!-- room options sheet -->
+    <div class="roomscrim" id="roomScrim"></div>
+    <div class="roomsheet" id="roomSheet">
+      <div class="rs-head">
+        <div class="rs-grab"></div>
+        <h3>Choose your room</h3>
+        <button class="rs-x" id="roomClose" aria-label="Close">&#10005;</button>
+      </div>
+      <div class="rs-list" id="rsList"></div>
+    </div>
+
+    <!-- sticky book bar -->
+    <div class="bookbar">
+      <div class="bb-price">
+        <b id="bbNightly">₹18,500</b><span>/ night</span>
+        <small id="bbSmall">₹55,500 total · 3 nights</small>
+      </div>
+      <button class="bookbtn">Book now</button>
+    </div>
+    <div class="homebar"></div>
+  </div>
+</div>
+
+<script>
+  // shared booking state → keeps the sticky price bar in sync
+  window.STAY = { rate:18500, nights:3, guests:3, cap:3 };
+  // rooms needed for the party at a given per-room capacity (⌈guests ÷ capacity⌉)
+  window.roomsFor = cap => Math.max(1, Math.ceil((window.STAY.guests||1)/(cap||1)));
+  window.refreshBookBar = function(){
+    const s = window.STAY, f = n => '₹' + n.toLocaleString('en-IN');
+    const bn = document.getElementById('bbNightly'); if(bn) bn.textContent = f(s.rate);
+    const bs = document.getElementById('bbSmall');
+    if(bs){
+      const rooms = window.roomsFor(s.cap);
+      bs.textContent = f(s.rate * s.nights * rooms) + ' total · ' + (rooms>1?rooms+' rooms · ':'') + s.nights + ' night' + (s.nights>1?'s':'');
+    }
+  };
+
+  // gallery dots + counter
+  (function(){
+    const gal = document.getElementById('gal');
+    const dots = document.getElementById('dots');
+    const n = gal.children.length;
+    for(let i=0;i<n;i++){ const d=document.createElement('i'); if(i===0)d.className='on'; dots.appendChild(d); }
+    gal.addEventListener('scroll', () => {
+      const i = Math.round(gal.scrollLeft / gal.clientWidth);
+      [...dots.children].forEach((d,idx)=>d.classList.toggle('on', idx===i));
+    }, {passive:true});
+  })();
+
+  // add-to-trip toggle (+ ⇄ ✓)
+  const addBtn = document.getElementById('addBtn');
+  addBtn.addEventListener('click', () => {
+    const on = addBtn.getAttribute('aria-pressed') === 'true';
+    addBtn.setAttribute('aria-pressed', String(!on));
+    addBtn.classList.toggle('on', !on);
+    addBtn.innerHTML = !on ? '&#10003;' : '&#43;';
+  });
+</script>
+
+<script>
+  // ---- draggable info panel (peek ⇄ expanded) ----
+  (function(){
+    const panel  = document.getElementById('infopanel');
+    const handle = document.getElementById('ipHandle');
+    const peek   = document.getElementById('ipPeek');
+    const scrim  = document.getElementById('scrim');
+    const EXPANDED = 0;
+    let COLLAPSED = 0, cur = 0, startY = 0, startT = 0, dragging = false;
+
+    function setT(t, anim){
+      cur = t;
+      panel.style.transition = anim ? 'transform .40s cubic-bezier(.22,1,.36,1)' : 'none';
+      panel.style.transform  = 'translateY(' + t + 'px)';
+      panel.classList.toggle('expanded', t < COLLAPSED / 2);
+    }
+    function recalc(){
+      COLLAPSED = Math.max(0, panel.offsetHeight - (handle.offsetHeight + peek.offsetHeight));
+      if(!dragging) setT(cur < COLLAPSED / 2 ? EXPANDED : COLLAPSED, false);
+    }
+    const sheetsOpen = () => scrim && scrim.classList.contains('open');
+
+    function start(e){
+      if(sheetsOpen()) return;
+      dragging = true; startY = e.clientY; startT = cur;
+      panel.style.transition = 'none';
+      try { panel.setPointerCapture(e.pointerId); } catch(_){}
+    }
+    handle.addEventListener('pointerdown', start);
+    peek.addEventListener('pointerdown', start);
+
+    panel.addEventListener('pointermove', e => {
+      if(!dragging) return;
+      let t = startT + (e.clientY - startY);
+      t = Math.max(EXPANDED, Math.min(COLLAPSED, t));
+      panel.style.transform = 'translateY(' + t + 'px)'; cur = t;
+    });
+    function end(){
+      if(!dragging) return; dragging = false;
+      const moved = Math.abs(cur - startT);
+      if(moved < 6) setT(startT > COLLAPSED / 2 ? EXPANDED : COLLAPSED, true);  // tap → toggle
+      else          setT(cur   < COLLAPSED / 2 ? EXPANDED : COLLAPSED, true);  // drag → nearest
+    }
+    panel.addEventListener('pointerup', end);
+    panel.addEventListener('pointercancel', end);
+
+    // start collapsed (peek)
+    requestAnimationFrame(() => { recalc(); setT(COLLAPSED, false); });
+    window.addEventListener('resize', recalc);
+  })();
+</script>
+
+<script>
+  // ---- room options (accordion: one expanded card, rest collapsed) ----
+  (function(){
+    const $ = id => document.getElementById(id);
+    const fmt = n => '₹' + n.toLocaleString('en-IN');
+    const FLEX_ADD = 1800;
+
+    const ROOMS = [
+      {key:'villa', name:'Villa Room', badge:'Best value', meta:'Guest room · 1 King · Garden view',
+       base:18500, why:null, chips:['Garden view','56 m²','Sleeps 3'],
+       imgs:[{src:'images/gv-01-bedroom.png',alt:'Garden-view room'},
+             {src:'images/gv-02-balcony.png',alt:'Private balcony'},
+             {src:'images/gv-03-bathroom.png',alt:'Bathroom'},
+             {src:'images/gv-04-exterior.png',alt:'Villa exterior'}]},
+      {key:'deluxe', name:'Deluxe Room', badge:'', meta:'Guest room · 1 King · Sea view',
+       base:23500, why:{amt:5000, points:['Arabian Sea view']}, chips:['Sea view','56 m²','Sleeps 3'],
+       imgs:[{src:'images/sv-01-bedroom.png',alt:'Deluxe Sea View Room'},
+             {src:'images/sv-02-living.png',alt:'Lounge seating'},
+             {src:'images/sv-03-bathroom.png',alt:'Bathroom'},
+             {src:'images/sv-04-bath-robes.png',alt:'Marble vanity'}]},
+      {key:'premium', name:'Premium Room', badge:'', meta:'Guest room · 1 King · Sea view',
+       base:27000, why:{amt:3500, points:['Better sea aspect']}, chips:['Sea view','59 m²','Sleeps 3'],
+       imgs:[{src:'images/pr-01-bedroom.png',alt:'Premium Room'},
+             {src:'images/pr-02-living.png',alt:'Lounge area'},
+             {src:'images/pr-03-bathroom.png',alt:'Marble bathroom'}]},
+      {key:'plunge', name:'Villa Room with Plunge Pool', badge:'', meta:'Villa · 1 King · Private plunge pool',
+       base:34000, why:{amt:7000, points:['Private plunge pool','Outdoor shower']}, chips:['Garden view','56 m²','Sleeps 3'],
+       imgs:[{src:'images/pp-01-exterior.png',alt:'Villa with plunge pool'},
+             {src:'images/pp-02-bedroom.png',alt:'Bedroom'},
+             {src:'images/pp-03-living.png',alt:'Living area'},
+             {src:'images/pp-04-bathroom.png',alt:'Bathroom'},
+             {src:'images/pp-05-pool.png',alt:'Plunge pool at dusk'}]},
+      {key:'junior', name:'Junior Suite', badge:'', meta:'Suite · 1 King · Sea view',
+       base:42000, why:{amt:8000, points:['Much larger — 93 m²','Separate living area']}, chips:['Sea view','93 m²','Sleeps 3'],
+       imgs:[{src:'images/js-01-bedroom.png',alt:'Junior Suite bedroom'},
+             {src:'images/js-02-living.png',alt:'Separate living area'},
+             {src:'images/js-03-bathroom.png',alt:'Bathroom'}]},
+      {key:'luxury', name:'Luxury Suite', badge:'', meta:'Suite · 1 King · Sea view',
+       base:58000, why:{amt:16000, points:['Larger — 115 m²','Living & dining area']}, chips:['Sea view','115 m²','Sleeps 3'],
+       imgs:[{src:'images/ls-01-bedroom.png',alt:'Luxury Suite bedroom'},
+             {src:'images/ls-02-living.png',alt:'Living and dining area'},
+             {src:'images/ls-03-bathroom.png',alt:'Bathroom'}]},
+      {key:'presidential', name:'Presidential Villa', badge:'', meta:'Villa · 2 bedrooms · Private pool',
+       base:145000, why:{amt:87000, points:['Private garden & plunge pool','Two-bedroom residence']}, chips:['Garden view','2 bedrooms','Sleeps 4'],
+       imgs:[{src:'images/pv-01-exterior.png',alt:'Presidential Villa exterior'},
+             {src:'images/pv-02-living.png',alt:'Living and dining room'},
+             {src:'images/pv-03-bedroom-a.png',alt:'Master bedroom'},
+             {src:'images/pv-04-bedroom-b.png',alt:'Second bedroom'},
+             {src:'images/pv-05-bathroom.png',alt:'Bathroom'},
+             {src:'images/pv-06-pool.png',alt:'Private plunge pool'}]}
+    ];
+
+    const bedOf = r => (r.meta.split('·')[1] || '').trim();  // middle segment, e.g. "1 King"
+    const shortMeta = r => {
+      const bed = bedOf(r);
+      const rest = r.chips.filter(c => !/^Sleeps/i.test(c) && c !== bed);
+      return [bed, ...rest].filter(Boolean).join(' · ');
+    };
+    // capacity from the "Sleeps N" chip → rooms this category needs for the party
+    const capOf = r => { const m = (r.chips.find(c => /sleeps/i.test(c)) || '').match(/\d+/); return m ? +m[0] : 2; };
+    const rsList   = $('rsList');
+    const roomSheet = $('roomSheet'), roomScrim = $('roomScrim');
+    let expandedKey = 'villa';
+
+    function buildRow(r){
+      const el = document.createElement('button');
+      el.type = 'button'; el.className = 'ro-row';
+      el.innerHTML =
+        '<img class="ro-thumb" src="'+r.imgs[0].src+'" alt="'+r.imgs[0].alt+'">'+
+        '<div class="ro-rowtx"><h4>'+r.name+'</h4>'+
+          '<div class="m">'+shortMeta(r)+'</div>'+
+          '<div class="p"><b>'+fmt(r.base)+'</b> / night</div></div>'+
+        '<span class="ro-chev">&#8250;</span>';
+      el.addEventListener('click', () => { expandedKey = r.key; renderList(); });
+      return el;
+    }
+
+    function buildCard(r){
+      const nights = window.STAY.nights;
+      const rooms = window.roomsFor(capOf(r));
+      const el = document.createElement('article');
+      el.className = 'ro-card';
+      el.innerHTML =
+        (r.badge ? '<div class="ro-badge">'+r.badge+'</div>' : '')+
+        '<div class="ro-photo">'+
+          '<img class="ro-img" src="'+r.imgs[0].src+'" alt="'+r.imgs[0].alt+'">'+
+          '<button class="ro-close" aria-label="Collapse">&#10005;</button>'+
+          (r.imgs.length>1 ? '<button class="ro-nav ro-prev" aria-label="Previous">&#8249;</button>'+
+                             '<button class="ro-nav ro-next" aria-label="Next">&#8250;</button>' : '')+
+          '<span class="ro-count"><span class="ro-now">1</span> / '+r.imgs.length+'</span>'+
+        '</div>'+
+        '<div class="ro-body">'+
+          '<h3 class="ro-name">'+r.name+'</h3>'+
+          '<div class="ro-meta">'+r.meta+'</div>'+
+          '<label class="ro-opt"><input type="checkbox" class="ro-flex"><span class="ro-radio"></span> Free cancellation · +₹1,800/night</label>'+
+          (r.why ? '<div class="ro-why"><b>Why +'+fmt(r.why.amt)+'/night:</b> '+r.why.points.join(' · ')+'</div>' : '')+
+          '<div class="ro-priced">'+
+            '<div class="ro-nightly"><b class="ro-nb">'+fmt(r.base)+'</b> <small>/ night</small></div>'+
+            '<div class="ro-tot"><b class="ro-tb">'+fmt(r.base*nights*rooms)+'</b>total · '+(rooms>1?rooms+' rooms · ':'')+nights+' night'+(nights>1?'s':'')+'</div>'+
+          '</div>'+
+          '<div class="ro-cta"><button class="ro-details">View details</button>'+
+            '<button class="ro-book">Book now</button></div>'+
+        '</div>';
+
+      // photo carousel
+      let ci = 0;
+      const img = el.querySelector('.ro-img'), now = el.querySelector('.ro-now');
+      const go = n => { ci=(n+r.imgs.length)%r.imgs.length; img.src=r.imgs[ci].src; img.alt=r.imgs[ci].alt; now.textContent=ci+1; };
+      const prev = el.querySelector('.ro-prev'), next = el.querySelector('.ro-next');
+      if(prev) prev.addEventListener('click', () => go(ci-1));
+      if(next) next.addEventListener('click', () => go(ci+1));
+
+      // free-cancellation toggle → updates this card's price
+      const flex = el.querySelector('.ro-flex'), nb = el.querySelector('.ro-nb'), tb = el.querySelector('.ro-tb');
+      flex.addEventListener('change', () => {
+        const nightly = r.base + (flex.checked ? FLEX_ADD : 0);
+        nb.textContent = fmt(nightly);
+        tb.textContent = fmt(nightly * window.STAY.nights * rooms);
+      });
+
+      el.querySelector('.ro-book').addEventListener('click', () => selectRoom(r, flex.checked));
+      // the × on the photo collapses the card → see all rooms at a glance
+      el.querySelector('.ro-close').addEventListener('click', () => { expandedKey = null; renderList(); });
+      return el;
+    }
+
+    function renderList(){
+      rsList.innerHTML = '';
+      ROOMS.forEach(r => rsList.appendChild(r.key===expandedKey ? buildCard(r) : buildRow(r)));
+    }
+    window.refreshRooms = renderList;   // re-run room-count maths when the party size changes
+
+    function selectRoom(r, flexOn){
+      window.STAY.rate = r.base + (flexOn ? FLEX_ADD : 0);
+      window.STAY.cap = capOf(r);            // selected room's capacity drives rooms-needed maths
+      window.refreshBookBar();
+      $('srName').textContent = r.name;
+      $('srMeta').textContent = ' · ' + shortMeta(r);
+      expandedKey = r.key;
+      closeSheet();
+    }
+
+    function openSheet(){ renderList(); roomScrim.classList.add('open'); roomSheet.classList.add('open'); }
+    function closeSheet(){ roomScrim.classList.remove('open'); roomSheet.classList.remove('open'); }
+
+    // tap the empty list background (outside any card/row) → collapse the open card
+    rsList.addEventListener('click', e => {
+      if(e.target === rsList && expandedKey !== null){ expandedKey = null; renderList(); }
+    });
+
+    $('selRoom').addEventListener('click', openSheet);
+    $('roomClose').addEventListener('click', closeSheet);
+    roomScrim.addEventListener('click', closeSheet);
+    document.addEventListener('keydown', e => { if(e.key==='Escape' && roomSheet.classList.contains('open')) closeSheet(); });
+  })();
+</script>
+
+<script>
+  // ---- date + guest bottom sheets (ported from the web first fold) ----
+  (function(){
+    const $ = id => document.getElementById(id);
+
+    // shared sheet controller
+    const scrim = $('scrim');
+    function closeSheets(){
+      scrim.classList.remove('open');
+      document.querySelectorAll('.msheet').forEach(s => s.classList.remove('open'));
+      $('guestChip').setAttribute('aria-expanded','false');
+    }
+    function openSheet(el){ closeSheets(); scrim.classList.add('open'); el.classList.add('open'); }
+    scrim.addEventListener('click', closeSheets);
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSheets(); });
+
+    /* ===================== GUESTS ===================== */
+    (function(){
+      const COMPANIONS = [
+        {id:'you',    em:'🧍', name:'You',    sub:'beach, Goan food',   score:95, fits:[]},
+        {id:'wife',   em:'💑', name:'Priya',  sub:'spa, sunset dining', score:96, fits:["Couples’ spa","Sunset dining"]},
+        {id:'kid',    em:'🧒', name:'Aarav',  sub:"kids’ club, play",   score:92, fits:["Kids’ Club"]},
+        {id:'mother', em:'🧘', name:'Mom',    sub:'yoga, wellness',     score:88, fits:["Daily yoga","Ayurvedic spa"]},
+        {id:'father', em:'⛳', name:'Dad',    sub:'golf, sports bar',   score:90, fits:["Golf next door"]}
+      ];
+      const BASE_FITS = ["Beachfront","6 restaurants"];
+      const MAP = {}; COMPANIONS.forEach(c => MAP[c.id] = c);
+      const btns = {};
+      let people = ['you','wife','kid'];
+      let extras = 0;
+      const MAXG = 8;
+
+      const relGroups = $('relGroups'), scoreEl = $('relScore');
+      const chipLi = (t,spot) => '<li'+(spot?' class="spot"':'')+'>'+t+'</li>';
+      const joinNames = a => a.length<=1 ? (a[0]||'') : a.slice(0,-1).join(', ')+' & '+a[a.length-1];
+      const total = () => people.length + extras;
+
+      COMPANIONS.forEach(c => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'compbtn'+(people.includes(c.id)?' on':'');
+        b.innerHTML =
+          '<span class="cb-em">'+c.em+'</span>'+
+          '<span class="cb-tx"><span class="cb-name">'+c.name+'</span>'+
+            '<span class="cb-sub">'+c.sub+'</span></span>'+
+          '<span class="cb-check">✓</span>';
+        b.addEventListener('click', () => {
+          const i = people.indexOf(c.id);
+          if(i>=0) people.splice(i,1);
+          else { if(total()>=MAXG) extras = Math.max(0,extras-1); people.push(c.id); }
+          apply();
+        });
+        btns[c.id] = b;
+        $('compList').appendChild(b);
+      });
+
+      function scoreFor(chosen, t){
+        let avg = chosen.length ? Math.round(chosen.reduce((s,c)=>s+c.score,0)/chosen.length) : 95;
+        if(t>=7) avg = Math.min(avg,83); else if(t>=5) avg = Math.min(avg,90);
+        return avg;
+      }
+      function apply(){
+        const t = total();
+        window.STAY.guests = t;               // party size drives rooms-needed everywhere
+        window.refreshBookBar();
+        if(window.refreshRooms) window.refreshRooms();
+        $('cNum').textContent = t;
+        $('cMinus').disabled = t<=1;
+        $('cPlus').disabled  = t>=MAXG;
+        COMPANIONS.forEach(c => btns[c.id].classList.toggle('on', people.includes(c.id)));
+        const nm = people.map(id => MAP[id].name);
+        let val;
+        if(nm.length && extras) val = joinNames(nm)+' +'+extras;
+        else if(nm.length)      val = joinNames(nm);
+        else if(extras)         val = extras+' guest'+(extras>1?'s':'');
+        else                    val = 'Add guests';
+        $('guestVal').textContent = val;
+        $('guestSub').textContent = t+' guest'+(t===1?'':'s');
+
+        const chosen = people.map(id => MAP[id]);
+        scoreEl.textContent = scoreFor(chosen, t) + '% match for your trip';
+        const pills = [];
+        chosen.forEach(c => pills.push(...c.fits));
+        pills.push(...BASE_FITS);
+        const uniq = pills.filter((v,i,a)=>a.indexOf(v)===i);
+        relGroups.innerHTML = '<ul class="vd-chips">'+uniq.map(c=>chipLi(c)).join('')+chipLi('Cost sweet spot',true)+'</ul>';
+      }
+
+      $('cMinus').addEventListener('click', () => {
+        if(total()<=1) return;
+        if(extras>0) extras--; else if(people.length>0) people.pop();
+        apply();
+      });
+      $('cPlus').addEventListener('click', () => { if(total()<MAXG) extras++; apply(); });
+
+      $('guestChip').addEventListener('click', () => {
+        openSheet($('guestSheet'));
+        $('guestChip').setAttribute('aria-expanded','true');
+      });
+
+      apply();
+    })();
+
+    /* ===================== DATES ===================== */
+    (function(){
+      const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const RATE = 18500;
+
+      const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const MIN = startOfDay(new Date());
+      const key = d => d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
+      const addDays = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+      const nights = (a,b) => Math.round((startOfDay(b)-startOfDay(a))/86400000);
+      const short = d => DOW[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3);
+
+      let checkIn  = new Date(2026,6,10);
+      let checkOut = new Date(2026,6,13);
+      if(checkIn < MIN){ checkIn = MIN; checkOut = addDays(MIN,3); }
+      let view = new Date(checkIn.getFullYear(), checkIn.getMonth(), 1);
+      let picking = 'in';
+
+      const grid = $('calGrid'), chip = $('dateChip');
+
+      function renderChip(){
+        const n = nights(checkIn, checkOut);
+        let label;
+        if(checkIn.getMonth()===checkOut.getMonth()){
+          label = DOW[checkIn.getDay()]+' '+checkIn.getDate()+' &ndash; '+DOW[checkOut.getDay()]+' '+checkOut.getDate()+' '+MONTHS[checkOut.getMonth()].slice(0,3);
+        } else {
+          label = short(checkIn)+' &ndash; '+short(checkOut);
+        }
+        $('dateVal').innerHTML = label;
+        $('nightsVal').textContent = n+' night'+(n>1?'s':'');
+        window.STAY.nights = n;
+        window.refreshBookBar();
+      }
+      const inRange = d => d > startOfDay(checkIn) && d < startOfDay(checkOut);
+
+      function renderCal(){
+        $('calTitle').textContent = MONTHS[view.getMonth()]+' '+view.getFullYear();
+        $('calPrev').disabled = (view.getFullYear()===MIN.getFullYear() && view.getMonth()<=MIN.getMonth());
+        grid.innerHTML = '';
+        const startDow = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
+        const daysIn = new Date(view.getFullYear(), view.getMonth()+1, 0).getDate();
+        for(let i=0;i<startDow;i++){ const c=document.createElement('div'); c.className='cal-cell'; grid.appendChild(c); }
+        for(let day=1; day<=daysIn; day++){
+          const d = new Date(view.getFullYear(), view.getMonth(), day);
+          const isStart = key(d)===key(startOfDay(checkIn));
+          const isEnd   = key(d)===key(startOfDay(checkOut));
+          const disabled = d < MIN;
+          const cell = document.createElement('div');
+          cell.className = 'cal-cell';
+          if(isStart || isEnd || inRange(d)){ cell.classList.add('rng'); if(isStart) cell.classList.add('start'); if(isEnd) cell.classList.add('end'); }
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'cal-day'+((isStart||isEnd)?' sel':'')+(disabled?' disabled':'')+(key(d)===key(MIN)?' today':'');
+          b.textContent = day;
+          if(!disabled) b.addEventListener('click', () => pick(d));
+          cell.appendChild(b);
+          grid.appendChild(cell);
+        }
+        const n = nights(checkIn, checkOut);
+        $('calFootTxt').innerHTML = n>0
+          ? (function(){ const rooms = window.roomsFor ? window.roomsFor(window.STAY.cap) : 1;
+              return '<b>'+n+'</b> night'+(n>1?'s':'')+(rooms>1?' · '+rooms+' rooms':'')+' · <span class="cf-cost">₹'+((window.STAY.rate||18500)*n*rooms).toLocaleString('en-IN')+'</span>'; })()
+          : 'Select check-out';
+      }
+
+      function pick(d){
+        if(picking==='in'){
+          checkIn = d;
+          if(checkOut <= d) checkOut = addDays(d,1);
+          picking = 'out';
+        } else {
+          if(d <= checkIn){ checkIn = d; checkOut = addDays(d,1); }
+          else checkOut = d;
+          picking = 'in';
+        }
+        renderChip(); renderCal();
+      }
+
+      chip.addEventListener('click', () => {
+        picking = 'in';
+        view = new Date(checkIn.getFullYear(), checkIn.getMonth(), 1);
+        openSheet($('dateSheet'));
+        renderCal();
+      });
+      $('calPrev').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth()-1, 1); renderCal(); });
+      $('calNext').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth()+1, 1); renderCal(); });
+
+      renderChip(); renderCal();
+    })();
+  })();
+</script>
+</body>
+</html>

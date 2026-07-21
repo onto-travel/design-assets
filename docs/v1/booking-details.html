@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taj Exotica · Your booking</title>
+<style>
+  :root{
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
+    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --green:#0f8a63;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+  h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+
+  .card{width:520px;max-width:100%;background:#faf8f3;border-radius:20px;box-shadow:var(--shadow);
+    overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 30px 32px;position:relative;}
+  .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
+    color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
+    transition:color .15s,background .15s;}
+  .backlink:hover{color:var(--jade);background:#faf8f3;}
+  .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .head{text-align:center;padding:26px 0 0;}
+  .head h1{font-family:Georgia,serif;font-size:32px;line-height:1.1;color:#063f2f;margin:0 0 12px;letter-spacing:-.015em;}
+  .head p{color:var(--muted);font-size:15.5px;margin:0 auto;max-width:400px;}
+  .head p b{color:#063f2f;font-weight:700;}
+
+  /* booking-reference panel */
+  .ref{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:#faf8f3;
+    border:1px solid var(--line);border-radius:30px;padding:9px 8px 9px 18px;font-size:13.5px;
+    color:#6b6459;font-weight:600;}
+  .ref b{color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;font-weight:700;margin-left:2px;}
+  .ref-copy{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+    border-radius:50%;border:none;background:none;color:var(--muted);cursor:pointer;transition:background .15s,color .15s;}
+  .ref-copy:hover{background:#f1ede3;color:var(--jade);}
+  .ref-copy.done{color:var(--green);}
+  .ref-copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* paid panel */
+  /* payment + rewards live in ONE neutral box; colour comes only from the small icons */
+  .paybox{margin-top:24px;border-radius:14px;overflow:hidden;background:#fff;text-align:left;
+    box-shadow:0 1px 3px rgba(40,30,10,.06), 0 10px 24px -14px rgba(40,30,10,.22);}
+  .paid{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 17px;}
+  .paid .pl{display:inline-flex;align-items:center;gap:9px;font-size:15px;color:#3a6a4d;font-weight:600;}
+  .paid .pl svg{width:17px;height:17px;stroke:var(--green);stroke-width:2.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .pl-tx{display:flex;flex-direction:column;}
+  .pl-tx em{font-style:normal;font-size:11.5px;font-weight:600;color:#3a6a4d;letter-spacing:.01em;margin-top:2px;}
+  .pl-tx em:empty{display:none;}
+  .paid .amt{font-family:Georgia,serif;font-size:23px;font-weight:600;color:#20321f;letter-spacing:-.01em;}
+  .paybox .paid + .paid{border-top:1px solid #efe8da;}
+  .paid.neutral .pl{color:var(--muted);}
+  .paid.neutral .pl svg{stroke:var(--muted);}
+  .paid.neutral .amt{color:var(--ink);}
+  .paid.neutral .pl-tx em{color:var(--muted);}
+
+  /* rewards nudge — sits just above the CTAs; shown only when booked as a guest */
+  [hidden]{display:none !important;}
+  .rewards{display:none;align-items:center;gap:12px;padding:12px 15px;
+    background:#fff;border:1px solid #e7e0d2;border-radius:14px;}
+  .rewards.show{display:flex;}
+  .rw-ic{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(193,154,75,.18);
+    display:flex;align-items:center;justify-content:center;color:#b8923f;}
+  .rw-ic svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .rw-tx{flex:1;min-width:0;}
+  .rw-h{font-size:13.5px;font-weight:600;color:#4a4641;line-height:1.35;}
+  .rw-h b{font-weight:700;color:#8a6a2e;}
+  .rw-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .rw-btn{flex:none;display:inline-flex;align-items:center;gap:5px;background:none;color:#a07d2e;
+    font-size:13px;font-weight:700;padding:7px 4px 7px 10px;border-radius:8px;cursor:pointer;
+    font-family:inherit;text-decoration:none;white-space:nowrap;border:none;transition:color .15s;}
+  .rw-btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
+  .rw-btn:hover{color:#7c5e22;}
+  .rw-btn:hover svg{transform:translateX(2px);}
+  @media(max-width:420px){ .rw-h{font-size:12.5px;} .rw-btn{padding-left:6px;} }
+
+  /* actions */
+  .actions{margin-top:24px;display:flex;flex-direction:column;gap:12px;}
+  .btnrow{display:flex;gap:12px;}
+  .btn{flex:1;border:none;background:var(--jade);color:#fff;font-size:15px;font-weight:600;
+    padding:13px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
+    display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s;}
+  .btn:hover{background:var(--jade-deep);}
+  .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .ghostbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
+    border:1px solid #e2dac9;border-radius:12px;padding:13px;font-family:inherit;font-size:14.5px;font-weight:600;
+    color:var(--jade);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
+  .ghostbtn:hover{background:#faf8f3;border-color:#d3c9b4;}
+  .ghostbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  /* tertiary — plain text link (used for Download voucher on the logged-out screen) */
+  .textbtn{display:flex;align-items:center;justify-content:center;gap:7px;background:none;border:none;
+    padding:6px;margin-top:-2px;font-family:inherit;font-size:14px;font-weight:600;color:var(--jade);
+    cursor:pointer;text-decoration:none;transition:color .15s;}
+  .textbtn:hover{color:var(--jade-deep);text-decoration:underline;}
+  .textbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  /* secondary cancel — danger-toned ghost button beside the wider Download CTA */
+  .actions-cta .btn{flex:2;}
+  /* Pay now — attached as a footer to the "To pay" box (clubbed into one unit) */
+  .paybox-pay{display:flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--green);color:#fff;border:none;font-family:inherit;font-size:16px;font-weight:700;
+    padding:17px;cursor:pointer;text-decoration:none;transition:background .15s;}
+  .paybox-pay:hover{background:var(--jade-deep);}
+  .paywarn{margin:0;padding:12px 17px;font-size:12.5px;font-weight:600;color:#8a5518;
+    background:#fff;border-top:1px solid #efe8da;display:flex;align-items:center;gap:8px;}
+  .paywarn svg{width:15px;height:15px;flex:none;stroke:#c0862c;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .paywarn b{color:#6f4413;font-weight:800;}
+  .paywarn[hidden]{display:none;}
+  .cancel-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;
+    border:1px solid #e6cfc9;border-radius:12px;padding:13px;font-family:inherit;font-size:14.5px;font-weight:600;
+    color:#b23b32;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
+  .cancel-btn:hover{background:#fbf3f1;border-color:#dcbab3;}
+  .cancel-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .txtlinks{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:6px;}
+  .txtlinks a{color:var(--jade);font-size:14px;font-weight:600;text-decoration:none;}
+  .txtlinks a:hover{text-decoration:underline;}
+  .txtlinks .dot{color:#c9c1b2;}
+
+  /* cancelled state — left hero title struck through, share hidden */
+  body.is-cancelled .sum-hero-tx h1{text-decoration:line-through;text-decoration-color:#c9c1b2;}
+  body.is-cancelled .hero-share{display:none;}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
+    background:#1b211e;color:#fff;font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;
+    display:flex;align-items:center;gap:9px;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast svg{width:16px;height:16px;stroke:#8fd6b4;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  @media(max-width:480px){ .txtlinks{flex-wrap:wrap;} }
+
+  /* two-column layout: confirmation + stay details */
+  .layout{display:flex;gap:24px;align-items:stretch;justify-content:center;flex-wrap:wrap;width:100%;}
+  .rightcol{order:2;width:520px;max-width:100%;display:flex;}
+  .rightcol > .card{width:100%;flex:1;}
+  .stay-card{order:1;width:480px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
+    padding:20px 20px 22px;display:flex;flex-direction:column;}
+
+  /* state cards (cancel / cancelled) reuse the confirmed-card frame */
+  .statecard{text-align:center;}
+  .warn{width:72px;height:72px;border-radius:50%;background:#fbeeec;border:1px solid #f2d5d0;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
+  .warn svg{width:32px;height:32px;stroke:#b23b32;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .xmark{width:72px;height:72px;border-radius:50%;background:#f3efe8;border:1px solid #e3dccf;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
+  .xmark svg{width:32px;height:32px;stroke:#7c7771;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .btn.danger{background:#b23b32;}
+  .btn.danger:hover{background:#9c332b;}
+
+  /* stay-detail card (ported from the checkout summary) */
+  .sum-hero{position:relative;border-radius:16px;overflow:hidden;height:248px;box-shadow:var(--shadow);}
+  .sum-hero img{width:100%;height:100%;object-fit:cover;display:block;}
+  .sum-hero::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(to top,rgba(20,16,26,.92) 0%,rgba(20,16,26,.55) 42%,rgba(20,16,26,.40) 72%,rgba(20,16,26,.52) 100%);}
+  .hero-share{position:absolute;top:14px;right:14px;z-index:3;width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.28);background:rgba(20,16,26,.38);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:background .15s,transform .12s;}
+  .hero-share:hover{background:rgba(20,16,26,.62);}
+  .hero-share:active{transform:scale(.93);}
+  .hero-share svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .sum-hero-tx{position:absolute;left:20px;right:18px;bottom:16px;z-index:2;color:#fff;}
+  .sum-hero-tx .stars{color:#f0c66a;letter-spacing:3px;font-size:14px;line-height:1;margin-bottom:6px;}
+  .sum-hero-tx h1{font-family:Georgia,serif;font-size:27px;line-height:1.08;margin:0 0 6px;color:#fff;letter-spacing:-.01em;}
+  .sum-hero-tx .place{color:rgba(255,255,255,.86);font-weight:600;font-size:11.5px;letter-spacing:.09em;}
+  .stay-sum{margin-top:16px;}
+  .sum-top{display:flex;align-items:center;justify-content:space-between;padding:0 2px 8px;}
+  .sum-top .sh{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-edit{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--jade);text-decoration:none;}
+  .sum-edit:hover{text-decoration:underline;}
+  .sum-edit svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .row-cancel{flex:none;display:inline-flex;align-items:center;gap:5px;color:#d64545;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap;}
+  .row-cancel:hover{text-decoration:underline;}
+  .row-cancel svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .sum-row{display:flex;gap:12px;align-items:center;padding:9px 2px;}
+  .sum-row+.sum-row{border-top:1px solid #f1ede5;}
+  .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f1ede3;color:#b3893f;
+    display:flex;align-items:center;justify-content:center;}
+  .sum-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .sum-c{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+  .sum-k{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-v{min-width:0;font-size:14.5px;color:var(--ink);font-weight:600;text-align:left;}
+  .sum-v span{display:inline;font-weight:400;color:var(--muted);}
+  .sum-v span:not(.av-title)::before{content:" · ";}
+  .sum-v .av-title{font-weight:600;color:var(--ink);}
+  .co-price{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:#f1ede3;border:1px solid #ece3d2;border-radius:15px;padding:14px 20px;text-align:left;}
+  .cp-left{display:flex;flex-direction:column;gap:5px;}
+  .cp-nights{font-size:13px;color:var(--muted);}
+  .tax-ok{font-size:12.5px;color:#8a6a24;font-weight:600;}
+  .tax-ok b{color:#8a6a24;font-weight:700;}
+  .cp-right{text-align:right;}
+  .cp-amt{font-family:Georgia,serif;font-size:30px;font-weight:600;color:var(--ink);letter-spacing:-.015em;line-height:1;}
+  .cp-tot{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:7px;}
+  @media(max-width:920px){ .layout{flex-direction:column;align-items:center;} .rightcol{order:0;} .stay-card{order:1;} }
+</style>
+</head>
+<body>
+  <div class="layout">
+  <div class="rightcol">
+  <!-- ===== state 1: confirmed ===== -->
+  <div class="card" id="confirmedCard">
+    <a class="backlink" href="home2.html">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to home
+    </a>
+    <div class="conf-top">
+    <div class="head">
+      <h1 id="statusTitle">Booking confirmed</h1>
+      <div class="ref">Booking reference <b id="ref">TAJ-000000</b>
+        <button type="button" class="ref-copy" id="copyRef" aria-label="Copy booking reference">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="paybox">
+    <div class="paid" id="paidBox">
+      <div class="pl"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg><span class="pl-tx"><span id="paidLabel">Paid</span><em id="refundNote"></em></span></div>
+      <div class="amt" id="amount">₹55,500</div>
+    </div>
+    <p class="paywarn" id="payWarn" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 1.8"/></svg><span>Pay by <b>9 Jul</b> or this booking will be cancelled.</span></p>
+    <a class="paybox-pay" id="payNowBtn" href="razorpay.html" hidden>Pay now</a>
+    </div>
+    </div>
+
+    <div class="actions">
+      <div class="rewards" id="rewards">
+        <span class="rw-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        </span>
+        <div class="rw-tx">
+          <div class="rw-h" id="rwHead">You&rsquo;ve earned <b>&#8377;2,775</b> in rewards</div>
+          <div class="rw-sub">Redeemable on your next stay</div>
+        </div>
+      </div>
+      <a class="btn" id="loginBtn" href="google-login.html" hidden>
+        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+        Log in to claim
+      </a>
+      <div class="btnrow actions-cta">
+        <a class="cancel-btn" id="cancelLink" href="cancel-booking.html">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+          Cancel
+        </a>
+        <button type="button" class="btn" id="dlVoucher">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
+          Download voucher
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== state 2: cancel confirmation ===== -->
+  <div class="card statecard" id="cancelCard" hidden>
+    <div class="conf-top">
+    <div class="head">
+      <div class="warn" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z"/><path d="M12 9.5v4"/><path d="M12 17.2v.01"/></svg>
+      </div>
+      <h1>Cancel this booking?</h1>
+    </div>
+
+    <div class="paybox">
+    <div class="paid neutral">
+      <div class="pl"><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18"/></svg><span class="pl-tx"><span>Amount paid</span></span></div>
+      <div class="amt" id="cancelPaidAmt">₹55,500</div>
+    </div>
+    <div class="paid">
+      <div class="pl"><svg viewBox="0 0 24 24"><path d="M9 14l-5-5 5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg><span class="pl-tx"><span>Refund amount</span></span></div>
+      <div class="amt" id="cancelRefundAmt">₹55,500</div>
+    </div>
+    </div>
+    </div>
+
+    <div class="actions">
+      <div class="btnrow">
+        <button type="button" class="ghostbtn" id="keepBooking">Keep the booking</button>
+        <button type="button" class="btn danger" id="confirmCancel">Cancel booking</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== state 3: cancelled ===== -->
+  <div class="card statecard" id="cancelledCard" hidden>
+    <a class="backlink" href="home2.html">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to home
+    </a>
+    <div class="conf-top">
+    <div class="head">
+      <div class="xmark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+      </div>
+      <h1>Booking cancelled</h1>
+      <div class="ref">Booking reference <b id="cnRef">TAJ-000000</b></div>
+    </div>
+
+    <div class="paybox">
+    <div class="paid neutral">
+      <div class="pl"><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18"/></svg><span class="pl-tx"><span>Amount paid</span></span></div>
+      <div class="amt" id="cnPaidAmt">₹55,500</div>
+    </div>
+    <div class="paid">
+      <div class="pl"><svg viewBox="0 0 24 24"><path d="M9 14l-5-5 5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg><span class="pl-tx"><span>Refund amount</span><em id="cnRefundNote">Back to your original payment method</em></span></div>
+      <div class="amt" id="cnAmt">₹55,500</div>
+    </div>
+    </div>
+    </div>
+
+    <div class="actions">
+      <a class="btn" href="results.html">Browse other stays</a>
+    </div>
+  </div>
+  </div>
+
+  <aside class="stay-card">
+    <div class="sum-hero">
+      <img src="images/04-pool-sunset.png" alt="Taj Exotica Resort &amp; Spa at sunset">
+      <button type="button" class="hero-share" id="shareBtn" aria-label="Share booking" title="Share booking">
+        <svg viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4l4 4"/><path d="M4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>
+      </button>
+      <div class="sum-hero-tx">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h1 id="csHotel">Taj Exotica Resort &amp; Spa</h1>
+        <div class="place">BENAULIM BEACH · GOA, INDIA</div>
+      </div>
+    </div>
+    <div class="stay-sum">
+      <div class="sum-top"><span class="sh">Your stay</span></div>
+      <div class="sum-row">
+        <span class="sum-ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
+        <div class="sum-c"><div class="sum-k">Check-in</div><div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div></div>
+      </div>
+      <div class="sum-row">
+        <span class="sum-ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/><path d="M9 14.5l2 2 3.5-3.5"/></svg></span>
+        <div class="sum-c"><div class="sum-k">Check-out</div><div class="sum-v">Mon 13 Jul · 3 nights<span>12:00 PM</span></div></div>
+      </div>
+      <div class="sum-row">
+        <span class="sum-ic"><svg viewBox="0 0 24 24"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M3 18v2.5M21 18v2.5"/><path d="M3 15h18"/><path d="M6.5 12V9.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V12"/></svg></span>
+        <div class="sum-c"><div class="sum-k">Room</div><div class="sum-v"><span class="av-title" id="csRoom">Villa Room</span></div></div>
+      </div>
+      <div class="sum-row">
+        <span class="sum-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.1"/><path d="M3.5 20c.6-3.1 3-4.8 5.5-4.8s4.9 1.7 5.5 4.8"/><path d="M16.2 5.3a3 3 0 0 1 0 5.6M21 20c-.4-2.1-1.7-3.5-3.4-4.2"/></svg></span>
+        <div class="sum-c"><div class="sum-k">Guests</div><div class="sum-v"><span class="av-title" id="csGuests">You</span></div></div>
+      </div>
+      <div class="sum-row">
+        <span class="sum-ic"><svg viewBox="0 0 24 24"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg></span>
+        <div class="sum-c"><div class="sum-k">Cancellation</div><div class="sum-v"><span class="av-title" id="leftCancelVal">Free till 9 July</span></div></div>
+      </div>
+      <div class="sum-row">
+        <span class="sum-ic"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/><path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg></span>
+        <div class="sum-c"><div class="sum-k">Breakfast</div><div class="sum-v"><span class="av-title">Included</span></div></div>
+      </div>
+    </div>
+  </aside>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  var b = {};
+  try { b = JSON.parse(sessionStorage.getItem('booking')) || {}; } catch(e){}
+  function set(id, val){ var el = document.getElementById(id); if(el && val){ el.textContent = val; } }
+  function setHTML(id, val){ if(val){ document.getElementById(id).innerHTML = val; } }
+
+  set('hotel', b.hotel);
+  set('amount', b.amount);
+  // amounts on the cancel / cancelled states
+  var refundAmt = b.refund || b.amount;
+  set('cancelPaidAmt', b.amount);
+  set('cnPaidAmt', b.amount);
+  set('cancelRefundAmt', refundAmt);
+  set('cnAmt', refundAmt);
+  // right-side stay-detail card
+  set('csHotel', b.hotel);
+  set('csRoom', b.room);
+  set('csGuests', b.guests);
+
+  // book now, pay later: reserved but not yet paid — settle online before the free-cancellation date
+  var PAY_BY = '9 Jul';                       // day before check-in — the free-cancellation cutoff
+  var unpaidReserve = (b.payMode === 'later' && !b.paid);
+  if(unpaidReserve){
+    var pbox = document.getElementById('paidBox');
+    if(pbox){
+      pbox.classList.add('neutral');
+      var plab = document.getElementById('paidLabel'); if(plab) plab.textContent = 'To pay';
+      var rnote = document.getElementById('refundNote'); if(rnote) rnote.textContent = '';
+      var psvg = pbox.querySelector('.pl svg');
+      if(psvg) psvg.style.display = 'none';   // no icon next to "To pay"
+    }
+    set('amount', b.dueAmount || b.amount);
+    // reserved, not paid — say so, and warn it's cancelled if unpaid by the cutoff
+    var st = document.getElementById('statusTitle'); if(st) st.textContent = 'Room reserved';
+    var pw = document.getElementById('payWarn'); if(pw) pw.hidden = false;
+    // attach Pay now to the "To pay" box as the primary action
+    var payNow = document.getElementById('payNowBtn');
+    if(payNow){
+      payNow.hidden = false;
+      set('payNowAmt', b.dueAmount || b.amount);
+      payNow.addEventListener('click', function(){
+        try { sessionStorage.setItem('payReturn', 'booking-details.html'); } catch(e){}
+      });
+    }
+    // keep Download voucher available, but demote it to an outline button so the green Pay now leads
+    var dlb = document.getElementById('dlVoucher'); if(dlb){ dlb.classList.remove('btn'); dlb.classList.add('ghostbtn'); }
+    // nothing paid yet → cancelling just releases the hold, no refund
+    set('cancelPaidAmt', '₹0');
+    set('cnPaidAmt', '₹0');
+    set('cancelRefundAmt', '₹0');
+    set('cnAmt', '₹0');
+    var crn = document.getElementById('cnRefundNote'); if(crn) crn.textContent = 'No payment was taken';
+  }
+
+  // booking reference — stable per confirmed booking (kept in sessionStorage)
+  var ref = b.ref;
+  if(!ref){
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s = '';
+    for(var i=0;i<6;i++){ s += chars.charAt(Math.floor(Math.random()*chars.length)); }
+    ref = 'TAJ-' + s;
+    b.ref = ref;
+    try { sessionStorage.setItem('booking', JSON.stringify(b)); } catch(e){}
+  }
+  document.getElementById('ref').textContent = ref;
+  document.getElementById('cnRef').textContent = ref;
+
+  // guest booking (not yet logged in) → keep offering the rewards sign-up nudge
+  // (?guest=1 forces it on for previewing without walking the whole flow)
+  var forceGuest = new URLSearchParams(location.search).get('guest') === '1';
+  var signedIn = false;
+  try { signedIn = sessionStorage.getItem('phoneVerified') === '1'; } catch(e){}
+  if((forceGuest || (b.guest && !signedIn)) && !unpaidReserve){
+    var amt = parseInt(String(b.amount || '').replace(/[^\d]/g, ''), 10) || 0;
+    if(amt){
+      var pts = Math.round(amt * 0.05);   // 5% back in reward points
+      document.getElementById('rwHead').innerHTML =
+        'You&rsquo;ve earned <b>&#8377;' + pts.toLocaleString('en-IN') + '</b> in rewards';
+    }
+    document.getElementById('rewards').classList.add('show');
+    // promote Log in to the primary CTA; demote Download voucher to secondary
+    var loginBtn = document.getElementById('loginBtn');
+    loginBtn.hidden = false;
+    var dl = document.getElementById('dlVoucher');
+    dl.classList.remove('btn'); dl.classList.add('textbtn');
+    // return here after the mock login completes
+    loginBtn.addEventListener('click', function(){
+      try { sessionStorage.setItem('authReturn', 'booking-details.html'); } catch(e){}
+    });
+  }
+
+  // ----- right-column state machine: confirmed ⇄ cancel → cancelled -----
+  var confirmedCard = document.getElementById('confirmedCard');
+  var cancelCard = document.getElementById('cancelCard');
+  var cancelledCard = document.getElementById('cancelledCard');
+  function showState(name){
+    confirmedCard.hidden = name !== 'confirmed';
+    cancelCard.hidden    = name !== 'cancel';
+    cancelledCard.hidden = name !== 'cancelled';
+  }
+  function markCancelledUI(){
+    document.body.classList.add('is-cancelled');
+    var row = document.getElementById('leftCancelVal');
+    if(row) row.textContent = unpaidReserve ? 'Cancelled' : 'Cancelled · full refund';
+  }
+
+  // land straight in the cancelled state if this booking was already cancelled
+  if(b.status === 'cancelled'){
+    markCancelledUI();
+    showState('cancelled');
+  }
+
+  // open the cancel confirmation inline (no page navigation)
+  document.getElementById('cancelLink').addEventListener('click', function(e){
+    e.preventDefault();
+    showState('cancel');
+  });
+  document.getElementById('keepBooking').addEventListener('click', function(){
+    showState('confirmed');
+  });
+  document.getElementById('confirmCancel').addEventListener('click', function(){
+    b.status = 'cancelled';
+    if(unpaidReserve){ b.refund = '₹0'; b.refundType = 'none'; }
+    else { b.refund = b.refund || b.amount || ''; b.refundType = 'full'; }
+    try { sessionStorage.setItem('booking', JSON.stringify(b)); } catch(e){}
+    markCancelledUI();
+    showState('cancelled');
+    if(typeof toast === 'function') toast(unpaidReserve ? 'Booking cancelled' : 'Booking cancelled — refund on its way');
+  });
+
+  // ----- toast helper -----
+  function toast(msg){
+    var t = document.getElementById('toast');
+    t.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' + msg;
+    t.classList.add('show');
+    clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  }
+
+  // ----- copy the booking reference -----
+  document.getElementById('copyRef').addEventListener('click', function(){
+    var btn = this;
+    function done(){
+      btn.classList.add('done');
+      if(typeof toast === 'function') toast('Reference copied');
+      clearTimeout(btn._t); btn._t = setTimeout(function(){ btn.classList.remove('done'); }, 1500);
+    }
+    if(navigator.clipboard){ navigator.clipboard.writeText(ref).then(done).catch(done); }
+    else { done(); }
+  });
+
+  // ----- share the booking (personalised to the first companion) -----
+  function firstCompanion(guests){
+    if(!guests) return null;
+    var parts = guests.split(/,|&|\band\b/i);
+    for(var i=0;i<parts.length;i++){
+      var p = parts[i].trim();
+      if(!p || /^you$/i.test(p) || /\d/.test(p)) continue;
+      if(/guest|room|adult|child|infant|travell?er/i.test(p)) continue;
+      return p.split(/\s+/)[0];
+    }
+    return null;
+  }
+  var companion = firstCompanion(b.guests);
+  if(companion){
+    var _sb = document.getElementById('shareBtn');
+    _sb.setAttribute('aria-label', 'Share with ' + companion);
+    _sb.setAttribute('title', 'Share with ' + companion);
+  }
+
+  document.getElementById('shareBtn').addEventListener('click', function(e){
+    e.preventDefault();
+    var data = {
+      title: (b.hotel || 'Taj Exotica Resort & Spa') + ' — booking',
+      text: 'My stay at ' + (b.hotel || 'Taj Exotica Resort & Spa') + ' (' + ref + ')' + (b.dates ? ', ' + b.dates : '') + '.',
+      url: location.href
+    };
+    if(navigator.share){ navigator.share(data).catch(function(){}); }
+    else if(navigator.clipboard){
+      navigator.clipboard.writeText(data.text + ' ' + data.url)
+        .then(function(){ toast('Booking link copied'); })
+        .catch(function(){ toast('Couldn’t copy — try again'); });
+    } else { toast('Sharing isn’t available here'); }
+  });
+
+  // download a simple text voucher (prototype)
+  document.getElementById('dlVoucher').addEventListener('click', function(){
+    var lines = [
+      'TAJ EXOTICA RESORT & SPA — BOOKING VOUCHER',
+      '==========================================',
+      '',
+      'Booking reference : ' + ref,
+      'Hotel             : ' + (b.hotel || 'Taj Exotica Resort & Spa'),
+      'Dates             : ' + (b.dates || '') + (b.nights ? ' (' + b.nights + ')' : ''),
+      'Room              : ' + (b.room || 'Villa Room'),
+      'Guests            : ' + (b.guests || ''),
+      (unpaidReserve
+        ? 'Amount due        : ' + (b.dueAmount || b.amount || '') + '  · pay by ' + PAY_BY + ' (Razorpay)'
+        : 'Amount paid       : ' + (b.amount || '') + '  · paid via Razorpay'),
+      '',
+      'Present this voucher at check-in. Prototype — not a real booking.'
+    ];
+    var blob = new Blob([lines.join('\n')], {type:'text/plain'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'Taj-Exotica-voucher-' + ref + '.txt';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 0);
+  });
+</script>
+</body>
+</html>
