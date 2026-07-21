@@ -506,7 +506,8 @@
       if(b && b.ref){
         return { hotel:b.hotel || 'Taj Exotica Resort & Spa', place:b.place || 'Goa, India',
           dates:b.dates || '', nights:b.nights || '', guests:b.guests || '', room:b.room || '',
-          amount:b.amount || '', ref:b.ref, status:b.status || '', img:'images/06-aerial-pool.png' };
+          amount:b.amount || '', ref:b.ref, status:b.status || '',
+          payMode:b.payMode || '', paid:!!b.paid, img:'images/06-aerial-pool.png' };
       }
     }catch(e){}
     return null;
@@ -535,6 +536,19 @@
   document.getElementById('tripGuests').textContent = upcoming.guests || '2 guests';
   document.getElementById('tripRoom').textContent = upcoming.room || 'Villa Room';
   document.getElementById('tripRef').textContent = upcoming.ref;
+
+  // reserved (book now, pay later) & not yet paid → the card's primary action becomes Pay now
+  var _card = document.getElementById('tripCard');
+  var _view = _card && _card.querySelector('.view');
+  if(_view && upcoming.payMode === 'later' && !upcoming.paid){
+    _card.classList.add('to-pay');
+    _view.textContent = upcoming.amount ? ('Pay now · ' + upcoming.amount) : 'Pay now';
+    _view.addEventListener('click', function(e){
+      e.stopPropagation();                       // don't fall through to "open booking"
+      try { sessionStorage.setItem('payReturn', 'booking-details.html'); } catch(err){}
+      window.location.href = 'razorpay.html';    // booking is already in sessionStorage
+    });
+  }
 
 })();
 
