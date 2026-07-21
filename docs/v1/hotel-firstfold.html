@@ -867,7 +867,7 @@
   #cfUpgradeRow .cf-ic--up svg{stroke:var(--jade);}
   #cfUpgradeRow .cf-v s{color:var(--muted);font-weight:400;margin-right:7px;text-decoration-color:#b8b0a0;}
   #cfUpgradeRow .cf-v #cfUpNow{color:var(--jade-deep);}
-  .cf-status{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;font-weight:600;color:var(--muted);}
+  .cf-status{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:14px;font-weight:500;color:var(--muted);line-height:1.5;max-width:380px;}
   .cf-status[hidden]{display:none;}
   .cf-status .cf-dot{width:8px;height:8px;border-radius:50%;background:#d9a43c;animation:cfdot 1.6s ease-out infinite;}
   @keyframes cfdot{0%{box-shadow:0 0 0 0 rgba(217,164,60,.55);}70%{box-shadow:0 0 0 7px rgba(217,164,60,0);}100%{box-shadow:0 0 0 0 rgba(217,164,60,0);}}
@@ -1564,6 +1564,11 @@
     // Book now, pay later → same detail step, but reserve leads on the confirm face
     if(document.getElementById('bookNow').classList.contains('is-empty') && window.addStandardRoom) window.addStandardRoom();
     var _r = document.querySelector('.cta-row'); if(_r) _r.classList.add('later');
+    // Account holder is travelling → details on file; reserve straight away, skip the confirm form
+    if(window.userInParty && window.userInParty()){
+      if(window.renderCart) window.renderCart();
+      if(window.submitReserve && window.submitReserve()) return;
+    }
     window.goToCart && window.goToCart();
   });
   document.getElementById('addTrip').addEventListener('click', function(){
@@ -1590,6 +1595,7 @@
     // the account holder's name lives in the Travellers store ("Myself"); default "You"
     const TKEY = 'onto:travellers:v3';
     const readUserName = () => { try { const a=JSON.parse(localStorage.getItem(TKEY))||[]; const me=a.find(t=>t.relation==='Myself'||t.id==='t-you'); if(me&&me.name&&me.name.toLowerCase()!=='you'&&!me.name.includes('@')) return me.name; } catch(e){} return 'You'; };
+    window.acctName = readUserName;   // account holder's name for the booking when the form is skipped
     const writeUserName = n => { try { let a=JSON.parse(localStorage.getItem(TKEY)); if(!Array.isArray(a)) a=[]; let me=a.find(t=>t.relation==='Myself'||t.id==='t-you'); if(me) me.name=n; else a.unshift({id:'t-you',name:n,relation:'Myself',interests:[]}); localStorage.setItem(TKEY, JSON.stringify(a)); } catch(e){} };
     const FUN_EMOJI = ['🦊','🐨','🐼','🦁','🐧','🐬','🦉','🐢','🐝','🦩'];
     const emojiFor = name => { let h=0; const s=String(name||''); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; };
@@ -2789,7 +2795,7 @@
         room:   t('#roomCard .sr-name') || 'Villa Room',
         rooms:  (window.cartLines ? window.cartLines() : []),
         amount: t('#confirmAmt') || t('#bkTotal') || t('.cp-amt'),
-        name:   (document.getElementById('fName')||{}).value || '',
+        name:   (document.getElementById('fName')||{}).value || (window.userInParty && window.userInParty() && window.acctName ? window.acctName() : ''),
         email:  (document.getElementById('fEmail')||{}).value || ''
       };
     }
@@ -2805,17 +2811,20 @@
     window.submitBooking = submitBooking;
     $('confirmBtn').addEventListener('click', submitBooking);
     // Pay with zero → reserve now, full amount due at the hotel; skip payment, go to the order page
-    var reserveBtn = $('reserveBtn');
-    if(reserveBtn) reserveBtn.addEventListener('click', function(){
-      if(!validateDetails()) return;
+    function submitReserve(){
+      if(!validateDetails()) return false;
       var booking = buildBooking();
       booking.payMode = 'later'; booking.paid = false;
       booking.dueAmount = booking.amount; booking.status = 'confirmed';
       try { sessionStorage.setItem('booking', JSON.stringify(booking)); } catch(e){}
       // reserve → show the ring in the right slot, then the reserved confirmation (same page)
       if(window.__reserveInline){ window.__reserveInline(); }
-      else { location.href = 'reserving.html'; }
-    });
+      else { try { sessionStorage.setItem('payReturn','hotel-firstfold.html?reserved=1'); } catch(e){} location.href = 'reserving.html'; }
+      return true;
+    }
+    window.submitReserve = submitReserve;
+    var reserveBtn = $('reserveBtn');
+    if(reserveBtn) reserveBtn.addEventListener('click', submitReserve);
   })();
   })();
 </script>
@@ -3019,7 +3028,7 @@
         // charge failed at the bank and was reversed instantly → no booking, offer to try again
         if(badge){ badge.classList.add('failed'); var bx = badge.querySelector('svg'); if(bx) bx.innerHTML = '<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>'; }
         setTx('cfTitle', 'Payment failed');
-        if(status){ status.hidden = false; status.classList.add('nodot'); setTx('cfStatusTx', 'The payment didn’t go through — your bank has reversed it.'); }
+        if(status){ status.hidden = false; status.classList.add('nodot'); setTx('cfStatusTx', 'The payment didn’t go through. If any amount was deducted, it will be refunded within 2–4 days.'); }
         if(refRow) refRow.style.display = 'none';
         if(totalRow) totalRow.style.display = 'none';
         var detailsF = document.getElementById('cfDetails'); if(detailsF) detailsF.hidden = true;

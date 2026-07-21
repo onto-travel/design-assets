@@ -724,7 +724,10 @@ function goFromSearch(){
   var q = (document.getElementById('hotelInput').value||'').trim(), ql = q.toLowerCase();
   var LOCS = ['Goa','Udaipur','Mumbai','Andaman'], match = null;
   for(var i=0;i<LOCS.length;i++){ if(LOCS[i].toLowerCase()===ql){ match = LOCS[i]; break; } }
-  window.location.href = match ? ('results.html?where='+encodeURIComponent(match)+'&auth=out') : 'hotel-firstfold-loggedout.html';
+  if(!q) return;
+  if(match){ window.location.href = 'results.html?where='+encodeURIComponent(match)+'&auth=out'; return; }
+  // a known hotel name → its PDP; gibberish / anything unknown → the "no properties" results screen
+  window.location.href = /taj|exotica/.test(ql) ? 'hotel-firstfold-loggedout.html' : ('results.html?where='+encodeURIComponent(q)+'&auth=out');
 }
 document.getElementById('searchGo').addEventListener('click', goFromSearch);
 
