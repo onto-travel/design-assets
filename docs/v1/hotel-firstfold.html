@@ -3090,6 +3090,11 @@
 
     // on load: pay-now returns from razorpay with ?paid=1 (?reserved=1 kept for deep-links)
     var qs = new URLSearchParams(location.search);
+    // ?state=<mode> — direct deep-link to any confcard state (for review/bookkeeping); URL is left intact
+    var _st = qs.get('state');
+    if(_st && ['reserved','pending','paid','payfail','failupgrade','failrebook'].indexOf(_st) !== -1){
+      renderConf(_st); return;
+    }
     if(qs.get('paid') === '1'){
       var failed = false, pend = false;
       try { failed = sessionStorage.getItem('payFailed') === '1'; if(failed) sessionStorage.removeItem('payFailed'); } catch(e){}
