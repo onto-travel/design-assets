@@ -2979,6 +2979,8 @@
         if(status) status.hidden = false;
         if(refRow) refRow.style.display = 'none';
         if(vou) vou.hidden = true;
+        // no confirmed booking yet → nothing to open; hide See details until it settles
+        var detailsP = document.getElementById('cfDetails'); if(detailsP) detailsP.hidden = true;
         // after a set time: confirmation arrives, or it times out → refund + a rebook offer
         var outcome = 'confirmed';
         try { outcome = sessionStorage.getItem('settleOutcome') || 'confirmed'; } catch(e){}
@@ -2994,6 +2996,8 @@
         var origRoom = b.room || 'Villa Room';
         if(refRow) refRow.style.display = 'none';
         if(vou) vou.hidden = true;
+        // booking didn't go through → no confirmed booking to open; the Rebook/Confirm-upgrade CTA carries it
+        var detailsFR = document.getElementById('cfDetails'); if(detailsFR) detailsFR.hidden = true;
         if(pay){ setTx('cfPayAmt', b.amount); pay.hidden = false; }
         if(isUp){
           // their room sold out → a better room at the same price (a free upgrade)
