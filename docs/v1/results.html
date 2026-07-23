@@ -184,6 +184,9 @@
   .person .person-x:hover{color:#b03636;}
   .person-in{width:118px;border:1px solid var(--jade);border-radius:20px;padding:5px 12px;font-family:inherit;
     font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;outline:none;}
+  .person-age{margin-left:1px;border:1px solid #d8c9a4;background:#fbf3e2;color:#7a5f28;
+    font-family:inherit;font-size:11px;font-weight:700;border-radius:11px;padding:2px 3px;cursor:pointer;outline:none;}
+  .person-age.set{border-color:#cbe0d3;background:#e9f4ee;color:var(--jade);}
   .gp-chead .gp-add{margin-left:8px;flex:none;width:25px;height:25px;padding:0;border-radius:50%;
     border:1px solid var(--line);background:#fff;color:var(--jade);font-size:17px;line-height:1;
     cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
@@ -203,8 +206,9 @@
   .sort:hover{border-color:#c2b8a4;}
 
   /* ============ TWO-COLUMN ============ */
+  /* left column = the narrowing rail; classic filter rail is retired */
   .grid{display:grid;grid-template-columns:264px 1fr;gap:28px;align-items:start;}
-  .rail{position:sticky;top:var(--stick);display:flex;flex-direction:column;gap:16px;}
+  .rail{display:none;position:sticky;top:var(--stick);flex-direction:column;gap:16px;}
 
   /* filter groups */
   .fgroup{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;}
@@ -277,15 +281,21 @@
   .star-chip.is-on{border-color:var(--jade);background:#eef6f1;color:var(--jade-deep);}
 
   /* ============ HOTEL LIST / CARDS ============ */
-  .list{display:flex;flex-direction:column;gap:20px;}
+  /* one wide card per row: photo left, details right */
+  .list{display:flex;flex-direction:column;gap:20px;max-width:960px;margin:0 auto;width:100%;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
     box-shadow:0 1px 2px rgba(40,30,10,.04),0 8px 22px rgba(40,30,10,.05);
-    display:grid;grid-template-columns:40% 60%;transition:box-shadow .2s;cursor:pointer;}
+    display:grid;grid-template-columns:40% 60%;cursor:pointer;min-width:0;transition:box-shadow .2s;}
   .card:hover{box-shadow:0 4px 26px rgba(40,30,10,.10);}
   .card:focus-visible{outline:2px solid var(--jade);outline-offset:2px;}
 
+  /* photo fills the left cell */
+  .ph{position:relative;min-height:280px;height:100%;overflow:hidden;}
+  @media(max-width:700px){ .card{grid-template-columns:1fr;} .ph{min-height:220px;height:220px;} }
+  .ph .car{height:100%;}
+
   /* carousel */
-  .car{position:relative;background:#20321f;overflow:hidden;min-height:300px;}
+  .car{position:relative;background:#20321f;overflow:hidden;min-height:100%;}
   .car-track{position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
     scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;}
   .car-track::-webkit-scrollbar{display:none;}
@@ -294,9 +304,9 @@
     background:radial-gradient(120% 80% at 30% 15%, rgba(255,255,255,.18), transparent 55%),
       linear-gradient(180deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.28) 100%);}
   img.car-slide{object-fit:cover;height:100%;display:block;background:#20321f;}
-  .car-count{position:absolute;bottom:12px;right:12px;z-index:3;background:rgba(20,22,20,.62);color:#fff;
-    font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:20px;font-variant-numeric:tabular-nums;
-    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .car-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:5px;}
+  .car-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);transition:background .15s;}
+  .car-dot.on{background:#fff;}
   .car-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:34px;height:34px;
     border-radius:50%;border:none;background:rgba(255,255,255,.94);color:var(--ink);cursor:pointer;
     display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.22);
@@ -308,38 +318,48 @@
   .car-arrow.next{right:10px;}
   .car-arrow svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
 
-  /* details */
-  .det{padding:22px 24px 20px;display:flex;flex-direction:column;min-width:0;}
-  .det-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;}
-  .det-head{min-width:0;}
-  .stars{display:flex;gap:2px;margin-bottom:8px;}
-  .stars svg{width:13px;height:13px;fill:var(--gold);stroke:none;}
-  .det h3{font-size:20px;line-height:1.22;}
-  .eyebrow{font-size:13px;color:var(--muted);margin-top:6px;}
-  .rating{flex:none;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
-  .rating .score{font-family:Georgia,"Times New Roman",serif;color:var(--ink);display:inline-flex;align-items:baseline;line-height:1;}
-  .rating .score b{font-size:21px;font-weight:600;letter-spacing:-.02em;}
-  .rating .score .out{font-size:13px;font-weight:600;color:var(--muted);margin-left:1px;}
-  .rating .score-cnt{font-size:11.5px;color:var(--muted);white-space:nowrap;}
+  /* details beside the photo: hook → stars/score → where → price → highlights →
+     guests loved → perfect for → CTA */
+  .det{display:flex;flex-direction:column;min-width:0;padding:20px 24px 18px;}
+  .cat-stars{color:var(--gold);letter-spacing:3px;font-size:14px;margin-bottom:4px;}
+  .name-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;}
+  .det h3{font-size:20px;line-height:1.22;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* two lines tall but height-capped, so it can't stretch the name row and push the
+     location line down — it hangs into the empty right side below */
+  .rate-inline{flex:none;height:20px;display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+    font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:visible;}
+  .rate-inline b{font-family:Georgia,serif;font-size:17px;line-height:1.2;color:var(--ink);}
+  .where{margin-top:4px;font-size:13px;color:var(--muted);}
+  .prow{font-size:13.5px;color:var(--muted);}
+  .prow b{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
+  .high{margin-top:10px;font-size:13.5px;font-weight:600;color:#4a453e;}
+  .kv{margin-top:7px;font-size:13px;color:#4a453e;}
+  .kv .k{color:var(--muted);margin-right:6px;}
 
-  .room{margin-top:16px;align-self:flex-start;border:1px solid #f0ebe1;background:#faf8f4;border-radius:11px;padding:11px 13px;}
-  .room-main{font-size:14px;font-weight:600;color:#3a3630;}
-  .room-sub{font-size:13px;color:var(--muted);margin-top:4px;}
-
-  .priceblock{margin-top:auto;padding-top:20px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-  .price .pn{font-size:15px;color:var(--muted);}
-  .price .pn b{font-family:Georgia,serif;font-size:24px;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
-  .price .pt{font-size:12.5px;color:var(--muted);margin-top:3px;}
-  .cta{display:flex;align-items:center;gap:8px;}
-  .view-btn{background:var(--jade);color:#fff;border:none;border-radius:12px;height:46px;padding:0 22px;
-    font-size:14.5px;font-weight:600;cursor:pointer;transition:background .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
-  .view-btn:hover{background:var(--jade-deep);}
-  .save-sq{width:46px;height:46px;flex:none;border:1px solid var(--line);background:#fff;border-radius:12px;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .13s;}
-  .save-sq:hover{border-color:#c2b8a4;background:#faf7f1;}
-  .save-sq svg{width:20px;height:20px;stroke:#3a3630;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:all .13s;}
-  .save-sq.saved{border-color:#bcdcc9;background:#eef6f1;}
-  .save-sq.saved svg{stroke:#3f8163;}
+  /* narrowing rail (left) + the receipts line above the list */
+  .narrow{position:sticky;top:var(--stick);display:flex;flex-direction:column;gap:18px;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .n-group{min-width:0;}
+  .n-lab{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:8px;}
+  .n-chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .n-chip{border:1px solid var(--line);background:#fff;border-radius:18px;padding:7px 13px;
+    font-size:13px;font-weight:600;color:#4a453e;cursor:pointer;transition:all .13s;}
+  .n-chip:hover{border-color:#c2b8a4;}
+  .n-chip.on{border-color:var(--jade);background:#eef6f1;color:var(--jade-deep);}
+  .ledger{margin:0 0 14px;font-size:13px;color:var(--muted);padding:0 2px;}
+  .ledger b{color:var(--ink);}
+  @media (max-width:900px){ .narrow{position:static;} }
+  /* pills — still used by the compare overlay */
+  .spec{display:inline-flex;align-items:center;gap:6px;background:#f3efe6;border-radius:18px;
+    padding:6px 11px;font-size:12.5px;font-weight:600;color:#4a453e;white-space:nowrap;}
+  .spec svg{width:13px;height:13px;stroke:#8a8378;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .spec svg.fill{fill:var(--gold);stroke:none;}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    margin-top:auto;padding-top:14px;}
+  .book-btn{flex:none;background:var(--jade);color:#fff;border:none;border-radius:12px;
+    padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;}
+  .book-btn:hover{background:var(--jade-deep);}
 
   /* empty state */
   .empty{padding:44px 0 56px;text-align:center;}
@@ -393,7 +413,6 @@
   @media (max-width:900px){
     .grid{grid-template-columns:1fr;gap:18px;}
     .rail{position:static;max-height:none;overflow:visible;}
-    .card{grid-template-columns:1fr;}
     .car,.car-slide{min-height:240px;}
     .res-head h1{font-size:26px;}
     .searchbar-in{padding:10px 16px;}
@@ -585,6 +604,84 @@ function photosFor(hotel){
   if(hotel.amenities.includes("Spa")) labels.splice(3,0,"Spa sanctuary");
   return labels.map((label,i)=>({ label, hue:(base + i*29)%360 }));
 }
+// The one or two signals that set a stay apart, in a fixed priority order so the
+// same slot reads the same way on every card. Commodity amenities rank last.
+const SIGNAL_RANK = ["Beachfront","Spa","Free cancellation","Free breakfast","Pet friendly","Scenic view","Airport transfer","Pool","Gym","Wi-Fi"];
+const SIGNAL_LABEL = { "Free breakfast":"Breakfast incl." };
+const signalsFor = h => SIGNAL_RANK.filter(a=>h.amenities.includes(a)).slice(0,2).map(a=>SIGNAL_LABEL[a]||a);
+
+/* ---- editorial card copy: the hook, what guests loved, who it's perfect for ---- */
+const CARD_X = {
+  "taj-exotica": {hook:"Sunset lawns rolling straight onto Benaulim beach",
+    high:["Private beach","Family favourite","6 restaurants"],
+    loved:["Breakfast","Service","Beach access"], perfect:"Relaxed family vacations"},
+  "w-goa": {hook:"Cliff-edge glamour above Vagator's surf",
+    high:["Rock-cut spa","Sea-view suites","DJ nights"],
+    loved:["Pool","Design","Nightlife"], perfect:"Party weekends with friends"},
+  "ahilya": {hook:"A waterfront villa that feels like a friend's estate",
+    high:["Private villa","Waterfront","Chef on call"],
+    loved:["Privacy","Hosts","Food"], perfect:"Small groups going off-grid"},
+  "postcard": {hook:"Quiet verandas in a 200-year-old Cansaulim hamlet",
+    high:["Heritage house","Hillside calm","All-day breakfast"],
+    loved:["Charm","Breakfast","Quiet"], perfect:"Slow, unplugged couples' trips"},
+  "vivenda": {hook:"A Portuguese home run by hosts who love feeding you",
+    high:["Colonial home","Pet friendly","Home kitchen"],
+    loved:["Hosts","Food","Character"], perfect:"Solo travellers & food lovers"},
+  "novotel": {hook:"Big pool, easy beach, zero fuss in Candolim",
+    high:["Kids' club","Swim-up bar","Beachfront"],
+    loved:["Pool","Location","Value"], perfect:"Easy family beach weeks"},
+};
+const cardX = h => CARD_X[h.id] || {
+  hook: `${h.stars}-star ${h.type.toLowerCase()} in ${h.area}`,
+  high: h.amenities.slice(0,3),
+  loved: h.amenities.slice(0,3).map(a=>SIGNAL_LABEL[a]||a),
+  perfect: h.score>=9 ? "Special-occasion trips" : "Easy comfortable stays",
+};
+
+/* ---- narrow with receipts: a few taps → survivors, every ruled-out stay accounted for ---- */
+const POOL = 200; // the full inventory the narrowing claims to have checked
+// keep = plausible fraction of the remaining pool that survives this cut;
+// fun = how the survivors read in the funnel line
+const NARROW = {
+  focus: {label:"What matters", opts:[
+    {id:"beach", label:"Beachfront",       keep:.41, fun:"beachfront",        test:h=>h.amenities.includes("Beachfront")},
+    {id:"quiet", label:"Quiet & secluded", keep:.52, fun:"quiet & secluded",  test:h=>h.place==="South Goa"||h.type==="Villa"||h.type==="Homestay"},
+    {id:"value", label:"Value",            keep:.58, fun:"good value",        test:h=>h.price<=12000},
+  ]},
+  budget: {label:"Budget / night", opts:[
+    {id:"lo",  label:"Under ₹12k", keep:.54, fun:"under ₹12k",  test:h=>h.price<12000},
+    {id:"mid", label:"₹12–22k",    keep:.36, fun:"in ₹12–22k",  test:h=>h.price>=12000&&h.price<=22000},
+    {id:"hi",  label:"₹22k+",      keep:.18, fun:"at ₹22k+",    test:h=>h.price>22000},
+  ]},
+  area: {label:"Where", opts:[
+    {id:"north", label:"North Goa", keep:.56, fun:"in North Goa", test:h=>h.place==="North Goa"},
+    {id:"south", label:"South Goa", keep:.44, fun:"in South Goa", test:h=>h.place==="South Goa"},
+  ]},
+};
+const NARROW_DIMS = Object.keys(NARROW);
+const narrowOpt = (dim,id) => NARROW[dim].opts.find(o=>o.id===id);
+
+// Each survivor's edge over the rest — the reason it isn't interchangeable with
+// its neighbours. One line per card, never the same line twice.
+function edgesFor(list){
+  const m = {}; if(list.length<2) return m;
+  const minP = Math.min(...list.map(h=>h.price));
+  const maxS = Math.max(...list.map(h=>h.score));
+  const maxR = Math.max(...list.map(h=>h.reviews));
+  const used = new Set();
+  list.forEach(h=>{
+    const cand = [];
+    if(h.price===minP) cand.push("Cheapest of these "+list.length);
+    if(h.score===maxS) cand.push("Highest rated · "+h.score.toFixed(1));
+    const uniq = SIGNAL_RANK.find(a=>h.amenities.includes(a) && !list.some(o=>o.id!==h.id&&o.amenities.includes(a)));
+    if(uniq) cand.push("The only one with "+(SIGNAL_LABEL[uniq]||uniq).toLowerCase());
+    if(h.reviews===maxR) cand.push("Most reviewed · "+h.reviews.toLocaleString("en-IN"));
+    const pick = cand.find(c=>!used.has(c));
+    if(pick){ used.add(pick); m[h.id] = pick; }
+  });
+  return m;
+}
+
 const REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ================= ICONS ================= */
@@ -624,7 +721,11 @@ function Carousel({photos, name}){
             role="img" aria-label={`${name} — ${p.label}`}/>
         ))}
       </div>
-      <span className="car-count" aria-hidden="true">{idx+1} / {total}</span>
+      {total>1 && (
+        <span className="car-dots" aria-hidden="true">
+          {photos.map((_,i)=><span key={i} className={"car-dot"+(i===idx?" on":"")}/>)}
+        </span>
+      )}
       <button className="car-arrow prev" onClick={e=>{e.stopPropagation(); go(-1);}} disabled={idx===0} aria-label="Previous photo">
         <Svg d={I.chevL}/></button>
       <button className="car-arrow next" onClick={e=>{e.stopPropagation(); go(1);}} disabled={idx===total-1} aria-label="Next photo">
@@ -634,50 +735,31 @@ function Carousel({photos, name}){
 }
 
 /* ================= HOTEL CARD ================= */
-function HotelCard({hotel, saved, onSave, onBook, nights}){
+function HotelCard({hotel, onBook, nights}){
   const photos = useMemo(()=>photosFor(hotel), [hotel.id]);
-  const cancel = hotel.amenities.includes("Free cancellation");
-  const bfast = hotel.amenities.includes("Free breakfast");
-  const total = hotel.price * nights;
   const openPdp = () => { location.href = PDP_HREF; };
+  const x = cardX(hotel);
   return (
     <article className="card" onClick={openPdp} role="link" tabIndex={0}
       aria-label={`${hotel.name} — view details`}
       onKeyDown={e=>{ if(e.key==="Enter"){ e.preventDefault(); openPdp(); } }}>
-      <Carousel photos={photos} name={hotel.name}/>
+      <div className="ph">
+        <Carousel photos={photos} name={hotel.name}/>
+      </div>
       <div className="det">
-        <div className="det-top">
-          <div className="det-head">
-            <div className="stars" aria-label={hotel.stars+"-star property"}>
-              {Array.from({length:hotel.stars}).map((_,i)=><Svg key={i} d={<path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 18.9 5 21.4l1.4-6.8L1.3 9.9l6.9-.8L12 2z"/>}/>)}
-            </div>
-            <h3>{hotel.name}</h3>
-            <div className="eyebrow">{hotel.area} · {hotel.place} · {hotel.dist}</div>
-          </div>
-          <div className="rating">
-            <span className="score"><b>{hotel.score.toFixed(1)}</b><span className="out">/10</span></span>
-            <span className="score-cnt">{hotel.reviews.toLocaleString("en-IN")} reviews</span>
+        <div className="cat-stars" aria-label={hotel.stars+"-star property"}>{"★".repeat(hotel.stars)}</div>
+        <div className="name-row">
+          <h3>{hotel.name}</h3>
+          <div className="rate-inline">
+            <b>{hotel.score.toFixed(1)}</b>
+            <span>{hotel.reviews.toLocaleString("en-IN")} reviews</span>
           </div>
         </div>
-
-        <div className="room">
-          <div className="room-main">{hotel.room}</div>
-          <div className="room-sub">
-            {cancel ? "Free cancellation" : "Non-refundable"} · {bfast ? "Breakfast included" : "Room only"}
-          </div>
-        </div>
-
-        <div className="priceblock">
-          <div className="price">
-            <div className="pn"><b>{inr(hotel.price)}</b> / night</div>
-            <div className="pt">{inr(total)} total · {nights} {nights===1?"night":"nights"}</div>
-          </div>
-          <div className="cta">
-            <button className="view-btn" onClick={e=>{e.stopPropagation(); onBook();}}>Book now</button>
-            <button className={"save-sq"+(saved?" saved":"")} onClick={e=>{e.stopPropagation(); onSave();}}
-              aria-pressed={saved} aria-label={saved?"Remove from shortlist":"Add to shortlist"}>
-              <Svg d={saved ? I.check : I.plus}/></button>
-          </div>
+        <div className="where">{hotel.place} | {hotel.dist}</div>
+        <div className="high">{x.high.join(" • ")}</div>
+        <div className="foot">
+          <div className="prow"><b>{inr(hotel.price)}</b>/night</div>
+          <button className="book-btn" onClick={e=>{e.stopPropagation(); onBook();}}>Book now</button>
         </div>
       </div>
     </article>
@@ -850,6 +932,9 @@ function GuestPicker({party, setParty, rooms, setRooms}){
     if(party[cat].length<=MIN[cat]) return;
     const np = cloneParty(party); np[cat] = np[cat].filter((_,j)=>j!==i); commit(np);
   };
+  const setAge = (cat,i,age) => {
+    const np = cloneParty(party); const arr = [...np[cat]]; arr[i] = {...arr[i], age}; np[cat] = arr; commit(np);
+  };
   const commitName = val => {
     if(!editing){ return; }
     const np = cloneParty(party); const arr = [...np[editing.cat]]; const p = {...arr[editing.i]};
@@ -906,6 +991,15 @@ function GuestPicker({party, setParty, rooms, setRooms}){
                         {editable
                           ? <button type="button" className="person-name" onClick={e=>{e.stopPropagation(); setEditing({cat,i});}}>{name}</button>
                           : name}
+                        {cat==="children" && (
+                          <select className={"person-age"+(typeof p.age==="number"?" set":"")} aria-label={name+" age"}
+                            value={typeof p.age==="number"?String(p.age):""}
+                            onClick={e=>e.stopPropagation()}
+                            onChange={e=>{e.stopPropagation(); setAge(cat,i,parseInt(e.target.value,10));}}>
+                            <option value="" disabled hidden>Age</option>
+                            {Array.from({length:11},(_,k)=>k+2).map(a=><option key={a} value={a}>Age {a}</option>)}
+                          </select>
+                        )}
                         <button type="button" className="person-x" aria-label={"Remove "+name}
                           onClick={e=>{e.stopPropagation(); removePerson(cat,i);}}>×</button>
                       </span>
@@ -1060,7 +1154,9 @@ function App(){
   const [amenities, setAmen]    = useState([]);
   const [price, setPrice]       = useState(null); // {min,max} per night, or null = full range
   const [sort, setSort]         = useState("recommended");
-  const [saved, setSaved]       = useState(()=>({}));
+  // the narrowing taps: {focus, budget, area} → option id or null
+  const [narrow, setNarrow]     = useState({focus:null, budget:null, area:null});
+  const tapNarrow = (dim,id) => setNarrow(n=>({...n, [dim]: n[dim]===id ? null : id}));
 
   const covered = Object.prototype.hasOwnProperty.call(LOCATIONS, loc);
   const all = covered ? LOCATIONS[loc] : [];
@@ -1073,6 +1169,7 @@ function App(){
     if(next === loc) return;
     setLoc(next);
     setStarCat([]); setTypes([]); setRating(null); setAmen([]); setPrice(null); setSort("recommended");
+    setNarrow({focus:null, budget:null, area:null});
   }, [loc]);
 
   const clearAll = () => { setStarCat([]); setTypes([]); setRating(null); setAmen([]); setPrice(null); };
@@ -1086,11 +1183,29 @@ function App(){
       (rating==null || h.score >= rating) &&
       inPrice(h)
     );
+    NARROW_DIMS.forEach(dim=>{ if(narrow[dim]) r = r.filter(narrowOpt(dim, narrow[dim]).test); });
     if(sort==="price-asc")  r = [...r].sort((a,b)=>a.price-b.price);
     if(sort==="price-desc") r = [...r].sort((a,b)=>b.price-a.price);
     if(sort==="rating")     r = [...r].sort((a,b)=>b.score-a.score);
     return r;
-  }, [all, starCat, types, rating, amenities, price, sort]);
+  }, [all, starCat, types, rating, amenities, price, sort, narrow]);
+
+  // the receipts: a sequential funnel — each cut applies to what the previous
+  // one left, and the final step lands exactly on the real survivor count
+  const narrowActive = NARROW_DIMS.some(d=>narrow[d]);
+  const ledger = useMemo(()=>{
+    if(!narrowActive) return null;
+    const opts = NARROW_DIMS.filter(d=>narrow[d]).map(d=>narrowOpt(d, narrow[d]));
+    let rem = POOL;
+    return opts.map((o,i)=>{
+      let next = i===opts.length-1
+        ? results.length
+        : Math.max(results.length, Math.min(rem, Math.round(rem*o.keep)));
+      rem = next;
+      return {n: next, label: o.fun};
+    });
+  }, [narrowActive, narrow, results.length]);
+  const edgeMap = useMemo(()=>edgesFor(results), [results]);
 
   const [authOpen, setAuthOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -1099,13 +1214,6 @@ function App(){
     setToast(msg);
     if(toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(()=>setToast(null), 2200);
-  };
-  // logged out: saving requires an account → prompt sign-in instead of toggling
-  const onSave = id => {
-    if(LOGGED_OUT){ setAuthOpen(true); return; }
-    const adding = !saved[id];
-    setSaved(p=>({...p, [id]:!p[id]}));
-    showToast(adding ? "Added to trip" : "Removed from trip");
   };
 
   // Book now: logged out → prompt sign-in; logged in → seed the booking snapshot
@@ -1199,20 +1307,35 @@ function App(){
           </div>
         ) : (
           <div className="grid">
-            <FilterRail
-              all={all}
-              starCat={starCat} setStarCat={setStarCat}
-              types={types} setTypes={setTypes}
-              rating={rating} setRating={setRating}
-              amenities={amenities} setAmenities={setAmen}
-              price={price} setPrice={setPrice}
-              loggedOut={LOGGED_OUT}/>
+            <aside className="narrow" role="group" aria-label="Narrow the list">
+              {NARROW_DIMS.map(dim=>(
+                <div className="n-group" key={dim}>
+                  <span className="n-lab">{NARROW[dim].label}</span>
+                  <div className="n-chips">
+                    {NARROW[dim].opts.map(o=>(
+                      <button key={o.id} className={"n-chip"+(narrow[dim]===o.id?" on":"")}
+                        aria-pressed={narrow[dim]===o.id} onClick={()=>tapNarrow(dim,o.id)}>{o.label}</button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </aside>
             <div>
+              <div className="ledger" aria-live="polite">
+                {narrowActive ? (
+                  <React.Fragment>
+                    {POOL} stays{ledger.map((l,i)=>(
+                      <React.Fragment key={i}> → {i===ledger.length-1 ? <b>{l.n} {l.label}</b> : `${l.n} ${l.label}`}</React.Fragment>
+                    ))}
+                  </React.Fragment>
+                ) : (
+                  <React.Fragment>Top <b>{results.length}</b> of {POOL} stays</React.Fragment>
+                )}
+              </div>
               {results.length>0 ? (
                 <div className="list">
                   {results.map(h=>(
-                    <HotelCard key={h.id} hotel={h} saved={!!saved[h.id]} nights={nights}
-                      onSave={()=>onSave(h.id)} onBook={()=>bookNow(h)}/>
+                    <HotelCard key={h.id} hotel={h} nights={nights} onBook={()=>bookNow(h)}/>
                   ))}
                 </div>
               ) : (
@@ -1220,7 +1343,7 @@ function App(){
                   <div className="em-ic"><Svg d={I.filter}/></div>
                   <h3>No stays match these filters</h3>
                   <p>We have {all.length} stays in {loc}, but none fit every filter you've set. Loosen a filter to see more.</p>
-                  <div className="em-sug"><button onClick={clearAll}>Clear all filters</button></div>
+                  <div className="em-sug"><button onClick={()=>{clearAll(); setNarrow({focus:null, budget:null, area:null});}}>Clear all filters</button></div>
                 </div>
               )}
             </div>
