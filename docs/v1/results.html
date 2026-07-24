@@ -208,7 +208,7 @@
   /* ============ TWO-COLUMN ============ */
   /* left column = the narrowing rail; classic filter rail is retired */
   .grid{display:grid;grid-template-columns:264px 1fr;gap:28px;align-items:start;}
-  .rail{display:none;position:sticky;top:var(--stick);flex-direction:column;gap:16px;}
+  .rail{display:flex;position:sticky;top:var(--stick);flex-direction:column;gap:16px;}
 
   /* filter groups */
   .fgroup{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;}
@@ -285,12 +285,12 @@
   .list{display:flex;flex-direction:column;gap:20px;max-width:960px;margin:0 auto;width:100%;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
     box-shadow:0 1px 2px rgba(40,30,10,.04),0 8px 22px rgba(40,30,10,.05);
-    display:grid;grid-template-columns:40% 60%;cursor:pointer;min-width:0;transition:box-shadow .2s;}
+    display:grid;grid-template-columns:46% 54%;cursor:pointer;min-width:0;transition:box-shadow .2s;}
   .card:hover{box-shadow:0 4px 26px rgba(40,30,10,.10);}
   .card:focus-visible{outline:2px solid var(--jade);outline-offset:2px;}
 
   /* photo fills the left cell */
-  .ph{position:relative;min-height:280px;height:100%;overflow:hidden;}
+  .ph{position:relative;min-height:320px;height:100%;overflow:hidden;}
   @media(max-width:700px){ .card{grid-template-columns:1fr;} .ph{min-height:220px;height:220px;} }
   .ph .car{height:100%;}
 
@@ -304,9 +304,6 @@
     background:radial-gradient(120% 80% at 30% 15%, rgba(255,255,255,.18), transparent 55%),
       linear-gradient(180deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.28) 100%);}
   img.car-slide{object-fit:cover;height:100%;display:block;background:#20321f;}
-  .car-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:5px;}
-  .car-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);transition:background .15s;}
-  .car-dot.on{background:#fff;}
   .car-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:34px;height:34px;
     border-radius:50%;border:none;background:rgba(255,255,255,.94);color:var(--ink);cursor:pointer;
     display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.22);
@@ -333,6 +330,16 @@
   .prow{font-size:13.5px;color:var(--muted);}
   .prow b{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
   .high{margin-top:10px;font-size:13.5px;font-weight:600;color:#4a453e;}
+  /* property pros — pills where the summary line was; a camera pill jumps the photo */
+  .pros{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;}
+  .pro-pill{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:13px;font-weight:600;
+    line-height:1;color:#4a453e;background:#f1ede3;border:1px solid transparent;border-radius:20px;padding:8px 13px;}
+  button.pro-pill{cursor:pointer;transition:background .14s,border-color .14s,color .14s;}
+  button.pro-pill:hover{background:#e8e2d5;}
+  .pro-pill .pp-cam{width:14px;height:14px;stroke:#8a8378;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  button.pro-pill.on{background:#eef6f1;border-color:var(--jade);color:var(--jade-deep);}
+  button.pro-pill.on .pp-cam{stroke:var(--jade);}
+  .pro-pill.val{background:#f7f0e0;border-color:#ebddbf;color:#8a6a24;}
   .kv{margin-top:7px;font-size:13px;color:#4a453e;}
   .kv .k{color:var(--muted);margin-right:6px;}
 
@@ -576,32 +583,38 @@ function guestsLabel(p){
 }
 function loadParty(){
   let party; try{ party=JSON.parse(sessionStorage.getItem("searchGuests")); }catch(e){}
-  if(!party || !party.adults) party = { adults:[{companion:"you"}], children:[], infants:[] };
-  CATS.forEach(c=>{ if(party[c]) party[c]=party[c].filter(x=>!x.companion||MAP[x.companion]); });
+  if(!party || typeof party!=="object") party = {};
+  // guarantee every category is an array. Other pages' guest pickers may write a
+  // subset — the PDP's shared picker has no `infants` — so reading its snapshot
+  // here must not leave a category undefined (knownIn/heads/etc. would crash).
+  CATS.forEach(c=>{ party[c] = Array.isArray(party[c]) ? party[c].filter(x=>!x.companion||MAP[x.companion]) : []; });
+  if(!party.adults.length) party.adults = [{companion:"you"}];
   return party;
 }
 
 // Real photography for the hotels we have shot; others fall back to gradients.
 const PHOTOS = {
   "taj-exotica":[
-    {src:"images/gv-01-bedroom.png", label:"Bedroom"},
-    {src:"images/gv-02-balcony.png", label:"Balcony"},
-    {src:"images/gv-04-exterior.png",label:"Villa exterior"},
-    {src:"images/gv-03-bathroom.png",label:"Bathroom"},
+    {src:"images/08-villa-exterior.png",label:"Exterior"},
+    {src:"images/06-aerial-pool.png",   label:"Aerial"},
+    {src:"images/04-pool-sunset.png",   label:"Pool"},
+    {src:"images/07-garden-view.png",   label:"Grounds"},
   ],
   "w-goa":[
-    {src:"w-goa-rooms/suite-sleeping.jpg",label:"Bedroom"},
-    {src:"w-goa-rooms/suite-patio.jpg",   label:"Patio"},
-    {src:"w-goa-rooms/chalet-sea.jpg",    label:"Sea view"},
-    {src:"w-goa-rooms/suite-bathroom.jpg",label:"Bathroom"},
+    {src:"w-goa-rooms/oasis-villa-ii-exterior.jpg",label:"Exterior"},
+    {src:"w-goa-rooms/chalet-sea.jpg",             label:"Sea view"},
+    {src:"w-goa-rooms/oasis-villa-i-garden.jpg",   label:"Garden"},
+    {src:"w-goa-rooms/chalet-garden.jpg",          label:"Grounds"},
   ],
 };
+// Every card offers the same set of labelled views, so the pills read as a
+// consistent, verifiable set across the whole list.
 function photosFor(hotel){
   if(PHOTOS[hotel.id]) return PHOTOS[hotel.id];
   const base = hashHue(hotel.id);
-  const labels = ["Arrival & lobby","Signature suite","Pool & deck","Dining","The grounds"];
-  if(hotel.amenities.includes("Beachfront")) labels[4] = "Private beach";
-  if(hotel.amenities.includes("Spa")) labels.splice(3,0,"Spa sanctuary");
+  const labels = ["Exterior","Pool","Grounds","Dining"];
+  if(hotel.amenities.includes("Beachfront")) labels[2] = "Beach";
+  if(hotel.amenities.includes("Spa")) labels[3] = "Spa";
   return labels.map((label,i)=>({ label, hue:(base + i*29)%360 }));
 }
 // The one or two signals that set a stay apart, in a fixed priority order so the
@@ -637,6 +650,56 @@ const cardX = h => CARD_X[h.id] || {
   loved: h.amenities.slice(0,3).map(a=>SIGNAL_LABEL[a]||a),
   perfect: h.score>=9 ? "Special-occasion trips" : "Easy comfortable stays",
 };
+
+/* ---- the three standardised pros: same axes on every card, so stays compare
+   apples-to-apples. Locality + Dining come straight off the data; Scene is a
+   one-word editorial read, mapped per stay with a sensible fallback. ---- */
+const SCENE = {
+  "taj-exotica":"Family", "w-goa":"Nightlife", "ahilya":"Secluded", "postcard":"Quiet",
+  "vivenda":"Foodie", "novotel":"Family",
+  "udaivilas":"Romantic", "lake-palace":"Romantic", "amet":"Quiet", "radisson-udr":"City",
+  "taj-palace":"Heritage", "trident-np":"City", "jw-juhu":"Beach life", "abode":"Boutique",
+  "taj-havelock":"Beach life", "barefoot":"Nature",
+};
+const sceneFor = h => SCENE[h.id] || (
+  h.amenities.includes("Beachfront") ? "Beach life" :
+  (h.type==="Villa"||h.type==="Homestay") ? "Secluded" :
+  h.dist==="City centre" ? "City" : "Quiet"
+);
+const diningFor = h => h.restaurants===0 ? null
+  : h.restaurants + " restaurant" + (h.restaurants>1 ? "s" : "");
+
+// the one gold "highlight" pro — why this stay stands out (no photo behind it)
+function highlightFor(h){
+  if(h.price <= 12000)  return "Cost sweet spot";
+  if(h.score >= 9.2)    return "Guest favourite";
+  if(h.reviews >= 2500) return "Traveller favourite";
+  return null;
+}
+
+// Property pros, shown as pills where the old summary line was. A pro a photo
+// can prove carries a camera icon and, tapped, jumps the card's photo to that
+// view — the same pill→photo trust move as the PDP. The gold highlight has none.
+function prosFor(h, photos){
+  const findPhoto = re => { const i = photos.findIndex(p=>re.test((p.label||"").toLowerCase())); return i>=0 ? i : null; };
+  const pros = [{ label:h.dist, photo: findPhoto(/beach|sea|exterior|aerial|water|lake|island|hill|city|rainforest|grounds|garden|marine|gateway|boutique/) }];
+  const dine = diningFor(h);
+  if(dine) pros.push({ label:dine, photo: findPhoto(/dining|restaurant/) });
+  const AMEN = [
+    {a:"Pool",           label:"Pool",               re:/pool/},
+    {a:"Spa",            label:"Spa",                re:/spa/},
+    {a:"Scenic view",    label:"Scenic views",       re:/view|garden|grounds|sea|aerial/},
+    {a:"Free breakfast", label:"Breakfast included", re:/dining|restaurant/},
+    {a:"Gym",            label:"Fitness centre",     re:/gym|fitness/},
+  ];
+  // prefer an amenity a photo can prove; otherwise the first one present
+  const pick = AMEN.find(x=>h.amenities.includes(x.a) && findPhoto(x.re)!=null)
+            || AMEN.find(x=>h.amenities.includes(x.a));
+  if(pick) pros.push({ label:pick.label, photo: findPhoto(pick.re) });
+  const hl = highlightFor(h);
+  if(hl) pros.push({ label:hl, value:true });
+  return pros;
+}
 
 /* ---- narrow with receipts: a few taps → survivors, every ruled-out stay accounted for ---- */
 const POOL = 200; // the full inventory the narrowing claims to have checked
@@ -694,25 +757,24 @@ const I = {
   pin:     <g><path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></g>,
   compass: <g><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></g>,
   filter:  <path d="M4 6h16M7 12h10M10 18h4"/>,
+  cam:     <g><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7l1.2-1.7A1 1 0 0 1 9 4.9h6a1 1 0 0 1 .8.4L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-9z"/><circle cx="12" cy="12.3" r="3"/></g>,
 };
 const Svg = ({d, vb="0 0 24 24", ...p}) => <svg viewBox={vb} {...p}>{d}</svg>;
 
 /* ================= CAROUSEL ================= */
-function Carousel({photos, name}){
-  const track = useRef(null);
-  const [idx, setIdx] = useState(0);
+function Carousel({photos, name, trackRef, idx, setIdx}){
   const onScroll = () => {
-    const el = track.current; if(!el) return;
+    const el = trackRef.current; if(!el) return;
     setIdx(Math.round(el.scrollLeft / el.clientWidth));
   };
   const go = dir => {
-    const el = track.current; if(!el) return;
+    const el = trackRef.current; if(!el) return;
     el.scrollBy({ left: dir*el.clientWidth, behavior: REDUCED ? "auto":"smooth" });
   };
   const total = photos.length;
   return (
     <div className="car">
-      <div className="car-track" ref={track} onScroll={onScroll} tabIndex={-1}>
+      <div className="car-track" ref={trackRef} onScroll={onScroll} tabIndex={-1}>
         {photos.map((p,i)=> p.src ? (
           <img className="car-slide" key={i} src={p.src} alt={`${name} — ${p.label}`} loading="lazy" draggable={false}/>
         ) : (
@@ -721,11 +783,6 @@ function Carousel({photos, name}){
             role="img" aria-label={`${name} — ${p.label}`}/>
         ))}
       </div>
-      {total>1 && (
-        <span className="car-dots" aria-hidden="true">
-          {photos.map((_,i)=><span key={i} className={"car-dot"+(i===idx?" on":"")}/>)}
-        </span>
-      )}
       <button className="car-arrow prev" onClick={e=>{e.stopPropagation(); go(-1);}} disabled={idx===0} aria-label="Previous photo">
         <Svg d={I.chevL}/></button>
       <button className="car-arrow next" onClick={e=>{e.stopPropagation(); go(1);}} disabled={idx===total-1} aria-label="Next photo">
@@ -737,14 +794,19 @@ function Carousel({photos, name}){
 /* ================= HOTEL CARD ================= */
 function HotelCard({hotel, onBook, nights}){
   const photos = useMemo(()=>photosFor(hotel), [hotel.id]);
+  const pros = useMemo(()=>prosFor(hotel, photos), [hotel.id]);
+  const trackRef = useRef(null);
+  const [idx, setIdx] = useState(0);
+  const goTo = i => { const el = trackRef.current; if(!el) return;
+    el.scrollTo({ left: i*el.clientWidth, behavior: REDUCED ? "auto":"smooth" }); };
   const openPdp = () => { location.href = PDP_HREF; };
-  const x = cardX(hotel);
   return (
-    <article className="card" onClick={openPdp} role="link" tabIndex={0}
+    <article className="card" role="link" tabIndex={0}
       aria-label={`${hotel.name} — view details`}
+      onClick={e=>{ if(e.target.closest("button, a, .pro-pill")) return; openPdp(); }}
       onKeyDown={e=>{ if(e.key==="Enter"){ e.preventDefault(); openPdp(); } }}>
       <div className="ph">
-        <Carousel photos={photos} name={hotel.name}/>
+        <Carousel photos={photos} name={hotel.name} trackRef={trackRef} idx={idx} setIdx={setIdx}/>
       </div>
       <div className="det">
         <div className="cat-stars" aria-label={hotel.stars+"-star property"}>{"★".repeat(hotel.stars)}</div>
@@ -756,7 +818,17 @@ function HotelCard({hotel, onBook, nights}){
           </div>
         </div>
         <div className="where">{hotel.place} | {hotel.dist}</div>
-        <div className="high">{x.high.join(" • ")}</div>
+        <div className="pros">
+          {pros.map((p,i)=> p.photo!=null ? (
+            <button type="button" key={i} className={"pro-pill"+(idx===p.photo?" on":"")}
+              aria-pressed={idx===p.photo} aria-label={`Show ${p.label}`}
+              onClick={e=>{e.stopPropagation(); goTo(p.photo);}}>
+              <Svg className="pp-cam" d={I.cam}/>{p.label}
+            </button>
+          ) : (
+            <span key={i} className={"pro-pill"+(p.value?" val":" flat")}>{p.label}</span>
+          ))}
+        </div>
         <div className="foot">
           <div className="prow"><b>{inr(hotel.price)}</b>/night</div>
           <button className="book-btn" onClick={e=>{e.stopPropagation(); onBook();}}>Book now</button>
@@ -789,7 +861,7 @@ function PriceFilter({all, value, setValue}){
   const setMaxV = v => setValue({min: curMin, max: Math.max(v, curMin)});
   return (
     <div className="fsub">
-      <p className="fg-h">Price range<span className="fg-note">per night</span></p>
+      <p className="fg-h">Budget<span className="fg-note">per night</span></p>
       <div className="pr-vals">
         <span className="pv">{inr(curMin)}</span>
         <span className="pv">{inr(curMax)}{curMax>=max?"+":""}</span>
@@ -806,27 +878,28 @@ function PriceFilter({all, value, setValue}){
   );
 }
 
-/* guest rating — score floor (shares the `rating` state) */
-function GuestRatingFilter({rating, setRating}){
+/* review score — minimum-score pills (shares the `rating` state) */
+function ScoreFilter({rating, setRating}){
+  const opts = [{v:null, label:"Any"}, {v:7, label:"7+"}, {v:8, label:"8+"}, {v:9, label:"9+"}];
   return (
     <div className="fsub">
-      <p className="fg-h">Guest rating</p>
+      <p className="fg-h">Review score</p>
       <div className="star-row">
-        {[9,8,7].map(v=>(
-          <button type="button" key={v} className={"star-chip"+(rating===v?" is-on":"")}
-            aria-pressed={rating===v} onClick={()=>setRating(p=>p===v?null:v)}>{v}+</button>
+        {opts.map(o=>(
+          <button type="button" key={o.label} className={"star-chip"+(rating===o.v?" is-on":"")}
+            aria-pressed={rating===o.v} onClick={()=>setRating(o.v)}>{o.label}</button>
         ))}
       </div>
     </div>
   );
 }
 
-/* star rating — 3 to 5 stars (shares the `starCat` state) */
+/* star category — 3 to 5 stars (shares the `starCat` state) */
 function StarFilter({starCat, setStarCat}){
   const toggle = s => setStarCat(p => p.includes(s) ? p.filter(x=>x!==s) : [...p,s]);
   return (
     <div className="fsub">
-      <p className="fg-h">Star rating</p>
+      <p className="fg-h">Star category</p>
       <div className="star-row">
         {[5,4,3].map(s=>(
           <button type="button" key={s} className={"star-chip"+(starCat.includes(s)?" is-on":"")}
@@ -839,31 +912,13 @@ function StarFilter({starCat, setStarCat}){
   );
 }
 
-function FilterRail({all, starCat, setStarCat, types, setTypes, rating, setRating, amenities, setAmenities,
-  price, setPrice, loggedOut}){
-  const toggleAmen = a => setAmenities(p => p.includes(a) ? p.filter(x=>x!==a) : [...p,a]);
-  const toggleRating = v => setRating(p => p===v ? null : v);
-
-  // usual
-  const usualAmenActive = a => amenities.includes(a);
-  const usualRatingActive = rating === USUAL.rating;
-  const allUsualActive = USUAL.amenities.every(usualAmenActive) && usualRatingActive;
-  const applyAllUsual = () => {
-    if(allUsualActive){
-      setAmenities(p => p.filter(a => !USUAL.amenities.includes(a)));
-      if(usualRatingActive) setRating(null);
-    } else {
-      setAmenities(p => Array.from(new Set([...p, ...USUAL.amenities])));
-      setRating(USUAL.rating);
-    }
-  };
-
+function FilterRail({all, starCat, setStarCat, rating, setRating, price, setPrice}){
   return (
     <aside className="rail" aria-label="Filters">
       <div className="fgroup">
         <PriceFilter all={all} value={price} setValue={setPrice}/>
-        <GuestRatingFilter rating={rating} setRating={setRating}/>
         <StarFilter starCat={starCat} setStarCat={setStarCat}/>
+        <ScoreFilter rating={rating} setRating={setRating}/>
       </div>
     </aside>
   );
@@ -1307,31 +1362,9 @@ function App(){
           </div>
         ) : (
           <div className="grid">
-            <aside className="narrow" role="group" aria-label="Narrow the list">
-              {NARROW_DIMS.map(dim=>(
-                <div className="n-group" key={dim}>
-                  <span className="n-lab">{NARROW[dim].label}</span>
-                  <div className="n-chips">
-                    {NARROW[dim].opts.map(o=>(
-                      <button key={o.id} className={"n-chip"+(narrow[dim]===o.id?" on":"")}
-                        aria-pressed={narrow[dim]===o.id} onClick={()=>tapNarrow(dim,o.id)}>{o.label}</button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </aside>
+            <FilterRail all={all} starCat={starCat} setStarCat={setStarCat}
+              rating={rating} setRating={setRating} price={price} setPrice={setPrice}/>
             <div>
-              <div className="ledger" aria-live="polite">
-                {narrowActive ? (
-                  <React.Fragment>
-                    {POOL} stays{ledger.map((l,i)=>(
-                      <React.Fragment key={i}> → {i===ledger.length-1 ? <b>{l.n} {l.label}</b> : `${l.n} ${l.label}`}</React.Fragment>
-                    ))}
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>Top <b>{results.length}</b> of {POOL} stays</React.Fragment>
-                )}
-              </div>
               {results.length>0 ? (
                 <div className="list">
                   {results.map(h=>(
