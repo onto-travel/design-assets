@@ -10,7 +10,9 @@
     --line:#e4dfd2; --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e;
     --pill:#f1ede3; --info:#f1ede3;
     --shadow:0 1px 2px rgba(0,0,0,.04), 0 12px 30px rgba(40,30,10,.06);
-    --stick:150px;
+    /* nav is 60px + 1px border = 61; parks sticky columns 8px under it, same as the PDP.
+       Was 150px, sized to clear the old sticky search bar that now lives in the rail. */
+    --stick:69px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;}
@@ -28,7 +30,7 @@
   .topnav{position:sticky;top:0;z-index:90;
     background:rgba(250,248,243,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);}
-  .topnav-in{max-width:1240px;margin:0 auto;padding:0 28px;height:60px;display:flex;align-items:center;gap:26px;}
+  .topnav-in{max-width:1400px;margin:0 auto;padding:0 28px;height:60px;display:flex;align-items:center;gap:26px;}
   .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);
     letter-spacing:-.01em;text-decoration:none;white-space:nowrap;}
   .tn-brand span{color:var(--gold);}
@@ -94,34 +96,44 @@
   .auth-fine a:hover{text-decoration:underline;}
 
   /* ============ STICKY SEARCH BAR ============ */
-  .searchbar{position:sticky;top:60px;z-index:80;
-    background:rgba(250,248,243,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);}
-  .searchbar-in{max-width:1240px;margin:0 auto;padding:12px 28px;}
-  .search-card{background:var(--card);border:1px solid var(--line);border-radius:16px;
-    box-shadow:var(--shadow);padding:7px;display:flex;align-items:stretch;gap:2px;}
-  .seg{position:relative;flex:1;text-align:left;padding:8px 16px;border-radius:11px;min-width:0;}
-  .seg.dest{flex:1.6;}
-  .seg + .seg::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:1px;background:var(--line);}
-  .seg .lb{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
-  .seg-cnt{text-transform:none;letter-spacing:.01em;font-weight:600;}
-  .seg .vl{display:block;font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* "Your stay" summary — the old full-width search bar, now stacked field cards in the right rail */
+  .searchbar{position:static;background:none;border:none;}
+  .searchbar-in{max-width:none;margin:0;padding:0;}
+  .search-card{background:none;border:none;box-shadow:none;padding:0;
+    display:flex;flex-direction:column;gap:10px;}
+  /* .seg == the PDP's .tripchip, token for token */
+  .seg{position:relative;text-align:left;min-width:0;
+    background:#fff;border:1px solid #ece5d6;border-radius:18px;padding:12px 14px;
+    box-shadow:0 1px 2px rgba(0,0,0,.03),0 5px 16px rgba(40,30,10,.07);
+    display:flex;align-items:center;gap:13px;transition:box-shadow .15s,border-color .15s;}
+  .seg:hover{border-color:#e0d5bd;box-shadow:0 2px 5px rgba(0,0,0,.05),0 12px 26px rgba(40,30,10,.1);}
+  .seg + .seg::before{content:none;}          /* the vertical divider belonged to the row layout */
+  .seg-ic{flex:none;width:36px;height:36px;border-radius:11px;background:var(--jade-deep);color:#fff;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .seg-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .seg-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .seg-ar{flex:none;color:#b3ada2;display:flex;align-items:center;}
+  .seg-ar svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .seg .lb{display:block;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0;}
+  .seg-cnt{text-transform:none;letter-spacing:normal;font-weight:400;font-size:11.5px;color:var(--muted);}
+  .seg .vl{display:block;font-size:16px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .seg-input{display:block;width:100%;border:none;background:none;padding:0;margin:0;
-    font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);outline:none;}
+    font-family:inherit;font-size:16px;font-weight:600;color:var(--ink);outline:none;}
   .seg-input::placeholder{color:#a49d90;font-weight:500;}
-  .search-go{flex:none;align-self:stretch;display:flex;align-items:center;gap:8px;
-    background:var(--jade);color:#fff;border:none;border-radius:12px;padding:0 24px;margin-left:4px;
-    font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;}
-  .search-go:hover{background:var(--jade-deep);}
-  .search-go svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
-  .seg-btn{display:block;width:100%;text-align:left;background:none;border:none;padding:0;margin:0;cursor:pointer;font-family:inherit;}
-  .seg.active{background:#f6f1e8;}
+  /* the Search submit collapses into the Where card as an icon button */
+  .search-go{flex:none;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+    background:none;color:var(--jade-deep);border:none;border-radius:50%;padding:0;
+    font-size:0;cursor:pointer;transition:background .15s;}
+  .search-go:hover{background:#f1ede3;}
+  .search-go svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
+  .seg-btn{display:flex;align-items:center;gap:13px;width:100%;text-align:left;background:none;border:none;padding:0;margin:0;cursor:pointer;font-family:inherit;}
+  .seg.active{border-color:#d8ccb2;box-shadow:0 2px 5px rgba(0,0,0,.05),0 12px 26px rgba(40,30,10,.1);}
 
-  /* dates + guests popovers */
-  .pop{position:absolute;top:calc(100% + 12px);background:var(--card);border:1px solid var(--line);
+  /* dates + guests popovers — anchored to the card, sized to it */
+  .pop{position:absolute;top:calc(100% + 8px);background:var(--card);border:1px solid var(--line);
     border-radius:16px;box-shadow:0 16px 44px rgba(40,30,10,.18);z-index:60;padding:16px;}
-  .pop-dates{left:0;width:300px;}
-  .pop-guests{right:0;width:322px;}
+  .pop-dates{left:0;width:100%;min-width:290px;}
+  .pop-guests{left:0;right:auto;width:100%;min-width:300px;}
   .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
   .cal-head b{font-size:14px;font-family:Georgia,serif;font-weight:600;}
   .cal-nav{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;
@@ -194,7 +206,7 @@
   .gp-chead .gp-add:disabled{opacity:.4;cursor:default;}
 
   /* ============ SHELL ============ */
-  .wrap{max-width:1240px;margin:0 auto;padding:0 28px 80px;}
+  .wrap{max-width:1400px;margin:0 auto;padding:0 28px 80px;}
 
   /* results header */
   .res-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:26px 0 18px;flex-wrap:wrap;}
@@ -207,11 +219,20 @@
 
   /* ============ TWO-COLUMN ============ */
   /* left column = the narrowing rail; classic filter rail is retired */
-  .grid{display:grid;grid-template-columns:264px 1fr;gap:28px;align-items:start;}
-  .rail{display:flex;position:sticky;top:var(--stick);flex-direction:column;gap:16px;}
+  /* listing left, stay summary + filters right */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:34px;align-items:start;}
+  .col-list{min-width:0;}
+  .side{position:sticky;top:var(--stick);display:flex;flex-direction:column;gap:22px;min-width:0;}
+  /* the PDP's .book: same radius, padding and shadow, so the rail reads as the same component */
+  .stay-card{background:var(--card);border-radius:18px;padding:22px 20px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;}
+  /* sans, not the serif h1/h2/h3 default — matches the PDP's .book-lbl */
+  .side-h{font-family:inherit;font-size:19px;font-weight:600;color:var(--ink);margin:0 0 18px;}
+  .rail{display:flex;flex-direction:column;gap:16px;}
 
   /* filter groups */
-  .fgroup{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;}
+  /* same shell as .stay-card so both rail cards read as one component, heading included */
+  .fgroup{background:var(--card);border-radius:18px;padding:22px 20px;box-shadow:var(--shadow);}
   .fg-h{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 9px;}
   .fg-h .fg-note{text-transform:none;letter-spacing:0;font-weight:500;color:#a49d90;}
   .fg-h .fg-note::before{content:"·";margin:0 6px;color:#c3bcae;}
@@ -282,7 +303,8 @@
 
   /* ============ HOTEL LIST / CARDS ============ */
   /* one wide card per row: photo left, details right */
-  .list{display:flex;flex-direction:column;gap:20px;max-width:960px;margin:0 auto;width:100%;}
+  /* no centring cap — the list now fills its own grid column */
+  .list{display:flex;flex-direction:column;gap:20px;width:100%;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
     box-shadow:0 1px 2px rgba(40,30,10,.04),0 8px 22px rgba(40,30,10,.05);
     display:grid;grid-template-columns:46% 54%;cursor:pointer;min-width:0;transition:box-shadow .2s;}
@@ -418,17 +440,13 @@
   /* ============ RESPONSIVE ============ */
   .rail-toggle{display:none;}
   @media (max-width:900px){
-    .grid{grid-template-columns:1fr;gap:18px;}
-    .rail{position:static;max-height:none;overflow:visible;}
+    /* one column: the rail stacks above the listing so the stay summary stays reachable first */
+    .grid{grid-template-columns:1fr;gap:26px;}
+    .side{position:static;order:-1;}
+    .rail{max-height:none;overflow:visible;}
     .car,.car-slide{min-height:240px;}
     .res-head h1{font-size:26px;}
-    .searchbar-in{padding:10px 16px;}
     .wrap{padding:0 16px 60px;}
-    .search-card{flex-wrap:wrap;}
-    .seg{flex:1 1 40%;}
-    .seg.dest{flex:1 1 100%;}
-    .seg + .seg::before{display:none;}
-    .search-go{flex:1 1 100%;justify-content:center;margin-left:0;padding:12px;}
   }
   @media (prefers-reduced-motion:reduce){
     *{scroll-behavior:auto!important;transition:none!important;animation:none!important;}
@@ -758,6 +776,9 @@ const I = {
   compass: <g><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></g>,
   filter:  <path d="M4 6h16M7 12h10M10 18h4"/>,
   cam:     <g><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7l1.2-1.7A1 1 0 0 1 9 4.9h6a1 1 0 0 1 .8.4L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-9z"/><circle cx="12" cy="12.3" r="3"/></g>,
+  cal:     <g><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></g>,
+  guests:  <g><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></g>,
+  chevD:   <path d="M6 9l6 6 6-6"/>,
 };
 const Svg = ({d, vb="0 0 24 24", ...p}) => <svg viewBox={vb} {...p}>{d}</svg>;
 
@@ -817,7 +838,8 @@ function HotelCard({hotel, onBook, nights}){
             <span>{hotel.reviews.toLocaleString("en-IN")} reviews</span>
           </div>
         </div>
-        <div className="where">{hotel.place} | {hotel.dist}</div>
+        {/* place only — h.dist is already the first pro-pill below (see pros), no need to say it twice */}
+        <div className="where">{hotel.place}</div>
         <div className="pros">
           {pros.map((p,i)=> p.photo!=null ? (
             <button type="button" key={i} className={"pro-pill"+(idx===p.photo?" on":"")}
@@ -916,6 +938,7 @@ function FilterRail({all, starCat, setStarCat, rating, setRating, price, setPric
   return (
     <aside className="rail" aria-label="Filters">
       <div className="fgroup">
+        <h2 className="side-h">Filters</h2>
         <PriceFilter all={all} value={price} setValue={setPrice}/>
         <StarFilter starCat={starCat} setStarCat={setStarCat}/>
         <ScoreFilter rating={rating} setRating={setRating}/>
@@ -1102,20 +1125,30 @@ function SearchBar({location, onSearch, checkIn, checkOut, onPickDate, party, se
       <div className="searchbar-in">
         <form className="search-card" onSubmit={submit} role="search" ref={wrapRef}>
           <div className="seg dest">
-            <label className="lb" htmlFor="whereInput">Where</label>
-            <input id="whereInput" className="seg-input" value={draft} list="known-locations"
-              placeholder="Search a destination" autoComplete="off"
-              onChange={e=>setDraft(e.target.value)} onFocus={()=>setOpen(null)}/>
+            <span className="seg-ic"><Svg d={I.pin}/></span>
+            <span className="seg-body">
+              <label className="lb" htmlFor="whereInput">Where</label>
+              <input id="whereInput" className="seg-input" value={draft} list="known-locations"
+                placeholder="Search a destination" autoComplete="off"
+                onChange={e=>setDraft(e.target.value)} onFocus={()=>setOpen(null)}/>
+            </span>
             <datalist id="known-locations">
               {KNOWN.map(k=><option key={k} value={k}/>)}
             </datalist>
+            <button className="search-go" type="submit" aria-label="Search">
+              <Svg d={I.search}/>
+            </button>
           </div>
 
           <div className={"seg"+(open==="dates"?" active":"")}>
             <button type="button" className="seg-btn" aria-expanded={open==="dates"}
               onClick={()=>setOpen(open==="dates"?null:"dates")}>
-              <span className="lb">Dates</span>
-              <span className="vl">{datesLabel(checkIn,checkOut)}</span>
+              <span className="seg-ic"><Svg d={I.cal}/></span>
+              <span className="seg-body">
+                <span className="lb">When</span>
+                <span className="vl">{datesLabel(checkIn,checkOut)}</span>
+              </span>
+              <span className="seg-ar"><Svg d={I.chevD}/></span>
             </button>
             {open==="dates" && (
               <div className="pop pop-dates open" onClick={e=>e.stopPropagation()}>
@@ -1127,8 +1160,12 @@ function SearchBar({location, onSearch, checkIn, checkOut, onPickDate, party, se
           <div className={"seg"+(open==="guests"?" active":"")}>
             <button type="button" className="seg-btn" aria-expanded={open==="guests"}
               onClick={()=>setOpen(open==="guests"?null:"guests")}>
-              <span className="lb">Guests <span className="seg-cnt">· {heads(party)} {heads(party)===1?"guest":"guests"} · {rooms} {rooms===1?"room":"rooms"}</span></span>
-              <span className="vl">{guestsLabel(party)}</span>
+              <span className="seg-ic"><Svg d={I.guests}/></span>
+              <span className="seg-body">
+                <span className="lb">Who all <span className="seg-cnt">· {heads(party)} {heads(party)===1?"guest":"guests"} · {rooms} {rooms===1?"room":"rooms"}</span></span>
+                <span className="vl">{guestsLabel(party)}</span>
+              </span>
+              <span className="seg-ar"><Svg d={I.chevD}/></span>
             </button>
             {open==="guests" && (
               <div className="pop pop-guests open" onClick={e=>e.stopPropagation()}>
@@ -1136,10 +1173,6 @@ function SearchBar({location, onSearch, checkIn, checkOut, onPickDate, party, se
               </div>
             )}
           </div>
-
-          <button className="search-go" type="submit">
-            <Svg d={I.search}/> Search
-          </button>
         </form>
       </div>
     </div>
@@ -1323,10 +1356,6 @@ function App(){
         </div>
       </nav>
 
-      <SearchBar location={loc} onSearch={runSearch}
-        checkIn={checkIn} checkOut={checkOut} onPickDate={pickDate}
-        party={party} setParty={setParty} rooms={rooms} setRooms={setRooms}/>
-
       <div className="wrap">
         <div className="res-head">
           {covered && <h1>Stays in {loc}</h1>}
@@ -1362,9 +1391,7 @@ function App(){
           </div>
         ) : (
           <div className="grid">
-            <FilterRail all={all} starCat={starCat} setStarCat={setStarCat}
-              rating={rating} setRating={setRating} price={price} setPrice={setPrice}/>
-            <div>
+            <div className="col-list">
               {results.length>0 ? (
                 <div className="list">
                   {results.map(h=>(
@@ -1380,6 +1407,18 @@ function App(){
                 </div>
               )}
             </div>
+
+            {/* right rail: the PDP's "Your stay" card (minus price/CTA), then the filters */}
+            <aside className="side">
+              <div className="stay-card">
+                <h2 className="side-h">Your stay</h2>
+                <SearchBar location={loc} onSearch={runSearch}
+                  checkIn={checkIn} checkOut={checkOut} onPickDate={pickDate}
+                  party={party} setParty={setParty} rooms={rooms} setRooms={setRooms}/>
+              </div>
+              <FilterRail all={all} starCat={starCat} setStarCat={setStarCat}
+                rating={rating} setRating={setRating} price={price} setPrice={setPrice}/>
+            </aside>
           </div>
         )}
       </div>
