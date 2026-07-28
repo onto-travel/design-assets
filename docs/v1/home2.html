@@ -598,6 +598,9 @@
   var party;
   try{ party = JSON.parse(sessionStorage.getItem('searchGuests')); }catch(e){}
   if(!party || !party.adults) party = { adults:[{companion:'you'}], children:[], infants:[] };
+  // guest-picker.js writes a 2-category party (no infants); backfill so this 3-category reader can't crash
+  if(!party.children) party.children = [];
+  if(!party.infants)  party.infants  = [];
   // drop any stale companions no longer defined (after removing seeded people)
   CATS.forEach(function(c){ if(party[c]) party[c] = party[c].filter(function(p){ return !p.companion || MAP[p.companion]; }); });
   var funN  = { adults:0, children:0, infants:0 };
