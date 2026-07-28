@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto · Companions</title>
+<style>
+  :root{
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
+    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --pill:#f1ede3; --green:#0f8a63; --danger:#b23b32;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;}
+  [hidden]{display:none !important;}
+
+  .topbar{border-bottom:1px solid var(--line);background:rgba(250,247,241,.8);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20;}
+  .topbar-in{max-width:900px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;}
+  .brand{font-family:Georgia,serif;font-weight:700;font-size:20px;color:var(--jade);text-decoration:none;letter-spacing:-.01em;}
+  .brand span{color:var(--gold);}
+  .crumb{margin-left:12px;padding-left:14px;border-left:1px solid var(--line);color:var(--muted);font-size:13.5px;font-weight:600;}
+
+  .page{max-width:900px;margin:0 auto;padding:34px 24px 64px;}
+  .title{font-family:Georgia,serif;font-size:38px;letter-spacing:-.02em;margin:0 0 26px;line-height:1.05;color:var(--ink);}
+
+  .btn{border:none;background:var(--jade);color:#fff;font-size:14.5px;font-weight:600;padding:12px 18px;border-radius:12px;
+    cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;text-decoration:none;transition:background .15s;}
+  .btn:hover{background:var(--jade-deep);}
+  .btn.ghost{background:#fff;color:var(--jade);border:1px solid #d9d1c1;}
+  .btn.ghost:hover{background:#faf7f1;border-color:#c2b8a4;}
+  .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---------- YOU hero ---------- */
+  .yh{position:relative;overflow:hidden;border-radius:22px;padding:26px 30px 30px;color:var(--ink);
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);}
+  .yh-deco{position:absolute;top:-70px;right:-40px;width:260px;height:260px;border-radius:50%;
+    border:1.5px dashed rgba(140,116,64,.22);pointer-events:none;}
+  .yh-dot{position:absolute;top:64px;right:78px;width:9px;height:9px;border-radius:50%;background:var(--gold);}
+  .yh-edit{position:absolute;top:24px;right:26px;display:inline-flex;align-items:center;gap:7px;
+    background:#fff;border:1px solid #d9cbab;color:var(--jade);border-radius:22px;
+    padding:9px 16px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;}
+  .yh-edit{background:#faf7f1;border-color:#e4d9c1;}
+  .yh-edit:hover{background:#f3ede1;border-color:#d9cbab;}
+  .yh-edit svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .yh-label{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#a68a4e;font-weight:700;}
+  .yh-top{display:flex;align-items:center;gap:18px;margin-top:16px;}
+  .yh-av{flex:none;width:62px;height:62px;border-radius:16px;background:#f4efe6;
+    border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:31px;line-height:1;}
+  .yh-name{font-family:Georgia,serif;font-size:28px;font-weight:600;letter-spacing:-.01em;line-height:1.1;color:var(--ink);}
+  .yh-sub{color:var(--muted);font-size:14.5px;margin-top:3px;}
+
+  /* ---------- companions section ---------- */
+  .comp-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:36px 0 16px;}
+  .comp-h{display:flex;align-items:baseline;gap:11px;}
+  .comp-h h2{font-family:Georgia,serif;font-size:24px;margin:0;letter-spacing:-.01em;}
+  .comp-count{font-size:16px;color:var(--muted);font-weight:600;}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  @media(max-width:660px){ .grid{grid-template-columns:1fr;} }
+
+  .ccard{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;
+    box-shadow:var(--shadow);cursor:pointer;transition:border-color .15s,transform .06s;}
+  .ccard:hover{border-color:#d3c9b4;}
+  .ccard:active{transform:translateY(1px);}
+  .cc-top{display:flex;align-items:center;gap:13px;}
+  .cc-av{flex:none;width:46px;height:46px;border-radius:13px;background:#f4efe6;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;}
+  .cc-name{font-family:Georgia,serif;font-size:18px;font-weight:600;letter-spacing:-.01em;line-height:1.15;}
+  .cc-meta{color:var(--muted);font-size:13.5px;margin-top:4px;}
+  .tdel{position:absolute;top:13px;right:13px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
+    background:#fff;color:#9a948c;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    opacity:0;transition:opacity .15s,color .15s,border-color .15s,background .15s;}
+  .ccard:hover .tdel{opacity:1;}
+  .tdel:hover{color:var(--danger);border-color:#eec9c3;background:#fbeeec;}
+  .tdel svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+
+  .grid-empty{grid-column:1 / -1;color:var(--muted);font-size:14px;padding:10px 2px;}
+
+  /* ---------- modal ---------- */
+  .scrim{position:fixed;inset:0;background:rgba(28,24,20,.42);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60;}
+  .sheet{width:560px;max-width:100%;max-height:92vh;overflow:auto;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
+    animation:rise .25s cubic-bezier(.22,1,.36,1) both;}
+  @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+  .sheet-hd{display:flex;align-items:center;justify-content:space-between;padding:22px 24px 14px;}
+  .sheet-hd h2{font-family:Georgia,serif;font-size:21px;margin:0;letter-spacing:-.01em;}
+  .x{width:32px;height:32px;border-radius:50%;border:none;background:#f3efe6;color:#7c7771;font-size:20px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+  .x:hover{background:#e9e2d5;}
+  .sheet-body{padding:2px 24px 8px;}
+  .fl{display:block;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:16px 0 8px;}
+  .fl .opt{text-transform:none;letter-spacing:0;font-weight:400;color:#a39c90;}
+  .fin{width:100%;border:1px solid #d9d1c1;border-radius:12px;padding:13px 15px;font-family:inherit;font-size:15px;color:var(--ink);background:#fff;}
+  .fin:focus{outline:none;border-color:var(--jade);box-shadow:0 0 0 3px rgba(15,138,99,.13);}
+  .fin.age{width:130px;}
+  .fin.bad{border-color:var(--danger);box-shadow:0 0 0 3px rgba(178,59,50,.12);}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{border:1px solid #d9d1c1;border-radius:20px;padding:8px 13px;font-family:inherit;font-size:13px;font-weight:600;color:#4b463f;background:#fff;cursor:pointer;transition:all .13s;}
+  .chip:hover{border-color:#bcae94;}
+  .chip.on{background:#e7f3ec;border-color:var(--jade);color:var(--jade);}
+  .avatar-pick{display:flex;flex-direction:column;align-items:center;gap:14px;margin:4px 0 8px;}
+  .ap-btn{position:relative;width:84px;height:84px;border-radius:50%;border:1px solid #e0d3b6;background:#f4efe6;
+    font-size:44px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+  .ap-btn:hover{background:#efe7d6;}
+  .ap-badge{position:absolute;bottom:-2px;right:-2px;width:28px;height:28px;border-radius:50%;background:var(--jade);
+    border:2px solid var(--card);display:flex;align-items:center;justify-content:center;}
+  .ap-badge svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ap-pop{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:308px;padding:12px;
+    background:#faf7f1;border:1px solid #ece4d5;border-radius:14px;}
+  .ap-pop[hidden]{display:none;}
+  .emoji-opt{width:46px;height:46px;border:1px solid #d9d1c1;border-radius:12px;background:#fff;font-size:23px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .13s,border-color .13s,box-shadow .13s;}
+  .emoji-opt:hover{border-color:#bcae94;}
+  .emoji-opt.on{background:#f4efe6;border-color:var(--jade);box-shadow:0 0 0 2px rgba(15,138,99,.16);}
+  .sheet-ft{display:flex;gap:12px;justify-content:flex-end;padding:16px 24px 22px;position:sticky;bottom:0;
+    background:linear-gradient(to top,var(--card) 78%,rgba(255,255,255,0));}
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#1b211e;color:#fff;font-size:13.5px;font-weight:600;
+    padding:11px 12px 11px 18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25);z-index:70;display:flex;align-items:center;gap:14px;animation:rise .2s both;}
+  .toast .undo{background:none;border:none;color:#f0c66a;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;padding:2px 6px;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-in">
+      <a class="brand" href="home2.html">onto<span>.</span></a>
+      <span class="crumb">Companions</span>
+    </div>
+  </div>
+
+  <div class="page">
+    <h1 class="title">Travel companions</h1>
+
+    <!-- YOU -->
+    <section class="yh" id="youHero"></section>
+
+    <!-- COMPANIONS -->
+    <div class="comp-head">
+      <div class="comp-h"><h2>Companions</h2><span class="comp-count" id="compCount">0</span></div>
+      <button class="btn" id="addTop">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add companion
+      </button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- add / edit modal -->
+  <div class="scrim" id="scrim" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-hd">
+        <h2 id="sheetTitle">Add companion</h2>
+        <button class="x" id="closeSheet" aria-label="Close">&times;</button>
+      </div>
+      <div class="sheet-body">
+        <div class="avatar-pick">
+          <button type="button" class="ap-btn" id="apBtn" aria-label="Choose emoji">
+            <span class="ap-emoji" id="apEmoji"></span>
+            <span class="ap-badge"><svg viewBox="0 0 24 24"><path d="M4 20h4l10.5-10.5a2 2 0 0 0-2.8-2.8L5 17.5V20z"/><path d="M13.5 6.5l4 4"/></svg></span>
+          </button>
+          <div class="ap-pop" id="apPop" hidden></div>
+        </div>
+
+        <label class="fl" for="fName">Name</label>
+        <input class="fin" id="fName" type="text" placeholder="Full name" autocomplete="off">
+
+        <div id="relField">
+          <label class="fl">Relation</label>
+          <div class="chips" id="relChips"></div>
+        </div>
+
+        <div id="genderField">
+          <label class="fl">Gender</label>
+          <div class="chips" id="genderChips"></div>
+        </div>
+
+        <label class="fl">Age <span class="opt">· optional</span></label>
+        <div class="chips" id="ageChips"></div>
+      </div>
+      <div class="sheet-ft">
+        <button class="btn ghost" id="cancelSheet">Cancel</button>
+        <button class="btn" id="saveSheet">Save companion</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+<script>
+  (function(){
+    const $ = id => document.getElementById(id);
+    const KEY = 'onto:travellers:v3';
+
+    const RELATIONS = ['Partner','Child','Parent','Sibling','Friend','Other'];
+    const GENDERS = ['Female','Male','Prefer not to say'];
+
+    // age brackets — infant / child / adult / senior, shown as ranges
+    const AGES = ['0–2','3–12','13–59','60+'];
+
+    const SEED = [
+      {id:'t-you', name:'You', relation:'Myself', age:'13–59'}
+    ];
+
+    let travellers = [];
+    try { travellers = JSON.parse(localStorage.getItem(KEY)); } catch(e){}
+    if(!Array.isArray(travellers)){ travellers = SEED.slice(); persist(); }
+
+    function persist(){ try { localStorage.setItem(KEY, JSON.stringify(travellers)); } catch(e){} }
+    function uid(){ return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const isMine = t => !!(t && (t.relation === 'Myself' || t.id === 't-you'));
+
+    const FUN_EMOJI = ['🦊','🐨','🐼','🦁','🐧','🐬','🦉','🐢','🐝','🦩'];
+    function emojiFor(name){ let h=0; const s=String(name||''); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; }
+
+    /* ---------- render ---------- */
+    function render(){
+      const me = travellers.find(isMine);
+      const comps = travellers.filter(t => !isMine(t));
+
+      // YOU hero
+      if(me){
+        const sub = [(me.age || me.age === 0) ? esc(me.age) : '', me.gender ? esc(me.gender) : ''].filter(Boolean).join(' · ') || 'Your traveller profile';
+        $('youHero').innerHTML =
+          '<div class="yh-deco"></div><div class="yh-dot"></div>'+
+          '<button class="yh-edit" id="editYou"><svg viewBox="0 0 24 24"><path d="M4 20h4l10.5-10.5a2 2 0 0 0-2.8-2.8L5 17.5V20z"/><path d="M13.5 6.5l4 4"/></svg>Edit</button>'+
+          '<div class="yh-label">You</div>'+
+          '<div class="yh-top"><span class="yh-av">'+(me.emoji || emojiFor(me.name))+'</span>'+
+            '<div><div class="yh-name">'+esc(me.name)+'</div><div class="yh-sub">'+sub+'</div></div></div>';
+        $('editYou').addEventListener('click', () => openForm(me.id));
+      }
+
+      // COMPANIONS
+      $('compCount').textContent = comps.length;
+      $('grid').innerHTML = comps.length ? comps.map(t => {
+        const meta = [(t.age || t.age === 0) ? esc(t.age) : '', t.gender ? esc(t.gender) : '', t.relation ? esc(t.relation) : ''].filter(Boolean).join(' · ');
+        return '<article class="ccard" data-id="'+t.id+'">'+
+          '<button class="tdel" data-del="'+t.id+'" aria-label="Remove '+esc(t.name)+'"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button>'+
+          '<div class="cc-top"><span class="cc-av">'+(t.emoji || emojiFor(t.name))+'</span>'+
+            '<div><div class="cc-name">'+esc(t.name)+'</div><div class="cc-meta">'+(meta || '&nbsp;')+'</div></div></div>'+
+        '</article>';
+      }).join('') : '<div class="grid-empty">No companions yet. Use “Add companion” to save the people you usually travel with.</div>';
+
+      $('grid').querySelectorAll('.ccard').forEach(c => c.addEventListener('click', e => {
+        if(e.target.closest('.tdel')) return;
+        openForm(c.dataset.id);
+      }));
+      $('grid').querySelectorAll('.tdel').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); del(b.dataset.del); }));
+    }
+
+    /* ---------- delete + undo ---------- */
+    let toastTimer = null;
+    function del(id){
+      const idx = travellers.findIndex(t => t.id === id);
+      if(idx < 0 || isMine(travellers[idx])) return;   // can't remove yourself
+      const removed = travellers[idx];
+      travellers.splice(idx, 1); persist(); render();
+      const toast = $('toast');
+      toast.innerHTML = 'Removed ' + esc(removed.name) + '<button class="undo">Undo</button>';
+      toast.hidden = false;
+      toast.querySelector('.undo').addEventListener('click', () => {
+        travellers.splice(Math.min(idx, travellers.length), 0, removed); persist(); render();
+        toast.hidden = true; clearTimeout(toastTimer);
+      });
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { toast.hidden = true; }, 4500);
+    }
+
+    /* ---------- add / edit form ---------- */
+    let editing = null;
+    const scrim = $('scrim');
+
+    $('relChips').innerHTML = RELATIONS.map(r => '<button type="button" class="chip rel-chip" data-rel="'+r+'">'+r+'</button>').join('');
+    $('genderChips').innerHTML = GENDERS.map(g => '<button type="button" class="chip gender-chip" data-gender="'+g+'">'+g+'</button>').join('');
+    $('ageChips').innerHTML = AGES.map(a => '<button type="button" class="chip age-chip" data-age="'+a+'">'+a+'</button>').join('');
+
+    $('genderChips').addEventListener('click', e => {
+      const c = e.target.closest('.gender-chip'); if(!c) return;
+      editing.gender = c.dataset.gender;
+      $('genderChips').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c));
+    });
+    $('ageChips').addEventListener('click', e => {
+      const c = e.target.closest('.age-chip'); if(!c) return;
+      editing.age = (editing.age === c.dataset.age) ? '' : c.dataset.age;   // tap again → clear (optional field)
+      $('ageChips').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x.dataset.age === editing.age));
+    });
+    $('apPop').innerHTML = FUN_EMOJI.map(e => '<button type="button" class="emoji-opt" data-emoji="'+e+'">'+e+'</button>').join('');
+
+    const curEmoji = () => editing.emoji || emojiFor($('fName').value.trim());
+    function paintEmoji(){
+      $('apEmoji').textContent = curEmoji();
+      $('apPop').querySelectorAll('.emoji-opt').forEach(x => x.classList.toggle('on', x.dataset.emoji === editing.emoji));
+    }
+    $('apBtn').addEventListener('click', () => { $('apPop').hidden = !$('apPop').hidden; });
+    $('apPop').addEventListener('click', e => {
+      const c = e.target.closest('.emoji-opt'); if(!c) return;
+      editing.emoji = (editing.emoji === c.dataset.emoji) ? '' : c.dataset.emoji;   // tap selected again → back to auto
+      paintEmoji();
+      $('apPop').hidden = true;
+    });
+
+    $('relChips').addEventListener('click', e => {
+      const c = e.target.closest('.rel-chip'); if(!c) return;
+      editing.relation = c.dataset.rel;
+      $('relChips').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c));
+    });
+    function openForm(id){
+      const t = id ? travellers.find(x => x.id === id) : null;
+      const me = isMine(t);
+      editing = { id: id || null, relation: t ? t.relation : '', gender: t ? (t.gender || '') : '', age: t ? (t.age || '') : '', emoji: t ? (t.emoji || '') : '' };
+      $('sheetTitle').textContent = me ? 'Your details' : (t ? 'Edit companion' : 'Add companion');
+      $('saveSheet').textContent = me ? 'Save companion' : (t ? 'Save changes' : 'Add companion');
+      $('relField').hidden = me;
+      $('fName').value = t ? t.name : '';
+      $('fName').classList.remove('bad');
+      $('relChips').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x.dataset.rel === editing.relation));
+      $('genderChips').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x.dataset.gender === editing.gender));
+      $('ageChips').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x.dataset.age === editing.age));
+      $('apPop').hidden = true;
+      paintEmoji();
+      scrim.hidden = false;
+      setTimeout(() => $('fName').focus(), 30);
+    }
+    function closeForm(){ scrim.hidden = true; editing = null; }
+
+    function save(){
+      const name = $('fName').value.trim();
+      if(!name){ $('fName').classList.add('bad'); $('fName').focus(); return; }
+      const rec = {
+        id: editing.id || uid(),
+        name: name,
+        relation: editing.relation || '',
+        gender: editing.gender || '',
+        emoji: editing.emoji || '',
+        age: editing.age || null
+      };
+      if(editing.id){
+        const i = travellers.findIndex(x => x.id === editing.id);
+        if(i >= 0) travellers[i] = rec;
+      } else {
+        travellers.push(rec);
+      }
+      persist(); render(); closeForm();
+    }
+
+    $('addTop').addEventListener('click', () => openForm());
+    $('saveSheet').addEventListener('click', save);
+    $('cancelSheet').addEventListener('click', closeForm);
+    $('closeSheet').addEventListener('click', closeForm);
+    $('fName').addEventListener('input', () => { $('fName').classList.remove('bad'); if(editing && !editing.emoji) paintEmoji(); });
+    $('fName').addEventListener('keydown', e => { if(e.key === 'Enter') save(); });
+    scrim.addEventListener('click', e => { if(e.target === scrim) closeForm(); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape' && !scrim.hidden) closeForm(); });
+
+    render();
+  })();
+</script>
+</body>
+</html>

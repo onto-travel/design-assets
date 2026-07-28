@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in – Google Accounts</title>
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:#fff;color:#202124;
+    font-family:"Roboto",Arial,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased;}
+
+  .card{width:450px;max-width:100%;border:1px solid #dadce0;border-radius:8px;
+    padding:48px 40px 36px;}
+  .glogo{height:24px;margin-bottom:16px;}
+  h1{font-size:24px;font-weight:400;line-height:1.33;margin:0 0 8px;letter-spacing:0;}
+  .sub{font-size:16px;color:#5f6368;margin:0 0 30px;}
+  .sub b{font-weight:500;color:inherit;}
+
+  .acct-list{border:1px solid #dadce0;border-radius:8px;overflow:hidden;}
+  .acct{display:flex;align-items:center;gap:16px;width:100%;text-align:left;
+    background:none;border:none;font-family:inherit;cursor:pointer;padding:14px 16px;
+    transition:background .15s;}
+  .acct + .acct{border-top:1px solid #dadce0;}
+  .acct:hover{background:#f7f8f8;}
+  .avatar{width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:16px;font-weight:500;
+    background:linear-gradient(135deg,#5b8def,#2f4f74);}
+  .acct-name{font-size:14px;font-weight:500;line-height:1.3;}
+  .acct-email{font-size:14px;color:#5f6368;line-height:1.3;}
+  .acct-r{flex:1;min-width:0;}
+
+  .use-another{display:flex;align-items:center;gap:16px;width:100%;text-align:left;
+    background:none;border:1px solid #dadce0;border-radius:8px;font-family:inherit;cursor:pointer;
+    padding:14px 16px;margin-top:14px;transition:background .15s;}
+  .use-another:hover{background:#f7f8f8;}
+  .ua-ic{width:36px;height:36px;flex:none;display:flex;align-items:center;justify-content:center;color:#5f6368;}
+  .ua-tx{font-size:14px;font-weight:500;color:#3c4043;}
+
+  .foot{font-size:12px;color:#5f6368;margin-top:34px;line-height:1.5;}
+  .foot a{color:#1a73e8;text-decoration:none;}
+  .foot a:hover{text-decoration:underline;}
+  .disclaim{font-size:12px;color:#5f6368;margin:20px 0 0;line-height:1.5;}
+
+  /* signing-in state */
+  .signing{display:none;flex-direction:column;align-items:center;justify-content:center;
+    padding:40px 0 30px;text-align:center;}
+  .card.busy .acct-list,.card.busy .use-another,.card.busy .sub,.card.busy h1,
+  .card.busy .foot,.card.busy .disclaim{display:none;}
+  .card.busy .signing{display:flex;}
+  .spinner{width:40px;height:40px;border-radius:50%;border:3px solid #e0e0e0;border-top-color:#1a73e8;
+    animation:spin .8s linear infinite;margin-bottom:22px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .signing-tx{font-size:15px;color:#5f6368;}
+  .signing-name{font-weight:500;color:#202124;}
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <!-- Google wordmark -->
+    <svg class="glogo" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg" aria-label="Google">
+      <path fill="#4285F4" d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+      <path fill="#EA4335" d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+      <path fill="#FBBC05" d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z"/>
+      <path fill="#4285F4" d="M225 3v65h-9.5V3h9.5z"/>
+      <path fill="#34A853" d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.05zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z"/>
+      <path fill="#EA4335" d="M35.29 41.41V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.36 53.89.36 34.91.36 15.93 16.32.47 35.3.47c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-22.49.01z"/>
+    </svg>
+
+    <h1>Choose an account</h1>
+    <p class="sub">to continue to <b>onto</b></p>
+
+    <div class="acct-list">
+      <button type="button" class="acct" id="acctBtn">
+        <span class="avatar">X</span>
+        <span class="acct-r">
+          <div class="acct-name">xyz@email.com</div>
+        </span>
+      </button>
+    </div>
+
+    <button type="button" class="use-another" id="useAnother">
+      <span class="ua-ic">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"></circle>
+          <path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"></path>
+        </svg>
+      </span>
+      <span class="ua-tx">Use another account</span>
+    </button>
+
+    <p class="disclaim">To continue, Google will share your name, email address and profile picture with onto.</p>
+
+    <div class="foot">
+      <a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms of Service</a>
+    </div>
+
+    <!-- signing-in state -->
+    <div class="signing">
+      <div class="spinner"></div>
+      <div class="signing-tx">Signing in as <span class="signing-name">xyz@email.com</span>…</div>
+    </div>
+  </div>
+
+<script>
+  (function(){
+    const card = document.getElementById('card');
+
+    // Mock "backend": phone numbers already linked to a Google account.
+    // On sign-in we look the email up here; a match means we can skip the
+    // manual add-number + OTP step. The demo account has no number on file.
+    const PHONE_ON_FILE = {
+      'xyz@email.com': null      // e.g. '+919876543210' would skip verification
+    };
+
+    function finish(){
+      card.classList.add('busy');
+
+      let dest = 'hotel-firstfold.html';
+      try { dest = sessionStorage.getItem('authReturn') || dest; } catch(e){}
+
+      // returning user, already verified this session → straight through
+      let verified = false;
+      try { verified = sessionStorage.getItem('phoneVerified') === '1'; } catch(e){}
+
+      // backend lookup: is a phone number linked to this Google account?
+      const email = (document.querySelector('#acctBtn .acct-name') || {}).textContent || '';
+      const onFile = PHONE_ON_FILE[email.trim()] || null;
+
+      if(verified || onFile){
+        // number known (linked to account, or verified earlier) → no OTP needed
+        try {
+          if(onFile) sessionStorage.setItem('userPhone', onFile);
+          sessionStorage.setItem('phoneVerified', '1');
+          sessionStorage.removeItem('authReturn');
+        } catch(e){}
+        setTimeout(() => { location.href = dest; }, 1400);
+      } else {
+        // no number on file → collect + verify one (phone-verify.html consumes authReturn)
+        setTimeout(() => { location.href = 'phone-verify.html'; }, 1400);
+      }
+    }
+    document.getElementById('acctBtn').addEventListener('click', finish);
+    document.getElementById('useAnother').addEventListener('click', finish);
+  })();
+</script>
+</body>
+</html>

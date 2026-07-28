@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taj Exotica · Price updated</title>
+<style>
+  :root{
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
+    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --green:#0f8a63; --amber:#b8862f;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+  h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+
+  .card{width:520px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;position:relative;}
+  .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
+    color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
+    transition:color .15s,background .15s;}
+  .backlink:hover{color:var(--jade);background:#faf8f3;}
+  .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+
+  .head{text-align:center;padding:40px 34px 22px;}
+  .mark{width:66px;height:66px;border-radius:50%;background:#fbf3e0;border:1px solid #eeddb6;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+  .mark svg{width:32px;height:32px;stroke:var(--amber);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .mark.pop{animation:pop .45s cubic-bezier(.22,1.2,.36,1) both;}
+  @keyframes pop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+  .head h1{font-size:27px;margin-bottom:8px;}
+  .head p{color:var(--muted);font-size:15px;margin:0 auto;max-width:390px;}
+
+  .stars{color:var(--gold);letter-spacing:3px;font-size:14px;}
+  .sum{margin:8px 34px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .sum-hd{padding:18px 18px 16px;background:#faf8f3;}
+  .sum-hd .h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .sum-hd .n{font-family:Georgia,serif;font-size:17px;font-weight:700;margin-top:3px;}
+  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#4a4641;margin-top:11px;}
+  .sum-hd .hd-dates span{font-weight:400;color:var(--muted);}
+  .sum-hd .hd-dates span::before{content:" · ";}
+
+  .prow{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;}
+  .prow+.prow{border-top:1px solid #f1ede5;}
+  .prow .pk{font-size:13.5px;color:var(--muted);}
+  .prow .pv{font-size:15px;font-weight:600;}
+  .prow.old .pv{color:var(--muted);text-decoration:line-through;text-decoration-color:#c9c1b2;}
+  .prow.new{background:#f6f2ea;}
+  .prow.new .pk{color:#4a4641;font-weight:600;}
+  .prow.new .pv{font-family:Georgia,serif;font-size:22px;letter-spacing:-.01em;}
+  .diff{display:inline-flex;align-items:center;gap:5px;margin-left:9px;font-size:12px;font-weight:700;
+    padding:2px 8px;border-radius:20px;vertical-align:middle;background:#fbeeea;color:#c0442f;}
+  .diff.down{background:#eaf5ef;color:var(--green);}
+  .diff svg{width:11px;height:11px;stroke:currentColor;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+
+  .note{margin:16px 34px 0;display:flex;gap:11px;align-items:flex-start;
+    padding:13px 15px;border-radius:12px;background:#faf8f3;border:1px solid var(--line);}
+  .note svg{flex:none;width:18px;height:18px;stroke:var(--muted);stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-top:1px;}
+  .note p{margin:0;font-size:13px;color:var(--muted);line-height:1.45;}
+
+  .actions{padding:22px 34px 28px;display:flex;flex-direction:column;gap:12px;}
+  .btn{border:none;background:var(--jade);color:#fff;font-size:15.5px;font-weight:600;
+    padding:15px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
+    display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s;}
+  .btn:hover{background:var(--jade-deep);}
+  .btn b{font-weight:700;}
+  .ghostbtn{display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
+    border:1px solid #e2dac9;border-radius:12px;padding:14px;font-family:inherit;font-size:14.5px;font-weight:600;
+    color:var(--jade);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
+  .ghostbtn:hover{background:#faf8f3;border-color:#d3c9b4;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <a class="backlink" href="home2.html">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to home
+    </a>
+    <div class="head">
+      <div class="mark pop" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7-7A2 2 0 0 1 3 12.2V5a2 2 0 0 1 2-2h7.2a2 2 0 0 1 1.4.6l7 7a2 2 0 0 1 0 2.8z"/><path d="M7.5 7.5v0"/></svg>
+      </div>
+      <h1>The price has changed</h1>
+      <p id="lede">While we were confirming your booking, the room rate was updated. Review the new total to continue &mdash; you won&rsquo;t be charged until you confirm.</p>
+    </div>
+
+    <div class="sum">
+      <div class="sum-hd">
+        <div class="h">Your stay</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="n" id="hotel">Taj Exotica Resort &amp; Spa</div>
+        <div class="hd-dates" id="dates">Fri 10 &ndash; Mon 13 Jul<span id="nights">3 nights</span></div>
+      </div>
+      <div class="prow old">
+        <div class="pk">Previous total</div>
+        <div class="pv" id="oldAmount">&#8377;55,500</div>
+      </div>
+      <div class="prow new">
+        <div class="pk">Updated total<span class="diff" id="diff"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span id="diffAmt">&#8377;2,400 more</span></span></div>
+        <div class="pv" id="newAmount">&#8377;57,900</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8v0"/></svg>
+      <p>Rates can move with demand and availability. This new total is locked for the next few minutes.</p>
+    </div>
+
+    <div class="actions">
+      <a class="btn" id="continue" href="razorpay.html">
+        Continue at <b id="ctaAmount">&#8377;57,900</b>
+      </a>
+      <a class="ghostbtn" href="checkout.html">Keep my old dates &amp; look again</a>
+    </div>
+  </div>
+
+<script>
+  var b = {};
+  try { b = JSON.parse(sessionStorage.getItem('booking')) || {}; } catch(e){}
+  function toNum(s){ return parseInt(String(s || '').replace(/[^\d]/g,''), 10) || 0; }
+  function inr(n){ return '₹' + n.toLocaleString('en-IN'); }
+  function set(id, val){ if(val){ document.getElementById(id).textContent = val; } }
+
+  set('hotel', b.hotel);
+  if(b.dates){ document.getElementById('dates').innerHTML = b.dates + (b.nights ? '<span>'+b.nights+'</span>' : ''); }
+
+  // old = the amount the user saw; new = repriced amount (default: +₹2,400 for the mock)
+  var oldN = toNum(b.amount) || 55500;
+  var newN = toNum(b.newAmount) || (oldN + 2400);
+  var delta = newN - oldN;
+
+  document.getElementById('oldAmount').textContent = inr(oldN);
+  document.getElementById('newAmount').textContent = inr(newN);
+  document.getElementById('ctaAmount').textContent = inr(newN);
+
+  var diff = document.getElementById('diff');
+  var diffAmt = document.getElementById('diffAmt');
+  if(delta < 0){
+    diff.classList.add('down');
+    diff.querySelector('svg path').setAttribute('d','M12 5v14M5 12l7 7 7-7'); // arrow down
+    diffAmt.textContent = inr(-delta) + ' less';
+  } else if(delta === 0){
+    diff.style.display = 'none';
+  } else {
+    diffAmt.textContent = inr(delta) + ' more';
+  }
+
+  // continuing accepts the new price → carry it into the payment amount
+  document.getElementById('continue').addEventListener('click', function(){
+    b.amount = inr(newN); b.status = 'repriced';
+    try {
+      sessionStorage.setItem('booking', JSON.stringify(b));
+      sessionStorage.setItem('payReturn', 'booking-details.html');
+    } catch(e){}
+  });
+</script>
+</body>
+</html>
