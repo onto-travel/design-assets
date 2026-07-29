@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voucher email — A4 spread</title>
+<style>
+  :root{
+    --sheet-w: 794px;      /* A4 @96dpi */
+    --sheet-h: 1123px;
+    --margin:  45px;       /* 12mm */
+    --card-w:  600px;
+    /* Fallbacks only — used when the browser blocks reading the iframe.
+       Serve over http://localhost and the script below measures for real. */
+    --break:   800px;      /* where page 1 stops (a little into blank padding) */
+    --p2start: 787px;      /* where page 2 begins — the true break */
+    --tail:    907px;      /* height of page 2's content */
+    --lead:    26px;       /* .page top padding in the email */
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:40px 24px 56px;
+    background:#EAE4D9;
+    font-family:Georgia,'Times New Roman',serif;
+    color:#1B211E;
+  }
+  .head{ max-width:1240px; margin:0 auto 26px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  .head h1{ font-size:19px; font-weight:normal; margin:0; }
+  .head span{ font-family:Helvetica,Arial,sans-serif; font-size:12.5px; color:#7C7771; letter-spacing:.2px; }
+
+  .stage{ width:1628px; transform-origin:top left; margin:0 auto; }
+  .spread{ display:flex; gap:40px; }
+
+  figure{ margin:0; }
+  .sheet{
+    position:relative;
+    width:var(--sheet-w); height:var(--sheet-h);
+    background:#fff; overflow:hidden;
+    box-shadow:0 1px 2px rgba(27,33,30,.10), 0 12px 34px rgba(27,33,30,.16);
+  }
+  /* Each sheet is clipped to ITS page's content height — not to the full
+     printable area — so a page stops exactly where print stops it, and no
+     background bleeds in past the end of the card. */
+  .clip{
+    position:absolute; top:var(--margin); left:calc((var(--sheet-w) - var(--card-w)) / 2);
+    width:var(--card-w); overflow:hidden;
+  }
+  .p1 .clip{ height:var(--break); }
+  .p2 .clip{ height:var(--tail); }
+  /* 700px, NOT 620 — the email's mobile media query fires at max-width:620px,
+     which stacks the Maps/Call buttons and throws the pagination out. The card
+     stays centred at 600px, so shift left by (700-600)/2 to crop the gutters. */
+  .clip iframe{
+    position:absolute; left:-50px;
+    width:700px; height:2100px; border:0; display:block;
+  }
+  .p1 iframe{ top:calc(0px - var(--lead)); }
+  .p2 iframe{ top:calc(0px - var(--lead) - var(--p2start)); }
+
+  figcaption{
+    margin-top:14px; display:flex; align-items:baseline; gap:10px;
+    font-family:Helvetica,Arial,sans-serif;
+  }
+  figcaption b{ font-size:13px; font-weight:bold; letter-spacing:.3px; }
+  figcaption i{ font-style:normal; font-size:12px; color:#7C7771; }
+
+  @media (max-width:1700px){ .stage{ transform:scale(.78); width:1628px; margin-left:calc(50% - 635px); } }
+  @media (max-width:1360px){ .stage{ transform:scale(.62); margin-left:calc(50% - 505px); } }
+  @media (max-width:1080px){ .stage{ transform:scale(.46); margin-left:calc(50% - 375px); } }
+  @media print{ body{background:#fff; padding:0;} .head,figcaption{display:none;} }
+</style>
+</head>
+<body>
+
+  <div class="head">
+    <h1>Voucher email &mdash; A4 spread</h1>
+    <span>210 &times; 297&thinsp;mm &middot; 12&thinsp;mm margins &middot; break forced before &ldquo;Your stay&rdquo; &middot; <i id="note" style="font-style:normal">measuring&hellip;</i></span>
+  </div>
+
+  <div class="stage">
+    <div class="spread">
+
+      <figure>
+        <div class="sheet p1">
+          <div class="clip"><iframe src="index.html" scrolling="no" title="Page 1"></iframe></div>
+        </div>
+        <figcaption><b>Page 1</b><i>Logo, hero, Maps &amp; Call, the IDs, Carry these &mdash; <span id="c1">&mdash;</span></i></figcaption>
+      </figure>
+
+      <figure>
+        <div class="sheet p2">
+          <div class="clip"><iframe src="index.html" scrolling="no" title="Page 2"></iframe></div>
+        </div>
+        <figcaption><b>Page 2</b><i>Your stay, At the desk, If plans change, footer &mdash; <span id="c2">&mdash;</span></i></figcaption>
+      </figure>
+
+    </div>
+  </div>
+
+<script>
+  /* The fold must sit exactly where the email actually breaks, not where we
+     guessed. Measure .pgbreak inside the iframe and feed it back into --break.
+     If the browser blocks same-origin access to a file:// iframe, the CSS
+     fallback above stands and the note below says so. */
+  (function () {
+    var frame = document.querySelector('.p1 iframe');
+    function measure() {
+      try {
+        var doc = frame.contentDocument;
+        if (!doc) throw 0;
+        var card = doc.querySelector('.wrap');
+        var row  = doc.querySelector('.pgbreak');
+        if (!card || !row) throw 0;
+        var px = Math.round(row.getBoundingClientRect().top - card.getBoundingClientRect().top);
+        if (!px || px < 100) throw 0;
+        var total = card.offsetHeight, root = document.documentElement.style;
+        root.setProperty('--break',   (px + 20) + 'px');
+        root.setProperty('--p2start', px + 'px');
+        root.setProperty('--tail',    (total - px) + 'px');
+        report(px, total);
+      } catch (e) {
+        var n = document.getElementById('note');
+        n.textContent = 'estimates — open via http://localhost:8765/ for measured values';
+        n.style.color = '#9A5B2B';
+        document.getElementById('c1').textContent = '~787px est.';
+        document.getElementById('c2').textContent = '~907px est.';
+      }
+    }
+    function report(brk, total) {
+      var limit = 1123 - 45 * 2;
+      document.getElementById('note').textContent =
+        'measured live — page 1 ' + brk + 'px, page 2 ' + (total - brk) +
+        'px, sheet holds ' + limit + 'px';
+      document.getElementById('c1').textContent = brk + 'px';
+      document.getElementById('c2').textContent = (total - brk) + 'px';
+    }
+    frame.addEventListener('load', measure);
+    if (frame.contentDocument && frame.contentDocument.readyState === 'complete') measure();
+  })();
+</script>
+
+</body>
+</html>
