@@ -316,15 +316,9 @@
   .rc-info li:last-child{margin-bottom:0;}
   .rc-info li::before{content:"";position:absolute;left:1px;top:4px;width:9px;height:5px;
     border-left:2px solid #0f8a63;border-bottom:2px solid #0f8a63;transform:rotate(-45deg);}
-  /* the card's only scrolling region: why-block + add-ons. min-height:0 is what
-     lets a flex child actually scroll instead of stretching its parent */
-  /* capped so an open add-on list scrolls in place instead of stretching the card
-     (and with it every sibling — they're a stretch row) */
-  .rc-scroll{flex:1;min-height:0;max-height:150px;overflow-y:auto;overscroll-behavior:contain;
-    scrollbar-width:thin;scrollbar-color:#d9d1c1 transparent;}
-  .rc-scroll::-webkit-scrollbar{width:6px;}
-  .rc-scroll::-webkit-scrollbar-track{background:transparent;}
-  .rc-scroll::-webkit-scrollbar-thumb{background:#d9d1c1;border-radius:8px;}
+  /* why-block + add-ons. Grows to fit — an open add-on list makes the card taller
+     (and with it every sibling, since they're a stretch row) rather than scrolling. */
+  .rc-scroll{flex:1;}
   .rc-addons{margin-top:12px;}
   .rc-addlbl{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:9px;}
   .rc-addlist{display:flex;flex-direction:column;gap:9px;}
@@ -2170,7 +2164,6 @@
         const r = ROOM_BY[card.dataset.key]; if(!r) return;
         const slot = card.querySelector('.rc-rel');
         if(slot) slot.innerHTML = relHTML(r);
-        const sc = card.querySelector('.rc-scroll'); if(sc) sc.scrollTop = 0;
       });
       if(window.applyExtras) window.applyExtras();   // re-tick the boxes that moved
     };
