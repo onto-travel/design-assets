@@ -11,9 +11,10 @@
   @media only screen and (max-width:620px) {
     .wrap     { width:100% !important; }
     .pad      { padding-left:22px !important; padding-right:22px !important; }
-    .id-value { font-size:22px !important; letter-spacing:0.4px !important; }
+    .id-value { font-size:18px !important; letter-spacing:0.3px !important; }
     .ic       { width:48px !important; }
     .half     { display:block !important; width:100% !important; padding:0 0 8px 0 !important; }
+    .sep      { border-left:0 !important; padding-left:0 !important; text-align:left !important; }
   }
 
   /* ── Print: two clean A4 sheets, split before "Your stay" ── */
@@ -65,17 +66,17 @@
           <tr>
             <td class="half" width="50%" valign="top" style="width:50%; padding:0 5px 0 0;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr><td align="center" style="background-color:#FFFFFF; border:1px solid #E0D8C6; border-radius:5px;">
+                <tr><td align="center" style="background-color:#FFFFFF; border:1px solid #D9D1C1; border-radius:12px;">
                   <a href="https://www.google.com/maps?q=28.707489,77.09631"
-                     style="display:block; padding:13px 10px; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:18px; color:#063F2F; text-decoration:none; font-weight:bold;">Open in Maps</a>
+                     style="display:block; padding:13px 16px; font-family:Helvetica,Arial,sans-serif; font-size:15px; line-height:19px; color:#0F8A63; text-decoration:none; font-weight:bold;">Open in Maps</a>
                 </td></tr>
               </table>
             </td>
             <td class="half" width="50%" valign="top" style="width:50%; padding:0 0 0 5px;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr><td align="center" style="background-color:#FFFFFF; border:1px solid #E0D8C6; border-radius:5px;">
+                <tr><td align="center" style="background-color:#FFFFFF; border:1px solid #D9D1C1; border-radius:12px;">
                   <a href="tel:+9111246907102"
-                     style="display:block; padding:13px 10px; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:18px; color:#063F2F; text-decoration:none; font-weight:bold;">Call 91-112-46907102</a>
+                     style="display:block; padding:13px 16px; font-family:Helvetica,Arial,sans-serif; font-size:15px; line-height:19px; color:#0F8A63; text-decoration:none; font-weight:bold;">Call 91-112-46907102</a>
                 </td></tr>
               </table>
             </td>
@@ -87,19 +88,21 @@
     <!-- ══ SIGNATURE BLOCK — THE IDs ═══════════════════════════ -->
     <tr>
       <td class="pad" style="padding:10px 36px 0 36px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#FFFFFF; border:1px solid #E0D8C6; border-radius:5px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#FFFFFF; border:1px solid #D9D1C1; border-radius:12px;">
           <tr>
-            <td style="padding:16px 22px 15px 22px;">
-              <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; line-height:15px; letter-spacing:1.5px; text-transform:uppercase; color:#8A857D; margin:0 0 4px 0;">
-                Confirmation ID <span style="color:#0F8A63;">&mdash; reception asks for this</span>
-              </div>
-              <div class="id-value" style="font-family:'Courier New',Courier,monospace; font-size:24px; line-height:29px; letter-spacing:0.5px; color:#063F2F; font-weight:bold;">
-                CT-MOCK-CNF-700780
-              </div>
-              <div style="padding-top:10px;">
-                <span style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#8A857D;">Booking ID</span>
-                <span style="font-family:'Courier New',Courier,monospace; font-size:15px; letter-spacing:0.5px; color:#7C7771;">&nbsp;&nbsp;900000700780</span>
-              </div>
+            <td style="padding:14px 18px 14px 18px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td class="half" width="50%" valign="top" style="width:50%; padding:0 20px 0 0;">
+                    <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; line-height:15px; letter-spacing:1.4px; text-transform:uppercase; color:#8A857D;">Confirmation ID<img src="images/ic-copy.png" width="14" height="14" alt="copy" style="display:inline-block; vertical-align:-3px; border:0; width:14px; height:14px; margin-left:7px;"></div>
+                    <div class="id-value" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:18px; line-height:24px; letter-spacing:0.5px; color:#063F2F; font-weight:600;">CT-MOCK-CNF-700780</div>
+                  </td>
+                  <td class="half sep" width="50%" valign="top" align="right" style="width:50%; padding:0 0 0 20px; border-left:1px solid #E4DCCB; text-align:right;">
+                    <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; line-height:15px; letter-spacing:1.4px; text-transform:uppercase; color:#8A857D;">Booking ID<img src="images/ic-copy.png" width="14" height="14" alt="copy" style="display:inline-block; vertical-align:-3px; border:0; width:14px; height:14px; margin-left:7px;"></div>
+                    <div class="id-value" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:18px; line-height:24px; letter-spacing:0.5px; color:#063F2F; font-weight:600;">900000700780</div>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
         </table>
