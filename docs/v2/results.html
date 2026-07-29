@@ -302,19 +302,38 @@
   .star-chip.is-on{border-color:var(--jade);background:#eef6f1;color:var(--jade-deep);}
 
   /* ============ HOTEL LIST / CARDS ============ */
-  /* one wide card per row: photo left, details right */
-  /* no centring cap — the list now fills its own grid column */
-  .list{display:flex;flex-direction:column;gap:20px;width:100%;}
+  /* two-column masonry: each column is its own flex stack, so a card keeps its
+     natural height and rank order still reads left → right (1|2 / 3|4 / …)
+     rather than down-one-column-then-the-other like CSS columns would give */
+  .list{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;width:100%;}
+  .mcol{display:flex;flex-direction:column;gap:20px;min-width:0;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
     box-shadow:0 1px 2px rgba(40,30,10,.04),0 8px 22px rgba(40,30,10,.05);
-    display:grid;grid-template-columns:46% 54%;cursor:pointer;min-width:0;transition:box-shadow .2s;}
+    display:flex;flex-direction:column;cursor:pointer;min-width:0;transition:box-shadow .2s;}
   .card:hover{box-shadow:0 4px 26px rgba(40,30,10,.10);}
   .card:focus-visible{outline:2px solid var(--jade);outline-offset:2px;}
 
-  /* photo fills the left cell */
-  .ph{position:relative;min-height:320px;height:100%;overflow:hidden;}
-  @media(max-width:700px){ .card{grid-template-columns:1fr;} .ph{min-height:220px;height:220px;} }
+  /* Photo is the same height on every card — the stagger comes from the detail
+     block below it (name wrapping, pills going to a second row). It's inset on
+     all four sides so the card's white frame reads around it. */
+  .ph{position:relative;height:240px;flex:none;overflow:hidden;
+    margin:10px 10px 0;border-radius:12px;}
   .ph .car{height:100%;}
+
+  /* photo overlays: rank badge, save, photo dots */
+  .badge{position:absolute;top:12px;left:12px;z-index:5;background:var(--jade-deep);color:#fff;
+    border-radius:20px;padding:7px 13px;font-size:12.5px;font-weight:600;letter-spacing:.01em;
+    box-shadow:0 2px 8px rgba(0,0,0,.28);}
+  .wish{position:absolute;top:10px;right:10px;z-index:5;width:34px;height:34px;border:none;
+    background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+  .wish svg{width:23px;height:23px;fill:rgba(0,0,0,.18);stroke:#fff;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;transition:fill .15s,stroke .15s;}
+  .wish:hover svg{fill:rgba(0,0,0,.3);}
+  .wish.on svg{fill:#fff;stroke:#fff;}
+  .dots{position:absolute;left:0;right:0;bottom:11px;z-index:5;display:flex;justify-content:center;gap:5px;}
+  .dot{width:6px;height:6px;padding:0;border:none;border-radius:50%;background:rgba(255,255,255,.55);
+    cursor:pointer;transition:background .14s,transform .14s;}
+  .dot.on{background:#fff;transform:scale(1.15);}
 
   /* carousel */
   .car{position:relative;background:#20321f;overflow:hidden;min-height:100%;}
@@ -339,23 +358,34 @@
 
   /* details beside the photo: hook → stars/score → where → price → highlights →
      guests loved → perfect for → CTA */
-  .det{display:flex;flex-direction:column;min-width:0;padding:20px 24px 18px;}
-  .cat-stars{color:var(--gold);letter-spacing:3px;font-size:14px;margin-bottom:4px;}
-  .name-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;}
-  .det h3{font-size:20px;line-height:1.22;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  /* two lines tall but height-capped, so it can't stretch the name row and push the
-     location line down — it hangs into the empty right side below */
-  .rate-inline{flex:none;height:20px;display:flex;flex-direction:column;align-items:flex-end;gap:2px;
-    font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:visible;}
-  .rate-inline b{font-family:Georgia,serif;font-size:17px;line-height:1.2;color:var(--ink);}
-  .where{margin-top:4px;font-size:13px;color:var(--muted);}
-  .prow{font-size:13.5px;color:var(--muted);}
-  .prow b{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
+  .det{display:flex;flex-direction:column;flex:1;min-width:0;padding:12px 18px 16px;}
+  /* locality line + rating on one row, name beneath */
+  .meta-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;}
+  /* wraps to a second line in the narrower column instead of truncating */
+  .det h3{font-size:19px;line-height:1.22;min-width:0;margin-top:3px;}
+  /* score over review count, aligned to the right edge of the meta row */
+  .rate-inline{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:1px;
+    font-size:11.5px;color:var(--muted);white-space:nowrap;}
+  .rate-inline b{display:inline-flex;align-items:center;gap:4px;font-family:Georgia,serif;
+    font-size:17px;line-height:1.2;color:var(--ink);}
+  .rt-star{width:14px;height:14px;fill:var(--ink);stroke:none;flex:none;}
+  /* locality → area → category, with the pin the PDP uses */
+  .where{display:flex;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted);line-height:1.35;}
+  .wh-pin{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;margin-right:5px;}
+  .wh-sep{margin:0 6px;}
+  /* total first, per-night breakdown beneath */
+  .prow{display:flex;align-items:baseline;justify-content:flex-end;gap:5px;font-size:13px;color:var(--muted);}
+  .prow b{font-family:Georgia,serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
+  .psub{margin-top:2px;font-size:12.5px;color:var(--muted);}
   .high{margin-top:10px;font-size:13.5px;font-weight:600;color:#4a453e;}
   /* property pros — pills where the summary line was; a camera pill jumps the photo */
   .pros{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;}
-  .pro-pill{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:13px;font-weight:600;
-    line-height:1;color:#4a453e;background:#f1ede3;border:1px solid transparent;border-radius:20px;padding:8px 13px;}
+  /* each pill keeps its natural width and wraps to the next line whole, rather
+     than shrinking and breaking its label across two lines */
+  .pro-pill{display:inline-flex;align-items:center;gap:5px;flex:none;white-space:nowrap;
+    font-family:inherit;font-size:13px;font-weight:600;
+    line-height:1;color:#4a453e;background:#f1ede3;border:1px solid transparent;border-radius:20px;padding:6px 10px;}
   button.pro-pill{cursor:pointer;transition:background .14s,border-color .14s,color .14s;}
   button.pro-pill:hover{background:#e8e2d5;}
   .pro-pill .pp-cam{width:14px;height:14px;stroke:#8a8378;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none;}
@@ -384,11 +414,9 @@
     padding:6px 11px;font-size:12.5px;font-weight:600;color:#4a453e;white-space:nowrap;}
   .spec svg{width:13px;height:13px;stroke:#8a8378;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
   .spec svg.fill{fill:var(--gold);stroke:none;}
-  .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;
-    margin-top:auto;padding-top:14px;}
-  .book-btn{flex:none;background:var(--jade);color:#fff;border:none;border-radius:12px;
-    padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;}
-  .book-btn:hover{background:var(--jade-deep);}
+  /* price only, bottom-right — the card itself is the link to the PDP, no CTA */
+  .foot{display:flex;flex-direction:column;align-items:flex-end;
+    margin-top:auto;padding-top:18px;text-align:right;}
 
   /* empty state */
   .empty{padding:44px 0 56px;text-align:center;}
@@ -444,7 +472,9 @@
     .grid{grid-template-columns:1fr;gap:26px;}
     .side{position:static;order:-1;}
     .rail{max-height:none;overflow:visible;}
-    .car,.car-slide{min-height:240px;}
+    /* masonry collapses with the shell — one card per row */
+    .list{grid-template-columns:1fr;}
+    .ph{height:220px;}
     .res-head h1{font-size:26px;}
     .wrap{padding:0 16px 60px;}
   }
@@ -690,7 +720,8 @@ const diningFor = h => h.restaurants===0 ? null
 // the one gold "highlight" pro — why this stay stands out (no photo behind it)
 function highlightFor(h){
   if(h.price <= 12000)  return "Cost sweet spot";
-  if(h.score >= 9.2)    return "Guest favourite";
+  // "Guest favourite" (score >= 9.2) is retired — it landed on half the list,
+  // so it separated nothing.
   if(h.reviews >= 2500) return "Traveller favourite";
   return null;
 }
@@ -716,8 +747,18 @@ function prosFor(h, photos){
   if(pick) pros.push({ label:pick.label, photo: findPhoto(pick.re) });
   const hl = highlightFor(h);
   if(hl) pros.push({ label:hl, value:true });
+  DEMO_EXTRA[h.id]?.forEach(label => pros.push({ label }));
   return pros;
 }
+
+/* TEMPORARY — scaffolding to see the masonry stagger. These stays carry extra
+   pills (their own unused amenities) so their pill block wraps to another row
+   and the card runs taller than its neighbour. Delete the map to go back to the
+   three standardised pros on every card. */
+const DEMO_EXTRA = {
+  "taj-exotica": ["Airport transfer", "Fitness centre"],
+  "postcard":    ["Free cancellation", "Wi-Fi"],
+};
 
 /* ---- narrow with receipts: a few taps → survivors, every ruled-out stay accounted for ---- */
 const POOL = 200; // the full inventory the narrowing claims to have checked
@@ -779,6 +820,8 @@ const I = {
   cal:     <g><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></g>,
   guests:  <g><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></g>,
   chevD:   <path d="M6 9l6 6 6-6"/>,
+  heart:   <path d="M12 20s-7.2-4.5-9.2-9A5 5 0 0 1 12 6.5 5 5 0 0 1 21.2 11c-2 4.5-9.2 9-9.2 9z"/>,
+  starF:   <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 18.9 5 21.4l1.4-6.8L1.3 9.9l6.9-.8L12 2z"/>,
 };
 const Svg = ({d, vb="0 0 24 24", ...p}) => <svg viewBox={vb} {...p}>{d}</svg>;
 
@@ -813,11 +856,13 @@ function Carousel({photos, name, trackRef, idx, setIdx}){
 }
 
 /* ================= HOTEL CARD ================= */
-function HotelCard({hotel, onBook, nights}){
+function HotelCard({hotel, nights, badge}){
   const photos = useMemo(()=>photosFor(hotel), [hotel.id]);
-  const pros = useMemo(()=>prosFor(hotel, photos), [hotel.id]);
+  // h.dist now heads the meta line, so it no longer doubles as the first pill
+  const pros = useMemo(()=>prosFor(hotel, photos).filter(p=>p.label!==hotel.dist), [hotel.id]);
   const trackRef = useRef(null);
   const [idx, setIdx] = useState(0);
+  const [saved, setSaved] = useState(false);
   const goTo = i => { const el = trackRef.current; if(!el) return;
     el.scrollTo({ left: i*el.clientWidth, behavior: REDUCED ? "auto":"smooth" }); };
   const openPdp = () => { location.href = PDP_HREF; };
@@ -828,18 +873,34 @@ function HotelCard({hotel, onBook, nights}){
       onKeyDown={e=>{ if(e.key==="Enter"){ e.preventDefault(); openPdp(); } }}>
       <div className="ph">
         <Carousel photos={photos} name={hotel.name} trackRef={trackRef} idx={idx} setIdx={setIdx}/>
+        {badge && <span className="badge">{badge}</span>}
+        <button type="button" className={"wish"+(saved?" on":"")} aria-pressed={saved}
+          aria-label={saved ? `Remove ${hotel.name} from saved` : `Save ${hotel.name}`}
+          onClick={e=>{e.stopPropagation(); setSaved(s=>!s);}}>
+          <Svg d={I.heart}/>
+        </button>
+        {photos.length>1 && (
+          <div className="dots">
+            {photos.map((_,i)=>(
+              <button type="button" key={i} className={"dot"+(idx===i?" on":"")}
+                aria-label={`Photo ${i+1}`} aria-current={idx===i}
+                onClick={e=>{e.stopPropagation(); goTo(i);}}/>
+            ))}
+          </div>
+        )}
       </div>
       <div className="det">
-        <div className="cat-stars" aria-label={hotel.stars+"-star property"}>{"★".repeat(hotel.stars)}</div>
-        <div className="name-row">
-          <h3>{hotel.name}</h3>
+        <div className="meta-row">
+          <div className="where">
+            <Svg className="wh-pin" d={I.pin}/>
+            {hotel.dist} · {hotel.area}<span className="wh-sep">•</span>{hotel.stars}-star {hotel.type.toLowerCase()}
+          </div>
           <div className="rate-inline">
-            <b>{hotel.score.toFixed(1)}</b>
+            <b><Svg className="rt-star" d={I.starF}/>{hotel.score.toFixed(1)}</b>
             <span>{hotel.reviews.toLocaleString("en-IN")} reviews</span>
           </div>
         </div>
-        {/* place only — h.dist is already the first pro-pill below (see pros), no need to say it twice */}
-        <div className="where">{hotel.place}</div>
+        <h3>{hotel.name}</h3>
         <div className="pros">
           {pros.map((p,i)=> p.photo!=null ? (
             <button type="button" key={i} className={"pro-pill"+(idx===p.photo?" on":"")}
@@ -852,8 +913,8 @@ function HotelCard({hotel, onBook, nights}){
           ))}
         </div>
         <div className="foot">
-          <div className="prow"><b>{inr(hotel.price)}</b>/night</div>
-          <button className="book-btn" onClick={e=>{e.stopPropagation(); onBook();}}>Book now</button>
+          <div className="prow"><b>{inr(hotel.price)}</b><span>/night</span></div>
+          <div className="psub">{inr(hotel.price*nights)} total · {nights} {nights===1?"night":"nights"}</div>
         </div>
       </div>
     </article>
@@ -1304,23 +1365,6 @@ function App(){
     toastTimer.current = setTimeout(()=>setToast(null), 2200);
   };
 
-  // Book now: logged out → prompt sign-in; logged in → seed the booking snapshot
-  // (same shape checkout writes) and hand off to the payment screen.
-  const bookNow = h => {
-    if(LOGGED_OUT){ setAuthOpen(true); return; }
-    const booking = {
-      hotel: h.name,
-      place: `${h.area} · ${h.place}, India`,
-      dates: datesStr, nights: `${nights} ${nights===1?"night":"nights"}`, guests: guestsStr,
-      room: h.room,
-      rooms: rooms + " room" + (rooms>1?"s":""),
-      amount: inr(h.price * nights),
-      name: "You", email: "xyz@email.com",
-    };
-    try{ sessionStorage.setItem("booking", JSON.stringify(booking)); }catch(e){}
-    location.href = "razorpay.html";
-  };
-
   return (
     <div>
       <nav className="topnav">
@@ -1394,8 +1438,15 @@ function App(){
             <div className="col-list">
               {results.length>0 ? (
                 <div className="list">
-                  {results.map(h=>(
-                    <HotelCard key={h.id} hotel={h} nights={nights} onBook={()=>bookNow(h)}/>
+                  {/* dealt alternately so the top-ranked stay stays top-left and
+                      rank still reads across, not down one column then the next */}
+                  {[0,1].map(col=>(
+                    <div className="mcol" key={col}>
+                      {results.map((h,i)=>({h,i})).filter(x=>x.i%2===col).map(({h,i})=>(
+                        <HotelCard key={h.id} hotel={h} nights={nights}
+                          badge={i===0 ? "Top pick" : null}/>
+                      ))}
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -1411,7 +1462,6 @@ function App(){
             {/* right rail: the PDP's "Your stay" card (minus price/CTA), then the filters */}
             <aside className="side">
               <div className="stay-card">
-                <h2 className="side-h">Your stay</h2>
                 <SearchBar location={loc} onSearch={runSearch}
                   checkIn={checkIn} checkOut={checkOut} onPickDate={pickDate}
                   party={party} setParty={setParty} rooms={rooms} setRooms={setRooms}/>
