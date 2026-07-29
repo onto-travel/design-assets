@@ -1255,22 +1255,29 @@
 
 <script>
   // ---- hero carousel ----
+  // Property / public shots — these stay in the gallery no matter which room is picked.
+  const GENERIC = [
+    {src:"images/06-aerial-pool.png",         alt:"Aerial view of the main pool",         tag:"pool"},
+    {src:"images/04-pool-sunset.png",         alt:"Pool and beach at sunset",             tag:"pool"},
+    {src:"images/07-garden-view.png",         alt:"Palm gardens and grounds"},
+    {src:"images/08-villa-exterior.png",      alt:"Resort villa exteriors"},
+    {src:"images/taj-gallery/ext-01.jpg",     alt:"Beach and sun loungers at sunset"},
+    {src:"images/taj-gallery/ext-05.jpg",     alt:"Resort grounds and the beach from the air"},
+    {src:"images/taj-gallery/ext-09.jpg",     alt:"Beachfront lawns and palm groves"},
+    {src:"images/taj-gallery/ext-12.jpg",     alt:"Courtyard fountain from above"},
+    {src:"images/taj-gallery/pool-01.jpg",    alt:"Pool terrace with Goan chapel niche",  tag:"pool"},
+    {src:"images/taj-gallery/spa-03.jpg",     alt:"Indoor spa pool and loungers",         tag:"pool"},
+    {src:"images/taj-gallery/spa-04.jpg",     alt:"Yoga on the lawn"},
+    {src:"images/taj-gallery/dine-01.jpg",    alt:"Lounge and bar"},
+    {src:"images/taj-gallery/dine-02.jpg",    alt:"Private dining set up on the beach at dusk"},
+    {src:"images/taj-gallery/dine-03.jpg",    alt:"Alfresco dining terrace above the beach"}
+  ];
   const photos = [
     {src:"images/gv-01-bedroom.png",     alt:"Villa Room — garden-view bedroom"},
     {src:"images/gv-02-balcony.png",     alt:"Villa Room — private balcony over the garden"},
     {src:"images/gv-03-bathroom.png",    alt:"Villa Room — bathroom with soaking tub",  tag:"bathroom"},
     {src:"images/gv-04-exterior.png",    alt:"Villa Room — Goan-Portuguese villa block"},
-    {src:"images/06-aerial-pool.png",    alt:"Aerial view of the main pool",            tag:"pool"},
-    {src:"images/04-pool-sunset.png",    alt:"Pool and beach at sunset",                tag:"pool"},
-    {src:"images/07-garden-view.png",    alt:"Palm gardens and grounds"},
-    {src:"images/08-villa-exterior.png", alt:"Resort villa exteriors"}
-  ];
-  // Property / public shots — these stay in the gallery no matter which room is picked.
-  const GENERIC = [
-    {src:"images/06-aerial-pool.png",    alt:"Aerial view of the main pool",  tag:"pool"},
-    {src:"images/04-pool-sunset.png",    alt:"Pool and beach at sunset",      tag:"pool"},
-    {src:"images/07-garden-view.png",    alt:"Palm gardens and grounds"},
-    {src:"images/08-villa-exterior.png", alt:"Resort villa exteriors"}
+    ...GENERIC.map(g => ({...g}))
   ];
   const mainImg = document.getElementById('mainImg');
   const counterNow = document.getElementById('counterNow');

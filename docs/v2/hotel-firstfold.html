@@ -277,8 +277,6 @@
   .xt-chk em{font-style:normal;color:var(--muted);font-weight:500;}
   .xt-bar--card{flex-direction:column;align-items:stretch;gap:8px;margin:12px 0 2px;}
   /* one set of add-ons for the whole room list, sat on the section heading */
-  .rooms-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;}
-  .xt-bar--inline{margin:0;gap:20px;}
   .rooms-scroll{display:flex;gap:20px;overflow-x:auto;padding:4px 2px 18px;scroll-snap-type:x proximity;}
   .rooms-scroll::-webkit-scrollbar{height:8px;}
   .rooms-scroll::-webkit-scrollbar-track{background:transparent;}
@@ -310,12 +308,26 @@
     padding:4px 10px;font-size:11.5px;font-weight:600;color:var(--ink);}
   .wchip svg{width:12px;height:12px;stroke:var(--jade);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .wchip.wchip-lead{color:var(--jade);font-weight:700;}
+  /* the cheaper-than-anchor lead: a saving, stated in ink rather than jade */
+  .wchip.wchip-less{color:var(--ink);font-weight:700;}
   /* baseline inclusions — plain info on the standard room (the floor every option shares) */
   .rc-info{list-style:none;margin:2px 0;padding:0;}
   .rc-info li{position:relative;padding-left:19px;font-size:13px;color:#3a3a3a;margin-bottom:6px;}
   .rc-info li:last-child{margin-bottom:0;}
   .rc-info li::before{content:"";position:absolute;left:1px;top:4px;width:9px;height:5px;
     border-left:2px solid #0f8a63;border-bottom:2px solid #0f8a63;transform:rotate(-45deg);}
+  /* the card's only scrolling region: why-block + add-ons. min-height:0 is what
+     lets a flex child actually scroll instead of stretching its parent */
+  /* capped so an open add-on list scrolls in place instead of stretching the card
+     (and with it every sibling — they're a stretch row) */
+  .rc-scroll{flex:1;min-height:0;max-height:150px;overflow-y:auto;overscroll-behavior:contain;
+    scrollbar-width:thin;scrollbar-color:#d9d1c1 transparent;}
+  .rc-scroll::-webkit-scrollbar{width:6px;}
+  .rc-scroll::-webkit-scrollbar-track{background:transparent;}
+  .rc-scroll::-webkit-scrollbar-thumb{background:#d9d1c1;border-radius:8px;}
+  .rc-addons{margin-top:12px;}
+  .rc-addlbl{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:9px;}
+  .rc-addlist{display:flex;flex-direction:column;gap:9px;}
   .rc-foot{margin-top:auto;}
   .rc-price-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
     border-top:1px solid var(--line);padding-top:18px;margin-top:20px;margin-bottom:16px;}
@@ -1045,7 +1057,10 @@
                     <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg>
                   </span>
                   <span class="sc-body">
-                    <span class="tc-k">Guests <span class="tc-cnt" id="guestSub">3 guests</span></span>
+                    <!-- room count sits here, not on the room chip: the stepper that
+                         changes it lives in this chip's popover (guest-picker.js).
+                         Separate span so the picker's guestSub writes can't clobber it. -->
+                    <span class="tc-k">Guests <span class="tc-cnt" id="guestSub">3 guests</span><span class="tc-cnt" id="roomSub">1 room</span></span>
                     <span class="tc-v" id="guestVal">You</span>
                   </span>
                   <span class="sc-ar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
@@ -1061,7 +1076,7 @@
             <button type="button" class="roomchip" id="roomCard" aria-label="Choose your room">
               <span class="sc-ic sc-ic-photo"><img src="images/gv-01-bedroom.png" alt="Villa Room"></span>
               <span class="sc-body">
-                <span class="tc-k">Room <span class="tc-cnt" id="roomCnt">1 room</span></span>
+                <span class="tc-k">Room</span>
                 <span class="sr-line"><span class="sr-name">Villa Room</span><span class="sr-det">1 King &middot; Garden view &middot; 56 m&sup2;</span></span>
                 <span class="sr-tag" id="roomTag" hidden></span>
               </span>
@@ -1187,15 +1202,7 @@
 <!-- ================= CHOOSE YOUR ROOM ================= -->
 <section id="rooms">
   <div class="wrap">
-    <!-- the two rate add-ons ride the section heading: one set for the whole
-         list, so every room card below prices on the same basis -->
-    <div class="rooms-head">
-      <h2 class="sec-h">Choose your room</h2>
-      <div class="xt-bar xt-bar--inline">
-        <label class="xt-chk"><input type="checkbox" data-extra="cancel"> Free cancellation <em>+₹1,800/night</em></label>
-        <label class="xt-chk"><input type="checkbox" data-extra="breakfast"> Breakfast <em>+₹1,500/night</em></label>
-      </div>
-    </div>
+    <h2 class="sec-h">Choose your room</h2>
     <div class="rooms-scroll" id="roomsScroll"></div>
   </div>
 </section>
@@ -1502,22 +1509,29 @@
 
 <script>
   // ---- hero carousel ----
+  // Property / public shots — these stay in the gallery no matter which room is picked.
+  const GENERIC = [
+    {src:"images/06-aerial-pool.png",         alt:"Aerial view of the main pool",         tag:"pool"},
+    {src:"images/04-pool-sunset.png",         alt:"Pool and beach at sunset",             tag:"pool"},
+    {src:"images/07-garden-view.png",         alt:"Palm gardens and grounds"},
+    {src:"images/08-villa-exterior.png",      alt:"Resort villa exteriors"},
+    {src:"images/taj-gallery/ext-01.jpg",     alt:"Beach and sun loungers at sunset"},
+    {src:"images/taj-gallery/ext-05.jpg",     alt:"Resort grounds and the beach from the air"},
+    {src:"images/taj-gallery/ext-09.jpg",     alt:"Beachfront lawns and palm groves"},
+    {src:"images/taj-gallery/ext-12.jpg",     alt:"Courtyard fountain from above"},
+    {src:"images/taj-gallery/pool-01.jpg",    alt:"Pool terrace with Goan chapel niche",  tag:"pool"},
+    {src:"images/taj-gallery/spa-03.jpg",     alt:"Indoor spa pool and loungers",         tag:"pool"},
+    {src:"images/taj-gallery/spa-04.jpg",     alt:"Yoga on the lawn"},
+    {src:"images/taj-gallery/dine-01.jpg",    alt:"Lounge and bar"},
+    {src:"images/taj-gallery/dine-02.jpg",    alt:"Private dining set up on the beach at dusk"},
+    {src:"images/taj-gallery/dine-03.jpg",    alt:"Alfresco dining terrace above the beach"}
+  ];
   const photos = [
     {src:"images/gv-01-bedroom.png",     alt:"Villa Room — garden-view bedroom"},
     {src:"images/gv-02-balcony.png",     alt:"Villa Room — private balcony over the garden"},
     {src:"images/gv-03-bathroom.png",    alt:"Villa Room — bathroom with soaking tub",  tag:"bathroom"},
     {src:"images/gv-04-exterior.png",    alt:"Villa Room — Goan-Portuguese villa block"},
-    {src:"images/06-aerial-pool.png",    alt:"Aerial view of the main pool",            tag:"pool"},
-    {src:"images/04-pool-sunset.png",    alt:"Pool and beach at sunset",                tag:"pool"},
-    {src:"images/07-garden-view.png",    alt:"Palm gardens and grounds"},
-    {src:"images/08-villa-exterior.png", alt:"Resort villa exteriors"}
-  ];
-  // Property / public shots — these stay in the gallery no matter which room is picked.
-  const GENERIC = [
-    {src:"images/06-aerial-pool.png",    alt:"Aerial view of the main pool",  tag:"pool"},
-    {src:"images/04-pool-sunset.png",    alt:"Pool and beach at sunset",      tag:"pool"},
-    {src:"images/07-garden-view.png",    alt:"Palm gardens and grounds"},
-    {src:"images/08-villa-exterior.png", alt:"Resort villa exteriors"}
+    ...GENERIC.map(g => ({...g}))
   ];
   const mainImg = document.getElementById('mainImg');
   const gallery = document.getElementById('gallery');
@@ -1959,7 +1973,8 @@
   // ---- room catalogue: powers the "Choose your room" cards + the shared details drawer ----
   (function(){
     const $ = id => document.getElementById(id);
-    const fmt = n => '₹' + n.toLocaleString('en-IN');
+    // rounds because a per-stay add-on spread over nights rarely divides evenly
+    const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
     const nightsNow = () => { const m = ($('nightsVal').textContent||'').match(/\d+/); return m ? +m[0] : 3; };
     const FLEX_ADD = 1800;   // free cancellation, per night
     const BREAKFAST = 1500;  // per night
@@ -2029,14 +2044,34 @@
     ];
     const ROOM_BY = {}; ROOMS.forEach(r=>ROOM_BY[r.key]=r);
     // headline price is ROOM-ONLY (competitive in search); free cancellation + breakfast are opt-in add-ons.
-    // r.base is the all-in nightly; strip the extras to get the "from" rate. Per night: cancel ₹1,800 + breakfast ₹1,500.
+    // r.base carries a ₹3,300 margin over the room-only "from" rate the cards headline.
     const EXTRAS_PN = 3300;
     const roomRate = r => r.base - EXTRAS_PN;   // nightly room-only "from" rate
     // opt-in extras (default OFF) — one shared state across room cards, the booking price and the cart
-    window.EXTRAS_ON = {cancel:false, breakfast:false};
-    const EX_PN = {cancel:1800, breakfast:1500};
-    window.extrasPN = () => (window.EXTRAS_ON.cancel?EX_PN.cancel:0) + (window.EXTRAS_ON.breakfast?EX_PN.breakfast:0);
-    const effRate = r => roomRate(r) + window.extrasPN();   // nightly with the chosen extras applied
+    window.EXTRAS_ON = {cancel:false, breakfast:false, spa:false};
+    // The add-on catalogue. Every price is PER STAY — one charge for the whole
+    // booking, not a nightly one. It reaches the nightly rate as amount ÷ nights.
+    const EX_PS = {cancel:1800, breakfast:1500, spa:2000};
+    const EX_LABEL = {cancel:'Cancellation', breakfast:'Breakfast',
+                      spa:'Spa credit'};
+    // Which add-ons a room offers. Cancellation and breakfast are on every room so
+    // the cards still compare like for like; the spa credit rides the suites/villas.
+    const EX_BASE = ['cancel','breakfast'];
+    const EX_BY_ROOM = {
+      plunge:       [...EX_BASE, 'spa'],
+      junior:       [...EX_BASE, 'spa'],
+      luxury:       [...EX_BASE, 'spa'],
+      presidential: [...EX_BASE, 'spa'],
+    };
+    const addonsFor = r => EX_BY_ROOM[r.key] || EX_BASE;
+    // Only the add-ons a room actually offers count towards its rate, so turning on
+    // a suite-only extra can't move the price of a room that doesn't sell it.
+    const extrasPSFor = r => addonsFor(r).reduce((s,k)=> s + (window.EXTRAS_ON[k] ? EX_PS[k] : 0), 0);
+    // nightly figure shown on the cards: the stay charge spread across the nights
+    const effRate = r => roomRate(r) + extrasPSFor(r) / nightsNow();
+    // totals are built from the exact stay charge rather than effRate × nights, so a
+    // stay amount that doesn't divide evenly (₹1,800 over 7 nights) can't drift
+    const effTotal = (r, n, rooms) => (roomRate(r) * n + extrasPSFor(r)) * (rooms || 1);
 
     // unified room descriptor used everywhere: bed type · view · size
     const bedOf  = r => (r.meta.split('·')[1] || '').trim();      // e.g. "1 King", "2 bedrooms"
@@ -2070,23 +2105,75 @@
     const roomSqm = r => { const c=(r.chips||[]).find(x=>/m²/.test(x)); return c?parseInt(c,10):null; };
     // the "+₹x" and "+X m²" are always measured against the standard room (the one with no upgrade premium)
     const STD_ROOM = ROOMS.find(r=>!r.why) || ROOMS[0];
-    const STD_BASE = STD_ROOM.base;
-    const BASE_SQM = roomSqm(STD_ROOM) || 56;
     const whyChip = (icon,label) => '<span class="wchip"><svg viewBox="0 0 24 24">'+icon+'</svg>'+label+'</span>';
-    function whyBlock(r){
-      const amt = r.base - STD_BASE;   // premium over the standard room, not the previous tier
-      const sq = roomSqm(r);
-      const bigger = sq && sq>BASE_SQM;
-      // when we show a "+X m²" pill, drop the redundant size-word point ("Much larger", "Larger")
-      const isSizeWord = p => /^(much |slightly )?(larger|bigger)$/i.test(String(p).trim());
-      // lead chip is always the price premium vs the standard room
-      const lead = '<span class="wchip wchip-lead">+'+fmt(amt)+'/night vs '+STD_ROOM.name+'</span>';
-      const chips = r.why.points
-        .filter(p => !(bigger && isSizeWord(p)))
-        .map(p=>whyChip(whyIconFor(p), p));
-      if(bigger) chips.push(whyChip(WHY_ICON.expand, '+'+(sq-BASE_SQM)+' m²'));
+    /* ---------- everything below is relative to the SELECTED room ----------
+       The selected room carries the add-on checkboxes; every other card compares
+       itself to it — dearer rooms answer "why pay more", cheaper ones say what
+       they give up. Pick a different room and the roles swap. */
+    window.ANCHOR_KEY = STD_ROOM.key;
+    const anchorRoom = () => ROOM_BY[window.ANCHOR_KEY] || STD_ROOM;
+
+    // A room's comparable features: its chips minus size and occupancy, which are
+    // handled separately (size as a delta, occupancy only ever as a gain).
+    const featureChips = r => (r.chips||[]).filter(c => !/m²/.test(c) && !/^sleeps/i.test(c));
+    const lowerFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
+
+    function addonsHTML(r){
+      return '<div class="rc-addons">'+
+        '<div class="rc-addlbl">Add-ons</div>'+
+        '<div class="rc-addlist">'+
+          addonsFor(r).map(k =>
+            '<label class="xt-chk"><input type="checkbox" data-extra="'+k+'"> '+
+            EX_LABEL[k]+' <em>— '+fmt(EX_PS[k])+'</em></label>').join('')+
+        '</div>'+
+      '</div>';
+    }
+
+    // dearer than the anchor → what the extra money buys
+    function gainChips(r, a){
+      const have = new Set(featureChips(a));
+      const chips = featureChips(r).filter(c => !have.has(c)).map(c => whyChip(whyIconFor(c), c));
+      const sq = roomSqm(r), asq = roomSqm(a);
+      if(sq && asq && sq > asq) chips.push(whyChip(WHY_ICON.expand, '+'+(sq-asq)+' m²'));
+      const sleeps = (r.chips||[]).find(c=>/^sleeps/i.test(c)),
+            aSleeps = (a.chips||[]).find(c=>/^sleeps/i.test(c));
+      if(sleeps && aSleeps && parseInt(sleeps,10) > parseInt(aSleeps,10)) chips.push(whyChip(WHY_ICON.spark, sleeps));
+      return chips;
+    }
+
+    // cheaper than the anchor → what it doesn't have. Bed/bedroom counts are left
+    // out: "No 2 bedrooms" is a worse way of saying it's a smaller room.
+    function lossChips(r, a){
+      const have = new Set(featureChips(r));
+      const chips = featureChips(a)
+        .filter(c => !have.has(c) && !/bed|bedroom/i.test(c))
+        .map(c => whyChip(whyIconFor(c), 'No '+lowerFirst(c)));
+      const sq = roomSqm(r), asq = roomSqm(a);
+      if(sq && asq && sq < asq) chips.push(whyChip(WHY_ICON.expand, '−'+(asq-sq)+' m²'));
+      return chips;
+    }
+
+    function relHTML(r){
+      const a = anchorRoom();
+      if(r.key === a.key) return addonsHTML(r);
+      const dearer = r.base > a.base;
+      const amt = Math.abs(r.base - a.base);
+      const lead = '<span class="wchip '+(dearer?'wchip-lead':'wchip-less')+'">'+
+        (dearer?'+':'−')+fmt(amt)+'/night vs '+a.name+'</span>';
+      const chips = dearer ? gainChips(r, a) : lossChips(r, a);
       return '<div class="rc-why"><div class="rc-whychips">'+lead+chips.join('')+'</div></div>';
     }
+
+    // repaint every card's relative block — called on load and on every selection
+    window.renderRoomRel = function(){
+      document.querySelectorAll('#roomsScroll .rcard').forEach(card => {
+        const r = ROOM_BY[card.dataset.key]; if(!r) return;
+        const slot = card.querySelector('.rc-rel');
+        if(slot) slot.innerHTML = relHTML(r);
+        const sc = card.querySelector('.rc-scroll'); if(sc) sc.scrollTop = 0;
+      });
+      if(window.applyExtras) window.applyExtras();   // re-tick the boxes that moved
+    };
 
     /* ---------- room cards ---------- */
     const scroll = $('roomsScroll');
@@ -2106,11 +2193,14 @@
         '<div class="rc-body">'+
           '<h3 class="rc-name" title="'+r.name+'">'+r.name+'</h3>'+
           '<div class="rc-meta">'+descriptor(r)+'</div>'+
-          (r.why ? whyBlock(r) : '')+
+          // only this middle region scrolls — the name/meta above and the price
+          // footer below stay put however many add-ons are open. Its contents are
+          // relative to the selected room, so they're filled in by renderRel().
+          '<div class="rc-scroll"><div class="rc-rel"></div></div>'+
           '<div class="rc-foot">'+
             '<div class="rc-price-row">'+
               '<div class="rc-price"><b class="rc-nightly">'+fmt(effRate(r))+'</b> <small class="rc-basis">/ night</small></div>'+
-              '<div class="rc-total"><b class="rc-tot">'+fmt(effRate(r)*N)+'</b>'+
+              '<div class="rc-total"><b class="rc-tot">'+fmt(effTotal(r, N, 1))+'</b>'+
                 '<span class="rc-totlbl">total · '+N+' night'+(N>1?'s':'')+'</span></div>'+
             '</div>'+
             '<div class="rc-cta">'+
@@ -2133,7 +2223,7 @@
         const nn = nightsNow();
         const rooms = roomsFor(r);
         nightlyEl.textContent = fmt(effRate(r));
-        totEl.textContent = fmt(effRate(r)*nn*rooms);
+        totEl.textContent = fmt(effTotal(r, nn, rooms));
         totLbl.textContent = 'total · '+(rooms>1?rooms+' rooms · ':'')+nn+' night'+(nn>1?'s':'');
         if(basisEl) basisEl.textContent = '/ night';
       };
@@ -2144,11 +2234,13 @@
       el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); addRoom(r.key); });
       // click anywhere else on the card (beige body or photo) → open the room details drawer
       el.addEventListener('click', e=>{
-        if(e.target.closest('.rc-book, .rc-nav, .rc-name, .xt-bar')) return;
+        if(e.target.closest('.rc-book, .rc-nav, .rc-name, .xt-bar, .rc-addons')) return;
         openRoom(r.key);
       });
       scroll.appendChild(el);
     });
+
+    window.renderRoomRel();   // initial pass: anchor = the recommended room
 
     /* ---------- select a room → reflect it in the first fold (hero, badge, selected-room line, price) ---------- */
     function selectRoom(key){
@@ -2161,6 +2253,10 @@
       const line = document.querySelector('#roomCard .sr-line');
       if(line) line.innerHTML = '<span class="sr-name">'+r.name+'</span><span class="sr-det">'+descriptor(r)+'</span>';
       document.querySelectorAll('#roomsScroll .rcard').forEach(c=>c.classList.toggle('selected', c.dataset.key===key));
+      // the selected room becomes the comparison anchor: it takes the add-ons list,
+      // every other card re-states itself against it
+      window.ANCHOR_KEY = key;
+      if(window.renderRoomRel) window.renderRoomRel();
       if(window.refreshPricing) window.refreshPricing();          // nightly + total + Book now label
       document.getElementById('top').scrollIntoView({behavior:'smooth', block:'start'});
     }
@@ -2190,7 +2286,7 @@
     window.cartRooms = cartRooms;
     window.cartCount = () => window.CART.reduce((s,x)=>s+x.qty, 0);   // total rooms across all types
     window.cartTypes = () => window.CART.length;                     // distinct room types
-    window.cartTotalFor = n => cartRooms().reduce((s,x)=> s + effRate(x.r) * n * x.qty, 0);   // room-only + chosen extras
+    window.cartTotalFor = n => cartRooms().reduce((s,x)=> s + effTotal(x.r, n, x.qty), 0);   // room-only + chosen extras
     window.cartNightly  = () => cartRooms().reduce((s,x)=> s + effRate(x.r) * x.qty, 0);
     window.stdNightly   = () => effRate(ROOMS[0]);   // room-only nightly of the standard room (matches its card; respects extras)
     window.cartLines    = () => cartRooms().map(x=>({key:x.r.key, name:x.r.name, descriptor:descriptor(x.r), rate:effRate(x.r), qty:x.qty}));
@@ -2250,11 +2346,17 @@
         }
       }
       // Room chip count + the dropdown stepper both reflect the TOTAL number of rooms
-      const cntEl = document.getElementById('roomCnt'); if(cntEl) cntEl.textContent = total+' room'+(total===1?'':'s');
+      const cntEl = document.getElementById('roomSub'); if(cntEl) cntEl.textContent = total+' room'+(total===1?'':'s');
       const pv = document.getElementById('roomPopVal');   if(pv) pv.textContent = total;
       const pm = document.getElementById('roomPopMinus');  if(pm) pm.disabled = total <= 1;
       const pp = document.getElementById('roomPopPlus');   if(pp) pp.disabled = total >= MAXQ;
       markCards();
+      // the chosen room is the comparison anchor: it holds the add-ons list and
+      // every other card restates itself against it
+      if(window.ANCHOR_KEY !== r.key){
+        window.ANCHOR_KEY = r.key;
+        if(window.renderRoomRel) window.renderRoomRel();
+      }
       if(window.refreshPricing) window.refreshPricing();
       if(window.resizeCards) window.resizeCards();   // extras line can change the card height — re-fit
     }
@@ -2352,7 +2454,7 @@
       if(!dr) return;
       const N = nightsNow();
       const rooms = roomsFor(dr.r);
-      const total = effRate(dr.r)*N*rooms;   // room-only + any chosen extras
+      const total = effTotal(dr.r, N, rooms);   // room-only + any chosen extras
       $('drPrice').textContent = fmt(effRate(dr.r));
       $('drTotal').textContent = fmt(total) + ' total · ' + (rooms>1?rooms+' rooms · ':'') + N + ' night' + (N>1?'s':'');
     }
@@ -2511,7 +2613,7 @@
   // ===== flip PDP <-> cart (grafted onto the interactive product page) =====
   (function(){
     const $ = id => document.getElementById(id);
-    const money = n => '₹' + n.toLocaleString('en-IN');
+    const money = n => '₹' + Math.round(n).toLocaleString('en-IN');
   (function(){
     // The booking card is its own natural height now (a sticky sidebar, no longer matched to the gallery).
     // We only size its swipe viewport to the taller of the two faces so the Your-stay ⇄ Confirm swipe
@@ -2650,19 +2752,18 @@
 <script>
   // ===== cart summary add-ons =====
   (function(){
-    const money = n => '₹' + n.toLocaleString('en-IN');
+    const money = n => '₹' + Math.round(n).toLocaleString('en-IN');
     // the base is the ROOM-ONLY cart total the first fold arrived at; add-ons build up from here
     const baseNow  = () => { const t=(document.getElementById('bkTotal')||{}).textContent||''; const n=parseInt(t.replace(/[^\d]/g,''),10); return n||45600; };
-    const nightsNow = () => { const t=(document.getElementById('nightsVal')||{}).textContent||''; const n=parseInt(t.replace(/[^\d]/g,''),10); return n||3; };
     const roomsNow  = () => (window.cartCount ? Math.max(1, window.cartCount()) : 1);
-    // opt-in extras — default OFF for the lowest price; priced per room, per night
+    // opt-in extras — default OFF for the lowest price; priced per room, per STAY
     const ADDONS = {
-      cancel:    {pn:1800, on:'Free till 9 July', off:'Non-refundable',
+      cancel:    {ps:1800, on:'Free till 9 July', off:'Non-refundable',
                   policyOn:'Free cancellation before Wed 9 Jul', policyOff:'Non-refundable rate'},
-      breakfast: {pn:1500, on:'Breakfast included', off:'Not included',
+      breakfast: {ps:1500, on:'Breakfast included', off:'Not included',
                   policyOn:'Breakfast included', policyOff:'Breakfast not included'}
     };
-    const costOf = k => ADDONS[k].pn * nightsNow() * roomsNow();
+    const costOf = k => ADDONS[k].ps * roomsNow();   // already a whole-stay charge — no × nights
     const totalEls = [document.querySelector('.cp-amt')];
 
     function paint(){

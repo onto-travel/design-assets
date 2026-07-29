@@ -643,10 +643,13 @@ function loadParty(){
 // Real photography for the hotels we have shot; others fall back to gradients.
 const PHOTOS = {
   "taj-exotica":[
-    {src:"images/08-villa-exterior.png",label:"Exterior"},
-    {src:"images/06-aerial-pool.png",   label:"Aerial"},
-    {src:"images/04-pool-sunset.png",   label:"Pool"},
-    {src:"images/07-garden-view.png",   label:"Grounds"},
+    {src:"images/08-villa-exterior.png",   label:"Exterior"},
+    {src:"images/06-aerial-pool.png",      label:"Aerial"},
+    {src:"images/04-pool-sunset.png",      label:"Pool"},
+    {src:"images/07-garden-view.png",      label:"Grounds"},
+    {src:"images/taj-gallery/ext-01.jpg",  label:"Beach"},
+    {src:"images/taj-gallery/dine-02.jpg", label:"Dining"},
+    {src:"images/taj-gallery/spa-04.jpg",  label:"Yoga"},
   ],
   "w-goa":[
     {src:"w-goa-rooms/oasis-villa-ii-exterior.jpg",label:"Exterior"},
@@ -729,6 +732,13 @@ function highlightFor(h){
 // Property pros, shown as pills where the old summary line was. A pro a photo
 // can prove carries a camera icon and, tapped, jumps the card's photo to that
 // view — the same pill→photo trust move as the PDP. The gold highlight has none.
+// One-off experiences a property runs that no amenity flag covers. Each names the
+// photo that proves it, so the pill keeps the camera affordance rather than
+// becoming another flat claim.
+const SIGNATURE = {
+  "taj-exotica": [{label:"Yoga session", re:/yoga/}],
+};
+
 function prosFor(h, photos){
   const findPhoto = re => { const i = photos.findIndex(p=>re.test((p.label||"").toLowerCase())); return i>=0 ? i : null; };
   const pros = [{ label:h.dist, photo: findPhoto(/beach|sea|exterior|aerial|water|lake|island|hill|city|rainforest|grounds|garden|marine|gateway|boutique/) }];
@@ -745,6 +755,7 @@ function prosFor(h, photos){
   const pick = AMEN.find(x=>h.amenities.includes(x.a) && findPhoto(x.re)!=null)
             || AMEN.find(x=>h.amenities.includes(x.a));
   if(pick) pros.push({ label:pick.label, photo: findPhoto(pick.re) });
+  SIGNATURE[h.id]?.forEach(s => pros.push({ label:s.label, photo: findPhoto(s.re) }));
   const hl = highlightFor(h);
   if(hl) pros.push({ label:hl, value:true });
   DEMO_EXTRA[h.id]?.forEach(label => pros.push({ label }));
@@ -756,7 +767,7 @@ function prosFor(h, photos){
    and the card runs taller than its neighbour. Delete the map to go back to the
    three standardised pros on every card. */
 const DEMO_EXTRA = {
-  "taj-exotica": ["Airport transfer", "Fitness centre"],
+  "taj-exotica": ["Fitness centre"],
   "postcard":    ["Free cancellation", "Wi-Fi"],
 };
 
