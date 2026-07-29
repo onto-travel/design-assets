@@ -110,9 +110,24 @@
   .ms-tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease;}
   .ms-tile:not(.ms-hero):hover img{transform:scale(1.04);}
   .ms-hero{grid-area:1 / 1 / 3 / 3;border-radius:18px;}
+  /* hero paging arrows — same shape as the room drawer's .nav, revealed on hover.
+     SVG chevrons rather than ‹ › glyphs, whose side bearings sat them off-centre */
+  .ms-nav{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:7;width:40px;height:40px;border-radius:50%;
+    background:rgba(255,255,255,.92);border:none;cursor:pointer;padding:0;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);
+    opacity:0;transition:opacity .16s,background .15s,transform .15s;
+  }
+  .ms-nav svg{width:17px;height:17px;display:block;fill:none;stroke:#222;stroke-width:2.3;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .ms-hero:hover .ms-nav,.ms-nav:focus-visible{opacity:1;}
+  .ms-nav:hover{background:#fff;}
+  .ms-nav:active{transform:translateY(-50%) scale(.92);}
+  .ms-nav.prev{left:14px;}
+  .ms-nav.next{right:14px;}
   .badge{
     position:absolute;top:16px;left:16px;background:rgba(20,18,16,.78);color:#fff;
-    font-size:13px;font-weight:600;padding:7px 14px;border-radius:20px;backdrop-filter:blur(4px);
+    font-size:13px;font-weight:600;padding:5px 11px;border-radius:20px;backdrop-filter:blur(4px);
   }
   /* sits over the grid's bottom-right tile — kept a sibling of the tiles, not a child, so the
      tile buttons don't end up nesting a button inside a button */
@@ -261,6 +276,9 @@
   .xt-chk input{width:16px;height:16px;accent-color:var(--jade);cursor:pointer;margin:0;flex:none;}
   .xt-chk em{font-style:normal;color:var(--muted);font-weight:500;}
   .xt-bar--card{flex-direction:column;align-items:stretch;gap:8px;margin:12px 0 2px;}
+  /* one set of add-ons for the whole room list, sat on the section heading */
+  .rooms-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .xt-bar--inline{margin:0;gap:20px;}
   .rooms-scroll{display:flex;gap:20px;overflow-x:auto;padding:4px 2px 18px;scroll-snap-type:x proximity;}
   .rooms-scroll::-webkit-scrollbar{height:8px;}
   .rooms-scroll::-webkit-scrollbar-track{background:transparent;}
@@ -512,14 +530,14 @@
   .hr-sub{font-size:13.5px;color:rgba(255,255,255,.82);}
   .hr-sub b{font-weight:600;color:#fff;}
   .hr-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0;}
-  .hr-pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;padding:7px 13px;
-    border-radius:11px;color:#ece9e1;background:rgba(72,82,66,.55);border:none;cursor:pointer;font-family:inherit;
+  .hr-pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;padding:5px 10px;
+    border-radius:9px;color:#ece9e1;background:rgba(72,82,66,.55);border:none;cursor:pointer;font-family:inherit;
     backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);transition:background .15s;}
   .hr-pill:hover{background:rgba(84,95,77,.7);}
   .hr-pill.neg{background:rgba(92,80,54,.55);color:#eae1d2;}
   .hr-pill.neg:hover{background:rgba(106,92,62,.7);}
-  .hr-all{margin-left:4px;padding:0;border:none;background:none;white-space:nowrap;cursor:pointer;
-    color:#fff;font-family:inherit;font-size:13px;font-weight:600;transition:opacity .15s;
+  .hr-all{margin-left:auto;padding:0;border:none;background:none;white-space:nowrap;cursor:pointer;
+    color:#fff;font-family:inherit;font-size:12px;font-weight:600;transition:opacity .15s;
     text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.45);}
   .hr-all:hover{opacity:.78;}
 
@@ -966,6 +984,12 @@
       <div class="ms-tile ms-hero" id="msHero">
         <img id="mainImg" src="images/gv-01-bedroom.png" alt="Villa Room — garden-view bedroom">
         <span class="badge">Villa Room · Garden View</span>
+        <button class="ms-nav prev" id="msPrev" type="button" aria-label="Previous photo">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="ms-nav next" id="msNext" type="button" aria-label="Next photo">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
         <div class="hero-rev" id="heroRev" hidden></div>
       </div>
       <button class="ms-all" id="msAll" type="button">View all photos</button>
@@ -1163,7 +1187,15 @@
 <!-- ================= CHOOSE YOUR ROOM ================= -->
 <section id="rooms">
   <div class="wrap">
-    <h2 class="sec-h">Choose your room</h2>
+    <!-- the two rate add-ons ride the section heading: one set for the whole
+         list, so every room card below prices on the same basis -->
+    <div class="rooms-head">
+      <h2 class="sec-h">Choose your room</h2>
+      <div class="xt-bar xt-bar--inline">
+        <label class="xt-chk"><input type="checkbox" data-extra="cancel"> Free cancellation <em>+₹1,800/night</em></label>
+        <label class="xt-chk"><input type="checkbox" data-extra="breakfast"> Breakfast <em>+₹1,500/night</em></label>
+      </div>
+    </div>
     <div class="rooms-scroll" id="roomsScroll"></div>
   </div>
 </section>
@@ -1514,6 +1546,11 @@
   }
   window.renderMosaic = renderMosaic;
   renderMosaic();
+
+  // hero arrows page photos[] in place; stopPropagation keeps the tile's own
+  // click (which opens the lightbox) from firing too
+  document.getElementById('msPrev').addEventListener('click', e => { e.stopPropagation(); show(cur - 1); });
+  document.getElementById('msNext').addEventListener('click', e => { e.stopPropagation(); show(cur + 1); });
   msAll.addEventListener('click', () => { if(window.openLightbox) window.openLightbox(0); });
 
   // jump the gallery to a specific photo by src (used by the "match" chips)
@@ -1891,13 +1928,15 @@
       const p = photos[i], t = p && p.tag && TRUST[p.tag];
       if(counterEl) counterEl.style.visibility = t ? 'hidden' : 'visible';  // avoid overlap with the full-width bar
       if(!t){ heroRev.hidden = true; heroRev.innerHTML = ''; return; }
+      // "See all" rides the head row, not the pill row — wrapping pills used to
+      // strand it alone on a line of its own
       heroRev.innerHTML =
         '<div class="hr-head">'+
           '<div class="hr-score"><b>'+t.rating+'</b><span>/10</span></div>'+
           '<div class="hr-sub">'+t.label+'</div>'+
+          '<button class="hr-all" type="button">See all '+t.count+' reviews &rarr;</button>'+
         '</div>'+
         '<div class="hr-pills">'+t.keys.map(k=>'<button type="button" class="hr-pill'+(k.neg?' neg':'')+'" data-key="'+k.t+'">'+k.t+'</button>').join('')+
-          '<button class="hr-all" type="button">See all '+t.count+' reviews &rarr;</button>'+
         '</div>';
       heroRev.hidden = false;
     };
@@ -2067,11 +2106,7 @@
         '<div class="rc-body">'+
           '<h3 class="rc-name" title="'+r.name+'">'+r.name+'</h3>'+
           '<div class="rc-meta">'+descriptor(r)+'</div>'+
-          (r.why ? whyBlock(r)
-             : '<div class="xt-bar xt-bar--card">'+
-                 '<label class="xt-chk"><input type="checkbox" data-extra="cancel"> Free cancellation <em>+₹1,800/night</em></label>'+
-                 '<label class="xt-chk"><input type="checkbox" data-extra="breakfast"> Breakfast <em>+₹1,500/night</em></label>'+
-               '</div>')+
+          (r.why ? whyBlock(r) : '')+
           '<div class="rc-foot">'+
             '<div class="rc-price-row">'+
               '<div class="rc-price"><b class="rc-nightly">'+fmt(effRate(r))+'</b> <small class="rc-basis">/ night</small></div>'+
