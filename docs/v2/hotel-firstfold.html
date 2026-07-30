@@ -211,12 +211,14 @@
   .bk-l2 #bkTotal{font-weight:600;color:#3a3630;}
   .bk-l1 em{font-style:normal;color:var(--muted);}
 
-  /* --- CTAs: stacked full-width. Side by side does NOT fit a 350px sidebar — both labels are
-     nowrap, so at ~262px of content width the primary button overflowed the card. --- */
+  /* --- CTAs: pay-later left, Book now right — same row shape as checkout.html and the logged-out
+     PDP. Those pages have a fluid 1fr sidebar; this one is a fixed 400px (360px of content), so the
+     halves land at 174px and the .btn side padding comes in from 18px to keep the nowrap price
+     label (and a 6-digit total) clear of the edge. --- */
   .cta-stack{margin-top:18px;display:flex;flex-direction:column;gap:14px;}
-  .cta-main{display:flex;flex-direction:column;gap:10px;}
-  .cta-main .btn{width:100%;font-size:15px;}
-  .cta-main .btn-secondary{width:100%;font-size:14px;}
+  .cta-main{display:flex;gap:12px;align-items:stretch;}
+  .cta-main .btn{flex:1;width:auto;min-width:0;font-size:15px;padding-left:12px;padding-right:12px;}
+  .cta-main .btn-secondary{flex:1;width:auto;min-width:0;font-size:14px;padding-left:12px;padding-right:12px;white-space:nowrap;}
   /* header: title on the left, share + add-to-trip icons on the right */
   /* ---------- page title row ---------- */
   .pdp-title{padding:18px 0 4px;}
@@ -874,11 +876,29 @@
   /* total row — a touch heavier with a stronger rule to close the ledger */
   .cf-row--total{margin-top:2px;border-top:1px solid var(--line);}
   .cf-total{font-family:Georgia,serif;font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-.01em;}
-  /* stacked, secondary first — same order and 10px rhythm as the front face's .cta-main.
+  /* the primary/share row, then the tertiary link under it, on a 10px rhythm.
      No flex:1 here: in a column that would stretch the buttons to fill the leftover slot height. */
   .cf-actions{margin-top:auto;padding-top:26px;display:flex;flex-direction:column;gap:10px;}
   .cf-actions .btn,.cf-actions .btn-secondary{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;text-decoration:none;}
   .cf-actions .btn[hidden],.cf-actions .btn-secondary[hidden]{display:none;}
+  /* tertiary — text only, no container: same language as .btn-ghost but jade, since it's still
+     a real destination. Sits under the primary CTA, so no border competes with the filled button. */
+  .cf-tertiary{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+    background:none;border:none;color:var(--jade);font-family:inherit;font-size:14.5px;font-weight:600;
+    padding:4px 2px;cursor:pointer;transition:color .15s;}
+  .cf-tertiary:hover{color:var(--jade-deep);text-decoration:underline;}
+  .cf-tertiary[hidden]{display:none;}
+  /* share + primary CTA on one line, equal halves. The card is a fixed 400px (360px of content), so
+     each half is 174px — ~154px inside the padding. That is why the primary reads "Download" and not
+     "Download voucher": the full label is ~157px of icon+text and overflows at this width. Side
+     padding is trimmed for the same reason. Share needs no explicit height — as a flex item it
+     stretches to the primary button's. */
+  .cf-btnrow{display:flex;gap:12px;}
+  .cf-btnrow .btn{flex:1 1 0;width:auto;min-width:0;padding-left:10px;padding-right:10px;}
+  /* scoped through .cf-btnrow so it outranks the column-layout `.cf-actions .btn-secondary{width:100%}` */
+  .cf-btnrow .cf-share{flex:1 1 0;width:auto;min-width:0;padding:13px 10px;gap:7px;}
+  .cf-btnrow .cf-share[hidden]{display:none;}
+  .cf-btnrow .cf-share svg{flex:none;width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
   /* settlement-pending variant — money received, awaiting the hotel's confirmation */
   .cf-check.pending{background:#fbf1dd;border-color:#ecd9ab;}
   .cf-check.pending svg{stroke:#c79a3e;}
@@ -1172,12 +1192,20 @@
         </div>
       </div>
       <div class="cf-actions">
-        <button type="button" class="btn-secondary" id="cfDetails">See details</button>
-        <button type="button" class="btn" id="cfVoucher">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
-          Download voucher
-        </button>
-        <a class="btn" id="cfPay" href="razorpay.html" hidden><span id="cfPayVerb">Pay now</span> &middot; <span id="cfPayAmt">&#8377;45,600</span></a>
+        <div class="cf-btnrow">
+          <button type="button" class="btn-secondary cf-share" id="cfShare" aria-label="Share booking" title="Share booking">
+            <svg viewBox="0 0 24 24"><path d="M12 15.5V4M12 4L8.2 7.8M12 4l3.8 3.8"/><path d="M5 13.5v5a1.8 1.8 0 0 0 1.8 1.8h10.4A1.8 1.8 0 0 0 19 18.5v-5"/></svg>
+            Share
+          </button>
+          <!-- "Download", not "Download voucher": the full label does not fit an equal half of the
+               400px card. The ledger above already establishes what is being downloaded. -->
+          <button type="button" class="btn" id="cfVoucher">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
+            Download
+          </button>
+          <a class="btn" id="cfPay" href="razorpay.html" hidden><span id="cfPayVerb">Pay now</span> &middot; <span id="cfPayAmt">&#8377;45,600</span></a>
+        </div>
+        <button type="button" class="cf-tertiary" id="cfDetails">See details</button>
       </div>
       </div>
 
@@ -2978,6 +3006,10 @@
         setTx('cfTitle', 'You’re all set for Goa');
       }
 
+      // share tracks See details: both need a booking that actually exists to point at
+      var share = document.getElementById('cfShare'), detailsEl = document.getElementById('cfDetails');
+      if(share && detailsEl) share.hidden = detailsEl.hidden;
+
       hideBooking();
       if(load) load.hidden = true;
       card.hidden = false;
@@ -2995,6 +3027,18 @@
       }); }
       var details = document.getElementById('cfDetails');
       if(details && !details._wired){ details._wired = true; details.addEventListener('click', function(){ location.href = 'booking-details.html'; }); }
+      // share the booking itself (booking-details), not the PDP the page is sitting on.
+      // reads the reference at click time — the handler is wired once but the card re-renders per mode.
+      if(share && !share._wired){ share._wired = true; share.addEventListener('click', function(){
+        var url = new URL('booking-details.html', location.href).href;
+        var rEl = document.getElementById('cfRef'), rf = rEl ? rEl.textContent : '';
+        var data = {title:'Taj Exotica Resort & Spa', url:url};
+        if(rf) data.text = 'Booking ' + rf;
+        function copied(){ if(window.showToast) window.showToast('Link copied'); }
+        if(navigator.share){ navigator.share(data).catch(function(){}); }
+        else if(navigator.clipboard){ navigator.clipboard.writeText(url).then(copied).catch(copied); }
+        else copied();
+      }); }
       var dl = document.getElementById('cfVoucher');
       if(dl && !dl._wired){ dl._wired = true; dl.addEventListener('click', function(){
         var lines = [

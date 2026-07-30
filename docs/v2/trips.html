@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>onto · Trips</title>
+<title>onto · Bookings</title>
 <style>
   :root{
     --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
@@ -127,7 +127,7 @@
       <a class="tn-brand" href="home2.html">onto<span>.</span></a>
       <div class="tn-links">
         <a href="home2.html">Stays</a>
-        <a href="trips.html" class="active">Trips</a>
+        <a href="trips.html" class="active">Bookings</a>
       </div>
       <div class="tn-right">
         <button type="button" class="tn-avatar" id="profileBtn" aria-haspopup="true" aria-expanded="false">Y</button>
@@ -154,7 +154,7 @@
     <section class="fridge-hero">
       <div class="fh-copy">
         <div class="fh-eyebrow">Your travel fridge</div>
-        <h1 class="fh-h1">Trips</h1>
+        <h1 class="fh-h1">Bookings</h1>
         <p class="fh-sub">A magnet for every corner of the world you've checked into — and room for plenty more.</p>
         <div class="fh-stat"><b>6</b> places · <b>4</b> stays</div>
       </div>
@@ -172,8 +172,8 @@
 
     <!-- simple heading while the fridge hero is stashed -->
     <div class="trips-head">
-      <div class="fh-eyebrow">Your trips</div>
-      <h1 class="fh-h1">Trips</h1>
+      <div class="fh-eyebrow">Your bookings</div>
+      <h1 class="fh-h1">Bookings</h1>
     </div>
     <div class="tabs" id="tabs">
       <button type="button" class="tab on" data-tab="upcoming">Upcoming <span class="n" id="cUpcoming">0</span></button>
@@ -242,7 +242,7 @@
       });
       const rows = trips.filter(t => t.status === active);
       if(!rows.length){
-        $('list').innerHTML = '<div class="empty">No '+active+' trips.</div>';
+        $('list').innerHTML = '<div class="empty">No '+active+' bookings.</div>';
         return;
       }
       $('list').innerHTML = rows.map((t, i) => {
