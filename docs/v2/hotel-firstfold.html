@@ -272,13 +272,6 @@
 
   /* ---------- CHOOSE YOUR ROOM: horizontal row of vertical cards ---------- */
   /* section headings all come from .sec-h — see the token near the reviews block */
-  /* opt-in extras toggle bar (room list + booking module) */
-  .xt-bar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:2px 0 16px;}
-  .xt-chk{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer;}
-  .xt-chk input{width:16px;height:16px;accent-color:var(--jade);cursor:pointer;margin:0;flex:none;}
-  .xt-chk em{font-style:normal;color:var(--muted);font-weight:500;}
-  .xt-bar--card{flex-direction:column;align-items:stretch;gap:8px;margin:12px 0 2px;}
-  /* one set of add-ons for the whole room list, sat on the section heading */
   .rooms-scroll{display:flex;gap:20px;overflow-x:auto;padding:4px 2px 18px;scroll-snap-type:x proximity;}
   .rooms-scroll::-webkit-scrollbar{height:8px;}
   .rooms-scroll::-webkit-scrollbar-track{background:transparent;}
@@ -301,17 +294,21 @@
   .rc-body{padding:19px 18px 20px;display:flex;flex-direction:column;flex:1;}
   .rc-name{font-family:Georgia,serif;font-size:19px;font-weight:600;margin:0 0 5px;color:var(--ink);
     cursor:pointer;display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .rc-meta{font-size:13px;color:var(--muted);margin-bottom:16px;}
+  .rc-meta{font-size:13px;color:var(--muted);margin-bottom:5px;}
   .rc-opt{display:flex;align-items:center;gap:9px;font-size:13px;color:#444;margin-top:13px;cursor:pointer;}
   .rc-opt input{width:16px;height:16px;accent-color:var(--jade);flex:none;}
-  .rc-why{margin:10px 0 2px;}
-  .rc-whychips{display:flex;flex-wrap:wrap;gap:8px;}
-  .wchip{display:inline-flex;align-items:center;gap:5px;background:var(--pill);border-radius:16px;
-    padding:4px 10px;font-size:11.5px;font-weight:600;color:var(--ink);}
-  .wchip svg{width:12px;height:12px;stroke:var(--jade);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  .wchip.wchip-lead{color:var(--jade);font-weight:700;}
-  /* the cheaper-than-anchor lead: a saving, stated in ink rather than jade */
-  .wchip.wchip-less{color:var(--ink);font-weight:700;}
+  /* the whole comparison hangs off one rule — jade when the room is an upgrade on the
+     selected one, sand when it's the cheaper trade-down */
+  .rc-why{margin:10px 0 2px 1px;border-left:2px solid var(--jade);padding-left:13px;}
+  .rc-why.is-less{border-left-color:#d5cdbc;}
+  .rc-lead{font-size:13.5px;line-height:1.35;}
+  .rc-lead b{font-weight:700;color:var(--jade);}
+  .rc-why.is-less .rc-lead b{color:var(--ink);}
+  .rc-lead span{font-size:12px;color:var(--muted);white-space:nowrap;}
+  /* differentiator rows — feature, then the smaller qualifier naming what it replaces */
+  .rc-feats{display:flex;flex-direction:column;gap:11px;margin-top:11px;}
+  .rc-feat{font-size:13.5px;line-height:1.35;font-weight:600;color:var(--ink);}
+  .rc-feat span{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap;}
   /* baseline inclusions — plain info on the standard room (the floor every option shares) */
   .rc-info{list-style:none;margin:2px 0;padding:0;}
   .rc-info li{position:relative;padding-left:19px;font-size:13px;color:#3a3a3a;margin-bottom:6px;}
@@ -321,9 +318,25 @@
   /* why-block + add-ons. Grows to fit — an open add-on list makes the card taller
      (and with it every sibling, since they're a stretch row) rather than scrolling. */
   .rc-scroll{flex:1;}
-  .rc-addons{margin-top:12px;}
+  /* flex gap rather than margins — the chosen line and the pill list each come and go */
+  .rc-addons{display:flex;flex-direction:column;gap:15px;margin-top:5px;}
+  /* chosen add-ons sit under the room name as a subtitle; the cross clears the set */
+  .rc-xsel{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink);}
+  .rc-xnames{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rc-xclear{border:none;background:none;padding:0;margin:0;flex:none;cursor:pointer;
+    display:inline-flex;color:#a8a196;transition:color .15s;}
+  .rc-xclear svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+  .rc-xclear:hover{color:var(--ink);}
   .rc-addlbl{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:9px;}
-  .rc-addlist{display:flex;flex-direction:column;gap:9px;}
+  .rc-xpills{display:flex;flex-wrap:wrap;gap:8px;}
+  .xpill{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--card);
+    border-radius:16px;padding:5px 12px;font-family:inherit;font-size:12.5px;font-weight:600;
+    color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s;}
+  .xpill:hover{border-color:#bfe0cf;background:#f4faf7;}
+  /* the price stays folded away until you're actually considering the add-on */
+  .xpill span{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;color:var(--muted);font-weight:500;
+    transition:max-width .18s ease,opacity .14s ease,margin-left .18s ease;}
+  .xpill:hover span{max-width:80px;opacity:1;margin-left:6px;}
   .rc-foot{margin-top:auto;}
   .rc-price-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
     border-top:1px solid var(--line);padding-top:18px;margin-top:20px;margin-bottom:16px;}
@@ -2104,30 +2117,9 @@
     const capOf = r => { const m = (r.chips.find(c => /sleeps/i.test(c)) || '').match(/\d+/); return m ? +m[0] : 2; };
     const roomsFor = r => window.roomsNeeded ? window.roomsNeeded(capOf(r)) : 1;
 
-    /* ---------- "why +₹x" icon pills ---------- */
-    const WHY_ICON = {
-      wave:'<path d="M2 8c2-2.2 4.5-2.2 6.5 0s4.5 2.2 6.5 0 4.5-2.2 6.5 0"/><path d="M2 13c2-2.2 4.5-2.2 6.5 0s4.5 2.2 6.5 0 4.5-2.2 6.5 0"/>',
-      expand:'<path d="M14 4h6v6"/><path d="M20 4l-7 7"/><path d="M10 20H4v-6"/><path d="M4 20l7-7"/>',
-      drop:'<path d="M12 3s6 6.4 6 10.5A6 6 0 0 1 6 13.5C6 9.4 12 3 12 3z"/>',
-      sofa:'<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 12a2 2 0 0 1 2 2v3h16v-3a2 2 0 0 1 2-2"/><path d="M5 17v2M19 17v2"/>',
-      leaf:'<path d="M4 20c0-8 6-14 16-15C19 14 13 20 4 20z"/><path d="M9 15c3-3 6-4 9-5"/>',
-      home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>',
-      spark:'<path d="M12 4l1.6 4.8L18 10l-4.4 1.2L12 16l-1.6-4.8L6 10l4.4-1.2z"/>'
-    };
-    const whyIconFor = text => {
-      const t = String(text).toLowerCase();
-      if(/sea|ocean|aspect|view/.test(t)) return WHY_ICON.wave;
-      if(/pool|plunge|shower/.test(t))    return WHY_ICON.drop;
-      if(/living|dining|lounge|separate/.test(t)) return WHY_ICON.sofa;
-      if(/larg|bigger|much/.test(t))      return WHY_ICON.expand;
-      if(/garden|veranda|balcony|outdoor/.test(t)) return WHY_ICON.leaf;
-      if(/villa|secluded|bedroom|residence|private/.test(t)) return WHY_ICON.home;
-      return WHY_ICON.spark;
-    };
     const roomSqm = r => { const c=(r.chips||[]).find(x=>/m²/.test(x)); return c?parseInt(c,10):null; };
     // the "+₹x" and "+X m²" are always measured against the standard room (the one with no upgrade premium)
     const STD_ROOM = ROOMS.find(r=>!r.why) || ROOMS[0];
-    const whyChip = (icon,label) => '<span class="wchip"><svg viewBox="0 0 24 24">'+icon+'</svg>'+label+'</span>';
     /* ---------- everything below is relative to the SELECTED room ----------
        The selected room carries the add-on checkboxes; every other card compares
        itself to it — dearer rooms answer "why pay more", cheaper ones say what
@@ -2140,39 +2132,89 @@
     const featureChips = r => (r.chips||[]).filter(c => !/m²/.test(c) && !/^sleeps/i.test(c));
     const lowerFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
 
+    /* Add-ons live on the selected room's card in two states. Unchosen ones are pills
+       that keep their price hidden until you hover — browsing the list shouldn't read
+       as a price list. Chosen ones leave the pills and join a line under the room name,
+       where one cross drops the whole set and the rate falls back to room-only. */
     function addonsHTML(r){
-      return '<div class="rc-addons">'+
-        '<div class="rc-addlbl">Add-ons</div>'+
-        '<div class="rc-addlist">'+
-          addonsFor(r).map(k =>
-            '<label class="xt-chk"><input type="checkbox" data-extra="'+k+'"> '+
-            EX_LABEL[k]+' <em>— '+fmt(EX_PS[k])+'</em></label>').join('')+
-        '</div>'+
-      '</div>';
+      const keys = addonsFor(r);
+      const on   = keys.filter(k =>  window.EXTRAS_ON[k]);
+      const off  = keys.filter(k => !window.EXTRAS_ON[k]);
+      let h = '<div class="rc-addons">';
+      if(on.length)
+        h += '<div class="rc-xsel"><span class="rc-xnames">'+on.map(k=>EX_LABEL[k]).join(' · ')+'</span>'+
+             '<button class="rc-xclear" type="button" aria-label="Remove all add-ons">'+
+               '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>'+
+             '</button></div>';
+      if(off.length)
+        h += '<div class="rc-xlist"><div class="rc-addlbl">Add-ons</div>'+
+             '<div class="rc-xpills">'+off.map(k =>
+               '<button class="xpill" type="button" data-extra="'+k+'">'+EX_LABEL[k]+
+               '<span>'+fmt(EX_PS[k])+'</span></button>').join('')+'</div></div>';
+      return h + '</div>';
     }
 
+    /* Each differentiator is a row: the feature, then what it replaces in the selected
+       room. Two shapes only — a SWAP (both rooms have something in that category, so
+       the qualifier names what it trades away) or an ADDITION/LOSS (no counterpart at
+       all, so the feature stands alone). The category is what decides.
+       Direction isn't marked per row — the block's rule and the +/− lead say whether
+       you're reading gains or give-ups. */
+    const FEAT_CAT = c => {
+      const t = String(c).toLowerCase();
+      if(/view$/.test(t))                          return 'view';
+      if(/bed|bedroom/.test(t))                    return 'bed';
+      if(/pool/.test(t))                           return 'pool';
+      if(/balcony|veranda|terrace|garden/.test(t)) return 'outdoor';
+      if(/living|dining|lounge/.test(t))           return 'living';
+      return null;
+    };
+    // "Garden view" → "garden"; anything without the category word keeps its wording
+    const featShort = c => lowerFirst(String(c).replace(/\s*view$/i, ''));
+    const featRow = (title, sub) =>
+      '<div class="rc-feat"><b>'+title+'</b>'+(sub ? ' <span>· '+sub+'</span>' : '')+'</div>';
+
     // dearer than the anchor → what the extra money buys
-    function gainChips(r, a){
-      const have = new Set(featureChips(a));
-      const chips = featureChips(r).filter(c => !have.has(c)).map(c => whyChip(whyIconFor(c), c));
+    function gainRows(r, a){
+      const aFeat = featureChips(a), have = new Set(aFeat);
+      const rows = [];
+      featureChips(r).filter(c => !have.has(c)).forEach(c => {
+        const cat = FEAT_CAT(c);
+        const swap = cat && aFeat.find(x => FEAT_CAT(x) === cat);
+        // a veranda for a balcony isn't worth a line — when both rooms have an
+        // outdoor space, the view is the difference, and it has its own row
+        if(swap && cat === 'outdoor') return;
+        // an addition has nothing to trade against, so it stands on its own
+        rows.push(swap ? featRow(c, 'not '+featShort(swap)) : featRow(c, ''));
+      });
       const sq = roomSqm(r), asq = roomSqm(a);
-      if(sq && asq && sq > asq) chips.push(whyChip(WHY_ICON.expand, '+'+(sq-asq)+' m²'));
+      // no "vs <anchor>" line here — the lead above already says which room it's against
+      if(sq && asq && sq > asq) rows.push(featRow('+'+(sq-asq)+' m²', ''));
       const sleeps = (r.chips||[]).find(c=>/^sleeps/i.test(c)),
             aSleeps = (a.chips||[]).find(c=>/^sleeps/i.test(c));
-      if(sleeps && aSleeps && parseInt(sleeps,10) > parseInt(aSleeps,10)) chips.push(whyChip(WHY_ICON.spark, sleeps));
-      return chips;
+      if(sleeps && aSleeps && parseInt(sleeps,10) > parseInt(aSleeps,10))
+        rows.push(featRow(sleeps, 'vs '+parseInt(aSleeps,10)));
+      return rows;
     }
 
     // cheaper than the anchor → what it doesn't have. Bed/bedroom counts are left
     // out: "No 2 bedrooms" is a worse way of saying it's a smaller room.
-    function lossChips(r, a){
-      const have = new Set(featureChips(r));
-      const chips = featureChips(a)
-        .filter(c => !have.has(c) && !/bed|bedroom/i.test(c))
-        .map(c => whyChip(whyIconFor(c), 'No '+lowerFirst(c)));
+    function lossRows(r, a){
+      const rFeat = featureChips(r), have = new Set(rFeat);
+      const seen = new Set(), rows = [];
+      featureChips(a).filter(c => !have.has(c) && !/bed|bedroom/i.test(c)).forEach(c => {
+        const cat = FEAT_CAT(c);
+        const swap = cat && rFeat.find(x => FEAT_CAT(x) === cat);
+        // a swap is titled by what this room DOES have, so two anchor features of the
+        // same category can't produce the same row twice
+        const title = swap || c;
+        if(seen.has(title)) return;
+        seen.add(title);
+        rows.push(swap ? featRow(swap, 'not '+featShort(c)) : featRow(c, ''));
+      });
       const sq = roomSqm(r), asq = roomSqm(a);
-      if(sq && asq && sq < asq) chips.push(whyChip(WHY_ICON.expand, '−'+(asq-sq)+' m²'));
-      return chips;
+      if(sq && asq && sq < asq) rows.push(featRow('−'+(asq-sq)+' m²', ''));
+      return rows;
     }
 
     function relHTML(r){
@@ -2180,20 +2222,31 @@
       if(r.key === a.key) return addonsHTML(r);
       const dearer = r.base > a.base;
       const amt = Math.abs(r.base - a.base);
-      const lead = '<span class="wchip '+(dearer?'wchip-lead':'wchip-less')+'">'+
-        (dearer?'+':'−')+fmt(amt)+'/night vs '+a.name+'</span>';
-      const chips = dearer ? gainChips(r, a) : lossChips(r, a);
-      return '<div class="rc-why"><div class="rc-whychips">'+lead+chips.join('')+'</div></div>';
+      // the figure heads the block; the rule down its side carries the direction, so a
+      // cheaper room's give-ups aren't dressed in the jade that means "upgrade"
+      const lead = '<div class="rc-lead"><b>'+(dearer?'+':'−')+fmt(amt)+'/night</b>'+
+        ' <span>· vs '+a.name+'</span></div>';
+      const rows = dearer ? gainRows(r, a) : lossRows(r, a);
+      return '<div class="rc-why'+(dearer?'':' is-less')+'">'+lead+
+             '<div class="rc-feats">'+rows.join('')+'</div></div>';
     }
 
     // repaint every card's relative block — called on load and on every selection
     window.renderRoomRel = function(){
+      const a = anchorRoom();
       document.querySelectorAll('#roomsScroll .rcard').forEach(card => {
         const r = ROOM_BY[card.dataset.key]; if(!r) return;
         const slot = card.querySelector('.rc-rel');
         if(slot) slot.innerHTML = relHTML(r);
+        // the bed · view · size line only reads as fact on the selected room; on the
+        // others its contents are already stated as a difference, so it's hidden
+        const meta = card.querySelector('.rc-meta');
+        if(meta) meta.hidden = (r.key !== a.key);
       });
-      if(window.applyExtras) window.applyExtras();   // re-tick the boxes that moved
+      // NB: this must not call back into applyExtras — applyExtras drives this function
+      // now, since toggling an add-on repaints the pills. The add-on state is read
+      // straight out of EXTRAS_ON at render time, so there's nothing to re-sync.
+      if(window.resizeCards) window.resizeCards();   // the block's height just changed — re-fit
     };
 
     /* ---------- room cards ---------- */
@@ -2255,7 +2308,7 @@
       el.querySelector('.rc-book').addEventListener('click', e=>{ e.stopPropagation(); addRoom(r.key); });
       // click anywhere else on the card (beige body or photo) → open the room details drawer
       el.addEventListener('click', e=>{
-        if(e.target.closest('.rc-book, .rc-nav, .rc-name, .xt-bar, .rc-addons')) return;
+        if(e.target.closest('.rc-book, .rc-nav, .rc-name, .rc-addons')) return;
         openRoom(r.key);
       });
       scroll.appendChild(el);
@@ -2442,7 +2495,7 @@
       if(window.refreshRoomPrices) window.refreshRoomPrices();   // all room cards (apples to apples)
       if(window.refreshPricing)    window.refreshPricing();      // first-fold Book now price
       if(window.renderCart)        window.renderCart();          // cart rows + total
-      document.querySelectorAll('input[data-extra]').forEach(cb=>{ cb.checked = !!window.EXTRAS_ON[cb.dataset.extra]; });
+      if(window.renderRoomRel)     window.renderRoomRel();        // pills ⇄ the chosen line
       const tag = document.querySelector('#roomCard .sr-tag');
       if(tag){
         const parts = [];
@@ -2453,11 +2506,15 @@
       }
       if(window.resizeCards) window.resizeCards();   // the extras line changes the card's content height — re-fit
     };
-    document.addEventListener('change', function(e){
-      const cb = e.target && e.target.matches && e.target.matches('input[data-extra]') ? e.target : null;
-      if(!cb) return;
-      window.EXTRAS_ON[cb.dataset.extra] = cb.checked;
-      window.applyExtras();
+    document.addEventListener('click', function(e){
+      if(!e.target || !e.target.closest) return;
+      const pill = e.target.closest('.xpill[data-extra]');
+      if(pill){ window.EXTRAS_ON[pill.dataset.extra] = true; window.applyExtras(); return; }
+      // all or nothing: the cross drops every add-on and the rate falls back to room-only
+      if(e.target.closest('.rc-xclear')){
+        Object.keys(window.EXTRAS_ON).forEach(k => { window.EXTRAS_ON[k] = false; });
+        window.applyExtras();
+      }
     });
     window.applyExtras();   // sync initial UI (room-only)
 
