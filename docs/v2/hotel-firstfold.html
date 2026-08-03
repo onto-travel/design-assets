@@ -2163,7 +2163,10 @@
     const FEAT_CAT = c => {
       const t = String(c).toLowerCase();
       if(/view$/.test(t))                          return 'view';
-      if(/bed|bedroom/.test(t))                    return 'bed';
+      // a bedroom count and a bed type aren't the same claim — swapping them
+      // against each other reads as "2 bedrooms · not king bed"
+      if(/bedroom/.test(t))                        return 'bedrooms';
+      if(/bed/.test(t))                            return 'bed';
       if(/pool/.test(t))                           return 'pool';
       if(/balcony|veranda|terrace|garden/.test(t)) return 'outdoor';
       if(/living|dining|lounge/.test(t))           return 'living';
