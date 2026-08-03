@@ -14,9 +14,10 @@
    })
 
    Party model: Adults (18+) and Children (under 18). Each child chip reads
-   "Name · 7 yrs ⌄" — the age is part of the pill with a dot separator and a
-   chevron dropdown (0–2 as one bucket, then 3…17). Until an age is picked the
-   whole chip goes amber and reads "· add age". */
+   "Name · 7 yrs ⌄" — the age is part of the pill with a dot separator, and
+   tapping it opens an inline tray of 0…17 pill tokens on the line below (exact
+   year, no buckets — the backend wants the real age). Until an age is picked
+   the whole chip goes amber and reads "· add age". */
 (function(){
   'use strict';
 
@@ -63,12 +64,27 @@
   .person-in{width:118px;border:1px solid var(--jade);border-radius:20px;padding:5px 12px;font-family:inherit;
     font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;outline:none;}
   .person .age-sep{opacity:.55;}
-  .person .age-dd{position:relative;display:inline-flex;align-items:center;}
-  .age-dd select{appearance:none;-webkit-appearance:none;border:none;background:none;font:inherit;color:inherit;
-    cursor:pointer;padding:0 10px 0 0;outline:none;}
-  .age-dd::after{content:"";position:absolute;right:2px;top:50%;width:4px;height:4px;margin-top:-3px;
-    border-right:1.4px solid currentColor;border-bottom:1.4px solid currentColor;transform:rotate(45deg);pointer-events:none;opacity:.7;}
+  /* the age opens an inline token row, not a menu — a grid of numbers here would read
+     as the date chip's calendar (.cal-grid), which sits 8px away in the same trip bar */
+  .person .age-btn{position:relative;border:none;background:none;font:inherit;color:inherit;
+    cursor:pointer;padding:0 11px 0 0;outline:none;border-radius:3px;}
+  .person .age-btn::after{content:"";position:absolute;right:2px;top:50%;width:4px;height:4px;margin-top:-3px;
+    border-right:1.4px solid currentColor;border-bottom:1.4px solid currentColor;transform:rotate(45deg);
+    transition:transform .15s;opacity:.7;}
+  .person .age-btn[aria-expanded="true"]::after{transform:rotate(-135deg);margin-top:-1px;}
+  .person .age-btn:focus-visible{outline:2px solid var(--jade);outline-offset:2px;}
   .person.age-unset{background:#fbf3e2;border-color:#d8c9a4;color:#7a5f28;}
+  /* ragged wrapped pills, deliberately not a fixed column count */
+  .age-tray{flex:0 0 100%;display:flex;flex-wrap:wrap;gap:5px;margin:1px 0 3px;padding:8px 8px 9px;
+    border:1px solid #e4dcc9;border-radius:12px;background:#fdfcf8;}
+  .age-tray .age-tray-lab{flex:0 0 100%;font-size:11px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);margin:0 1px 2px;}
+  .age-tok{border:1px solid var(--line);border-radius:20px;background:#fff;color:var(--ink);
+    font-family:inherit;font-size:12.5px;font-weight:600;line-height:1;padding:6px 10px;cursor:pointer;
+    font-variant-numeric:tabular-nums;transition:all .12s;}
+  .age-tok:hover{border-color:var(--jade);background:#eef6f1;color:var(--jade);}
+  .age-tok[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:#fff;}
+  .age-tok:focus-visible{outline:2px solid var(--jade);outline-offset:2px;}
   .gp-chead .gp-add,.gp-chead .gp-minus{flex:none;width:25px;height:25px;padding:0;border-radius:50%;
     border:1px solid var(--line);background:#fff;color:var(--jade);font-size:17px;line-height:1;
     cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;}
@@ -172,9 +188,9 @@
     const COUNT  = { adults:'adCount',  children:'chCount'  };
     const MIN    = { adults:1, children:0 };   // keep at least one adult
     const MAXG   = 9;
-    // child age dropdown: 2 renders as "0–2", then literal 3…17
-    const AGE_MIN = 2, AGE_MAX = 17;
-    const ageLbl = a => a<=AGE_MIN ? '0–2' : String(a);
+    // child age dropdown: every year 0…17, no buckets (1 takes the singular unit)
+    const AGE_MIN = 0, AGE_MAX = 17;
+    const ageLbl = a => a===1 ? '1 yr' : a+' yrs';
 
     // each person is {companion:id}  OR  {auto:true, em, name, custom?}; children also carry {age}
     let party = null;
@@ -185,8 +201,8 @@
         : { adults:[{companion:'you'}], children:[] };
     }
     if(!party.children) party.children = [];
-    // migrate a stored 3-category party: infants become 0–2 children
-    if(party.infants){ party.infants.forEach(p=>party.children.push(Object.assign({}, p, {em:EM.children, age:AGE_MIN}))); delete party.infants; }
+    // migrate a stored 3-category party: infants ("under 2") become age-0 children
+    if(party.infants){ party.infants.forEach(p=>party.children.push(Object.assign({}, p, {em:EM.children, age:0}))); delete party.infants; }
     // drop any stale companions no longer defined (after removing seeded people)
     CATS.forEach(c=>{ party[c] = party[c].filter(p=> !p.companion || MAP[p.companion]); });
     const funN = { adults: opts.loggedOut ? 2 : 0, children: 0 };
@@ -237,15 +253,41 @@
 
     function addCompanion(id){
       const c = MAP[id]; if(!c || heads()>=MAXG || usedIds().has(id)) return;
-      party[c.cat].push({companion:id}); apply();
+      party[c.cat].push({companion:id}); agePick=null; apply();
     }
     function addExtra(cat){
       if(heads()>=MAXG) return;
-      party[cat].push({ auto:true, em:EM[cat], name:FUN[cat][funN[cat]++ % FUN[cat].length] }); apply();
+      party[cat].push({ auto:true, em:EM[cat], name:FUN[cat][funN[cat]++ % FUN[cat].length] }); agePick=null; apply();
     }
     function removePerson(cat,i){
       if(party[cat].length<=MIN[cat]) return;   // adults never drop below 1
-      party[cat].splice(i,1); apply();
+      party[cat].splice(i,1); agePick=null; apply();   // indices shift, so any open tray is stale
+    }
+
+    // which child chip has its age tray open — {cat,i}, cleared whenever the party changes
+    let agePick = null;
+    function ageTray(cat,i,p){
+      const tray = document.createElement('div');
+      tray.className = 'age-tray';
+      tray.addEventListener('click', e=>e.stopPropagation());
+      const lab = document.createElement('span');
+      lab.className = 'age-tray-lab'; lab.textContent = 'Age at check-in';
+      tray.appendChild(lab);
+      for(let a=AGE_MIN; a<=AGE_MAX; a++){
+        const t = document.createElement('button');
+        t.type='button'; t.className='age-tok';
+        t.setAttribute('aria-pressed', String(p.age===a));
+        t.setAttribute('aria-label', ageLbl(a));
+        t.textContent = String(a);
+        t.addEventListener('click', e=>{
+          e.stopPropagation();
+          const person = party[cat][i]; if(person) person.age = a;
+          agePick = null; apply();
+        });
+        tray.appendChild(t);
+      }
+      setTimeout(()=>{ const sel = tray.querySelector('.age-tok[aria-pressed="true"]') || tray.querySelector('.age-tok'); if(sel) sel.focus(); }, 0);
+      return tray;
     }
 
     // inline rename for extra (auto) people
@@ -291,23 +333,28 @@
             ? '<button type="button" class="person-name" aria-label="Rename">'+esc(name)+'</button>'
             : esc(name);
           const set = typeof p.age==='number';
+          const open = !!(agePick && agePick.cat===cat && agePick.i===i);
           if(cat==='children' && !set) chip.classList.add('age-unset');
           const ageHTML = cat==='children'
-            ? '<span class="age-sep">·</span><span class="age-dd"><select aria-label="'+esc(name)+' age">'
-              + '<option value="" disabled hidden'+(set?'':' selected')+'>add age</option>'
-              + Array.from({length:AGE_MAX-AGE_MIN+1},(_,k)=>AGE_MIN+k).map(a=>'<option value="'+a+'"'+(p.age===a?' selected':'')+'>'+ageLbl(a)+' yrs</option>').join('')
-              + '</select></span>'
+            ? '<span class="age-sep">·</span>'
+              + '<button type="button" class="age-btn" aria-expanded="'+open+'" aria-label="'+esc(name)+' age">'
+              + (set ? ageLbl(p.age) : 'add age') + '</button>'
             : '';
           chip.innerHTML = '<span class="person-em">'+em+'</span>'+nameHTML + ageHTML
             + '<button type="button" class="person-x" aria-label="Remove '+esc(name)+'">&times;</button>';
-          if(editable) chip.querySelector('.person-name').addEventListener('click', e=>{ e.stopPropagation(); editing={cat,i}; apply(); });
+          if(editable) chip.querySelector('.person-name').addEventListener('click', e=>{ e.stopPropagation(); editing={cat,i}; agePick=null; apply(); });
           chip.querySelector('.person-x').addEventListener('click', e=>{ e.stopPropagation(); removePerson(cat,i); });
           if(cat==='children'){
-            const dd = chip.querySelector('.age-dd select');
-            dd.addEventListener('click', e=>e.stopPropagation());
-            dd.addEventListener('change', e=>{ e.stopPropagation(); party[cat][i].age = parseInt(dd.value,10); apply(); });
+            chip.querySelector('.age-btn').addEventListener('click', e=>{
+              e.stopPropagation();
+              agePick = open ? null : {cat,i};   // second tap on the same chip closes it
+              editing = null;
+              apply();
+            });
           }
           box.appendChild(chip);
+          // the tray sits on its own line directly under the chip it belongs to
+          if(open) box.appendChild(ageTray(cat,i,p));
         });
       });
     }
@@ -399,12 +446,17 @@
       if(window.closeRoomPop) window.closeRoomPop();
       showPanel('guests'); pop.hidden=false; trigger.setAttribute('aria-expanded','true');
     };
-    const closePop = ()=>{ editing=null; pop.hidden=true; trigger.setAttribute('aria-expanded','false'); apply(); };
+    const closePop = ()=>{ editing=null; agePick=null; pop.hidden=true; trigger.setAttribute('aria-expanded','false'); apply(); };
     window.closeGuestPop = closePop;
     trigger.addEventListener('click', e=>{ e.stopPropagation(); pop.hidden?openPop():closePop(); });
     pop.addEventListener('click', e=>e.stopPropagation());
     document.addEventListener('click', e=>{ if(!pop.hidden && !pop.contains(e.target) && !trigger.contains(e.target)) closePop(); });
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !pop.hidden) closePop(); });
+    // Escape backs out of an open age tray first, and only then the whole popover
+    document.addEventListener('keydown', e=>{
+      if(e.key!=='Escape' || pop.hidden) return;
+      if(agePick){ agePick=null; apply(); return; }
+      closePop();
+    });
 
     window.syncGuestRooms = apply;   // let the room cart refresh the "N rooms" chip label
     window.userInParty = () => usedIds().has('you');   // is the account holder among the travellers?
