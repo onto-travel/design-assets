@@ -534,7 +534,7 @@
         var mins = Math.max(1, Math.floor(ms / 60000));
         var mtext = mins + (mins === 1 ? ' minute' : ' minutes');
         return { expired: false, days: 0, hours: 0, short: mtext, text: mtext + ' left',
-                 label: 'Cancel within ' + mtext, urgent: true };
+                 label: 'Cancel old booking within ' + mtext, urgent: true };
       }
       var d = Math.floor(totalHours / 24);
       var h = totalHours % 24;
@@ -548,8 +548,8 @@
         : h + (h === 1 ? ' hour' : ' hours');
       var urgent = d === 0;
       var label = urgent
-        ? 'Cancel within ' + h + (h === 1 ? ' hour' : ' hours')
-        : 'Cancel by ' + fmt.day(iso);
+        ? 'Cancel old booking within ' + h + (h === 1 ? ' hour' : ' hours')
+        : 'Cancel old booking by ' + fmt.day(iso);
       return { expired: false, days: d, hours: h, short: short, urgent: urgent,
                text: parts.join(' ') + ' left', label: label };
     }

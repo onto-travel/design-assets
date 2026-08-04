@@ -269,12 +269,10 @@
   function sourceLabel(b){
     if(b.ownership === 'owned' || b.counterpart)
       return '<span class="src owned"><span class="dot"></span>Booked with us</span>';
-    /* Side by side for review: one row names the platform, the other doesn't.
-       Both chips are otherwise identical, so the only question being asked is
-       whether the name is carrying anything. */
-    var anon = b.source_platform === 'booking';
-    return '<span class="src tracked">' + ICON.ext +
-      (anon ? 'Your original booking' : 'On ' + esc(b.platform.label)) + '</span>';
+    /* The platform name isn't doing work here — what the row needs to say is
+       which of the two bookings this is, and that reads the same whoever it
+       was made with. The name is on the booking itself. */
+    return '<span class="src tracked">' + ICON.ext + 'Your original booking</span>';
   }
 
   /* Status block + actions, driven entirely by ownership then status.
