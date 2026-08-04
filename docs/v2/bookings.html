@@ -61,10 +61,6 @@
   .btn.amber:hover{background:#824d06;border-color:#824d06;}
   .btn.sm{padding:8px 14px;font-size:13.5px;}
   .row.amber .btn:focus-visible{outline-color:var(--amber);}
-  /* tertiary: present, but never competing with the commit action */
-  .tert{background:none;border:none;padding:2px;font-family:inherit;font-size:13.5px;
-    font-weight:600;color:#6d4d17;text-decoration:none;cursor:pointer;}
-  .tert:hover{color:var(--amber);text-decoration:underline;}
 
   /* ===== the list: one list, both ownership states, a card per booking ===== */
   .list{display:flex;flex-direction:column;gap:14px;}
@@ -79,8 +75,10 @@
   .row.amber:hover{border-color:var(--amber);}
   .row.amber::before{background:var(--amber);}
 
-  /* the text blocks keep their own breathing room now the row has none */
-  .r-main{flex:1;min-width:0;padding:13px 0;}
+  /* the text blocks keep their own breathing room now the row has none.
+     Stretched and stacked so the reference can sit on the row's baseline
+     rather than trailing the details it belongs to. */
+  .r-main{flex:1;min-width:0;padding:13px 0;align-self:stretch;display:flex;flex-direction:column;}
   /* the ownership chip reads as part of the name, not a separate row */
   .r-title{display:flex;align-items:center;flex-wrap:wrap;gap:6px 11px;}
   .r-name{font-family:Georgia,serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin:0;}
@@ -98,6 +96,11 @@
   .r-meta .m{display:flex;align-items:center;gap:7px;}
   .r-meta svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.8;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  /* a detail of the booking, so it sits under the other details — pushed to
+     the foot of the card, clear of the meta line */
+  .r-ref{margin-top:auto;padding-top:10px;font-size:13px;color:var(--muted);}
+  .r-ref b{color:var(--ink);font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;
+    margin-left:6px;}
 
   /* The photo fills the row's height with only a hairline inset, so the image
      does the work rather than the whitespace around it. The row's own padding
@@ -118,20 +121,46 @@
   /* status block */
   .r-side{flex:none;width:266px;display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:11px;padding:13px 0;}
   .st{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
-  .st-big{font-size:22px;font-weight:700;letter-spacing:-.015em;color:var(--jade);font-variant-numeric:tabular-nums;}
   .st-good{display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:var(--jade-deep);}
   .st-good svg{width:16px;height:16px;stroke:var(--jade);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .st-ink{font-size:15px;font-weight:600;color:var(--ink);}
+  /* What they paid, then what we'd charge. The two numbers are the whole
+     pitch, so they carry it themselves — our price takes the weight, theirs
+     is struck through beside it at reading size. */
+  .st-prices{display:inline-flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums;}
+  .st-prices .was{font-size:15px;color:var(--muted);font-weight:500;text-decoration:line-through;
+    text-decoration-thickness:1px;text-underline-offset:0;}
+  .st-prices .now{font-size:22px;font-weight:700;letter-spacing:-.015em;color:var(--jade);}
   .st-note{font-size:13px;color:var(--muted);max-width:250px;}
   .row.amber .st-note{color:#6d4d17;}
-  .st-clock{font-size:13px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums;}
+  /* the deadline is also the way out, so it is the link — lifted clear of the
+     row's own full-bleed click target */
+  .st-clock{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;
+    font-size:13px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums;
+    text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(162,97,10,.35);}
+  .st-clock:hover{text-decoration-color:currentColor;}
+  .st-clock svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* the row a cancellation just settled: a single pass of the jade it has
+     become, so the change is noticed on the row rather than only in the toast */
+  .row.settled{animation:settle 1.5s ease-out;}
+  @keyframes settle{
+    0%{background:var(--jade-soft);border-color:#bfdfd0;}
+    100%{background:var(--card);border-color:var(--line);}
+  }
+  @media(prefers-reduced-motion:reduce){.row.settled{animation:none;}}
+
+  /* toast — carries the undo, so it outlives a glance (7s) */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
+    background:#1b211e;color:#fff;font-size:13.5px;font-weight:600;padding:11px 12px 11px 18px;
+    border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;
+    transition:opacity .2s,transform .2s;z-index:90;display:flex;align-items:center;gap:14px;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .t-undo{border:none;background:none;font-family:inherit;font-size:13.5px;font-weight:700;
+    color:#8fd6b4;cursor:pointer;padding:4px 8px;border-radius:8px;}
+  .t-undo:hover{background:rgba(255,255,255,.1);}
   .r-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;position:relative;z-index:2;}
-  /* Two actions never fit side by side in the status column, so stack them to
-     equal width rather than letting them wrap to a ragged right edge. */
-  .r-acts.stack{flex-direction:column;align-items:stretch;width:100%;}
-  .r-acts.stack .btn{justify-content:center;}
-  /* button then the way out, stacked at natural width rather than side by side */
-  .row.amber .r-acts{flex-direction:column;align-items:flex-end;gap:6px;}
 
   /* forward entry point — persistent, at the end of the list */
   .fwd{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);
@@ -202,6 +231,7 @@
     <div class="list" id="list"></div>
     <div id="fwd"></div>
     <div class="foot"><button type="button" id="reset">Reset prototype data</button></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
 
 <script src="tracking-data.js"></script>
@@ -248,17 +278,22 @@
 
   /* Status block + actions, driven entirely by ownership then status.
      A tracked row never offers cancel, voucher, or manage. */
+  /* A booking of ours carries a reference, and a reference is a detail of the
+     booking rather than a status — so it sits with the dates and the room, not
+     in the column that exists for things needing a decision. */
+  function refFor(b){
+    var ref = b.ownership === 'owned' ? b.booking_ref
+      : (b.counterpart && b.status !== 'cancel_pending') ? b.counterpart.booking_ref
+      : null;
+    return ref ? '<div class="r-ref">Booking reference <b>' + esc(ref) + '</b></div>' : '';
+  }
+
   function sideFor(b){
     var st = '', acts = '';
 
-    if(b.ownership === 'owned'){
-      st = '<div class="st">' +
-             '<span class="st-good">' + ICON.tick + 'Confirmed</span>' +
-             '<span class="st-note">' + esc(b.booking_ref || '') + '</span>' +
-           '</div>';
-      /* The card is the link. Voucher and management are both inside it. */
-      return { st: st, acts: '' };
-    }
+    /* Nothing outstanding and nothing to decide: the card is the link, and the
+       voucher and management are both inside it. */
+    if(b.ownership === 'owned') return { st: '', acts: '' };
 
     /* ---- switched: one card, now ours, with whatever is still outstanding ---- */
     if(b.counterpart){
@@ -266,26 +301,23 @@
 
       if(b.status === 'cancel_pending'){
         var left = fmt.countdown(ev.cancel_deadline);
-        /* One status line, one commit button, one way out to the platform. */
+        /* Reminder, then where to act on it, then the confirmation — the way
+           out belongs with the deadline it applies to, not under the button. */
+        /* The deadline and the place it is cancelled are one thing, so they are
+           one control: the reminder is the way out. */
         st = '<div class="st">' +
-               '<span class="st-clock">' +
-                 (left.expired ? esc(left.text) : esc(left.short) + ' left to cancel') +
-               '</span>' +
+               '<a class="st-clock" href="' + esc(b.platform.manage) + '" target="_blank" ' +
+                 'rel="noopener">' + esc(left.label) + ICON.ext + '</a>' +
              '</div>';
         acts = '<button type="button" class="btn amber sm" data-cancelled="' + esc(b.id) +
-                 '">I’ve cancelled this</button>' +
-               '<a class="tert" href="' + esc(b.platform.manage) +
-                 '" target="_blank" rel="noopener">Open ' + esc(b.platform.label) + '</a>';
+                 '">I’ve cancelled this</button>';
         return { st: st, acts: acts };
       }
 
-      st = '<div class="st">' +
-             '<span class="st-good">' + ICON.tick + 'Saved ' + fmt.inr(saved) + '</span>' +
-             '<span class="st-note">' + esc(own.booking_ref || '') + '</span>' +
-           '</div>';
-      /* No button: the card opens the booking, where the voucher and management
-         both live. A button here would be a third route to the same page. */
-      return { st: st, acts: '' };
+      /* Cancelled on the platform, so nothing is outstanding: this is simply a
+         booking with us now, and it reads like every other one — the saving is
+         a fact about how it was made, not its standing state. */
+      return { st: '', acts: '' };
     }
 
     var c = b.comparison;
@@ -294,10 +326,12 @@
       case 'saving_available':
         if(c && c.isSaving){
           st = '<div class="st">' +
-                 '<span class="st-big">Save ' + fmt.inr(c.delta) + '</span>' +
-                 '<span class="st-note">Same room, free cancellation</span>' +
+                 '<span class="st-prices">' +
+                   '<span class="was">' + fmt.inr(c.theirTotal) + '</span>' +
+                   '<span class="now">' + fmt.inr(c.ourTotal) + '</span>' +
+                 '</span>' +
                '</div>';
-          acts = '<a class="btn jade sm" href="booking-switch.html?id=' + esc(b.id) + '">Switch</a>';
+          acts = '<a class="btn jade sm" href="booking-tracked.html?id=' + esc(b.id) + '">Switch</a>';
         } else if(c){
           /* Cheaper with us, but worse on an attribute. We don't offer it and we
              don't show the number — for the room they actually booked, what they
@@ -365,7 +399,7 @@
     if(b.ownership === 'owned' || b.counterpart) cls.push('own');
     if(b.status === 'cancel_pending') cls.push('amber');
 
-    return '<article class="' + cls.join(' ') + '">' +
+    return '<article class="' + cls.join(' ') + '" data-row="' + esc(b.id) + '">' +
       /* Property, when, and who it is with. Room and meal plan are one tap away
          on the booking itself — on the list they crowd out the status. */
       (b.image ? '<div class="r-thumb"><img src="' + esc(b.image) + '" alt=""></div>' : '') +
@@ -380,13 +414,10 @@
           '<span class="m">' + ICON.gst + esc(b.occupancy) + '</span>' +
           '<span class="m">' + ICON.bed + esc(b.room_category) + '</span>' +
         '</div>' +
+        refFor(b) +
       '</div>' +
       '<div class="r-side">' + side.st +
-        (side.acts
-          ? '<div class="r-acts' +
-              ((side.acts.match(/class="btn/g) || []).length > 1 ? ' stack' : '') +
-            '">' + side.acts + '</div>'
-          : '') +
+        (side.acts ? '<div class="r-acts">' + side.acts + '</div>' : '') +
       '</div>' +
     '</article>';
   }
@@ -412,9 +443,13 @@
     var done = e.target.closest('[data-cancelled]');
     if(done){
       e.preventDefault();
-      /* Taken on the user's word. No proof, no upload, no verification. */
-      T.markCancelled(done.getAttribute('data-cancelled'));
+      /* Taken on the user's word. No proof, no upload, no verification — so
+         the way back is a click, not a support conversation. */
+      var id = done.getAttribute('data-cancelled');
+      T.markCancelled(id);
       render();
+      settle(id);
+      toast('Cancellation noted', function(){ T.undoCancelled(id); render(); });
       return;
     }
     /* hand the owned booking to the existing voucher page */
@@ -427,6 +462,33 @@
   $('reset').addEventListener('click', function(){ T.reset(); render(); });
 
   function render(){ renderList(); }
+
+  /* ---------- confirming a cancellation ----------
+     The row changes from an outstanding task to a settled one, which is a
+     bigger change than the list usually makes on its own. It gets a beat of
+     attention so the change is seen where it happened, and an undo so a
+     mistaken tap costs nothing. */
+  function settle(id){
+    var row = document.querySelector('[data-row="' + id + '"]');
+    if(row) row.classList.add('settled');
+  }
+
+  var toastT = null;
+  function toast(msg, undo){
+    var el = $('toast');
+    el.innerHTML = '<span>' + esc(msg) + '</span>' +
+      (undo ? '<button type="button" class="t-undo">Undo</button>' : '');
+    el.classList.add('show');
+    if(undo){
+      el.querySelector('.t-undo').addEventListener('click', function(){
+        clearTimeout(toastT);
+        el.classList.remove('show');
+        undo();
+      });
+    }
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ el.classList.remove('show'); }, 7000);
+  }
   render();
 
   /* Countdowns are in days and hours, so re-render only when one of them would

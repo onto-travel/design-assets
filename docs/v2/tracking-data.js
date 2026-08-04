@@ -516,17 +516,25 @@
       h = h % 12; if (h === 0) h = 12;
       return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
     },
-    /* days + hours remaining, per the brief */
+    /* days + hours remaining, per the brief.
+       `label` is the whole phrase a screen shows, and it changes shape at the
+       one-day mark: a running count of days is not something anyone plans by,
+       so until the last day this states the date they have to act by. Inside
+       it, the hours are the point and the date no longer tells them anything. */
     countdown: function (iso) {
       var ms = new Date(iso) - new Date();
-      if (ms <= 0) return { expired: true, text: 'Free cancellation has passed' };
+      if (ms <= 0) return { expired: true, text: 'Free cancellation has passed',
+                            label: 'Free cancellation has passed' };
       var totalHours = Math.floor(ms / 3600000);
       /* Under an hour, hours floor to 0 and the countdown reads "0 hours left"
          at the exact moment it matters most. Drop to minutes instead. */
       if (totalHours === 0) {
-        var mins = Math.max(1, Math.round(ms / 60000));
+        /* floored, never rounded: rounding 59m59s up prints "60 minutes left"
+           of a window that has under an hour in it */
+        var mins = Math.max(1, Math.floor(ms / 60000));
         var mtext = mins + (mins === 1 ? ' minute' : ' minutes');
-        return { expired: false, days: 0, hours: 0, short: mtext, text: mtext + ' left' };
+        return { expired: false, days: 0, hours: 0, short: mtext, text: mtext + ' left',
+                 label: 'Cancel within ' + mtext, urgent: true };
       }
       var d = Math.floor(totalHours / 24);
       var h = totalHours % 24;
@@ -538,8 +546,12 @@
       var short = d >= 2 ? d + ' days'
         : d === 1 ? '1 day ' + h + (h === 1 ? ' hour' : ' hours')
         : h + (h === 1 ? ' hour' : ' hours');
-      return { expired: false, days: d, hours: h, short: short,
-               text: parts.join(' ') + ' left' };
+      var urgent = d === 0;
+      var label = urgent
+        ? 'Cancel within ' + h + (h === 1 ? ' hour' : ' hours')
+        : 'Cancel by ' + fmt.day(iso);
+      return { expired: false, days: d, hours: h, short: short, urgent: urgent,
+               text: parts.join(' ') + ' left', label: label };
     }
   };
 
@@ -850,6 +862,16 @@
       if (!b) return;
       var se = Object.assign({}, b.switch_event, { user_marked_cancelled_at: new Date().toISOString() });
       setOverride(id, { status: 'switched_cancelled', switch_event: se });
+    },
+
+    /* The mark is taken on their word, so it has to be as cheap to take back.
+       Nothing else changed when it was set: the stay is already ours either
+       way, only the outstanding cancellation task moves. */
+    undoCancelled: function (id) {
+      var b = get(id);
+      if (!b) return;
+      var se = Object.assign({}, b.switch_event, { user_marked_cancelled_at: null });
+      setOverride(id, { status: 'cancel_pending', switch_event: se });
     },
 
     stopTracking: function (id) {
