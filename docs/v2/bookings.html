@@ -57,8 +57,6 @@
   .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
   .btn.jade{background:var(--jade);border-color:var(--jade);color:#fff;}
   .btn.jade:hover{background:var(--jade-deep);border-color:var(--jade-deep);}
-  .btn.amber{background:var(--amber);border-color:var(--amber);color:#fff;}
-  .btn.amber:hover{background:#824d06;border-color:#824d06;}
   .btn.sm{padding:8px 14px;font-size:13.5px;}
   .row.amber .btn:focus-visible{outline-color:var(--amber);}
 
@@ -71,8 +69,9 @@
   .row:hover{border-color:#d9d1c1;box-shadow:0 2px 5px rgba(40,30,10,.05),0 12px 26px rgba(40,30,10,.08);}
   .row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#ddd6c8;}
   .row.own::before{background:var(--jade);}
-  .row.amber{background:var(--amber-soft);border-color:var(--amber-line);}
-  .row.amber:hover{border-color:var(--amber);}
+  /* An outstanding cancellation is still one of their bookings, so the card
+     stays a card. The rail and the deadline carry the urgency; a filled amber
+     panel made a task out of a row that is mostly just information. */
   .row.amber::before{background:var(--amber);}
 
   /* the text blocks keep their own breathing room now the row has none.
@@ -116,7 +115,6 @@
   .src.owned .dot{width:7px;height:7px;border-radius:50%;background:var(--jade);flex:none;}
   .src.tracked{background:#fff;border:1px solid #d7d0c2;color:#5b5650;}
   .src.tracked svg{width:13px;height:13px;stroke:#8a857d;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  .row.amber .src.tracked{background:#fff;border-color:var(--amber-line);}
 
   /* status block */
   .r-side{flex:none;width:266px;display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:11px;padding:13px 0;}
@@ -132,7 +130,6 @@
     text-decoration-thickness:1px;text-underline-offset:0;}
   .st-prices .now{font-size:22px;font-weight:700;letter-spacing:-.015em;color:var(--jade);}
   .st-note{font-size:13px;color:var(--muted);max-width:250px;}
-  .row.amber .st-note{color:#6d4d17;}
   /* the deadline is also the way out, so it is the link — lifted clear of the
      row's own full-bleed click target */
   .st-clock{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;
@@ -187,7 +184,6 @@
     .r-main{flex:1 1 180px;}
     .r-side{flex:1 1 100%;width:auto;align-items:flex-start;text-align:left;
       border-top:1px solid var(--line);padding-top:14px;}
-    .row.amber .r-side{border-top-color:var(--amber-line);}
     .st{align-items:flex-start;}
     .st-note{max-width:none;}
     .r-acts,.row.amber .r-acts{justify-content:flex-start;align-items:stretch;width:100%;}
@@ -314,7 +310,9 @@
                '<a class="st-clock" href="' + esc(b.platform.manage) + '" target="_blank" ' +
                  'rel="noopener">' + esc(left.label) + ICON.ext + '</a>' +
              '</div>';
-        acts = '<button type="button" class="btn amber sm" data-cancelled="' + esc(b.id) +
+        /* A self-report, not a commitment — it doesn't take the jade the
+           booking actions use, and it doesn't need a fill of its own. */
+        acts = '<button type="button" class="btn sm" data-cancelled="' + esc(b.id) +
                  '">I’ve cancelled this</button>';
         return { st: st, acts: acts };
       }
