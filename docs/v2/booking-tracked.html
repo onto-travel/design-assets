@@ -61,15 +61,12 @@
   .paid .pl{display:inline-flex;align-items:center;gap:9px;font-size:15px;color:#3a6a4d;font-weight:600;}
   .paid .pl svg{width:17px;height:17px;stroke:var(--green);stroke-width:2.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .pl-tx{display:flex;flex-direction:column;}
-  .pl-tx em{font-style:normal;font-size:11.5px;font-weight:600;color:#3a6a4d;letter-spacing:.01em;margin-top:2px;}
-  .pl-tx em:empty{display:none;}
   .paid .amt{font-family:Georgia,serif;font-size:23px;font-weight:600;color:#20321f;letter-spacing:-.01em;
     font-variant-numeric:tabular-nums;}
   .paybox .paid + .paid{border-top:1px solid #efe8da;}
   .paid.neutral .pl{color:var(--muted);}
   .paid.neutral .pl svg{stroke:var(--muted);}
   .paid.neutral .amt{color:var(--ink);}
-  .paid.neutral .pl-tx em{color:var(--muted);}
   /* the one they no longer have to pay */
   .paid.was .amt{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px;}
 
@@ -123,7 +120,8 @@
   .hero-out{position:absolute;top:14px;right:14px;z-index:3;display:inline-flex;align-items:center;gap:7px;
     border-radius:20px;padding:7px 13px 7px 11px;border:1px solid rgba(255,255,255,.28);
     background:rgba(20,16,26,.38);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-    color:#fff;font-size:12.5px;font-weight:600;text-decoration:none;transition:background .15s;}
+    color:#fff;font-size:12.5px;font-weight:600;text-decoration:none;transition:background .15s;
+    max-width:calc(100% - 28px);white-space:nowrap;}
   .hero-out:hover{background:rgba(20,16,26,.62);}
   .hero-out svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .sum-hero-tx{position:absolute;left:20px;right:18px;bottom:16px;z-index:2;color:#fff;}
@@ -247,7 +245,7 @@
         if(c && c.isSaving) return {
           note: changed === 'reduced' ? 'Our price rose by ' +
             fmt.inr(b.our_offer.our_price_total - alertedOurTotal) + ' after your alert went out' : '',
-          h: 'We have this cheaper',
+          h: 'We’ve got a lower price',
           morph: true,
           cta: '<button type="button" class="btn" id="bookBtn">Book with us</button>'
         };
@@ -309,9 +307,7 @@
 
     var theirs =
       '<div class="paid neutral' + (ours ? ' was' : '') + '">' +
-        '<span class="pl">' + ICON.ext +
-          '<span class="pl-tx">You paid<em>' + esc(b.platform.label) + '</em></span>' +
-        '</span>' +
+        '<span class="pl">' + ICON.ext + '<span class="pl-tx">You paid</span></span>' +
         '<span class="amt">' + fmt.inr(b.price_paid_total) + '</span>' +
       '</div>';
 
@@ -319,9 +315,7 @@
 
     return '<div class="paybox">' + theirs +
       '<div class="paid">' +
-        '<span class="pl">' + ICON.tick +
-          '<span class="pl-tx">With us<em>' + esc(b.room_category) + '</em></span>' +
-        '</span>' +
+        '<span class="pl">' + ICON.tick + '<span class="pl-tx">With us</span></span>' +
         '<span class="amt">' + fmt.inr(ours) + '</span>' +
       '</div></div>';
   }
@@ -343,7 +337,7 @@
            describes, and at this size it reads as a label rather than a
            second action competing with Book with us. */
         '<a class="hero-out" href="' + esc(b.platform.manage) + '" target="_blank" rel="noopener">' +
-          ICON.ext + 'Open ' + esc(b.platform.label) + '</a>' +
+          ICON.ext + 'Your original booking</a>' +
         '<div class="sum-hero-tx">' +
           '<div class="stars">' + new Array((b.stars || 0) + 1).join('★') + '</div>' +
           '<h1>' + esc(b.property_name_raw) + '</h1>' +
