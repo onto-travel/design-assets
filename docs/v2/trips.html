@@ -134,7 +134,7 @@
         <div class="menu" id="profileMenu" role="menu">
           <a class="menu-id" href="profile.html">
             <span class="tn-avatar" id="menuAvatar">Y</span>
-            <div><b id="menuName">You</b><small>xyz@email.com</small></div>
+            <div><b id="menuName">Saanvi</b><small>xyz@email.com</small></div>
             <span class="menu-id-ar">›</span>
           </a>
           <div class="menu-sec">
@@ -196,10 +196,10 @@
       try{
         const a = JSON.parse(localStorage.getItem('onto:travellers:v3')) || [];
         const me = a.find(t => t.relation==='Myself' || t.id==='t-you');
-        const nm = (me && me.name && me.name.toLowerCase()!=='you' && !me.name.includes('@')) ? me.name : 'You';
-        const ini = (nm[0]||'Y').toUpperCase();
+        const nm = (me && me.name && me.name.toLowerCase()!=='you' && !me.name.includes('@')) ? me.name : 'Saanvi';
+        const ini = (nm[0]||'S').toUpperCase();
         $('profileBtn').textContent = ini; $('menuAvatar').textContent = ini;
-        if(nm!=='You') $('menuName').textContent = nm;
+        var mn=$('menuName'); if(mn) mn.textContent = nm;
       }catch(e){}
     })();
 

@@ -197,7 +197,7 @@
     const AGES = ['0–2','3–12','13–59','60+'];
 
     const SEED = [
-      {id:'t-you', name:'You', relation:'Myself', age:'13–59'}
+      {id:'t-you', name:'Saanvi', relation:'Myself', age:'13–59'}
     ];
 
     let travellers = [];
@@ -208,6 +208,18 @@
     function uid(){ return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
     const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const isMine = t => !!(t && (t.relation === 'Myself' || t.id === 't-you'));
+
+    /* a store written before the account holder had a real name still carries
+       "You" (or a bare email) as the name — every other page treats that as
+       unset and falls back to the default, so heal it here too, otherwise this
+       page is the only one still calling the account holder "You" */
+    (function(){
+      const me = travellers.find(isMine);
+      if(me && (!me.name || me.name.toLowerCase() === 'you' || me.name.includes('@'))){
+        me.name = SEED[0].name;
+        persist();
+      }
+    })();
 
     const FUN_EMOJI = ['🦊','🐨','🐼','🦁','🐧','🐬','🦉','🐢','🐝','🦩'];
     function emojiFor(name){ let h=0; const s=String(name||''); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; }

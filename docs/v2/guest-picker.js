@@ -157,9 +157,9 @@
       document.head.appendChild(st);
     }
 
-    // the account holder's name lives in the Travellers store ("Myself"); default "You"
+    // the account holder's name lives in the Travellers store ("Myself"); default "Saanvi"
     const TKEY = 'onto:travellers:v3';
-    const readUserName = () => { try { const a=JSON.parse(localStorage.getItem(TKEY))||[]; const me=a.find(t=>t.relation==='Myself'||t.id==='t-you'); if(me&&me.name&&me.name.toLowerCase()!=='you'&&!me.name.includes('@')) return me.name; } catch(e){} return 'You'; };
+    const readUserName = () => { try { const a=JSON.parse(localStorage.getItem(TKEY))||[]; const me=a.find(t=>t.relation==='Myself'||t.id==='t-you'); if(me&&me.name&&me.name.toLowerCase()!=='you'&&!me.name.includes('@')) return me.name; } catch(e){} return 'Saanvi'; };
     const writeUserName = n => { try { let a=JSON.parse(localStorage.getItem(TKEY)); if(!Array.isArray(a)) a=[]; let me=a.find(t=>t.relation==='Myself'||t.id==='t-you'); if(me) me.name=n; else a.unshift({id:'t-you',name:n,relation:'Myself',interests:[]}); localStorage.setItem(TKEY, JSON.stringify(a)); } catch(e){} };
     const FUN_EMOJI = ['🦊','🐨','🐼','🦁','🐧','🐬','🦉','🐢','🐝','🦩'];
     const emojiFor = name => { let h=0; const s=String(name||''); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; };
@@ -212,6 +212,16 @@
     // rooms are an explicit choice where the toggle exists; fall back to auto-fit (~2 guests per room)
     window.roomsNeeded = cap => window.PARTY.rooms || Math.max(1, Math.ceil((window.PARTY.guests||1)/(cap||1)));
     if(!opts.loggedOut) window.acctName = readUserName;   // account holder's name for the booking when the form is skipped
+    /* renaming the account holder from outside the picker (the PDP's "Booking under
+       the name of" sheet) takes the same route the picker's own inline rename does:
+       the in-memory entry, then the store, then a re-render. Exporting writeUserName
+       alone would persist the name but leave this session's chip reading the old one. */
+    if(!opts.loggedOut) window.setAcctName = n => {
+      const v = String(n||'').trim(); if(!v) return;
+      if(MAP['you']) MAP['you'].name = v;
+      writeUserName(v);
+      apply();
+    };
 
     const $ = id => document.getElementById(id);
     const pop = $('guestPop'), trigger = $('guestChip');

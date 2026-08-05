@@ -172,7 +172,7 @@
         <div class="menu" id="profileMenu" role="menu">
           <a class="menu-id" href="profile.html">
             <span class="tn-avatar" id="menuAvatar">Y</span>
-            <div><b id="menuName">You</b><small>xyz@email.com</small></div>
+            <div><b id="menuName">Saanvi</b><small>xyz@email.com</small></div>
             <span class="menu-id-ar">›</span>
           </a>
           <div class="menu-sec">
@@ -310,11 +310,11 @@
 
     /* ---------- nav identity ---------- */
     function paintIdentity(){
-      const nm = data.name || (me && me.name && me.name.toLowerCase()!=='you' ? me.name : 'You');
-      const ini = (nm[0]||'Y').toUpperCase();
+      const nm = data.name || (me && me.name && me.name.toLowerCase()!=='you' ? me.name : 'Saanvi');
+      const ini = (nm[0]||'S').toUpperCase();
       $('profileBtn').textContent = ini;
       const ma=$('menuAvatar'); if(ma) ma.textContent = ini;
-      if(nm!=='You'){ const mn=$('menuName'); if(mn) mn.textContent = nm; }
+      const mn=$('menuName'); if(mn) mn.textContent = nm;
     }
 
     /* ---------- render: ledger rows, editable in place ---------- */

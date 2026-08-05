@@ -342,7 +342,7 @@
         <a class="menu-id" href="profile.html">
           <span class="tn-avatar" id="menuAvatar">S</span>
           <div>
-            <b id="menuName">You</b>
+            <b id="menuName">Saanvi</b>
             <small id="menuEmail">xyz@email.com</small>
           </div>
           <span class="menu-id-ar">›</span>
@@ -394,7 +394,7 @@
 
     <div class="seg" id="segGuests" role="button" tabindex="0">
       <span class="lb">Guests <span class="lb-cnt" id="guestCnt"></span></span>
-      <span class="vl" id="guestsVal">You</span>
+      <span class="vl" id="guestsVal">Saanvi</span>
       <div class="pop pop-guests" id="popGuests">
         <div class="gp-tabs" role="tablist">
           <button type="button" class="gp-tab is-on" data-tab="guests">Guests</button>
@@ -559,9 +559,9 @@
   var $ = function(id){ return document.getElementById(id); };
   var seg = $('segGuests'), pop = $('popGuests');
 
-  // the account holder's name lives in the Travellers store ("Myself"); default "You"
+  // the account holder's name lives in the Travellers store ("Myself"); default "Saanvi"
   var TKEY = 'onto:travellers:v3';
-  function readUserName(){ try{ var a=JSON.parse(localStorage.getItem(TKEY))||[]; var me=a.find(function(t){return t.relation==='Myself'||t.id==='t-you';}); if(me&&me.name&&me.name.toLowerCase()!=='you'&&me.name.indexOf('@')<0) return me.name; }catch(e){} return 'You'; }
+  function readUserName(){ try{ var a=JSON.parse(localStorage.getItem(TKEY))||[]; var me=a.find(function(t){return t.relation==='Myself'||t.id==='t-you';}); if(me&&me.name&&me.name.toLowerCase()!=='you'&&me.name.indexOf('@')<0) return me.name; }catch(e){} return 'Saanvi'; }
   function writeUserName(n){ try{ var a=JSON.parse(localStorage.getItem(TKEY)); if(!Array.isArray(a)) a=[]; var me=a.find(function(t){return t.relation==='Myself'||t.id==='t-you';}); if(me) me.name=n; else a.unshift({id:'t-you',name:n,relation:'Myself',interests:[]}); localStorage.setItem(TKEY, JSON.stringify(a)); }catch(e){} }
   var FUN_EMOJI = ['🦊','🐨','🐼','🦁','🐧','🐬','🦉','🐢','🐝','🦩'];
   function emojiFor(name){ var h=0,s=String(name||''); for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; }
@@ -576,7 +576,7 @@
     return list;
   }
   var COMPANIONS = loadCompanions();
-  try{ var _un=readUserName(), _ini=(_un[0]||'Y').toUpperCase();
+  try{ var _un=readUserName(), _ini=(_un[0]||'S').toUpperCase();
        var _mn=document.getElementById('menuName'); if(_mn) _mn.textContent = _un;
        var _na=document.getElementById('profileBtn'); if(_na) _na.textContent = _ini;
        var _ma=document.getElementById('menuAvatar'); if(_ma) _ma.textContent = _ini; }catch(e){}

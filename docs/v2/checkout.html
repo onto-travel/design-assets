@@ -756,7 +756,7 @@
       <div class="menu" id="profileMenu" role="menu">
         <a class="menu-id" href="profile.html">
           <span class="tn-avatar" id="menuAvatar">S</span>
-          <div><b id="menuName">You</b><small>xyz@email.com</small></div>
+          <div><b id="menuName">Saanvi</b><small>xyz@email.com</small></div>
           <span class="menu-id-ar">›</span>
         </a>
         <div class="menu-sec">
@@ -838,7 +838,7 @@
             </button>
             <button type="button" class="tripchip" id="guestChip" aria-haspopup="true" aria-expanded="false">
               <span class="tc-k">Guests <span class="tc-cnt" id="guestSub">3 guests</span></span>
-              <span class="tc-v" id="guestVal">You</span>
+              <span class="tc-v" id="guestVal">Saanvi</span>
             </button>
           </div>
 
@@ -2280,11 +2280,11 @@
     try{
       var a = JSON.parse(localStorage.getItem('onto:travellers:v3')) || [];
       var me = a.find(function(t){ return t.relation==='Myself' || t.id==='t-you'; });
-      var nm = (me && me.name && me.name.toLowerCase()!=='you' && me.name.indexOf('@')<0) ? me.name : 'You';
-      var ini = (nm[0]||'Y').toUpperCase();
+      var nm = (me && me.name && me.name.toLowerCase()!=='you' && me.name.indexOf('@')<0) ? me.name : 'Saanvi';
+      var ini = (nm[0]||'S').toUpperCase();
       if(btn) btn.textContent = ini;
       var ma = document.getElementById('menuAvatar'); if(ma) ma.textContent = ini;
-      if(nm!=='You'){ var mn=document.getElementById('menuName'); if(mn) mn.textContent = nm; }
+      var mn=document.getElementById('menuName'); if(mn) mn.textContent = nm;
     }catch(e){}
   })();
 </script>
