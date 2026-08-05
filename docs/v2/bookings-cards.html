@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto · Bookings (cards)</title>
+<style>
+  :root{
+    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
+    --jade:#0f8a63; --jade-deep:#063f2f; --jade-soft:#e7f3ec; --gold:#f2c14e;
+    --amber:#a2610a; --amber-soft:#fdf3e2; --amber-line:#e8cf9f;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;}
+  [hidden]{display:none !important;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:4px;}
+
+  /* top nav */
+  .topnav{position:sticky;top:0;z-index:80;background:rgba(250,247,241,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topnav-in{max-width:1180px;margin:0 auto;padding:0 28px;height:62px;display:flex;align-items:center;gap:26px;}
+  .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);text-decoration:none;letter-spacing:-.01em;}
+  .tn-brand span{color:var(--gold);}
+  .tn-links{display:flex;align-items:center;gap:2px;}
+  .tn-links a{font-size:14.5px;color:#5b5650;text-decoration:none;padding:8px 14px;border-radius:9px;transition:background .15s,color .15s;}
+  .tn-links a:hover{background:rgba(255,255,255,.62);color:var(--ink);}
+  .tn-links a.active{color:var(--jade);font-weight:600;}
+  .tn-right{margin-left:auto;display:flex;align-items:center;gap:9px;position:relative;}
+  .tn-avatar{width:34px;height:34px;border:none;padding:0;border-radius:50%;background:var(--jade);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:Georgia,serif;line-height:1;text-decoration:none;cursor:pointer;transition:box-shadow .12s;}
+  .tn-avatar:hover{box-shadow:0 0 0 3px rgba(15,138,99,.15);}
+  .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
+    border-radius:14px;box-shadow:0 14px 40px rgba(40,30,10,.2);padding:8px;opacity:0;transform:translateY(-6px);
+    pointer-events:none;transition:opacity .15s,transform .15s;}
+  .menu.open{opacity:1;transform:none;pointer-events:auto;}
+  .menu-id{display:flex;align-items:center;gap:11px;padding:11px 12px 13px;border-bottom:1px solid var(--line);margin-bottom:6px;text-decoration:none;color:inherit;cursor:pointer;border-radius:10px 10px 0 0;transition:background .15s;}
+  .menu-id:hover{background:#faf7f1;}
+  .menu-id-ar{margin-left:auto;color:#b8b0a2;font-size:17px;}
+  .menu-id .tn-avatar{width:38px;height:38px;font-size:20px;}
+  .menu-id b{font-size:14.5px;display:block;}
+  .menu-id small{font-size:12.5px;color:var(--muted);}
+  .menu .item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font-size:14px;color:var(--ink);text-decoration:none;cursor:pointer;}
+  .menu .item:hover{background:#faf7f1;}
+  .menu .item svg{width:19px;height:19px;stroke:#6b655c;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .menu .item .ar{margin-left:auto;color:#b8b0a2;}
+
+  /* page */
+  .page{max-width:1060px;margin:0 auto;padding:34px 28px 72px;}
+  .h1{font-family:Georgia,serif;font-size:34px;letter-spacing:-.015em;margin:0 0 22px;}
+
+  .btn{border:1px solid #d9d1c1;background:#fff;color:var(--ink);border-radius:11px;padding:10px 17px;
+    font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;
+    align-items:center;gap:8px;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;}
+  .btn:hover{background:#faf7f1;border-color:#c2b8a4;}
+  .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .btn.jade{background:var(--jade);border-color:var(--jade);color:#fff;}
+  .btn.jade:hover{background:var(--jade-deep);border-color:var(--jade-deep);}
+  .btn.sm{padding:8px 14px;font-size:13.5px;}
+  .card.amber .btn:focus-visible{outline-color:var(--amber);}
+
+  /* ===== one booking: a card on its own is a half-width column against a dead
+     half-page, and the masonry has nothing to stagger it against. A single
+     booking renders as a row instead — photo left, details centre, status
+     right, across the full width. Same parts, laid on their side. ===== */
+  .list{display:flex;flex-direction:column;gap:14px;}
+  .row{position:relative;display:flex;gap:18px;align-items:flex-start;
+    padding:11px 22px 11px 11px;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(40,30,10,.04);
+    transition:border-color .15s,box-shadow .15s;}
+  .row:hover{border-color:#d9d1c1;box-shadow:0 2px 5px rgba(40,30,10,.05),0 12px 26px rgba(40,30,10,.08);}
+  /* the text blocks keep their own breathing room; stacked so the reference can
+     sit on the row's baseline rather than trailing the details it belongs to */
+  .r-main{flex:1;min-width:0;padding:13px 0;align-self:stretch;display:flex;flex-direction:column;}
+  .r-title{display:flex;align-items:center;flex-wrap:wrap;gap:6px 11px;}
+  .r-name{font-family:Georgia,serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin:0;}
+  .r-name a{text-decoration:none;}
+  .row:hover .r-name a{text-decoration:underline;text-underline-offset:2px;}
+  .r-name a::after{content:"";position:absolute;inset:0;}
+  .r-name a:focus-visible{outline:none;}
+  .r-name a:focus-visible::after{outline:2px solid var(--jade);outline-offset:-3px;border-radius:8px;}
+  .r-meta{display:flex;flex-wrap:wrap;gap:5px 18px;margin-top:8px;font-size:13.5px;color:#4b463f;}
+  .r-meta .m{display:flex;align-items:center;gap:7px;}
+  .r-meta svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .r-ref{margin-top:auto;padding-top:10px;font-size:13px;color:var(--muted);}
+  .r-ref b{color:var(--ink);font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;
+    margin-left:6px;}
+  /* The photo fills the row's height with only a hairline inset, so the image
+     does the work rather than the whitespace around it. */
+  .r-thumb{flex:none;width:166px;align-self:stretch;min-height:124px;
+    border-radius:12px;overflow:hidden;background:#e7e1d6;}
+  .r-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  /* Sideways, the status is a column rather than a foot — so no rule, and it
+     right-aligns against the row's edge instead of left-aligning under a line. */
+  .r-side{flex:none;width:266px;display:flex;flex-direction:column;align-items:flex-end;
+    text-align:right;gap:11px;padding:13px 0;}
+  .row .st{align-items:flex-end;}
+  .row .st-note{max-width:250px;}
+  .r-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;position:relative;z-index:2;}
+  .row.settled{animation:settle 1.5s ease-out;}
+  @media(prefers-reduced-motion:reduce){.row.settled{animation:none;}}
+  .row.amber .btn:focus-visible{outline-color:var(--amber);}
+
+  /* ===== two-column masonry, same construction as the results list: each
+     column is its own flex stack, so a card keeps its natural height and order
+     still reads left → right (1|2 / 3|4) rather than down one column then the
+     other like CSS columns would give ===== */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;width:100%;}
+  .mcol{display:flex;flex-direction:column;gap:16px;min-width:0;}
+
+  /* The card is a column: photo, then what the booking is, then whatever is
+     outstanding. Each card ends where its own content ends — the foot sits
+     under the details rather than being pushed to a shared row height. */
+  .card{position:relative;display:flex;flex-direction:column;background:var(--card);
+    border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 1px 2px rgba(40,30,10,.04);transition:border-color .15s,box-shadow .15s;}
+  .card:hover{border-color:#d9d1c1;box-shadow:0 2px 5px rgba(40,30,10,.05),0 12px 26px rgba(40,30,10,.08);}
+
+  /* Wide and short: at this width a taller crop pushes the name and the status
+     apart without saying more about the hotel. */
+  .c-thumb{width:100%;aspect-ratio:16/9;background:#e7e1d6;flex:none;}
+  .c-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  .c-body{padding:15px 18px 16px;display:flex;flex-direction:column;flex:1;}
+  /* the ownership chip reads as part of the name, not a separate row */
+  .c-title{display:flex;align-items:center;flex-wrap:wrap;gap:6px 11px;}
+  .c-name{font-family:Georgia,serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin:0;}
+  /* A button on a card means there is something to do. Cards whose only
+     destination is the booking itself rely on the card being the link. */
+  .c-name a{text-decoration:none;}
+  .card:hover .c-name a{text-decoration:underline;text-underline-offset:2px;}
+  .c-name a::after{content:"";position:absolute;inset:0;}
+  .c-name a:focus-visible{outline:none;}
+  .c-name a:focus-visible::after{outline:2px solid var(--jade);outline-offset:-3px;border-radius:12px;}
+  /* Icon-led meta: the gold glyphs chunk three facts into scannable groups.
+     At this width they wrap to two lines rather than three, which keeps the
+     card's height off the length of the room name. */
+  .c-meta{display:flex;flex-wrap:wrap;gap:5px 18px;margin-top:9px;font-size:13.5px;color:#4b463f;}
+  .c-meta .m{display:flex;align-items:center;gap:7px;}
+  .c-meta svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  /* a detail of the booking, so it sits under the other details */
+  .c-ref{margin-top:10px;font-size:13px;color:var(--muted);}
+  .c-ref b{color:var(--ink);font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;
+    margin-left:6px;}
+
+  /* source label — the ownership tell. Information, not a warning. */
+  .src{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:2px 10px 2px 8px;
+    font-size:12.5px;font-weight:700;letter-spacing:.01em;}
+  .src.owned{background:var(--jade-soft);color:var(--jade-deep);}
+  .src.owned .dot{width:7px;height:7px;border-radius:50%;background:var(--jade);flex:none;}
+  .src.tracked{background:#fff;border:1px solid #d7d0c2;color:#5b5650;}
+  .src.tracked svg{width:13px;height:13px;stroke:#8a857d;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* ===== the foot of the card: status on the left, the way to act on the right
+     The rule above it is what separates "what this booking is" from "what is
+     outstanding on it" now that they are stacked rather than side by side. A
+     card with neither has no foot at all. ===== */
+  .c-foot{display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:10px 14px;padding:13px 18px;border-top:1px solid var(--line);}
+  .st{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;}
+  .st-good{display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:var(--jade-deep);}
+  .st-good svg{width:16px;height:16px;stroke:var(--jade);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .st-ink{font-size:15px;font-weight:600;color:var(--ink);}
+  /* What they paid, then what we'd charge. The two numbers are the whole
+     pitch, so they carry it themselves — our price takes the weight, theirs
+     is struck through beside it at reading size. */
+  .st-prices{display:inline-flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums;}
+  .st-prices .was{font-size:15px;color:var(--muted);font-weight:500;text-decoration:line-through;
+    text-decoration-thickness:1px;text-underline-offset:0;}
+  .st-prices .now{font-size:22px;font-weight:700;letter-spacing:-.015em;color:var(--jade);}
+  .st-note{font-size:13px;color:var(--muted);}
+  /* the deadline is also the way out, so it is the link — lifted clear of the
+     card's own full-bleed click target */
+  .st-clock{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;
+    font-size:13px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums;
+    text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(162,97,10,.35);}
+  .st-clock:hover{text-decoration-color:currentColor;}
+  .st-clock svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .c-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;position:relative;z-index:2;margin-left:auto;}
+
+  /* the card a cancellation just settled: a single pass of the jade it has
+     become, so the change is noticed on the card rather than only in the toast */
+  .card.settled{animation:settle 1.5s ease-out;}
+  @keyframes settle{
+    0%{background:var(--jade-soft);border-color:#bfdfd0;}
+    100%{background:var(--card);border-color:var(--line);}
+  }
+  @media(prefers-reduced-motion:reduce){.card.settled{animation:none;}}
+
+  /* toast — carries the undo, so it outlives a glance (7s) */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
+    background:#1b211e;color:#fff;font-size:13.5px;font-weight:600;padding:11px 12px 11px 18px;
+    border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;
+    transition:opacity .2s,transform .2s;z-index:90;display:flex;align-items:center;gap:14px;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .t-undo{border:none;background:none;font-family:inherit;font-size:13.5px;font-weight:700;
+    color:#8fd6b4;cursor:pointer;padding:4px 8px;border-radius:8px;}
+  .t-undo:hover{background:rgba(255,255,255,.1);}
+
+  /* forward entry point — persistent, at the end of the list. Full width under
+     the grid: it is not one of the bookings, so it does not take a cell. */
+  .fwd{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:20px 22px;margin-top:16px;}
+  .fwd-ic{flex:none;width:38px;height:38px;border-radius:50%;background:var(--jade-soft);display:flex;align-items:center;justify-content:center;}
+  .fwd-ic svg{width:20px;height:20px;stroke:var(--jade);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .fwd-body{flex:1;min-width:220px;}
+  .fwd-h{font-size:15.5px;font-weight:700;margin:0 0 2px;}
+  .fwd-p{font-size:14px;color:var(--muted);margin:0;}
+  .fwd-p b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;}
+
+  .foot{margin-top:26px;text-align:center;display:flex;justify-content:center;gap:6px;}
+  .foot button,.foot a{background:none;border:none;font-family:inherit;font-size:12.5px;color:#b8b0a2;
+    cursor:pointer;padding:6px 10px;text-decoration:none;}
+  .foot button:hover,.foot a:hover{color:var(--muted);text-decoration:underline;}
+
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important;} }
+
+  @media(max-width:860px){
+    .page{padding:24px 18px 64px;}
+    .h1{font-size:29px;}
+    .tn-links{display:none;}
+    /* the lone row: photo stays beside the name, status wraps to its own line */
+    .row{flex-wrap:wrap;gap:14px;padding:18px 18px 18px 20px;}
+    .r-thumb{width:112px;min-height:84px;}
+    .r-main{flex:1 1 180px;}
+    .r-side{flex:1 1 100%;width:auto;align-items:flex-start;text-align:left;
+      border-top:1px solid var(--line);padding-top:14px;}
+    .row .st{align-items:flex-start;}
+    .row .st-note{max-width:none;}
+    .r-acts{justify-content:flex-start;align-items:stretch;width:100%;}
+    .r-acts .btn{flex:1 1 auto;justify-content:center;}
+  }
+  /* One card to a row. The columns can't simply collapse — the cards were
+     dealt alternately, so stacking the two stacks would read 1,3,5 then 2,4,6.
+     The stacks dissolve instead and every card sorts on the index it was dealt
+     with, which puts them back in date order. */
+  @media(max-width:720px){
+    .grid{display:flex;flex-direction:column;gap:16px;}
+    .mcol{display:contents;}
+    .card{order:var(--i);}
+  }
+  @media(max-width:520px){
+    .topnav-in{padding:0 18px;}
+    .c-thumb{aspect-ratio:2/1;}
+    .c-foot{align-items:stretch;}
+    .c-acts{width:100%;justify-content:stretch;margin-left:0;}
+    .c-acts .btn{flex:1 1 auto;justify-content:center;}
+  }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <div class="topnav-in">
+      <a class="tn-brand" href="home2.html">onto<span>.</span></a>
+      <div class="tn-links">
+        <a href="home2.html">Stays</a>
+        <a href="bookings-cards.html" class="active">Bookings</a>
+      </div>
+      <div class="tn-right">
+        <button type="button" class="tn-avatar" id="profileBtn" aria-haspopup="true" aria-expanded="false">Y</button>
+        <div class="menu" id="profileMenu" role="menu">
+          <a class="menu-id" href="profile.html">
+            <span class="tn-avatar" id="menuAvatar">Y</span>
+            <div><b id="menuName">Saanvi</b><small>xyz@email.com</small></div>
+            <span class="menu-id-ar">›</span>
+          </a>
+          <div class="menu-sec">
+            <a class="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span class="ar">›</span></a>
+            <a class="item" href="help.html"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span class="ar">›</span></a>
+            <a class="item" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page">
+    <h1 class="h1">Bookings</h1>
+    <div class="grid" id="grid"></div>
+    <div id="fwd"></div>
+    <div class="foot">
+      <a href="bookings.html">Row layout</a>
+      <button type="button" id="reset">Reset prototype data</button>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+<script src="tracking-data.js"></script>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  var T = window.Tracking, fmt = T.fmt;
+
+  /* profile menu */
+  (function(){
+    var btn = $('profileBtn'), menu = $('profileMenu');
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var o = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', o ? 'true' : 'false');
+    });
+    document.addEventListener('click', function(e){
+      if(!menu.contains(e.target) && !btn.contains(e.target)){
+        menu.classList.remove('open'); btn.setAttribute('aria-expanded','false');
+      }
+    });
+  })();
+
+  /* This page exists to look at the card, so it shows every status fixture
+     rather than the two bookings a real account starts with. Same upcoming and
+     same merge rules as the list — only the DEFAULT_IDS narrowing is dropped. */
+  /* ?n=<count> trims the list, so the layout at every count an account can
+     actually be in is one URL away — n=1 is the row, n=2 the thinnest masonry. */
+  function limit(){
+    try{
+      var n = parseInt(new URLSearchParams(location.search).get('n'), 10);
+      return isNaN(n) ? null : Math.max(0, n);
+    }catch(e){ return null; }
+  }
+
+  function visible(){
+    var today = new Date(); today.setHours(0,0,0,0);
+    var list = T.all()
+      .filter(function(b){ return new Date(b.check_out) >= today; })
+      .filter(function(b){ return !b.merged_into; })
+      .sort(function(a,b){ return new Date(a.check_in) - new Date(b.check_in); });
+    var n = limit();
+    return n === null ? list : list.slice(0, n);
+  }
+
+  var ICON = {
+    ext:  '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+    tick: '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>',
+    chat: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 20.5l1.4-4.1A8.3 8.3 0 0 1 3.5 11.5a8.5 8.5 0 1 1 17.5 0z"/></svg>',
+    cal:  '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>',
+    gst:  '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg>',
+    bed:  '<svg viewBox="0 0 24 24"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4M3 18v2M21 18v2M6 12V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/></svg>'
+  };
+
+  /* Once a stay has been switched, the card belongs to us — that is the booking
+     the guest will actually turn up on. The old one is still live until they
+     cancel it, which the amber status says outright. */
+  function sourceLabel(b){
+    if(b.ownership === 'owned' || b.counterpart)
+      return '<span class="src owned"><span class="dot"></span>Booked with us</span>';
+    var anon = b.source_platform === 'booking';
+    return '<span class="src tracked">' + ICON.ext +
+      (anon ? 'Your original booking' : 'On ' + esc(b.platform.label)) + '</span>';
+  }
+
+  /* A booking of ours carries a reference, and a reference is a detail of the
+     booking rather than a status — so it sits with the dates and the room, not
+     in the foot that exists for things needing a decision. */
+  function refFor(b, cls){
+    var ref = b.ownership === 'owned' ? b.booking_ref
+      : (b.counterpart && b.status !== 'cancel_pending') ? b.counterpart.booking_ref
+      : null;
+    return ref ? '<div class="' + (cls || 'c-ref') + '">Booking reference <b>' +
+      esc(ref) + '</b></div>' : '';
+  }
+
+  /* Status + actions, driven entirely by ownership then status.
+     A tracked card never offers cancel, voucher, or manage. */
+  function sideFor(b){
+    var st = '', acts = '';
+
+    /* Nothing outstanding and nothing to decide: the card is the link, and the
+       voucher and management are both inside it. */
+    if(b.ownership === 'owned') return { st: '', acts: '' };
+
+    /* ---- switched: one card, now ours, with whatever is still outstanding ---- */
+    if(b.counterpart){
+      var ev = b.switch_event;
+
+      if(b.status === 'cancel_pending'){
+        var left = fmt.countdown(ev.cancel_deadline);
+        /* The deadline and the place it is cancelled are one thing, so they are
+           one control: the reminder is the way out. */
+        st = '<div class="st">' +
+               '<a class="st-clock" href="' + esc(b.platform.manage) + '" target="_blank" ' +
+                 'rel="noopener">' + esc(left.label) + ICON.ext + '</a>' +
+             '</div>';
+        /* A self-report, not a commitment — it doesn't take the jade the
+           booking actions use, and it doesn't need a fill of its own. */
+        acts = '<button type="button" class="btn sm" data-cancelled="' + esc(b.id) +
+                 '">I’ve cancelled this</button>';
+        return { st: st, acts: acts };
+      }
+
+      /* Cancelled on the platform, so nothing is outstanding: this is simply a
+         booking with us now, and it reads like every other one. */
+      return { st: '', acts: '' };
+    }
+
+    var c = b.comparison;
+
+    switch(b.status){
+      case 'saving_available':
+        if(c && c.isSaving){
+          st = '<div class="st">' +
+                 '<span class="st-prices">' +
+                   '<span class="was">' + fmt.inr(c.theirTotal) + '</span>' +
+                   '<span class="now">' + fmt.inr(c.ourTotal) + '</span>' +
+                 '</span>' +
+               '</div>';
+          acts = '<a class="btn jade sm" href="booking-tracked.html?id=' + esc(b.id) + '">Switch</a>';
+        } else if(c){
+          /* Cheaper with us, but worse on an attribute. We don't offer it and we
+             don't show the number — for the room they actually booked, what they
+             have is still the best rate we can put against it. */
+          st = '<div class="st">' +
+                 '<span class="st-good">' + ICON.tick + 'Still your best rate</span>' +
+               '</div>';
+        }
+        break;
+
+      case 'no_saving_up':
+        st = '<div class="st">' +
+               '<span class="st-good">' + ICON.tick + 'Still your best rate</span>' +
+               '<span class="st-note">Up ' + fmt.inr(b.rose_by) + ' with us since ' +
+                 esc(fmt.day(b.rose_since)) + '</span>' +
+             '</div>';
+        break;
+
+      case 'no_saving_flat':
+        st = '<div class="st">' +
+               '<span class="st-good">' + ICON.tick + 'Still your best rate</span>' +
+             '</div>';
+        break;
+
+      case 'sold_out':
+        st = '<div class="st">' +
+               '<span class="st-ink">Sold out for your dates</span>' +
+               '<span class="st-note">We’ll keep checking</span>' +
+             '</div>';
+        break;
+
+      case 'not_carried':
+        st = '<div class="st">' +
+               '<span class="st-ink">Not on onto</span>' +
+               '<span class="st-note">We don’t have this property, so we can’t watch its price</span>' +
+             '</div>';
+        acts = '<a class="btn sm" href="' + esc(T.WA.forward()) + '" target="_blank" rel="noopener">' +
+                 ICON.chat + 'Forward another booking</a>';
+        break;
+
+      case 'pending':
+        st = '<div class="st">' +
+               '<span class="st-ink">Checking your booking</span>' +
+               '<span class="st-note">We’ll confirm shortly</span>' +
+             '</div>';
+        break;
+
+      /* cancel_pending and switched_cancelled are handled above: both always
+         have a counterpart booking, so they never reach this switch. */
+    }
+    return { st: st, acts: acts };
+  }
+
+  /* Where the whole card goes. A switched stay points at the booking we made,
+     not the tracked record that is only still there to carry the cancellation. */
+  function linkFor(b){
+    if(b.counterpart)              /* switched: the card is our booking now */
+      return 'href="booking-details.html" data-owned="' + esc(b.counterpart.id) + '"';
+    if(b.ownership === 'owned')
+      return 'href="booking-details.html" data-owned="' + esc(b.id) + '"';
+    return 'href="booking-tracked.html?id=' + encodeURIComponent(b.id) + '"';
+  }
+
+  function cardHTML(b, i){
+    var side = sideFor(b);
+    var link = linkFor(b);
+
+    /* `own` and `amber` no longer paint anything on the card itself — the chip
+       carries ownership and the deadline carries the urgency. They stay as
+       hooks: amber still tints the focus ring on its own buttons. */
+    var cls = ['card'];
+    if(b.ownership === 'owned' || b.counterpart) cls.push('own');
+    if(b.status === 'cancel_pending') cls.push('amber');
+
+    return '<article class="' + cls.join(' ') + '" data-row="' + esc(b.id) + '"' +
+      ' style="--i:' + i + '">' +
+      (b.image ? '<div class="c-thumb"><img src="' + esc(b.image) + '" alt="" loading="lazy"></div>' : '') +
+      '<div class="c-body">' +
+        '<div class="c-title">' +
+          '<h3 class="c-name"><a ' + link + '>' + esc(b.property_name_raw) + '</a></h3>' +
+          sourceLabel(b) +
+        '</div>' +
+        /* Property, when, and who it is with. Room and meal plan are one tap
+           away on the booking itself. */
+        '<div class="c-meta">' +
+          '<span class="m">' + ICON.cal + esc(fmt.dateRange(b.check_in, b.check_out)) +
+            ' · ' + esc(b.nights) + '</span>' +
+          '<span class="m">' + ICON.gst + esc(b.occupancy) + '</span>' +
+          '<span class="m">' + ICON.bed + esc(b.room_category) + '</span>' +
+        '</div>' +
+        refFor(b) +
+      '</div>' +
+      /* No status and nothing to do means no foot — the rule would be drawing a
+         line under an empty strip. */
+      (side.st || side.acts
+        ? '<div class="c-foot">' + side.st +
+            (side.acts ? '<div class="c-acts">' + side.acts + '</div>' : '') +
+          '</div>'
+        : '') +
+    '</article>';
+  }
+
+  /* The lone booking, laid on its side. Same status block and same link rules —
+     only the arrangement differs, so it reads as the same object. */
+  function rowHTML(b){
+    var side = sideFor(b);
+    var cls = ['row'];
+    if(b.ownership === 'owned' || b.counterpart) cls.push('own');
+    if(b.status === 'cancel_pending') cls.push('amber');
+
+    return '<article class="' + cls.join(' ') + '" data-row="' + esc(b.id) + '">' +
+      (b.image ? '<div class="r-thumb"><img src="' + esc(b.image) + '" alt=""></div>' : '') +
+      '<div class="r-main">' +
+        '<div class="r-title">' +
+          '<h3 class="r-name"><a ' + linkFor(b) + '>' + esc(b.property_name_raw) + '</a></h3>' +
+          sourceLabel(b) +
+        '</div>' +
+        '<div class="r-meta">' +
+          '<span class="m">' + ICON.cal + esc(fmt.dateRange(b.check_in, b.check_out)) +
+            ' · ' + esc(b.nights) + '</span>' +
+          '<span class="m">' + ICON.gst + esc(b.occupancy) + '</span>' +
+          '<span class="m">' + ICON.bed + esc(b.room_category) + '</span>' +
+        '</div>' +
+        refFor(b, 'r-ref') +
+      '</div>' +
+      '<div class="r-side">' + side.st +
+        (side.acts ? '<div class="r-acts">' + side.acts + '</div>' : '') +
+      '</div>' +
+    '</article>';
+  }
+
+  function renderList(){
+    var list = visible();
+
+    /* One booking has nothing to sit beside, so it takes the row. Two is the
+       thinnest masonry there is and still takes the grid. */
+    if(list.length === 1){
+      $('grid').className = 'list';
+      $('grid').innerHTML = rowHTML(list[0]);
+      return renderFwd();
+    }
+
+    /* dealt alternately so the soonest stay stays top-left and the list still
+       reads across, not down one column then the next */
+    $('grid').className = 'grid';
+    $('grid').innerHTML = [0,1].map(function(col){
+      return '<div class="mcol">' +
+        list.map(function(b,i){ return {b:b,i:i}; })
+            .filter(function(x){ return x.i % 2 === col; })
+            .map(function(x){ return cardHTML(x.b, x.i); })
+            .join('') +
+      '</div>';
+    }).join('');
+    renderFwd();
+  }
+
+  /* Forward entry point — persistent, at the end of the list, whichever
+     arrangement the list took. */
+  function renderFwd(){
+    $('fwd').innerHTML =
+      '<section class="fwd">' +
+        '<div class="fwd-ic">' + ICON.chat + '</div>' +
+        '<div class="fwd-body">' +
+          '<p class="fwd-h">Booked a hotel somewhere else?</p>' +
+          '<p class="fwd-p">Forward it to us on WhatsApp at <b>' + esc(T.WA.display) +
+            '</b> and we’ll watch the price for you.</p>' +
+        '</div>' +
+        '<a class="btn jade" href="' + esc(T.WA.forward()) + '" target="_blank" rel="noopener">' +
+          ICON.chat + 'Forward on WhatsApp</a>' +
+      '</section>';
+  }
+
+  document.addEventListener('click', function(e){
+    var done = e.target.closest('[data-cancelled]');
+    if(done){
+      e.preventDefault();
+      /* Taken on the user's word. No proof, no upload, no verification — so
+         the way back is a click, not a support conversation. */
+      var id = done.getAttribute('data-cancelled');
+      T.markCancelled(id);
+      render();
+      settle(id);
+      toast('Cancellation noted', function(){ T.undoCancelled(id); render(); });
+      return;
+    }
+    /* hand the owned booking to the existing voucher page */
+    var own = e.target.closest('[data-owned]');
+    if(own){
+      T.openOwned(own.getAttribute('data-owned'));
+    }
+  });
+
+  $('reset').addEventListener('click', function(){ T.reset(); render(); });
+
+  function render(){ renderList(); }
+
+  /* ---------- confirming a cancellation ----------
+     The card changes from an outstanding task to a settled one, which is a
+     bigger change than the list usually makes on its own. It gets a beat of
+     attention so the change is seen where it happened, and an undo so a
+     mistaken tap costs nothing. */
+  function settle(id){
+    var row = document.querySelector('[data-row="' + id + '"]');
+    if(row) row.classList.add('settled');
+  }
+
+  var toastT = null;
+  function toast(msg, undo){
+    var el = $('toast');
+    el.innerHTML = '<span>' + esc(msg) + '</span>' +
+      (undo ? '<button type="button" class="t-undo">Undo</button>' : '');
+    el.classList.add('show');
+    if(undo){
+      el.querySelector('.t-undo').addEventListener('click', function(){
+        clearTimeout(toastT);
+        el.classList.remove('show');
+        undo();
+      });
+    }
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ el.classList.remove('show'); }, 7000);
+  }
+  render();
+
+  /* Countdowns are in days and hours, so re-render only when one of them would
+     actually read differently — a blind interval would steal focus mid-scan.
+     Read off this page's own list, not T.openCancelTasks(), which narrows to
+     the default two. */
+  var sig = function(){
+    return visible().filter(function(b){
+      return b.status === 'cancel_pending' &&
+             b.switch_event && !b.switch_event.user_marked_cancelled_at;
+    }).map(function(b){
+      return b.id + ':' + fmt.countdown(b.switch_event.cancel_deadline).text;
+    }).join('|');
+  };
+  var last = sig();
+  setInterval(function(){
+    var now = sig();
+    if(now !== last){ last = now; render(); }
+  }, 60000);
+})();
+</script>
+</body>
+</html>
