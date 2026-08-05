@@ -4,43 +4,65 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>onto — Search results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* Palette + metrics lifted from the v2 Figma (file ROND9okRloOJ6sFVoDBb6x, frame
+     1:29 "grid listing"). One deliberate departure: every place the design used
+     black #111827 as an *interactive* accent — selected filter pills, checked
+     boxes, the active radio — uses the brand green instead. Black is kept for
+     plain text, where it isn't a CTA. */
   :root{
-    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c;
-    --line:#e4dfd2; --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e;
-    --pill:#f1ede3; --info:#f1ede3;
+    --bg:#fafaf9; --card:#ffffff; --ink:#111827; --muted:#737373;
+    --line:#e8e8e6; --card-line:#e3e3df; --label:#808080;
+    --chip-bg:#f3f4f6; --chip-ink:#393939; --tab-off:#66666e;
+    --jade:#0f8a63; --jade-deep:#0b6d4e; --jade-soft:#eef6f1; --gold:#f2c14e;
+    --pill:#f3f4f6; --info:#f3f4f6;
     --shadow:0 1px 2px rgba(0,0,0,.04), 0 12px 30px rgba(40,30,10,.06);
-    /* nav is 60px + 1px border = 61; parks sticky columns 8px under it, same as the PDP.
-       Was 150px, sized to clear the old sticky search bar that now lives in the rail. */
-    --stick:69px;
+    /* Figma's four-stop card elevation, verbatim */
+    --shadow-card:0 6px 11px rgba(0,0,0,.07), 0 1.809px 3.316px rgba(0,0,0,.05),
+                  0 .751px 1.377px rgba(0,0,0,.04), 0 .272px .498px rgba(0,0,0,.02);
+    /* the same ramp at the rail's tighter blur */
+    --shadow-field:0 6px 5.5px rgba(0,0,0,.07), 0 1.809px 1.658px rgba(0,0,0,.05),
+                   0 .751px .688px rgba(0,0,0,.04), 0 .272px .249px rgba(0,0,0,.02);
+    /* header is 72px; sticky columns park 8px under it */
+    --stick:80px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;}
   body{
     background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     -webkit-font-smoothing:antialiased;min-height:100vh;
   }
-  h1,h2,h3{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+  /* the v2 design drops the Georgia serif — Manrope carries headings too */
+  h1,h2,h3{font-family:inherit;font-weight:700;letter-spacing:-.01em;margin:0;}
   button,input,select{font-family:inherit;}
   a{color:inherit;}
   :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:4px;}
 
   /* ============ TOP NAV ============ */
+  /* Figma 1:853 "Header" — breadcrumb left, view switcher optically centred on the
+     frame (not on the flex row), account right. 72px tall, .8px hairline. */
   .topnav{position:sticky;top:0;z-index:90;
-    background:rgba(250,248,243,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);}
-  .topnav-in{max-width:1400px;margin:0 auto;padding:0 28px;height:60px;display:flex;align-items:center;gap:26px;}
-  .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);
-    letter-spacing:-.01em;text-decoration:none;white-space:nowrap;}
-  .tn-brand span{color:var(--gold);}
-  .tn-links{display:flex;align-items:center;gap:2px;}
-  .tn-links a{font-size:14.5px;color:#5b5650;text-decoration:none;padding:8px 14px;border-radius:9px;transition:background .15s,color .15s;}
-  .tn-links a:hover{background:rgba(255,255,255,.62);color:var(--ink);}
-  .tn-links a.active{color:var(--jade);font-weight:600;}
-  .tn-right{margin-left:auto;display:flex;align-items:center;gap:9px;position:relative;}
+    background:rgba(250,250,249,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:.8px solid var(--line);}
+  .topnav-in{max-width:none;margin:0;padding:0 40px;height:72px;
+    display:flex;align-items:center;justify-content:space-between;gap:26px;position:relative;}
+  .tn-brand{display:flex;align-items:center;gap:9px;font-size:20px;color:var(--ink);
+    letter-spacing:normal;text-decoration:none;white-space:nowrap;font-weight:400;}
+  .tn-brand b{font-weight:700;}
+  .tn-brand .tn-sl{font-size:24px;font-weight:400;letter-spacing:-.12px;color:var(--ink);}
+  .tn-brand span{color:inherit;}
+
+  .tn-links{display:none;}
+  .tn-right{display:flex;align-items:center;gap:3px;position:relative;}
+  .tn-name{display:flex;align-items:center;gap:3px;border:none;background:none;padding:0;cursor:pointer;
+    font-family:inherit;font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;}
+  .tn-name img{width:16px;height:16px;display:block;flex:none;}
   .tn-avatar{width:34px;height:34px;border:none;padding:0;border-radius:50%;background:var(--jade);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:Georgia,serif;
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:inherit;
     line-height:1;text-decoration:none;cursor:pointer;transition:box-shadow .12s;}
   .tn-avatar:hover{box-shadow:0 0 0 3px rgba(15,138,99,.15);}
   .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
@@ -101,22 +123,23 @@
   .searchbar-in{max-width:none;margin:0;padding:0;}
   .search-card{background:none;border:none;box-shadow:none;padding:0;
     display:flex;flex-direction:column;gap:10px;}
-  /* .seg == the PDP's .tripchip, token for token */
+  /* Figma 1:587 / 1:622 / 1:646 — a 68px white field card, 20px radius, hairline
+     border, with a plain stroke icon (no filled tile) and a right-hand affordance. */
   .seg{position:relative;text-align:left;min-width:0;
-    background:#fff;border:1px solid #ece5d6;border-radius:18px;padding:12px 14px;
-    box-shadow:0 1px 2px rgba(0,0,0,.03),0 5px 16px rgba(40,30,10,.07);
-    display:flex;align-items:center;gap:13px;transition:box-shadow .15s,border-color .15s;}
-  .seg:hover{border-color:#e0d5bd;box-shadow:0 2px 5px rgba(0,0,0,.05),0 12px 26px rgba(40,30,10,.1);}
+    background:#fff;border:.8px solid var(--card-line);border-radius:20px;padding:10.8px 14.8px;
+    min-height:60px;box-shadow:var(--shadow-field);
+    display:flex;align-items:center;gap:12px;transition:box-shadow .15s,border-color .15s;}
+  .seg:hover{border-color:#d4d4cf;box-shadow:0 8px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);}
   .seg + .seg::before{content:none;}          /* the vertical divider belonged to the row layout */
-  .seg-ic{flex:none;width:36px;height:36px;border-radius:11px;background:var(--jade-deep);color:#fff;
-    display:flex;align-items:center;justify-content:center;overflow:hidden;}
-  .seg-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .seg-ic{flex:none;width:20px;height:20px;border-radius:0;background:none;color:var(--muted);
+    display:flex;align-items:center;justify-content:center;overflow:visible;}
+  .seg-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
   .seg-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
-  .seg-ar{flex:none;color:#b3ada2;display:flex;align-items:center;}
+  .seg-ar{flex:none;color:var(--muted);display:flex;align-items:center;}
   .seg-ar svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-  .seg .lb{display:block;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0;}
-  .seg-cnt{text-transform:none;letter-spacing:normal;font-weight:400;font-size:11.5px;color:var(--muted);}
-  .seg .vl{display:block;font-size:16px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .seg .lb{display:block;font-size:14px;font-weight:600;letter-spacing:normal;text-transform:none;color:var(--label);margin:0;}
+  .seg-cnt{text-transform:none;letter-spacing:normal;font-weight:700;font-size:14px;color:var(--ink);}
+  .seg .vl{display:block;font-size:16px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .seg-input{display:block;width:100%;border:none;background:none;padding:0;margin:0;
     font-family:inherit;font-size:16px;font-weight:600;color:var(--ink);outline:none;}
   .seg-input::placeholder{color:#a49d90;font-weight:500;}
@@ -206,124 +229,110 @@
   .gp-chead .gp-add:disabled{opacity:.4;cursor:default;}
 
   /* ============ SHELL ============ */
-  .wrap{max-width:1400px;margin:0 auto;padding:0 28px 80px;}
+  /* Figma frame is 1440 wide with 40px gutters: 952 results + 76 gap + 332 rail. */
+  .wrap{max-width:1440px;margin:0 auto;padding:0 40px 80px;}
 
-  /* results header */
-  .res-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:26px 0 18px;flex-wrap:wrap;}
-  .res-head h1{font-size:32px;line-height:1.1;margin-top:6px;}
+  /* results header — "Stays in Goa" + Sort By, on one 44px row */
+  .res-head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 0 12px;flex-wrap:wrap;}
+  .res-head h1{font-size:28px;line-height:1.35;margin-top:0;font-weight:700;letter-spacing:-.01em;}
   .sortwrap{display:flex;align-items:center;gap:9px;}
-  .sortwrap label{font-size:13px;color:var(--muted);font-weight:600;}
-  .sort{appearance:none;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237c7771' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
-    border:1px solid var(--line);border-radius:11px;padding:9px 34px 9px 14px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;transition:border-color .15s;}
-  .sort:hover{border-color:#c2b8a4;}
+  .sortwrap label{display:none;}
+  .sort{appearance:none;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+    border:.8px solid var(--card-line);border-radius:999px;padding:10px 38px 10px 16px;
+    font-family:inherit;font-size:16px;font-weight:400;color:var(--ink);cursor:pointer;
+    box-shadow:var(--shadow-field);transition:border-color .15s;}
+  .sort:hover{border-color:#cfcfc9;}
 
   /* ============ TWO-COLUMN ============ */
-  /* left column = the narrowing rail; classic filter rail is retired */
-  /* listing left, stay summary + filters right */
-  .grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:34px;align-items:start;}
+  /* listing left (952), stay summary + filters right (332) */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 332px;gap:clamp(24px,5vw,76px);align-items:start;}
   .col-list{min-width:0;}
-  .side{position:sticky;top:var(--stick);display:flex;flex-direction:column;gap:22px;min-width:0;}
-  /* the PDP's .book: same radius, padding and shadow, so the rail reads as the same component */
-  .stay-card{background:var(--card);border-radius:18px;padding:22px 20px;box-shadow:var(--shadow);
-    display:flex;flex-direction:column;}
-  /* sans, not the serif h1/h2/h3 default — matches the PDP's .book-lbl */
-  .side-h{font-family:inherit;font-size:19px;font-weight:600;color:var(--ink);margin:0 0 18px;}
-  .rail{display:flex;flex-direction:column;gap:16px;}
-
-  /* filter groups */
-  /* same shell as .stay-card so both rail cards read as one component, heading included */
-  .fgroup{background:var(--card);border-radius:18px;padding:22px 20px;box-shadow:var(--shadow);}
-  .fg-h{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 9px;}
-  .fg-h .fg-note{text-transform:none;letter-spacing:0;font-weight:500;color:#a49d90;}
-  .fg-h .fg-note::before{content:"·";margin:0 6px;color:#c3bcae;}
-
-  /* usual filters apply button */
-  .apply-all{margin-top:14px;width:100%;background:var(--jade);color:#fff;border:1px solid var(--jade);
-    border-radius:11px;padding:9px 16px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .13s;}
-  .apply-all:hover{background:var(--jade-deep);border-color:var(--jade-deep);}
-  .apply-all.ghost{background:transparent;color:var(--jade);}
-  .apply-all.ghost:hover{background:#f2ede3;}
-
-  /* popular filters list */
-  .chk.pfrow{align-items:flex-start;}
-  .chk.pfrow .box{margin-top:1px;}
-  .pop-main{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3;}
-  .pop-main small{color:var(--muted);font-size:12px;font-weight:400;margin-top:2px;}
-
-  .chips{display:flex;flex-wrap:wrap;gap:7px;}
-  .chip{border:1px solid var(--line);background:var(--card);color:#4a453e;border-radius:20px;
-    padding:6px 13px;font-size:13px;font-weight:600;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:6px;}
-  .chip:hover{border-color:#c2b8a4;background:#faf7f1;}
-  .chip[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:#fff;}
+  .side{position:sticky;top:var(--stick);display:flex;flex-direction:column;gap:32px;min-width:0;}
+  /* the rail's two blocks are unboxed in v2 — headings sit directly on the page */
+  .stay-card{background:none;border-radius:0;padding:0;box-shadow:none;
+    display:flex;flex-direction:column;gap:16px;}
+  .side-h{font-family:inherit;font-size:20px;font-weight:700;color:var(--ink);margin:0 0 16px;letter-spacing:-.01em;}
+  .rail{display:flex;flex-direction:column;gap:0;}
 
 
-  /* checkbox amenities */
+  /* ---- rail sections (Figma 1:714): hairline-separated collapsible rows.
+     "Popular filters" is the one section drawn as a raised card. ---- */
+  .fg-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .fg-count{font-style:normal;font-size:12px;font-weight:700;color:#b45309;margin-left:6px;
+    vertical-align:middle;}
+  .fsec{border-top:.8px solid var(--line);}
+  .fsec.is-card{border-top:none;background:#fff;border:.8px solid var(--card-line);
+    border-radius:20px;padding:10.8px 14.8px 16.8px;box-shadow:var(--shadow-field);margin-bottom:16px;}
+  .fsec-h{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+    background:none;border:none;padding:14px 0;cursor:pointer;font-family:inherit;
+    font-size:14px;font-weight:700;color:var(--ink);text-align:left;}
+  .fsec.is-card .fsec-h{padding:0 0 10px;}
+  .fsec-ar{width:16px;height:16px;flex:none;stroke:var(--muted);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
+  .fsec.is-open > .fsec-h .fsec-ar{transform:rotate(180deg);}
+  .fsec-b{padding-bottom:14px;}
+  .fsec.is-card .fsec-b{padding-bottom:0;}
+
+  /* pill filters — selected state uses the brand green where the design used black */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{border:.8px solid #e3e3e3;background:var(--card);color:var(--chip-ink);border-radius:999px;
+    height:36px;padding:0 8.8px 0 12.8px;font-family:inherit;font-size:14px;font-weight:600;
+    cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:6px;}
+  .chip img{width:16px;height:16px;display:block;flex:none;}
+  .chip:hover{border-color:#cfcfc9;background:#fafafa;}
+  .chip[aria-pressed="true"]{background:var(--jade-soft);border-color:var(--jade);
+    color:var(--jade-deep);font-weight:700;}
+  .chip-x{font-size:15px;line-height:1;color:var(--jade);margin-left:2px;}
+
+  /* checkbox rows with a live match count on the right */
   .checks{display:flex;flex-direction:column;gap:2px;}
-  .chk{display:flex;align-items:center;gap:10px;padding:6px 4px;border-radius:9px;cursor:pointer;font-size:14px;transition:background .1s;}
-  .chk:hover{background:#f6f1e8;}
+  .chk{display:flex;align-items:center;gap:10px;padding:7px 2px;border-radius:8px;cursor:pointer;
+    font-size:14px;transition:background .1s;}
+  .chk:hover{background:#f6f6f5;}
   .chk input{position:absolute;opacity:0;width:0;height:0;}
-  .chk .box{width:19px;height:19px;border:1.6px solid #c9c1b2;border-radius:6px;flex:none;
+  .chk .box{width:16px;height:16px;border:1px solid #767676;border-radius:2px;flex:none;
     display:flex;align-items:center;justify-content:center;background:#fff;transition:all .12s;}
-  .chk .box svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;opacity:0;}
+  .chk .box svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0;}
   .chk input:checked + .box{background:var(--jade);border-color:var(--jade);}
   .chk input:checked + .box svg{opacity:1;}
   .chk input:focus-visible + .box{outline:2px solid var(--jade);outline-offset:2px;}
+  .chk-lb{font-size:14px;font-weight:600;color:var(--chip-ink);}
+  .chk-n{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted);}
 
-  .clear-link{background:none;border:none;color:var(--jade);font-size:13.5px;font-weight:600;
+  .clear-link{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;
     cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:2px;align-self:flex-start;}
-  .clear-link:hover{color:var(--jade-deep);}
-
-  /* three filters sharing one box */
-  .fsub + .fsub{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);}
-
-  /* ---- price range ---- */
-  .pr-vals{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px;}
-  .pr-vals .pv{font-family:Georgia,serif;font-size:16px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
-  .pr-slider{position:relative;height:26px;margin:2px 0 2px;}
-  .pr-track{position:absolute;top:11px;left:0;right:0;height:4px;border-radius:2px;background:var(--line);}
-  .pr-fill{position:absolute;top:11px;height:4px;border-radius:2px;background:var(--jade);}
-  .pr-slider input[type=range]{position:absolute;top:3px;left:0;width:100%;height:20px;margin:0;
-    -webkit-appearance:none;appearance:none;background:none;pointer-events:none;}
-  .pr-slider input[type=range]:focus{outline:none;}
-  .pr-slider input[type=range]::-webkit-slider-runnable-track{height:20px;background:none;}
-  .pr-slider input[type=range]::-moz-range-track{height:20px;background:none;}
-  .pr-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:20px;height:20px;
-    border-radius:50%;background:#fff;border:2px solid var(--jade);cursor:pointer;box-shadow:0 1px 4px rgba(40,30,10,.28);}
-  .pr-slider input[type=range]::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;
-    border-radius:50%;background:#fff;border:2px solid var(--jade);cursor:pointer;box-shadow:0 1px 4px rgba(40,30,10,.28);}
-
-  /* ---- guest + star rating pills ---- */
-  .star-row{display:flex;flex-wrap:wrap;gap:7px;}
-  .star-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:#fff;
-    border-radius:20px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;
-    font-family:inherit;transition:all .13s;}
-  .star-chip:hover{border-color:#c2b8a4;background:#faf7f1;}
-  .star-chip .star-ic{width:12px;height:12px;fill:var(--gold);stroke:none;}
-  .star-chip.is-on{border-color:var(--jade);background:#eef6f1;color:var(--jade-deep);}
+  .clear-link:hover{color:var(--ink);}
 
   /* ============ HOTEL LIST / CARDS ============ */
   /* two-column masonry: each column is its own flex stack, so a card keeps its
      natural height and rank order still reads left → right (1|2 / 3|4 / …)
      rather than down-one-column-then-the-other like CSS columns would give */
-  .list{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;width:100%;}
-  .mcol{display:flex;flex-direction:column;gap:20px;min-width:0;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
-    box-shadow:0 1px 2px rgba(40,30,10,.04),0 8px 22px rgba(40,30,10,.05);
-    display:flex;flex-direction:column;cursor:pointer;min-width:0;transition:box-shadow .2s;}
-  .card:hover{box-shadow:0 4px 26px rgba(40,30,10,.10);}
+  .list{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;width:100%;}
+  .mcol{display:flex;flex-direction:column;gap:12px;min-width:0;}
+  .card{background:var(--card);border:.8px solid var(--card-line);border-radius:24px;overflow:hidden;
+    box-shadow:var(--shadow-card);padding:.8px .8px 16.8px;
+    display:flex;flex-direction:column;gap:4px;cursor:pointer;min-width:0;transition:box-shadow .2s;}
+  .card:hover{box-shadow:0 10px 20px rgba(0,0,0,.09),0 3px 6px rgba(0,0,0,.05);}
   .card:focus-visible{outline:2px solid var(--jade);outline-offset:2px;}
 
-  /* Photo is the same height on every card — the stagger comes from the detail
-     block below it (name wrapping, pills going to a second row). It's inset on
-     all four sides so the card's white frame reads around it. */
-  .ph{position:relative;height:270px;flex:none;overflow:hidden;
-    margin:10px 10px 0;border-radius:12px;}
+  /* Photo sits in an 8px well so the card's white frame reads around it.
+     292.8px is the Figma height at a 470px card width. */
+  .ph{position:relative;height:292.8px;flex:none;overflow:hidden;
+    margin:8px 8px 0;border-radius:17px;}
   .ph .car{height:100%;}
+  /* the scrim behind the dot row (Figma 1:46) */
+  .ph::after{content:"";position:absolute;left:0;right:0;bottom:0;height:28px;z-index:4;
+    pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.28));}
 
   /* photo overlays: rank badge, save, photo dots */
-  .badge{position:absolute;top:12px;left:12px;z-index:5;background:var(--jade-deep);color:#fff;
-    border-radius:20px;padding:7px 13px;font-size:12.5px;font-weight:600;letter-spacing:.01em;
-    box-shadow:0 2px 8px rgba(0,0,0,.28);}
+  /* "Top Pick" — the design's indigo→teal gradient chip, kept as-is: it's a
+     ranking marker, not a CTA, so the green swap doesn't apply to it. */
+  .badge{position:absolute;top:10px;left:10px;z-index:5;color:#fff;
+    background:linear-gradient(17.73deg,#3232af 28.844%,#36dbc8 120.51%);
+    border:.8px solid rgba(255,255,255,.32);
+    border-radius:8px;padding:0 10.8px;height:26px;display:inline-flex;align-items:center;
+    font-size:12px;font-weight:700;line-height:1.4;letter-spacing:0;
+    filter:drop-shadow(0 5px 7px rgba(50,50,175,.22));}
   .wish{position:absolute;top:10px;right:10px;z-index:5;width:34px;height:34px;border:none;
     background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
   .wish svg{width:23px;height:23px;fill:rgba(0,0,0,.18);stroke:#fff;stroke-width:1.8;
@@ -358,41 +367,44 @@
 
   /* details beside the photo: hook → stars/score → where → price → highlights →
      guests loved → perfect for → CTA */
-  .det{display:flex;flex-direction:column;flex:1;min-width:0;padding:12px 18px 16px;}
-  /* locality line + rating on one row, name beneath */
-  .meta-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;}
-  /* wraps to a second line in the narrower column instead of truncating */
-  .det h3{font-size:19px;line-height:1.22;min-width:0;margin-top:3px;}
-  /* score over review count, aligned to the right edge of the meta row */
-  .rate-inline{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:1px;
-    font-size:11.5px;color:var(--muted);white-space:nowrap;}
-  .rate-inline b{display:inline-flex;align-items:center;gap:4px;font-family:Georgia,serif;
-    font-size:17px;line-height:1.2;color:var(--ink);}
-  .rt-star{width:14px;height:14px;fill:var(--ink);stroke:none;flex:none;}
-  /* locality → area → category, with the pin the PDP uses */
-  .where{display:flex;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted);line-height:1.35;}
-  .wh-pin{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:1.7;
-    stroke-linecap:round;stroke-linejoin:round;flex:none;margin-right:5px;}
+  /* Figma 1:60 — content left, a fixed 132px column right holding the rating at
+     the top and the price pinned to the bottom. */
+  .det{display:flex;gap:16px;align-items:flex-end;flex:1;min-width:0;padding:0 12px;}
+  .det-main{flex:1;min-width:0;align-self:stretch;display:flex;flex-direction:column;gap:12px;}
+  .det-side{width:132px;flex:none;align-self:stretch;display:flex;flex-direction:column;}
+  .meta-row{display:flex;flex-direction:column;min-width:0;}
+  .det h3{font-size:20px;font-weight:700;line-height:1.5;min-width:0;margin-top:0;padding-top:4px;
+    color:var(--ink);letter-spacing:0;}
+  /* score over review count, top of the right column */
+  .rate-inline{display:flex;flex-direction:column;align-items:flex-end;gap:1px;
+    font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap;}
+  .rate-inline b{display:inline-flex;align-items:center;font-family:inherit;
+    font-size:16px;font-weight:700;line-height:1.5;color:var(--chip-ink);}
+  .rt-star{width:19px;height:19px;flex:none;display:block;}
+  /* locality → area → category */
+  .where{display:flex;align-items:center;flex-wrap:wrap;font-size:14px;font-weight:600;
+    color:var(--muted);line-height:1.5;padding-top:5px;}
+  .wh-pin{width:14px;height:14px;flex:none;margin-right:4px;display:block;}
   .wh-sep{margin:0 6px;}
   /* total first, per-night breakdown beneath */
-  .prow{display:flex;align-items:baseline;justify-content:flex-end;gap:5px;font-size:13px;color:var(--muted);}
-  .prow b{font-family:Georgia,serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
-  .psub{margin-top:2px;font-size:12.5px;color:var(--muted);}
-  .high{margin-top:10px;font-size:13.5px;font-weight:600;color:#4a453e;}
-  /* property pros — pills where the summary line was; a camera pill jumps the photo */
-  .pros{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;}
-  /* each pill keeps its natural width and wraps to the next line whole, rather
-     than shrinking and breaking its label across two lines */
-  .pro-pill{display:inline-flex;align-items:center;gap:5px;flex:none;white-space:nowrap;
-    font-family:inherit;font-size:13px;font-weight:600;
-    line-height:1;color:#4a453e;background:#f1ede3;border:1px solid transparent;border-radius:20px;padding:6px 10px;}
+  .prow{display:flex;align-items:flex-end;justify-content:flex-end;gap:2px;
+    font-size:12px;font-weight:700;color:var(--muted);line-height:1.4;}
+  .prow b{font-family:inherit;font-size:24px;font-weight:700;color:var(--ink);
+    letter-spacing:-.12px;line-height:1.3;}
+  .psub{margin-top:8px;font-size:12px;font-weight:600;color:var(--muted);line-height:1.4;text-align:right;}
+  .high{margin-top:10px;font-size:13.5px;font-weight:600;color:var(--chip-ink);}
+  /* amenity chips — flat grey, 8px radius, icon + label */
+  .pros{display:flex;flex-wrap:wrap;gap:8px;margin-top:0;}
+  .pro-pill{display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;
+    font-family:inherit;font-size:11px;font-weight:600;line-height:1.4;
+    color:var(--chip-ink);background:var(--chip-bg);border:1px solid transparent;
+    border-radius:8px;padding:6px 8px;}
   button.pro-pill{cursor:pointer;transition:background .14s,border-color .14s,color .14s;}
-  button.pro-pill:hover{background:#e8e2d5;}
-  .pro-pill .pp-cam{width:14px;height:14px;stroke:#8a8378;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  button.pro-pill.on{background:#eef6f1;border-color:var(--jade);color:var(--jade-deep);}
-  button.pro-pill.on .pp-cam{stroke:var(--jade);}
-  .pro-pill.val{background:#f7f0e0;border-color:#ebddbf;color:#8a6a24;}
-  .kv{margin-top:7px;font-size:13px;color:#4a453e;}
+  button.pro-pill:hover{background:#e9ebef;}
+  .pro-pill .pp-cam{width:14px;height:14px;flex:none;display:block;}
+  button.pro-pill.on{background:var(--jade-soft);border-color:var(--jade);color:var(--jade-deep);}
+  .pro-pill.val{background:var(--jade-soft);border-color:#bfe0cf;color:var(--jade-deep);}
+  .kv{margin-top:7px;font-size:13px;color:var(--chip-ink);}
   .kv .k{color:var(--muted);margin-right:6px;}
 
   /* narrowing rail (left) + the receipts line above the list */
@@ -415,8 +427,8 @@
   .spec svg{width:13px;height:13px;stroke:#8a8378;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
   .spec svg.fill{fill:var(--gold);stroke:none;}
   /* price only, bottom-right — the card itself is the link to the PDP, no CTA */
-  .foot{display:flex;flex-direction:column;align-items:flex-end;
-    margin-top:auto;padding-top:18px;text-align:right;}
+  .foot{display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;
+    flex:1;min-height:0;margin-top:0;padding-top:18px;text-align:right;}
 
   /* empty state */
   .empty{padding:44px 0 56px;text-align:center;}
@@ -477,6 +489,15 @@
     .ph{height:220px;}
     .res-head h1{font-size:26px;}
     .wrap{padding:0 16px 60px;}
+    .topnav-in{padding:0 16px;gap:12px;}
+    .tn-brand{font-size:16px;gap:6px;}
+    .tn-brand .tn-sl{font-size:18px;}
+  }
+  @media (max-width:620px){
+    .det{flex-direction:column;align-items:stretch;gap:12px;}
+    .det-side{width:auto;}
+    .foot{flex:none;padding-top:0;}
+    .rate-inline{align-items:flex-start;}
   }
   @media (prefers-reduced-motion:reduce){
     *{scroll-behavior:auto!important;transition:none!important;animation:none!important;}
@@ -513,22 +534,22 @@ const H = (id,name,type,stars,area,place,dist,score,reviews,price,amenities,room
 const LOCATIONS = {
   "Goa":[
     H("taj-exotica","Taj Exotica Resort & Spa","Resort",5,"Benaulim","South Goa","On the beach",9.2,1840,15200,
-      ["Pool","Spa","Beachfront","Airport transfer","Gym","Scenic view"],
+      ["Pool","Spa","Beachfront","Airport transfer","Gym","Scenic view","Parking"],
       "Deluxe Villa · King bed · Garden view · 48 m²",6),
     H("w-goa","W Goa","Resort",5,"Vagator","North Goa","2 min to beach",8.9,2210,21800,
-      ["Pool","Spa","Beachfront","Gym","Wi-Fi","Free breakfast","Scenic view"],
+      ["Pool","Spa","Beachfront","Gym","Wi-Fi","Free breakfast","Scenic view","Parking"],
       "Marvelous Suite · King bed · Sea view · 55 m²",5),
     H("ahilya","Ahilya by the Sea","Villa",5,"Nerul","North Goa","Waterfront",9.4,210,32000,
       ["Pool","Beachfront","Free breakfast","Scenic view","Airport transfer","Free cancellation"],
       "Private Villa · King bed · Sea view · 70 m²",1),
     H("postcard","The Postcard, Cuelim","Hotel",4,"Cansaulim","South Goa","Hillside",9.1,640,15200,
-      ["Pool","Spa","Free breakfast","Free cancellation","Wi-Fi"],
+      ["Pool","Spa","Free breakfast","Free cancellation","Wi-Fi","Parking"],
       "Garden Room · Queen bed · Courtyard view · 34 m²",2),
     H("vivenda","Vivenda dos Palhaços","Homestay",3,"Majorda","South Goa","5 min to beach",9.0,380,8800,
       ["Free breakfast","Wi-Fi","Pool","Pet friendly"],
       "Colonial Room · Queen bed · Garden view · 28 m²",1),
     H("novotel","Novotel Goa Candolim","Hotel",4,"Candolim","North Goa","Beachfront",8.2,3120,11400,
-      ["Pool","Gym","Wi-Fi","Free breakfast","Beachfront"],
+      ["Pool","Gym","Wi-Fi","Free breakfast","Beachfront","Parking"],
       "Superior Room · Twin beds · Pool view · 30 m²",3),
   ],
   "Udaipur":[
@@ -572,6 +593,23 @@ const KNOWN = Object.keys(LOCATIONS);
 
 /* ================= HELPERS ================= */
 const inr = n => "₹" + n.toLocaleString("en-IN");
+/* The v2 design shows guest ratings out of 5 ("4.6"), while the data is stored
+   on the 10-point scale the rest of the prototype uses. Convert at the edge so
+   only the display changes. */
+const star5 = s => (s/2).toFixed(1);
+
+/* Card-chip glyphs. The design draws card chips with its own three 14px marks —
+   ic-chip-1 (outlook/view), ic-chip-2 (spa), ic-chip-3 (activity) — and reserves
+   the 16px per-amenity set for the filter rail. Keeping that split means every
+   asset renders at its native size instead of being scaled into the wrong slot. */
+const CHIP_ICONS = [
+  [/spa|ayurveda|massage|wellness/i,                      "ic-chip-2"],
+  [/kayak|club|nights|dj|activit|gym|fitness|surf|dining|restaurant|breakfast/i, "ic-chip-3"],
+];
+const chipIcon = label => {
+  const hit = CHIP_ICONS.find(([re])=>re.test(String(label||"")));
+  return "images/figma/" + (hit ? hit[1] : "ic-chip-1") + ".svg";
+};
 const hashHue = str => { let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))%360; return h; };
 
 /* dates + guests */
@@ -586,7 +624,7 @@ const nightsBetween = (a,b) => (a&&b) ? Math.max(1, Math.round((startOfDay(b)-st
 const datesLabel = (a,b) => a&&b ? fmtDay(a)+" → "+fmtDay(b) : a ? fmtDay(a)+" → …" : "Add dates";
 /* ---- guest picker (companions + age groups), shared with the rest of the app ---- */
 const TKEY = "onto:travellers:v3";
-function readUserName(){ try{ const a=JSON.parse(localStorage.getItem(TKEY))||[]; const me=a.find(t=>t.relation==="Myself"||t.id==="t-you"); if(me&&me.name&&me.name.toLowerCase()!=="you"&&me.name.indexOf("@")<0) return me.name; }catch(e){} return "You"; }
+function readUserName(){ try{ const a=JSON.parse(localStorage.getItem(TKEY))||[]; const me=a.find(t=>t.relation==="Myself"||t.id==="t-you"); if(me&&me.name&&me.name.toLowerCase()!=="you"&&me.name.indexOf("@")<0) return me.name; }catch(e){} return "Saanvi"; }
 function writeUserName(n){ try{ let a=JSON.parse(localStorage.getItem(TKEY)); if(!Array.isArray(a)) a=[]; const me=a.find(t=>t.relation==="Myself"||t.id==="t-you"); if(me) me.name=n; else a.unshift({id:"t-you",name:n,relation:"Myself",interests:[]}); localStorage.setItem(TKEY, JSON.stringify(a)); }catch(e){} }
 const FUN_EMOJI = ["🦊","🐨","🐼","🦁","🐧","🐬","🦉","🐢","🐝","🦩"];
 function emojiFor(name){ let h=0,s=String(name||""); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; }
@@ -901,31 +939,40 @@ function HotelCard({hotel, nights, badge}){
         )}
       </div>
       <div className="det">
-        <div className="meta-row">
-          <div className="where">
-            <Svg className="wh-pin" d={I.pin}/>
-            {hotel.dist} · {hotel.area}<span className="wh-sep">•</span>{hotel.stars}-star {hotel.type.toLowerCase()}
+        <div className="det-main">
+          <div className="meta-row">
+            <div className="where">
+              <img className="wh-pin" src="images/figma/ic-pin.svg" alt="" width="14" height="14"/>
+              {hotel.dist} · {hotel.area}<span className="wh-sep">•</span>{hotel.type}
+            </div>
+            <h3>{hotel.name}</h3>
           </div>
+          <div className="pros">
+            {pros.map((p,i)=> p.photo!=null ? (
+              <button type="button" key={i} className={"pro-pill"+(idx===p.photo?" on":"")}
+                aria-pressed={idx===p.photo} aria-label={`Show ${p.label}`}
+                onClick={e=>{e.stopPropagation(); goTo(p.photo);}}>
+                <img className="pp-cam" src={chipIcon(p.label)} alt="" width="14" height="14"/>{p.label}
+              </button>
+            ) : (
+              <span key={i} className={"pro-pill"+(p.value?" val":" flat")}>
+                <img className="pp-cam" src={chipIcon(p.label)} alt="" width="14" height="14"/>{p.label}
+              </span>
+            ))}
+          </div>
+        </div>
+        {/* right column: rating top, price pinned to the bottom edge */}
+        <div className="det-side">
           <div className="rate-inline">
-            <b><Svg className="rt-star" d={I.starF}/>{hotel.score.toFixed(1)}</b>
+            <b><img className="rt-star" src="images/figma/ic-star.svg" alt="" width="19" height="19"/>{star5(hotel.score)}</b>
             <span>{hotel.reviews.toLocaleString("en-IN")} reviews</span>
           </div>
-        </div>
-        <h3>{hotel.name}</h3>
-        <div className="pros">
-          {pros.map((p,i)=> p.photo!=null ? (
-            <button type="button" key={i} className={"pro-pill"+(idx===p.photo?" on":"")}
-              aria-pressed={idx===p.photo} aria-label={`Show ${p.label}`}
-              onClick={e=>{e.stopPropagation(); goTo(p.photo);}}>
-              <Svg className="pp-cam" d={I.cam}/>{p.label}
-            </button>
-          ) : (
-            <span key={i} className={"pro-pill"+(p.value?" val":" flat")}>{p.label}</span>
-          ))}
-        </div>
-        <div className="foot">
-          <div className="prow"><b>{inr(hotel.price)}</b><span>/night</span></div>
-          <div className="psub">{inr(hotel.price*nights)} total · {nights} {nights===1?"night":"nights"}</div>
+          {/* per-night leads; the stay total is the supporting line. This inverts
+              the Figma, which leads with the total. */}
+          <div className="foot">
+            <div className="prow"><b>{inr(hotel.price)}</b><span>/night</span></div>
+            <div className="psub">{inr(hotel.price*nights)} total · {nights} {nights===1?"night":"nights"}</div>
+          </div>
         </div>
       </div>
     </article>
@@ -939,82 +986,137 @@ function Chip({active, onClick, children}){
   );
 }
 
-const STAR_PATH = <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 18.9 5 21.4l1.4-6.8L1.3 9.9l6.9-.8L12 2z"/>;
 
-/* price range — dual-handle per-night slider */
-function PriceFilter({all, value, setValue}){
-  const prices = all.map(h => h.price);
-  const step = 500;
+/* ---- Popular filters: the six amenity pills the design leads with. Each maps
+   onto an amenity already carried in LOCATIONS so the pill actually filters. ---- */
+const POPULAR = [
+  {a:"Pool",            label:"Pool",               icon:"ic-pool"},
+  {a:"Wi-Fi",           label:"Free WiFi",          icon:"ic-wifi"},
+  {a:"Free breakfast",  label:"Breakfast included", icon:"ic-utensils"},
+  {a:"Beachfront",      label:"Beachfront",         icon:"ic-beach"},
+  {a:"Parking",         label:"Parking",            icon:"ic-parking"},
+  {a:"Pet friendly",    label:"Pet friendly",       icon:"ic-pet"},
+];
+
+/* Guest rating — the design's four radio options, written against the 5-point
+   scale it displays. Stored on the 10-point scale the data uses. */
+const RATING_OPTS = [
+  {v:null, label:"Any rating"},
+  {v:9,    label:"Exceptional · 4.5+"},
+  {v:8,    label:"Very good · 4.0+"},
+  {v:7,    label:"Good · 3.5+"},
+];
+
+/* Price buckets. The design's fixed ₹1,500 / ₹3,000 / ₹5,000 rungs sit far below
+   this prototype's nightly rates, so the four-bucket shape is kept but the cuts
+   are derived from the live price range. */
+function priceBuckets(all){
+  const prices = all.map(h=>h.price);
+  if(!prices.length) return [];
   const lo = Math.min(...prices), hi = Math.max(...prices);
-  const min = Math.floor(lo/step)*step;
-  const max = Math.ceil(hi/step)*step;
-  const curMin = value ? Math.max(min, Math.min(value.min, max)) : min;
-  const curMax = value ? Math.min(max, Math.max(value.max, min)) : max;
-  const pct = v => max===min ? 0 : ((v-min)/(max-min))*100;
-  const setMinV = v => setValue({min: Math.min(v, curMax), max: curMax});
-  const setMaxV = v => setValue({min: curMin, max: Math.max(v, curMin)});
+  const round = n => Math.round(n/500)*500;
+  const a = round(lo + (hi-lo)/4), b = round(lo + (hi-lo)/2), c = round(lo + 3*(hi-lo)/4);
+  return [
+    {id:"b1", label:`Under ${inr(a)}`,      min:0, max:a-1},
+    {id:"b2", label:`${inr(a)} – ${inr(b)}`, min:a, max:b-1},
+    {id:"b3", label:`${inr(b)} – ${inr(c)}`, min:b, max:c-1},
+    {id:"b4", label:`${inr(c)}+`,            min:c, max:Infinity},
+  ];
+}
+
+/* A collapsible rail section — the hairline-separated <details> rows in the design */
+function FSection({title, children, open=true, card=false}){
+  const [on, setOn] = useState(open);
   return (
-    <div className="fsub">
-      <p className="fg-h">Budget<span className="fg-note">per night</span></p>
-      <div className="pr-vals">
-        <span className="pv">{inr(curMin)}</span>
-        <span className="pv">{inr(curMax)}{curMax>=max?"+":""}</span>
-      </div>
-      <div className="pr-slider">
-        <div className="pr-track"/>
-        <div className="pr-fill" style={{left:pct(curMin)+"%", right:(100-pct(curMax))+"%"}}/>
-        <input type="range" min={min} max={max} step={step} value={curMin}
-          aria-label="Minimum price" onChange={e=>setMinV(+e.target.value)}/>
-        <input type="range" min={min} max={max} step={step} value={curMax}
-          aria-label="Maximum price" onChange={e=>setMaxV(+e.target.value)}/>
-      </div>
+    <div className={"fsec"+(on?" is-open":"")+(card?" is-card":"")}>
+      <button type="button" className="fsec-h" aria-expanded={on} onClick={()=>setOn(v=>!v)}>
+        {title}
+        <svg className="fsec-ar" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      {on && <div className="fsec-b">{children}</div>}
     </div>
   );
 }
 
-/* review score — minimum-score pills (shares the `rating` state) */
-function ScoreFilter({rating, setRating}){
-  const opts = [{v:null, label:"Any"}, {v:7, label:"7+"}, {v:8, label:"8+"}, {v:9, label:"9+"}];
-  return (
-    <div className="fsub">
-      <p className="fg-h">Review score</p>
-      <div className="star-row">
-        {opts.map(o=>(
-          <button type="button" key={o.label} className={"star-chip"+(rating===o.v?" is-on":"")}
-            aria-pressed={rating===o.v} onClick={()=>setRating(o.v)}>{o.label}</button>
-        ))}
-      </div>
-    </div>
-  );
-}
+function FilterRail({all, buckets, rating, setRating, price, setPrice,
+                     amenities, setAmen, types, setTypes, onClear}){
+  const countBy = fn => all.filter(fn).length;
+  const toggleAmen = a => setAmen(p => p.includes(a) ? p.filter(x=>x!==a) : [...p,a]);
+  const toggleBucket = id => setPrice(p => {
+    const cur = p || [];
+    return cur.includes(id) ? cur.filter(x=>x!==id) : [...cur, id];
+  });
+  const toggleType = t => setTypes(p => p.includes(t) ? p.filter(x=>x!==t) : [...p,t]);
+  const TYPES = useMemo(()=>[...new Set(all.map(h=>h.type))], [all]);
+  const applied = amenities.length + types.length + (price?price.length:0) + (rating!=null?1:0);
 
-/* star category — 3 to 5 stars (shares the `starCat` state) */
-function StarFilter({starCat, setStarCat}){
-  const toggle = s => setStarCat(p => p.includes(s) ? p.filter(x=>x!==s) : [...p,s]);
-  return (
-    <div className="fsub">
-      <p className="fg-h">Star category</p>
-      <div className="star-row">
-        {[5,4,3].map(s=>(
-          <button type="button" key={s} className={"star-chip"+(starCat.includes(s)?" is-on":"")}
-            aria-pressed={starCat.includes(s)} onClick={()=>toggle(s)}>
-            {s} <Svg className="star-ic" d={STAR_PATH}/>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function FilterRail({all, starCat, setStarCat, rating, setRating, price, setPrice}){
   return (
     <aside className="rail" aria-label="Filters">
-      <div className="fgroup">
-        <h2 className="side-h">Filters</h2>
-        <PriceFilter all={all} value={price} setValue={setPrice}/>
-        <StarFilter starCat={starCat} setStarCat={setStarCat}/>
-        <ScoreFilter rating={rating} setRating={setRating}/>
+      <div className="fg-top">
+        <h2 className="side-h">
+          Filters {applied>0 && <em className="fg-count">{applied} applied</em>}
+        </h2>
+        {applied>0 && <button type="button" className="clear-link" onClick={onClear}>Clear all</button>}
       </div>
+
+      <FSection title="Popular filters" card>
+        <div className="chips">
+          {POPULAR.map(p=>{
+            const on = amenities.includes(p.a);
+            return (
+              <button type="button" key={p.a} className="chip" aria-pressed={on}
+                onClick={()=>toggleAmen(p.a)}>
+                <img src={"images/figma/"+p.icon+".svg"} alt="" width="16" height="16"/>
+                {p.label}
+                {on && <span className="chip-x" aria-hidden="true">×</span>}
+              </button>
+            );
+          })}
+        </div>
+      </FSection>
+
+      {/* collapsed by default, as drawn in frame 1:29 */}
+      <FSection title="Guest rating" open={false}>
+        {/* no glyph on these chips: the design's rating star is a small outline
+            mark that isn't exported separately, and the 19px filled card star is
+            the wrong asset to scale down into it. The label carries the meaning. */}
+        <div className="chips">
+          {RATING_OPTS.map(o=>(
+            <button type="button" key={o.label} className="chip" aria-pressed={rating===o.v}
+              onClick={()=>setRating(o.v)}>
+              {o.label}
+              {rating===o.v && o.v!=null && <span className="chip-x" aria-hidden="true">×</span>}
+            </button>
+          ))}
+        </div>
+      </FSection>
+
+      <FSection title="Price per night" open={false}>
+        <div className="checks">
+          {buckets.map(b=>(
+            <label className="chk" key={b.id}>
+              <input type="checkbox" checked={!!price && price.includes(b.id)}
+                onChange={()=>toggleBucket(b.id)}/>
+              <span className="box"><Svg d={I.check}/></span>
+              <span className="chk-lb">{b.label}</span>
+              <span className="chk-n">{countBy(h=>h.price>=b.min && h.price<=b.max)}</span>
+            </label>
+          ))}
+        </div>
+      </FSection>
+
+      <FSection title="Property type" open={false}>
+        <div className="checks">
+          {TYPES.map(t=>(
+            <label className="chk" key={t}>
+              <input type="checkbox" checked={types.includes(t)} onChange={()=>toggleType(t)}/>
+              <span className="box"><Svg d={I.check}/></span>
+              <span className="chk-lb">{t}</span>
+              <span className="chk-n">{countBy(h=>h.type===t)}</span>
+            </label>
+          ))}
+        </div>
+      </FSection>
     </aside>
   );
 }
@@ -1312,7 +1414,7 @@ function App(){
   const [types, setTypes]       = useState([]);
   const [rating, setRating]     = useState(null);
   const [amenities, setAmen]    = useState([]);
-  const [price, setPrice]       = useState(null); // {min,max} per night, or null = full range
+  const [price, setPrice]       = useState(null); // array of priceBuckets() ids, or null = any
   const [sort, setSort]         = useState("recommended");
   // the narrowing taps: {focus, budget, area} → option id or null
   const [narrow, setNarrow]     = useState({focus:null, budget:null, area:null});
@@ -1334,8 +1436,11 @@ function App(){
 
   const clearAll = () => { setStarCat([]); setTypes([]); setRating(null); setAmen([]); setPrice(null); };
 
+  const buckets = useMemo(()=>priceBuckets(all), [all]);
   const results = useMemo(()=>{
-    const inPrice = h => !price || (h.price >= price.min && h.price <= price.max);
+    // price is a list of selected bucket ids — a stay matches if it sits in any of them
+    const inPrice = h => !price || price.length===0 ||
+      buckets.some(b => price.includes(b.id) && h.price>=b.min && h.price<=b.max);
     let r = all.filter(h =>
       (starCat.length===0 || starCat.includes(h.stars)) &&
       (types.length===0 || types.includes(h.type)) &&
@@ -1348,7 +1453,7 @@ function App(){
     if(sort==="price-desc") r = [...r].sort((a,b)=>b.price-a.price);
     if(sort==="rating")     r = [...r].sort((a,b)=>b.score-a.score);
     return r;
-  }, [all, starCat, types, rating, amenities, price, sort, narrow]);
+  }, [all, starCat, types, rating, amenities, price, buckets, sort, narrow]);
 
   // the receipts: a sequential funnel — each cut applies to what the previous
   // one left, and the final step lands exactly on the real survivor count
@@ -1380,7 +1485,10 @@ function App(){
     <div>
       <nav className="topnav">
         <div className="topnav-in">
-          <a className="tn-brand" href={LOGGED_OUT ? "home-loggedout.html" : "home.html"}>onto<span>.</span></a>
+          <a className="tn-brand" href={LOGGED_OUT ? "home-loggedout.html" : "home.html"}>
+            <b>ONTO</b><span className="tn-sl">/</span>{covered ? "Stays in "+loc : "Stays"}
+          </a>
+
           {LOGGED_OUT ? (
             <div className="tn-right">
               <button type="button" className="tn-signup" onClick={()=>setAuthOpen(true)}>Sign up</button>
@@ -1392,7 +1500,9 @@ function App(){
                 <a href="trips.html">Bookings</a>
               </div>
               <div className="tn-right">
-                <button type="button" className="tn-avatar" aria-haspopup="true">{(readUserName()[0]||"Y").toUpperCase()}</button>
+                <button type="button" className="tn-name" aria-haspopup="true">
+                  {readUserName()}<img src="images/figma/ic-chevron-down.svg" alt="" width="16" height="16"/>
+                </button>
                 <div className="menu" role="menu">
                   <a className="menu-id" href="profile.html">
                     <span className="tn-avatar">{(readUserName()[0]||"Y").toUpperCase()}</span>
@@ -1400,6 +1510,9 @@ function App(){
                     <span className="menu-id-ar">›</span>
                   </a>
                   <div className="menu-sec">
+                    {/* the v2 header has no nav links, so Bookings moves into the
+                        account menu rather than losing its entry point */}
+                    <a className="item" href="trips.html"><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Bookings <span className="ar">›</span></a>
                     <a className="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span className="ar">›</span></a>
                     <a className="item" href="help.html"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span className="ar">›</span></a>
                     <a className="item" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
@@ -1477,8 +1590,10 @@ function App(){
                   checkIn={checkIn} checkOut={checkOut} onPickDate={pickDate}
                   party={party} setParty={setParty} rooms={rooms} setRooms={setRooms}/>
               </div>
-              <FilterRail all={all} starCat={starCat} setStarCat={setStarCat}
-                rating={rating} setRating={setRating} price={price} setPrice={setPrice}/>
+              <FilterRail all={all} buckets={buckets}
+                rating={rating} setRating={setRating} price={price} setPrice={setPrice}
+                amenities={amenities} setAmen={setAmen} types={types} setTypes={setTypes}
+                onClear={clearAll}/>
             </aside>
           </div>
         )}

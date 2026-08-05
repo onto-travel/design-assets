@@ -1,0 +1,8 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="pool">
+<path id="Vector" d="M14.6667 14H14C13.0324 14 12.1853 13.4274 12 12.6667C11.8147 13.4274 10.9676 14 10 14C9.0324 14 8.18533 13.4274 8 12.6667C7.81467 13.4274 6.9676 14 6 14C5.03242 14 4.18531 13.4274 4 12.6667C3.81469 13.4274 2.96758 14 2 14H1.33333" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M12.6667 2L12.4901 2.05887C11.6101 2.35221 11.17 2.49888 10.9183 2.84807C10.6667 3.19725 10.6667 3.66106 10.6667 4.58869V11.3333" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M7.33333 2L7.15673 2.05887C6.2767 2.35221 5.83669 2.49888 5.58501 2.84807C5.33333 3.19725 5.33333 3.66106 5.33333 4.58869V11.3333" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M5.33333 4.66667H10.6667M5.33333 7.33333H10.6667M5.33333 10H10.6667" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>
