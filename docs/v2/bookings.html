@@ -48,46 +48,6 @@
   .tn-who:hover{background:rgba(0,0,0,.045);}
   .tn-who .cv{width:9px;height:9px;stroke:#8a8a85;fill:none;stroke-width:2.2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  /* ============ ACCOUNT MENU ============
-     A card, not a list: a green crown carrying the brand pattern, the person
-     on it, then the account grouped by what each group is for. */
-  .menu{position:absolute;top:calc(100% + 8px);right:0;width:308px;background:#fff;
-    border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 48px rgba(0,0,0,.18);
-    padding:0;overflow:hidden;text-align:left;color:var(--ink);
-    opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .15s,transform .15s;}
-  .menu.open{opacity:1;transform:none;pointer-events:auto;}
-
-  .pm-top{padding-bottom:16px;text-align:center;}
-  .pm-band{height:78px;position:relative;overflow:hidden;background:#2b9068;}
-  /* flowing ribbons with a dotted spine, not a diamond field */
-  .pm-band::before{content:"";position:absolute;inset:-30%;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='76'%3E%3Cg fill='none' stroke='%23ffffff' stroke-linecap='round'%3E%3Cpath d='M-16 58 C 14 16 44 14 72 38 S 122 66 166 24' stroke-width='15' opacity='0.13'/%3E%3Cpath d='M-16 58 C 14 16 44 14 72 38 S 122 66 166 24' stroke-width='2.4' stroke-dasharray='1 8' opacity='0.5'/%3E%3C/g%3E%3C/svg%3E");
-    background-size:150px 76px;transform:rotate(-8deg);}
-  /* the person sits astride the crown */
-  .pm-av{position:relative;display:flex;align-items:center;justify-content:center;
-    width:80px;height:80px;margin:-40px auto 0;border-radius:50%;
-    background:#cfe7d9;color:#12704f;font-size:30px;font-weight:800;line-height:1;
-    border:5px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.10);}
-  .pm-name{display:block;margin-top:11px;font-size:16.5px;font-weight:700;letter-spacing:-.01em;}
-  .pm-mail{display:block;margin-top:1px;font-size:13.5px;font-weight:500;color:var(--muted);}
-
-  /* the rules are inset from the card edge, and one sits under the person too */
-  .pm-sec{position:relative;padding:6px;}
-  .pm-sec::before{content:"";position:absolute;top:0;left:18px;right:18px;height:1px;
-    background:var(--line);}
-  .pm-item{display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:12px;
-    font-size:15px;font-weight:600;color:var(--ink);text-decoration:none;cursor:pointer;
-    transition:background .14s;}
-  .pm-item:hover{background:#f7f7f5;}
-  /* where you already are */
-  .pm-item.on{background:var(--jade-soft);}
-  .pm-item svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;
-    stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  .pm-tx{display:flex;flex-direction:column;min-width:0;}
-  .pm-tx em{font-style:normal;font-size:12.5px;font-weight:500;color:var(--muted);
-    margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .pm-ar{margin-left:auto;color:#b8b8b2;font-size:18px;line-height:1;}
-  .pm-item.danger{color:#c0392b;}
 
   /* ============ PAGE — list + a rail ============ */
   .page{max-width:1240px;margin:0 auto;padding:34px 32px 80px;
@@ -103,11 +63,12 @@
     stroke-linecap:round;stroke-linejoin:round;}
   .btn.jade{background:var(--jade);border-color:var(--jade);color:#fff;}
   .btn.jade:hover{background:var(--jade-deep);border-color:var(--jade-deep);}
-  /* Stopping the watch is always available and never competes for the eye: no
-     border, no fill, the weight of a caption sitting beside the thing they
-     actually came to do. */
-  .btn.quiet{border-color:transparent;background:none;color:var(--muted);font-weight:600;}
-  .btn.quiet:hover{background:#f0f0ed;border-color:transparent;color:var(--ink);}
+  /* Stands where the Switch button would stand, and answers for its absence.
+     Not a control — there is nothing to press — so it takes the button's place
+     and its height with none of its affordance. */
+  .tag{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;
+    background:var(--chip-bg);color:var(--chip-ink);font-size:13.5px;font-weight:700;
+    white-space:nowrap;}
 
   /* ============ THE TICKET ============
      Body and photo are two halves of one stub, torn along a perforation: a
@@ -262,46 +223,6 @@
           <svg class="cv" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
         </button>
         <div class="menu" id="profileMenu" role="menu">
-          <div class="pm-top">
-            <div class="pm-band" aria-hidden="true"></div>
-            <span class="pm-av" id="menuAvatar">S</span>
-            <b class="pm-name" id="menuName">Saanvi</b>
-            <span class="pm-mail">xyz@email.com</span>
-          </div>
-
-          <div class="pm-sec">
-            <a class="pm-item on" href="bookings.html">
-              <svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="13.5" rx="2.5"/><path d="M8.5 7V5.2a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7"/></svg>
-              <span class="pm-tx">Bookings<em id="pmNext"></em></span>
-              <span class="pm-ar">&rsaquo;</span>
-            </a>
-            <a class="pm-item" href="#">
-              <svg viewBox="0 0 24 24"><path d="M12 20.3S3.8 15.4 3.8 9.9A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 8.2 1.9c0 5.5-8.2 10.4-8.2 10.4Z"/></svg>
-              Saved stays
-            </a>
-          </div>
-
-          <div class="pm-sec">
-            <a class="pm-item" href="#">
-              <svg viewBox="0 0 24 24"><path d="M3 9V7.2a2 2 0 0 1 1.6-2l11-2.1A1.4 1.4 0 0 1 17.3 4.5V6"/><rect x="3" y="6.8" width="18" height="13.4" rx="2.6"/><circle cx="16.6" cy="13.5" r="1.4"/></svg>
-              Payments and refunds
-            </a>
-            <a class="pm-item" href="profile.html">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.3"/><path d="M12 2.6v2.3M12 19.1v2.3M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.6 12h2.3M19.1 12h2.3M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg>
-              Account settings
-            </a>
-          </div>
-
-          <div class="pm-sec">
-            <a class="pm-item" href="help.html">
-              <svg viewBox="0 0 24 24"><path d="M4 14v-2.2a8 8 0 1 1 16 0V14"/><rect x="2" y="13.4" width="4.4" height="6.4" rx="2.2"/><rect x="17.6" y="13.4" width="4.4" height="6.4" rx="2.2"/><path d="M19.8 19.8a2.8 2.8 0 0 1-2.8 2.8h-3"/></svg>
-              Help and support
-            </a>
-            <a class="pm-item danger" href="home-loggedout.html">
-              <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-              Log out
-            </a>
-          </div>
         </div>
       </div>
     </div>
@@ -344,11 +265,8 @@
         menu.classList.remove('open'); btn.setAttribute('aria-expanded','false');
       }
     });
-    /* the soonest stay, so the row says what is behind it rather than only
-       where it goes — sorted() is already in check-in order */
-    var next = T.sorted()[0];
-    if(next) $('pmNext').textContent =
-      next.property_name_raw + ' — ' + fmt.day(next.check_in);
+    /* The next-stay subtext under Bookings is the panel's own business now —
+       topnav.js builds the panel and fills it from the same model. */
   })();
 
   var ICON = {
@@ -385,34 +303,12 @@
            '</span>';
   }
 
-  /* 3.9 — an offer that is left alone does not stand: it is re-priced, and it
-     ends at whichever runs out first, our rate or their free-cancellation
-     window. The model already picked the earlier one, so the card states a
-     single date and names which kind it is. Two dates on a card is a puzzle. */
-  function deadlineNote(b, w){
-    if(!w.expiresAt) return '';
-    var byRate = !!(b.our_offer && b.our_offer.rate_expires_at === w.expiresAt);
-    var txt = byRate
-      ? 'This price holds until ' + fmt.deadline(w.expiresAt)
-      : 'Free to cancel on ' + (b.platform ? b.platform.label : 'the original') +
-        ' until ' + fmt.deadline(w.expiresAt);
-    return '<span class="st-note">' + esc(txt) + '</span>';
-  }
-
-  /* 3.11 — where our price has come from since the stay entered the watch.
-     The proof that something is actually happening between alerts. */
-  function driftNote(w){
-    if(!w.drift || w.drift.by <= 0) return '';
-    return '<span class="st-note">Down ' + fmt.inr(w.drift.by) +
-             ' with us since we started watching</span>';
-  }
-
-  /* 4.6 / 5.4 — the answer has to be able to stick. Offered on every live
-     watch, and never on one that has already stopped. */
-  function stopWatch(b){
-    return '<button type="button" class="btn quiet" data-stop="' + esc(b.id) +
-             '">Stop watching</button>';
-  }
+  /* 3.9 and 3.11 — the offer expires and our price drifts, and the model still
+     tracks both (w.expiresAt, w.drift). Neither is stated on the card. A price
+     with a clock on it is a warning, and a saving is not something to be
+     hurried into: the offer is either live or it is gone, and when it goes the
+     card simply stops offering it. Anything that needs a date belongs on the
+     booking itself, where someone has gone looking for it. */
 
   /* Status block + actions, driven entirely by ownership then watch case.
      A tracked ticket never offers cancel, voucher, or manage. */
@@ -450,96 +346,82 @@
     var w = b.watch;
     if(!w) return { st: '', acts: '' };
 
-    var stop = stopWatch(b);
     var switchBtn = '<button type="button" class="btn jade" data-switch="' + esc(b.id) +
                       '">Switch</button>';
     var best = '<span class="st-good">' + ICON.tick + 'Your rate is still the best we see</span>';
 
     switch(w.kind){
-      /* 3.1 / 3.5 — the offer. Two prices, the date it stops being available,
-         and where our price has come from. One room or five changes nothing
-         except that both figures are sums. */
+      /* 3.1 / 3.5 — the offer. Two prices and a button, and nothing else: the
+         two numbers are the whole argument. One room or five changes nothing
+         at all here — both figures are what the whole booking costs either
+         way, and the line above already says how many rooms that is. */
       case 'saving':
-        var per = w.rooms > 1 ? ', ' + w.rooms + ' rooms' : '';
-        st = prices('You paid' + per, fmt.inr(w.theirTotal),
-                    'Our price' + per, fmt.inr(w.ourTotal)) +
-             deadlineNote(b, w) + driftNote(w);
-        acts = stop + switchBtn;
+        st = prices('You paid', fmt.inr(w.theirTotal),
+                    'Our price', fmt.inr(w.ourTotal));
+        acts = switchBtn;
         break;
 
-      /* 3.6 — cheaper on a different room. We switch exact matches only, so
-         there is no offer here and no number: against the room they actually
-         booked, what they hold is still the best we have.
-         3.2 — our price is level or higher. The common case, and the one that
-         decides whether being watched reads as alive or dead. */
+      /* 3.2 / 3.6 — three different findings, one answer. Our price is level,
+         or above theirs, or below it on a room they did not book; the model
+         keeps them apart because they are not the same fact, but there is
+         nothing for the guest to do about any of them. By how much and since
+         when is our problem, not theirs — a number here only invites a
+         comparison against a price they cannot have. */
       case 'near_miss':
       case 'level':
-        st = best;
-        acts = stop;
-        break;
-
       case 'dearer':
-        st = best + '<span class="st-note">Up ' + fmt.inr(w.by) + ' with us' +
-               (w.since ? ' since ' + esc(fmt.day(w.since)) : '') + '</span>';
-        acts = stop;
+        st = best;
+        acts = '';
         break;
 
       /* 3.4 — in our inventory, nothing free for these dates. Availability
-         comes back, and it can come back a grade up, so both are being looked
-         for. This is a pause in the watch, not the end of one. */
+         comes back, and it can come back a grade up; that we also look above
+         the room they booked is how the watch works, not something the card
+         has to promise. The dates are on the line above, so the whole case
+         fits in the one clause that distinguishes it from 3.3: we are still
+         looking. */
       case 'sold_out':
-        st = '<span class="st-ink">Sold out for your dates</span>' +
-             '<span class="st-note">Still watching these dates, and rooms above yours</span>';
-        acts = stop;
+        st = '<span class="st-ink">Sold out, but still watching</span>';
+        acts = '';
         break;
 
-      /* 3.3 — we don't sell it. Silence on this row is correct behaviour, so
-         the row says so rather than leaving it to be read as a failure. */
+      /* 3.3 — we don't sell it, so there is no price to watch and the handling
+         is a person rather than a system. Promising that a helpdesk would get
+         in touch took three lines to say what the button says by existing:
+         the way to a person is the answer, so it replaces the sentence rather
+         than following it. Stopping the watch is not offered — there is no
+         watch running to stop. */
       case 'not_carried':
-        st = '<span class="st-ink">Not on onto</span>' +
-             '<span class="st-note">We don’t sell this property, so there’s no price to watch</span>';
-        acts = stop +
-               '<a class="btn" href="' + esc(T.WA.forward()) + '" target="_blank" rel="noopener">' +
-                 ICON.chat + 'Forward another booking</a>';
+        st = '<span class="st-ink">Not on onto</span>';
+        acts = '<a class="btn" href="' + esc(T.WA.help(b)) + '" target="_blank" rel="noopener">' +
+                 ICON.chat + 'Contact us</a>';
         break;
 
-      /* 3.7 — the saving is real, correct, and permanently out of reach. We
-         state it and the reason it cannot be taken, because the alternative is
-         a guest who finds out later that we saw it and said nothing. */
+      /* 3.7 — the saving is real, correct, and permanently out of reach. It is
+         still shown, because a guest who finds out later that we saw it and
+         said nothing is the worse outcome. The two prices read exactly as they
+         do on an offer; what changes is where the button would be, which
+         carries the one word that explains why there isn't one. */
       case 'unreachable':
-        st = '<span class="st-ink">Non-refundable — can’t be switched</span>' +
-             '<span class="st-note">We’re ' + fmt.inr(w.delta) + ' cheaper for these nights, ' +
-               'but cancelling forfeits what you paid, so switching would mean paying twice</span>';
-        acts = stop;
+        st = prices('You paid', fmt.inr(w.theirTotal),
+                    'Our price', fmt.inr(w.ourTotal));
+        acts = '<span class="tag">Non-refundable</span>';
         break;
 
-      /* 3.8 — paid in points. No cash figure exists to beat, so we put ours on
-         the table and say plainly that it is not a comparison. */
-      case 'points':
-        st = prices('You paid', esc(b.points_detail || 'Points'),
-                    'Our price', fmt.inr(w.ourTotal)) +
-             '<span class="st-note">We can’t put a rupee value on points, so this is our price, ' +
-               'not a saving</span>' + deadlineNote(b, w);
-        acts = stop + (w.switchable ? switchBtn : '');
-        break;
-
-      /* 3.13 — charged in another currency. Their figure is reproduced as it
-         left their account and never converted: the exchange rate and the card
-         margin behind it are not ours to guess at. */
+      /* 3.13 — charged in another currency. Their figure sits in what it was
+         charged in and ours in rupees, side by side and unconverted. The
+         currency on their number says everything the sentence would have. */
       case 'cross_currency':
         st = prices('You paid', esc(fmt.money(w.theirTotal, w.theirCurrency)),
-                    'Our price', fmt.inr(w.ourTotal)) +
-             '<span class="st-note">Charged in ' + esc(w.theirCurrency) +
-               '. Your card set its own rate, so the two aren’t ours to compare</span>' +
-             deadlineNote(b, w);
-        acts = stop + (w.switchable ? switchBtn : '');
+                    'Our price', fmt.inr(w.ourTotal));
+        acts = w.switchable ? switchBtn : '';
         break;
 
       /* 3.12 — the window shut. The booking keeps its place; it has just
          stopped being switchable, and there is no watch left to stop. */
       case 'window_closed':
         st = '<span class="st-ink">Free cancellation ended ' + esc(fmt.day(w.closedAt)) + '</span>' +
-             '<span class="st-note">No longer switchable, so we’ve stopped watching the price</span>';
+             '<span class="st-note">No longer switchable</span>';
         break;
 
       case 'pending':
@@ -589,8 +471,8 @@
 
   function renderList(){
     var rows = T.sorted();
-    /* Reachable: stop watching every booking and the list is legitimately
-       empty. Reset at the foot of the page is the way back. */
+    /* An account with nothing ahead of it: every stay watched has already
+       been travelled. Nothing on this page can empty it by hand. */
     $('list').innerHTML = rows.length
       ? rows.map(rowHTML).join('')
       : '<p class="empty">Nothing being watched.</p>';
@@ -657,15 +539,6 @@
       startSwitch(sw.getAttribute('data-switch'));
       return;
     }
-    /* Taken at face value and acted on at once — an answer that needs
-       confirming is not an answer that sticks. Reset restores everything. */
-    var off = e.target.closest('[data-stop]');
-    if(off){
-      e.preventDefault();
-      T.stopTracking(off.getAttribute('data-stop'));
-      render();
-      return;
-    }
     /* hand the booking to the details page in the shape it reads */
     var own = e.target.closest('[data-owned]');
     if(own){
@@ -692,5 +565,6 @@
   }, 60000);
 })();
 </script>
+<script src="topnav.js"></script>
 </body>
 </html>

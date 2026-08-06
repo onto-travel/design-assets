@@ -158,7 +158,7 @@
   <nav class="topnav">
     <div class="topnav-in">
       <a class="tn-brand" href="home2.html">onto<span>.</span></a>
-      <a class="back" href="bookings.html">
+      <a class="back" href="bookings.html?all=1">
         <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg> Bookings</a>
     </div>
   </nav>
@@ -194,7 +194,7 @@
   if(!b || b.ownership !== 'tracked'){
     document.getElementById('page').innerHTML =
       '<div class="card"><div class="head"><h1>Not a tracked booking</h1>' +
-      '<p>Open it from <a href="bookings.html">your bookings</a>.</p></div></div>';
+      '<p>Open it from <a href="bookings.html?all=1">your bookings</a>.</p></div></div>';
     return;
   }
 
@@ -366,7 +366,7 @@
 
   document.getElementById('page').innerHTML =
     '<div class="rightcol"><div class="card">' +
-      '<a class="backlink" href="bookings.html">' +
+      '<a class="backlink" href="bookings.html?all=1">' +
         '<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to bookings</a>' +
       '<div>' +
         '<div class="head">' +
@@ -430,7 +430,7 @@
           document.getElementById('bookGo').addEventListener('click', function(){
             /* payment is stubbed in this prototype */
             T.completeSwitch(b.id, c.ourTotal);
-            location.href = 'bookings.html';
+            location.href = 'bookings.html?all=1';
           });
         });
     });
@@ -473,7 +473,7 @@
           });
           document.getElementById('stopGo').addEventListener('click', function(){
             T.stopTracking(b.id);
-            location.href = 'bookings.html';
+            location.href = 'bookings.html?all=1';
           });
         });
     });
@@ -481,5 +481,6 @@
   wireStop();
 })();
 </script>
+<script src="topnav.js"></script>
 </body>
 </html>

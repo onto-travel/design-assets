@@ -48,7 +48,7 @@
   .topnav{position:sticky;top:0;z-index:90;
     background:rgba(250,250,249,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
     border-bottom:.8px solid var(--line);}
-  .topnav-in{max-width:none;margin:0;padding:0 40px;height:72px;
+  .topnav-in{max-width:1440px;margin:0 auto;padding:0 40px;height:72px;
     display:flex;align-items:center;justify-content:space-between;gap:26px;position:relative;}
   .tn-brand{display:flex;align-items:center;gap:9px;font-size:20px;color:var(--ink);
     letter-spacing:normal;text-decoration:none;white-space:nowrap;font-weight:400;}
@@ -1497,25 +1497,37 @@ function App(){
             <>
               <div className="tn-links">
                 <a href="home.html" className="active">Stays</a>
-                <a href="bookings.html">Bookings</a>
+                <a href="bookings.html?all=1">Bookings</a>
               </div>
               <div className="tn-right">
-                <button type="button" className="tn-name" aria-haspopup="true">
-                  {readUserName()}<img src="images/figma/ic-chevron-down.svg" alt="" width="16" height="16"/>
+                {/* the shared bar's trigger, hand-held here because React owns
+                    this markup — same class, so it takes the same styling */}
+                <button type="button" className="tn-who" aria-haspopup="true">
+                  {readUserName()}
+                  <svg className="cv" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
                 </button>
+                {/* Same panel as every other page. React owns this markup
+                    because an injected one would be wiped on the next render,
+                    but the classes and the stylesheet come from
+                    topnav.js, so the design lives in one place. */}
                 <div className="menu" role="menu">
-                  <a className="menu-id" href="profile.html">
-                    <span className="tn-avatar">{(readUserName()[0]||"Y").toUpperCase()}</span>
-                    <div><b>{readUserName()}</b><small>xyz@email.com</small></div>
-                    <span className="menu-id-ar">›</span>
-                  </a>
-                  <div className="menu-sec">
-                    {/* the v2 header has no nav links, so Bookings moves into the
-                        account menu rather than losing its entry point */}
-                    <a className="item" href="bookings.html"><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Bookings <span className="ar">›</span></a>
-                    <a className="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span className="ar">›</span></a>
-                    <a className="item" href="help.html"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span className="ar">›</span></a>
-                    <a className="item" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
+                  <div className="pm-top">
+                    <div className="pm-band" aria-hidden="true"></div>
+                    <span className="pm-av">{(readUserName()[0]||"S").toUpperCase()}</span>
+                    <b className="pm-name">{readUserName()}</b>
+                    <span className="pm-mail">xyz@email.com</span>
+                  </div>
+                  <div className="pm-sec">
+                    <a className="pm-item" href="bookings.html?all=1"><svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="13.5" rx="2.5"/><path d="M8.5 7V5.2a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7"/></svg> Bookings <span className="pm-ar">›</span></a>
+                    <a className="pm-item" href="#"><svg viewBox="0 0 24 24"><path d="M12 20.3S3.8 15.4 3.8 9.9A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 8.2 1.9c0 5.5-8.2 10.4-8.2 10.4Z"/></svg> Saved stays</a>
+                  </div>
+                  <div className="pm-sec">
+                    <a className="pm-item" href="#"><svg viewBox="0 0 24 24"><path d="M3 9V7.2a2 2 0 0 1 1.6-2l11-2.1A1.4 1.4 0 0 1 17.3 4.5V6"/><rect x="3" y="6.8" width="18" height="13.4" rx="2.6"/><circle cx="16.6" cy="13.5" r="1.4"/></svg> Payments and refunds</a>
+                    <a className="pm-item" href="profile.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.3"/><path d="M12 2.6v2.3M12 19.1v2.3M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.6 12h2.3M19.1 12h2.3M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg> Account settings</a>
+                  </div>
+                  <div className="pm-sec">
+                    <a className="pm-item" href="help.html"><svg viewBox="0 0 24 24"><path d="M4 14v-2.2a8 8 0 1 1 16 0V14"/><rect x="2" y="13.4" width="4.4" height="6.4" rx="2.2"/><rect x="17.6" y="13.4" width="4.4" height="6.4" rx="2.2"/><path d="M19.8 19.8a2.8 2.8 0 0 1-2.8 2.8h-3"/></svg> Help and support</a>
+                    <a className="pm-item danger" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Log out</a>
                   </div>
                 </div>
               </div>
@@ -1615,5 +1627,6 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
+<script src="topnav.js"></script>
 </body>
 </html>

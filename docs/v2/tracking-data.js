@@ -24,6 +24,14 @@
     forward: function () {
       return WA.link("Hi onto — here's a hotel booking I'd like you to track.");
     },
+    /* A property we don't sell is handled by a person, so the card hands the
+       guest straight to one with the booking already named. */
+    help: function (b) {
+      return WA.link(
+        'Hi onto — I need some help with my booking at ' +
+        b.property_name_raw + ', ' + fmt.dateRange(b.check_in, b.check_out) + '.'
+      );
+    },
     fix: function (b) {
       return WA.link(
         'Hi onto — something looks wrong on the booking you\'re tracking for me: ' +
@@ -604,8 +612,10 @@
       ]
     },
 
-    /* 16 — 3.8: paid in points. There is no cash figure on the voucher to
-       beat, so we state our price and claim nothing about theirs. */
+    /* 16 — 3.8: paid in points. The voucher still states what the redemption
+       cost in rupees, so there is a figure to compare and this is an ordinary
+       offer. How they paid matters only when a refund has to find its way
+       back; it is not something the price needs to explain. */
     {
       id: 'bk-jw-sahar',
       ownership: 'tracked',
@@ -620,8 +630,9 @@
       meal_plan: 'Breakfast included',
       cancellation_policy: 'free_until',
       free_cancellation_until: '2026-09-15T18:00:00+05:30',
-      /* 68,000 Bonvoy points and nothing else. No rupee figure exists. */
-      price_paid_total: null,
+      /* what the redemption cost, as the voucher states it. `paid_with` is
+         carried for the refund path and is never rendered on the price. */
+      price_paid_total: 28900,
       paid_with: 'points',
       points_detail: '68,000 Bonvoy points',
       currency: 'INR',
@@ -1007,13 +1018,10 @@
                delta: beats ? c.delta : null };
     }
 
-    /* 3.8 / 3.13 — we know our price and nothing dependable about theirs. Both
-       resolve the same way: state ours in rupees, claim no saving, and leave
-       the comparison to the only person holding both numbers. */
-    if (c && c.noCashPrice) {
-      return { kind: 'points', ref: '3.8', switchable: match, ourTotal: ours,
-               paidWith: b.paid_with, expiresAt: offerExpiry(b) };
-    }
+    /* 3.13 — charged in another currency. Both figures go on the card as they
+       stand, theirs in what it was charged in and ours in rupees. We do not
+       convert between them: the exchange rate and the card margin behind their
+       number are not ours to guess at, so we state and let them read. */
     if (c && c.crossCurrency) {
       return { kind: 'cross_currency', ref: '3.13', switchable: match, ourTotal: ours,
                theirTotal: b.price_paid_total, theirCurrency: b.currency,
