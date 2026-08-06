@@ -173,7 +173,10 @@
   /* --- 2. BOOKING MODULE: the dominant block (fills the swipe viewport; header gap is on .flip-inner) --- */
   /* column so the price/CTA block can take the slack when the card is grown to the gallery's height */
   .booking{margin:0;display:flex;flex-direction:column;}
-  .booking>.stay-cards{flex:1;}
+  /* not flex:1 — the swipe viewport is sized to the taller "Confirm details"
+     face, so stretching this box put its bottom edge well below the last card,
+     and anything anchored to it (the name sheet) hung off the end */
+  .booking>.stay-cards{flex:none;}
   /* was margin-top:auto — that pinned the summary to the bottom of the swipe
      viewport (sized to the taller form face). Harmless while the rail was one
      boxed card; once the v2 rail went unboxed it read as a gap. */
@@ -260,15 +263,16 @@
      anchored to .stay-cards, so left/right:0 make it exactly as wide as the
      When/Who/Rooms cards. Pinned to the BOTTOM (it covers the price and CTAs —
      the cost box doesn't need to stay visible while you're naming the booking)
-     and min-height:100% floors it at the full stack height, so its top edge
-     clears the Dates card's own top rather than slicing through that card. It
-     still grows past that if the content is ever taller. --- */
-  .nm-pop{position:absolute;bottom:0;left:0;right:0;width:auto;min-height:100%;z-index:46;
+     inset:0 makes it exactly the stack — top of the Dates card to the foot of
+     the total card, no more. The slack that leaves is parked ABOVE the content:
+     the sheet has covered those cards, so blank there is the point, rather than
+     opening a gap before Done. --- */
+  .nm-pop{position:absolute;inset:0;width:auto;z-index:46;
     display:flex;flex-direction:column;
     background:#fff;border:1px solid var(--line);border-radius:20px;
     box-shadow:0 -6px 40px rgba(40,30,10,.16),0 6px 24px rgba(40,30,10,.10);padding:20px;}
   .nm-pop[hidden]{display:none;}
-  .nm-h{font-size:18px;font-weight:700;color:var(--ink);margin:0 0 14px;letter-spacing:-.01em;}
+  .nm-h{font-size:18px;font-weight:700;color:var(--ink);margin:auto 0 14px;letter-spacing:-.01em;}
   /* Myself / Someone else — same segmented shape as the design's view switcher */
   .nm-seg{display:flex;gap:4px;background:#f1f1f0;border-radius:14px;padding:4px;margin-bottom:16px;}
   .nm-seg button{flex:1;min-width:0;height:40px;border:none;background:none;border-radius:11px;
@@ -291,9 +295,7 @@
   .nm-err{display:none;margin-top:5px;font-size:12.5px;color:#d64545;font-weight:500;}
   .nm-f.invalid .nm-in{border-color:#e0b3a5;}
   .nm-f.invalid .nm-err{display:block;}
-  /* margin-top:auto — when the sheet is floored to the stack height the slack lands
-     here, keeping the rule and Done at the bottom instead of trailing whitespace */
-  .nm-rule{height:1px;background:var(--line);margin:auto 0 0;}
+  .nm-rule{height:1px;background:var(--line);margin:8px 0 0;}
   /* the design draws Done as #000; v2 replaces every black CTA with the brand green */
   .nm-done{width:100%;margin-top:16px;border:none;background:var(--jade);color:#fff;
     font-family:inherit;font-size:15px;font-weight:700;min-height:48px;border-radius:14px;
