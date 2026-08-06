@@ -76,6 +76,9 @@
         cancellation_policy: 'free_until',
         free_cancellation_until: '2026-08-12T18:00:00+05:30',
         our_price_total: 52900,
+        /* 3.9 — the rate behind the offer has its own life, shorter here than
+           the cancellation window. The offer ends at whichever runs out first. */
+        rate_expires_at: '2026-08-09T12:00:00+05:30',
         room_matched: true,
         availability: 'available'
       },
@@ -86,7 +89,9 @@
       ]
     },
 
-    /* 2 — cheaper, but one attribute is worse. Never presented as a saving. */
+    /* 2 — second like-for-like saving. Paired with #1 as the default account,
+       so the list opens on two live offers rather than one.
+       The cheaper-but-worse case is #14, which is where 3.6 is exercised. */
     {
       id: 'bk-leela-jaipur',
       ownership: 'tracked',
@@ -470,16 +475,278 @@
       last_checked_at: null,
       image: 'images/05-pool-day.png',
       switched_from: 'bk-hyatt-goa'
+    },
+
+    /* 13 — 3.5: more than one room. Nothing about the case is different except
+       that both figures are sums, so the comparison has to be made on the whole
+       booking and never on a nightly or per-room rate. */
+    {
+      id: 'bk-fishermans-cove',
+      ownership: 'tracked',
+      source_platform: 'makemytrip',
+      property_id: 'prop-fishermans-cove',
+      property_name_raw: "Taj Fisherman's Cove Resort & Spa, Chennai",
+      location: 'Covelong Beach · Chennai',
+      stars: 5,
+      check_in: '2026-09-04', check_out: '2026-09-07',
+      room_category: 'Deluxe Room Sea View',
+      rooms: 2,
+      occupancy: '2 rooms · 4 adults, 1 child',
+      /* the child sleeps on an extra bed in the second room — a priced line on
+         the voucher, so it is part of what has to match, not a footnote */
+      extra_beds: 1,
+      meal_plan: 'Breakfast included',
+      cancellation_policy: 'free_until',
+      free_cancellation_until: '2026-09-02T18:00:00+05:30',
+      price_paid_total: 96400,
+      currency: 'INR',
+      status: 'saving_available',
+      raw_artifact_ref: 'wa/2026-07-30/mmt-conf-4417.pdf',
+      parse_confidence: 0.93,
+      created_at: '2026-07-30T16:20:00+05:30',
+      last_checked_at: null,
+      image: 'images/sv-01-bedroom.png',
+      our_offer: {
+        room_category: 'Deluxe Room Sea View',
+        rooms: 2,
+        occupancy: '2 rooms · 4 adults, 1 child',
+        extra_beds: 1,
+        meal_plan: 'Breakfast included',
+        cancellation_policy: 'free_until',
+        free_cancellation_until: '2026-09-02T18:00:00+05:30',
+        our_price_total: 88700,
+        room_matched: true,
+        availability: 'available'
+      },
+      observations: [
+        ['2026-07-30', 95200], ['2026-08-02', 91400], ['2026-08-05', 88700]
+      ]
+    },
+
+    /* 14 — 3.6: cheaper with us, and not the same room. We only switch an
+       exact match, so this is never offered and never priced on screen. */
+    {
+      id: 'bk-udaivilas',
+      ownership: 'tracked',
+      source_platform: 'booking',
+      property_id: 'prop-oberoi-udaivilas',
+      property_name_raw: 'The Oberoi Udaivilas, Udaipur',
+      location: 'Haridasji Ki Magri · Udaipur',
+      stars: 5,
+      check_in: '2026-10-16', check_out: '2026-10-19',
+      room_category: 'Premier Room with Semi-Private Pool',
+      occupancy: '2 adults',
+      meal_plan: 'Breakfast included',
+      cancellation_policy: 'free_until',
+      free_cancellation_until: '2026-10-14T18:00:00+05:30',
+      price_paid_total: 74000,
+      currency: 'INR',
+      status: 'saving_available',
+      raw_artifact_ref: 'wa/2026-07-31/bdc-conf-6034.pdf',
+      parse_confidence: 0.95,
+      created_at: '2026-07-31T09:40:00+05:30',
+      last_checked_at: null,
+      image: 'images/pv-02-living.png',
+      our_offer: {
+        /* a grade down: no pool on the room. Cheaper, and not the thing they
+           chose — so the difference is the answer, not the price. */
+        room_category: 'Premier Room',
+        occupancy: '2 adults',
+        meal_plan: 'Breakfast included',
+        cancellation_policy: 'free_until',
+        free_cancellation_until: '2026-10-14T18:00:00+05:30',
+        our_price_total: 69500,
+        room_matched: false,
+        availability: 'available'
+      },
+      observations: [
+        ['2026-07-31', 70800], ['2026-08-04', 69500]
+      ]
+    },
+
+    /* 15 — 3.7: non-refundable original. The saving is real, correct, and
+       permanently out of reach — cancelling forfeits the whole of what they
+       already paid, so switching would mean buying the same nights twice. */
+    {
+      id: 'bk-lake-palace',
+      ownership: 'tracked',
+      source_platform: 'agoda',
+      property_id: 'prop-taj-lake-palace',
+      property_name_raw: 'Taj Lake Palace, Udaipur',
+      location: 'Pichola Lake · Udaipur',
+      stars: 5,
+      check_in: '2026-11-20', check_out: '2026-11-23',
+      room_category: 'Luxury Room Lake View',
+      occupancy: '2 adults',
+      meal_plan: 'Breakfast included',
+      cancellation_policy: 'non_refundable',
+      free_cancellation_until: null,
+      price_paid_total: 68000,
+      currency: 'INR',
+      status: 'saving_available',
+      raw_artifact_ref: 'wa/2026-08-01/agoda-conf-8875.jpg',
+      parse_confidence: 0.96,
+      created_at: '2026-08-01T12:15:00+05:30',
+      last_checked_at: null,
+      image: 'images/pp-05-pool.png',
+      our_offer: {
+        room_category: 'Luxury Room Lake View',
+        occupancy: '2 adults',
+        meal_plan: 'Breakfast included',
+        cancellation_policy: 'free_until',
+        free_cancellation_until: '2026-11-18T18:00:00+05:30',
+        our_price_total: 61200,
+        room_matched: true,
+        availability: 'available'
+      },
+      observations: [
+        ['2026-08-01', 64100], ['2026-08-04', 61200]
+      ]
+    },
+
+    /* 16 — 3.8: paid in points. There is no cash figure on the voucher to
+       beat, so we state our price and claim nothing about theirs. */
+    {
+      id: 'bk-jw-sahar',
+      ownership: 'tracked',
+      source_platform: 'makemytrip',
+      property_id: 'prop-jw-sahar',
+      property_name_raw: 'JW Marriott Mumbai Sahar',
+      location: 'Andheri East · Mumbai',
+      stars: 5,
+      check_in: '2026-09-17', check_out: '2026-09-19',
+      room_category: 'Deluxe Room',
+      occupancy: '2 adults',
+      meal_plan: 'Breakfast included',
+      cancellation_policy: 'free_until',
+      free_cancellation_until: '2026-09-15T18:00:00+05:30',
+      /* 68,000 Bonvoy points and nothing else. No rupee figure exists. */
+      price_paid_total: null,
+      paid_with: 'points',
+      points_detail: '68,000 Bonvoy points',
+      currency: 'INR',
+      status: 'saving_available',
+      raw_artifact_ref: 'wa/2026-08-02/mmt-fwd-0114.pdf',
+      parse_confidence: 0.89,
+      created_at: '2026-08-02T21:05:00+05:30',
+      last_checked_at: null,
+      image: 'images/ls-02-living.png',
+      our_offer: {
+        room_category: 'Deluxe Room',
+        occupancy: '2 adults',
+        meal_plan: 'Breakfast included',
+        cancellation_policy: 'free_until',
+        free_cancellation_until: '2026-09-15T18:00:00+05:30',
+        our_price_total: 24800,
+        room_matched: true,
+        availability: 'available'
+      },
+      observations: [
+        ['2026-08-02', 25600], ['2026-08-05', 24800]
+      ]
+    },
+
+    /* 17 — 3.12: the free-cancellation window shut while we were watching.
+       The stay is still ahead of them and stays on the list; it has simply
+       stopped being something we can switch. */
+    {
+      id: 'bk-oberoi-delhi',
+      ownership: 'tracked',
+      source_platform: 'booking',
+      property_id: 'prop-oberoi-delhi',
+      property_name_raw: 'The Oberoi, New Delhi',
+      location: 'Dr Zakir Hussain Marg · New Delhi',
+      stars: 5,
+      check_in: '2026-10-18', check_out: '2026-10-20',
+      room_category: 'Deluxe Room City View',
+      occupancy: '2 adults',
+      meal_plan: 'Breakfast included',
+      cancellation_policy: 'free_until',
+      /* already behind us — today is 6 Aug 2026 */
+      free_cancellation_until: '2026-08-01T18:00:00+05:30',
+      price_paid_total: 39800,
+      currency: 'INR',
+      status: 'saving_available',
+      raw_artifact_ref: 'wa/2026-07-11/bdc-conf-4402.pdf',
+      parse_confidence: 0.97,
+      created_at: '2026-07-11T14:00:00+05:30',
+      last_checked_at: null,
+      image: 'images/pr-02-living.png',
+      our_offer: {
+        room_category: 'Deluxe Room City View',
+        occupancy: '2 adults',
+        meal_plan: 'Breakfast included',
+        cancellation_policy: 'free_until',
+        free_cancellation_until: '2026-10-16T18:00:00+05:30',
+        /* cheaper, and it stopped mattering on 1 August */
+        our_price_total: 36100,
+        room_matched: true,
+        availability: 'available'
+      },
+      observations: [
+        ['2026-07-11', 39600], ['2026-07-25', 37900], ['2026-08-05', 36100]
+      ]
+    },
+
+    /* 18 — 3.13: charged in another currency. What left their account went
+       through an exchange rate and a card margin we never see, so their figure
+       is reproduced exactly as charged and never converted. */
+    {
+      id: 'bk-coromandel',
+      ownership: 'tracked',
+      source_platform: 'agoda',
+      property_id: 'prop-taj-coromandel',
+      property_name_raw: 'Taj Coromandel, Chennai',
+      location: 'Nungambakkam · Chennai',
+      stars: 5,
+      check_in: '2026-09-28', check_out: '2026-10-01',
+      room_category: 'Superior Charm Room',
+      occupancy: '2 adults',
+      meal_plan: 'Breakfast included',
+      cancellation_policy: 'free_until',
+      free_cancellation_until: '2026-09-26T18:00:00+05:30',
+      price_paid_total: 640,
+      currency: 'USD',
+      status: 'saving_available',
+      raw_artifact_ref: 'wa/2026-08-04/agoda-conf-9921.pdf',
+      parse_confidence: 0.92,
+      created_at: '2026-08-04T07:30:00+05:30',
+      last_checked_at: null,
+      image: 'images/gv-01-bedroom.png',
+      our_offer: {
+        room_category: 'Superior Charm Room',
+        occupancy: '2 adults',
+        meal_plan: 'Breakfast included',
+        cancellation_policy: 'free_until',
+        free_cancellation_until: '2026-09-26T18:00:00+05:30',
+        our_price_total: 48900,
+        room_matched: true,
+        availability: 'available'
+      },
+      observations: [
+        ['2026-08-04', 50200], ['2026-08-05', 48900]
+      ]
     }
   ];
 
   /* ---------- formatting ---------- */
   var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+  /* We sell in rupees. A voucher may be denominated in anything, and the card
+     that paid it added a margin we cannot see — so a foreign figure is only
+     ever reproduced, never converted. */
+  var SYMBOL = { INR: '₹', USD: '$', GBP: '£', EUR: '€', AED: 'AED ', SGD: 'S$', THB: '฿' };
+
   var fmt = {
     inr: function (n) {
       if (n === null || n === undefined) return '—';
       return '₹' + Math.round(n).toLocaleString('en-IN');
+    },
+    /* A figure in the currency it was actually charged in. */
+    money: function (n, cur) {
+      if (n === null || n === undefined) return '—';
+      if (!cur || cur === 'INR') return fmt.inr(n);
+      return (SYMBOL[cur] || cur + ' ') + Math.round(n).toLocaleString('en-US');
     },
     /* signed, for deltas */
     inrDelta: function (n) {
@@ -568,6 +835,17 @@
   /* Rank meal plans so we can tell "different" from "different and worse". */
   var MEAL_RANK = { 'Room only': 0, 'Breakfast included': 1, 'Breakfast and dinner': 2, 'All meals included': 3 };
 
+  /* Rooms, heads and extra beds are all priced lines on a voucher, so they are
+     part of what has to match. Stated as one phrase because that is how the
+     booking states it, and how anyone checks it. */
+  function occupancyText(x) {
+    var t = x.occupancy || '—';
+    if (x.extra_beds) {
+      t += ' · ' + x.extra_beds + (x.extra_beds === 1 ? ' extra bed' : ' extra beds');
+    }
+    return t;
+  }
+
   function cancellationText(policy, until) {
     if (policy === 'non_refundable') return 'Non-refundable';
     if (!until) return 'Free cancellation';
@@ -594,6 +872,10 @@
           var td = new Date(b.free_cancellation_until), od = new Date(o.free_cancellation_until);
           verdict = od >= td ? 'better' : 'worse';
         }
+      } else if (a.key === 'occupancy') {
+        theirs = occupancyText(b);
+        ours = occupancyText(o);
+        verdict = theirs === ours ? 'same' : 'differs';
       } else if (a.key === 'meal_plan') {
         theirs = b.meal_plan || '—';
         ours = o.meal_plan || '—';
@@ -611,26 +893,161 @@
       return { key: a.key, label: a.label, theirs: theirs, ours: ours, verdict: verdict };
     });
 
-    var delta = b.price_paid_total - o.our_price_total;
+    /* Two ways the arithmetic is simply unavailable, and they are not the same
+       as "no saving". Points and vouchers leave no cash figure to beat, and a
+       foreign charge went through an exchange rate and a card margin we never
+       see. In both we know our own price and nothing about theirs, so we state
+       ours and claim nothing — a delta invented from either would be a lie
+       with a number on it. */
+    var crossCurrency = (b.currency || 'INR') !== 'INR';
+    var noCashPrice = b.price_paid_total === null || b.price_paid_total === undefined;
+    var comparable = !crossCurrency && !noCashPrice;
+
+    var delta = comparable ? b.price_paid_total - o.our_price_total : null;
     var worse = rows.filter(function (r) { return r.verdict === 'worse' || r.verdict === 'differs'; });
     var likeForLike = worse.length === 0;
 
     return {
       rows: rows,
+      /* the room, board and terms still match even when the money cannot be
+         put side by side — that is what makes the switch sellable at all */
+      crossCurrency: crossCurrency,
+      noCashPrice: noCashPrice,
+      comparable: comparable,
       /* Every attribute matches or ours is better. Nothing is shown, compared,
          or offered unless this is true — we never ask someone to give up
          breakfast, a room grade or free cancellation to pay less. A cheaper
          rate that is worse on any attribute is not an option, it is not a
          saving, and it does not appear in the product at all. */
       likeForLike: likeForLike,
-      /* A saving is only a saving when it is like-for-like and cheaper. */
-      isSaving: likeForLike && delta > 0,
+      /* A saving is only a saving when it is like-for-like, cheaper, and
+         actually measurable against what they paid. */
+      isSaving: comparable && likeForLike && delta > 0,
       /* Kept for internal reasoning; never rendered as an offer. */
       tradeoffs: worse,
       delta: delta,
       theirTotal: b.price_paid_total,
       ourTotal: o.our_price_total
     };
+  }
+
+  /* ---------- 03 Watch: which case a booking we are watching is in ----------
+     One derived answer, resolved here rather than re-read from a scatter of
+     fields by every screen. Two things come out of it: `kind`, which decides
+     what we say, and `switchable`, which decides whether we offer anything at
+     all. They are separate on purpose — a saving can be real, correct and
+     completely unsellable, and the whole point of this stage is to tell those
+     apart before a button gets drawn. */
+
+  /* Free cancellation is the guest's ability to act. Once it lapses, a cheaper
+     price is not an opportunity, it is only a source of regret. */
+  function windowClosed(b) {
+    if (b.cancellation_policy !== 'free_until' || !b.free_cancellation_until) return false;
+    return new Date(b.free_cancellation_until) <= new Date();
+  }
+
+  /* An offer cannot outlive either the rate behind it or the window the guest
+     needs in order to take it. Whichever ends first ends the offer. */
+  function offerExpiry(b) {
+    var ends = [];
+    if (b.our_offer && b.our_offer.rate_expires_at) ends.push(b.our_offer.rate_expires_at);
+    if (b.cancellation_policy === 'free_until' && b.free_cancellation_until) {
+      ends.push(b.free_cancellation_until);
+    }
+    if (!ends.length) return null;
+    return ends.sort(function (x, y) { return new Date(x) - new Date(y); })[0];
+  }
+
+  /* How far our price has travelled since we started watching. `observations`
+     is our price over time, so the first entry is what the stay cost with us
+     on the day it entered the watch. */
+  function drift(b) {
+    var obs = b.observations || [];
+    var priced = obs.filter(function (o) { return o[1] !== null && o[1] !== undefined; });
+    if (priced.length < 2) return null;
+    var first = priced[0][1], last = priced[priced.length - 1][1];
+    return first === last ? null : { from: first, to: last, by: first - last };
+  }
+
+  function watch(b) {
+    if (b.ownership !== 'tracked') return null;
+
+    /* Not yet a watch: nothing has been confirmed to watch. Ingest owns this. */
+    if (b.status === 'pending') return { kind: 'pending', ref: '1.4', switchable: false };
+    /* A switch already happened on this stay — stage 04 owns what is left. */
+    if (b.switch_event) return { kind: 'switched', ref: '4.1', switchable: false };
+
+    /* 3.3 — we do not sell this property, so there is no price to watch. It is
+       on the trip and it is not a failure that it is quiet. */
+    if (!b.property_id) return { kind: 'not_carried', ref: '3.3', switchable: false };
+
+    /* 3.12 — the window shut. The booking stays; it stops being switchable. */
+    if (windowClosed(b)) {
+      return { kind: 'window_closed', ref: '3.12', switchable: false,
+               closedAt: b.free_cancellation_until };
+    }
+
+    /* 3.4 — we do sell it, and have nothing for these dates. Availability
+       comes back, so this is a pause in the watch, not the end of it. */
+    if (!b.our_offer || b.our_offer.availability !== 'available') {
+      return { kind: 'sold_out', ref: '3.4', switchable: false };
+    }
+
+    var c = b.comparison;
+    var ours = b.our_offer.our_price_total;
+    var match = !!(c && c.likeForLike);
+
+    /* 3.7 — non-refundable. Cancelling forfeits the whole original, so taking
+       our price would mean paying for the same nights twice. The saving is
+       arithmetically real and permanently out of reach. */
+    if (b.cancellation_policy === 'non_refundable') {
+      var beats = c && c.comparable && c.delta > 0;
+      return { kind: beats ? 'unreachable' : 'level', ref: beats ? '3.7' : '3.2',
+               switchable: false, ourTotal: ours, theirTotal: b.price_paid_total,
+               delta: beats ? c.delta : null };
+    }
+
+    /* 3.8 / 3.13 — we know our price and nothing dependable about theirs. Both
+       resolve the same way: state ours in rupees, claim no saving, and leave
+       the comparison to the only person holding both numbers. */
+    if (c && c.noCashPrice) {
+      return { kind: 'points', ref: '3.8', switchable: match, ourTotal: ours,
+               paidWith: b.paid_with, expiresAt: offerExpiry(b) };
+    }
+    if (c && c.crossCurrency) {
+      return { kind: 'cross_currency', ref: '3.13', switchable: match, ourTotal: ours,
+               theirTotal: b.price_paid_total, theirCurrency: b.currency,
+               expiresAt: offerExpiry(b) };
+    }
+
+    /* 3.1 / 3.5 — the offer. 3.5 is the same case carrying more than one room:
+       nothing changes except that the figures being compared are sums.
+       The expiry (3.9) and the drift (3.11) ride along with it — an offer left
+       untouched is re-priced rather than left standing, and when our price has
+       moved since we first flagged it, the offer says so. */
+    if (c && c.isSaving) {
+      return { kind: 'saving', ref: b.rooms > 1 ? '3.5' : '3.1', switchable: true,
+               ourTotal: c.ourTotal, theirTotal: c.theirTotal, delta: c.delta,
+               rooms: b.rooms || 1,
+               /* the window on the original is what they have to act inside */
+               actBy: b.cancellation_policy === 'free_until' ? b.free_cancellation_until : null,
+               expiresAt: offerExpiry(b), drift: drift(b) };
+    }
+
+    /* 3.6 — cheaper, but not the same thing. We only ever switch an exact
+       match, so this is not an offer and carries no number: against the room
+       they actually booked, what they hold is still the best we have. */
+    if (c && c.comparable && c.delta > 0) {
+      return { kind: 'near_miss', ref: '3.6', switchable: false };
+    }
+
+    /* 3.2 — our price is higher, or level. The common case, and the one that
+       decides whether being watched feels alive or dead. */
+    if (c && c.comparable && c.delta < 0) {
+      return { kind: 'dearer', ref: '3.2', switchable: false,
+               by: b.rose_by || -c.delta, since: b.rose_since || null };
+    }
+    return { kind: 'level', ref: '3.2', switchable: false };
   }
 
   /* ---------- grouping: overlapping date ranges are one decision ----------
@@ -690,6 +1107,7 @@
       b.last_checked_at = new Date(Date.now() - 38 * 60000).toISOString();
       b.platform = b.source_platform ? PLATFORMS[b.source_platform] : null;
       b.comparison = b.ownership === 'tracked' ? compare(b) : null;
+      b.watch = watch(b);
       b.nights = fmt.nights(b.check_in, b.check_out);
     });
 
@@ -830,7 +1248,10 @@
     sorted: sorted,
     groups: function () { return groups(all()); },
     compare: compare,
+    watch: watch,
+    windowClosed: windowClosed,
     cancellationText: cancellationText,
+    occupancyText: occupancyText,
     openCancelTasks: openCancelTasks,
     toLegacy: toLegacy,
 
