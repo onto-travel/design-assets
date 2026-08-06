@@ -17,6 +17,7 @@
   var WA = {
     display: '+91 90190 90190',
     digits: '919019090190',
+    tel: '+919019090190',
     link: function (text) {
       return 'https://wa.me/' + WA.digits + '?text=' + encodeURIComponent(text);
     },
@@ -760,12 +761,43 @@
     });
   }
 
-  /* Adapter to the shape booking-details.html already reads from sessionStorage,
-     so voucher / manage actions land on the existing voucher page. Owned only —
-     a tracked booking never produces a voucher. */
+  /* Adapter to the shape booking-details.html reads from sessionStorage.
+     Both ownerships pass through it now that the list opens every row on that
+     page — but a tracked booking is someone else's paperwork, so it carries a
+     `tracked` flag and no reference of ours, and the page drops the actions
+     that only a booking we made can honour. */
   function toLegacy(b) {
-    if (!b || b.ownership !== 'owned') return null;
+    if (!b) return null;
+    var tracked = b.ownership !== 'owned';
+    /* A booking we made by switching leaves the original live on the other
+       platform until the guest cancels it themselves. That task travels with
+       our booking, because ours is the page they will actually open. */
+    var old = (!tracked && b.switched_from) ? get(b.switched_from) : null;
+    var owes = old && old.switch_event && !old.switch_event.user_marked_cancelled_at
+      ? old.switch_event : null;
     return {
+      cancelOld: owes ? {
+        id: old.id,
+        platform: old.platform ? old.platform.label : null,
+        manage: old.platform ? old.platform.manage : null,
+        deadline: fmt.countdown(owes.cancel_deadline).label,
+        expired: !!fmt.countdown(owes.cancel_deadline).expired
+      } : null,
+      id: b.id,
+      tracked: tracked,
+      /* "your original booking" only means something once there is a second
+         booking to be original to — so the page needs to know a switch happened */
+      switched: !!(b.counterpart || b.switched_from),
+      platform: tracked && b.platform ? b.platform.label : null,
+      /* the standing offer on a tracked stay: what they paid against what we
+         would charge. Only when it is like-for-like and actually cheaper —
+         `compare` has already made that judgement. */
+      saving: tracked && b.comparison && b.comparison.isSaving ? {
+        theirs: fmt.inr(b.comparison.theirTotal),
+        ours: fmt.inr(b.comparison.ourTotal),
+        /* the raw figure the switch is actually booked at */
+        oursNum: b.comparison.ourTotal
+      } : null,
       status: b.status === 'completed' ? 'completed' : 'upcoming',
       hotel: b.property_name_raw,
       place: b.location,
@@ -774,10 +806,17 @@
       guests: b.occupancy + ' · 1 room',
       room: b.room_category,
       amount: fmt.inr(b.price_paid_total),
-      ref: b.booking_ref,
+      ref: b.booking_ref || null,
       img: b.image,
       paid: true,
-      payMode: 'paid'
+      payMode: 'paid',
+      /* the rate's own terms, so the booking page states them from the booking
+         rather than from a constant that only happened to match one property */
+      mealPlan: b.meal_plan || null,
+      freeCancelUntil: b.cancellation_policy === 'free_until' && b.free_cancellation_until
+        ? fmt.day(b.free_cancellation_until) : null,
+      /* no per-property switchboard in the prototype — calls land on our line */
+      phone: WA.tel
     };
   }
 

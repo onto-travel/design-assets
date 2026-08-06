@@ -4,231 +4,315 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>onto · Bookings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* v2 neutral system, same tokens as results.html. Following the departure
+     established there: where the design uses black #111827 as an *interactive*
+     accent, this uses the brand green. Black stays for plain text. */
   :root{
-    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
-    --jade:#0f8a63; --jade-deep:#063f2f; --jade-soft:#e7f3ec; --gold:#f2c14e;
-    --amber:#a2610a; --amber-soft:#fdf3e2; --amber-line:#e8cf9f;
-    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+    --bg:#f7f7f5; --card:#ffffff; --ink:#111827; --muted:#737373;
+    --line:#e8e8e6; --card-line:#e3e3df; --chip-bg:#f3f4f6; --chip-ink:#393939;
+    --jade:#0f8a63; --jade-deep:#0b6d4e; --jade-soft:#eef6f1;
+    --amber:#a2610a; --amber-soft:#fdf3e2;
+    --perf:#dcdcd8;
+    --shadow-card:0 6px 11px rgba(0,0,0,.07), 0 1.809px 3.316px rgba(0,0,0,.05),
+                  0 .751px 1.377px rgba(0,0,0,.04), 0 .272px .498px rgba(0,0,0,.02);
   }
   *{box-sizing:border-box;}
-  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  html,body{margin:0;}
+  body{min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     line-height:1.5;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:inherit;font-weight:700;letter-spacing:-.015em;margin:0;}
+  button,input,select{font-family:inherit;}
   [hidden]{display:none !important;}
   a{color:inherit;}
   :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:4px;}
 
-  /* top nav */
-  .topnav{position:sticky;top:0;z-index:80;background:rgba(250,247,241,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
-  .topnav-in{max-width:1180px;margin:0 auto;padding:0 28px;height:62px;display:flex;align-items:center;gap:26px;}
-  .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);text-decoration:none;letter-spacing:-.01em;}
-  .tn-brand span{color:var(--gold);}
-  .tn-links{display:flex;align-items:center;gap:2px;}
-  .tn-links a{font-size:14.5px;color:#5b5650;text-decoration:none;padding:8px 14px;border-radius:9px;transition:background .15s,color .15s;}
-  .tn-links a:hover{background:rgba(255,255,255,.62);color:var(--ink);}
-  .tn-links a.active{color:var(--jade);font-weight:600;}
-  .tn-right{margin-left:auto;display:flex;align-items:center;gap:9px;position:relative;}
-  .tn-avatar{width:34px;height:34px;border:none;padding:0;border-radius:50%;background:var(--jade);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:Georgia,serif;line-height:1;text-decoration:none;cursor:pointer;transition:box-shadow .12s;}
-  .tn-avatar:hover{box-shadow:0 0 0 3px rgba(15,138,99,.15);}
-  .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
-    border-radius:14px;box-shadow:0 14px 40px rgba(40,30,10,.2);padding:8px;opacity:0;transform:translateY(-6px);
-    pointer-events:none;transition:opacity .15s,transform .15s;}
+  /* ============ TOP NAV — breadcrumb left, account right ============ */
+  .topnav{position:sticky;top:0;z-index:80;background:rgba(247,247,245,.88);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topnav-in{max-width:1240px;margin:0 auto;padding:0 32px;height:64px;
+    display:flex;align-items:center;gap:10px;}
+  .crumb{display:flex;align-items:center;gap:10px;min-width:0;}
+  .tn-brand{font-size:17px;font-weight:800;letter-spacing:.01em;color:var(--ink);text-decoration:none;}
+  .crumb-sep{color:#c4c4bf;font-size:16px;}
+  .crumb-here{font-size:16px;font-weight:500;color:#6b6b66;}
+  .tn-right{margin-left:auto;display:flex;align-items:center;gap:8px;position:relative;}
+  /* the account is a name, not an initial — the mock is a single real person */
+  .tn-who{display:inline-flex;align-items:center;gap:7px;border:none;background:none;padding:7px 10px;
+    border-radius:10px;font-size:14.5px;font-weight:600;color:var(--ink);cursor:pointer;
+    transition:background .15s;}
+  .tn-who:hover{background:rgba(0,0,0,.045);}
+  .tn-who .cv{width:9px;height:9px;stroke:#8a8a85;fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  /* ============ ACCOUNT MENU ============
+     A card, not a list: a green crown carrying the brand pattern, the person
+     on it, then the account grouped by what each group is for. */
+  .menu{position:absolute;top:calc(100% + 8px);right:0;width:308px;background:#fff;
+    border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 48px rgba(0,0,0,.18);
+    padding:0;overflow:hidden;text-align:left;color:var(--ink);
+    opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .15s,transform .15s;}
   .menu.open{opacity:1;transform:none;pointer-events:auto;}
-  .menu-id{display:flex;align-items:center;gap:11px;padding:11px 12px 13px;border-bottom:1px solid var(--line);margin-bottom:6px;text-decoration:none;color:inherit;cursor:pointer;border-radius:10px 10px 0 0;transition:background .15s;}
-  .menu-id:hover{background:#faf7f1;}
-  .menu-id-ar{margin-left:auto;color:#b8b0a2;font-size:17px;}
-  .menu-id .tn-avatar{width:38px;height:38px;font-size:20px;}
-  .menu-id b{font-size:14.5px;display:block;}
-  .menu-id small{font-size:12.5px;color:var(--muted);}
-  .menu .item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font-size:14px;color:var(--ink);text-decoration:none;cursor:pointer;}
-  .menu .item:hover{background:#faf7f1;}
-  .menu .item svg{width:19px;height:19px;stroke:#6b655c;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
-  .menu .item .ar{margin-left:auto;color:#b8b0a2;}
 
-  /* page */
-  .page{max-width:1060px;margin:0 auto;padding:34px 28px 72px;}
-  .h1{font-family:Georgia,serif;font-size:34px;letter-spacing:-.015em;margin:0 0 22px;}
+  .pm-top{padding-bottom:16px;text-align:center;}
+  .pm-band{height:78px;position:relative;overflow:hidden;background:#2b9068;}
+  .pm-band::before{content:"";position:absolute;inset:-40%;opacity:.16;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58'%3E%3Crect x='19' y='19' width='20' height='20' rx='6' transform='rotate(45 29 29)' fill='%23ffffff'/%3E%3C/svg%3E");
+    background-size:58px 58px;transform:rotate(-13deg);
+    -webkit-mask-image:linear-gradient(107deg,transparent 18%,#000 34%,#000 52%,transparent 70%);
+    mask-image:linear-gradient(107deg,transparent 18%,#000 34%,#000 52%,transparent 70%);}
+  /* the person sits astride the crown */
+  .pm-av{position:relative;display:flex;align-items:center;justify-content:center;
+    width:80px;height:80px;margin:-40px auto 0;border-radius:50%;
+    background:var(--jade);color:#fff;font-size:30px;font-weight:800;line-height:1;
+    border:4px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+  .pm-name{display:block;margin-top:11px;font-size:16.5px;font-weight:700;letter-spacing:-.01em;}
+  .pm-mail{display:block;margin-top:1px;font-size:13.5px;font-weight:500;color:var(--muted);}
 
-  .btn{border:1px solid #d9d1c1;background:#fff;color:var(--ink);border-radius:11px;padding:10px 17px;
-    font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;
+  .pm-sec{padding:6px;}
+  .pm-sec + .pm-sec{border-top:1px solid var(--line);}
+  .pm-item{display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:12px;
+    font-size:15px;font-weight:600;color:var(--ink);text-decoration:none;cursor:pointer;
+    transition:background .14s;}
+  .pm-item:hover{background:#f7f7f5;}
+  /* where you already are */
+  .pm-item.on{background:var(--jade-soft);}
+  .pm-item svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .pm-tx{display:flex;flex-direction:column;min-width:0;}
+  .pm-tx em{font-style:normal;font-size:12.5px;font-weight:500;color:var(--muted);
+    margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pm-ar{margin-left:auto;color:#b8b8b2;font-size:18px;line-height:1;}
+  .pm-item.danger{color:#c0392b;}
+
+  /* ============ PAGE — list + a rail ============ */
+  .page{max-width:1240px;margin:0 auto;padding:34px 32px 80px;
+    display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:32px 34px;align-items:start;}
+  /* its own row across both columns, so the list and the rail start level */
+  .h1{grid-column:1/-1;font-size:36px;margin:0;}
+
+  .btn{border:1px solid #dededa;background:#fff;color:var(--ink);border-radius:12px;padding:10px 16px;
+    font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;
     align-items:center;gap:8px;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;}
-  .btn:hover{background:#faf7f1;border-color:#c2b8a4;}
-  .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .btn:hover{background:#f7f7f5;border-color:#cdcdc7;}
+  .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;}
   .btn.jade{background:var(--jade);border-color:var(--jade);color:#fff;}
   .btn.jade:hover{background:var(--jade-deep);border-color:var(--jade-deep);}
-  .btn.sm{padding:8px 14px;font-size:13.5px;}
-  .row.amber .btn:focus-visible{outline-color:var(--amber);}
 
-  /* ===== the list: one list, both ownership states, a card per booking ===== */
-  .list{display:flex;flex-direction:column;gap:14px;}
-  .row{position:relative;display:flex;gap:18px;align-items:flex-start;
-    padding:11px 22px 11px 11px;background:var(--card);border:1px solid var(--line);
-    border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(40,30,10,.04);
-    transition:border-color .15s,box-shadow .15s;}
-  .row:hover{border-color:#d9d1c1;box-shadow:0 2px 5px rgba(40,30,10,.05),0 12px 26px rgba(40,30,10,.08);}
-  .row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#ddd6c8;}
-  .row.own::before{background:var(--jade);}
-  /* An outstanding cancellation is still one of their bookings, so the card
-     stays a card. The rail and the deadline carry the urgency; a filled amber
-     panel made a task out of a row that is mostly just information. */
-  .row.amber::before{background:var(--amber);}
+  /* ============ THE TICKET ============
+     Body and photo are two halves of one stub, torn along a perforation: a
+     dashed rule with a notch punched out of the card's top and bottom edge. */
+  .list{display:flex;flex-direction:column;gap:16px;}
+  .tk{position:relative;display:flex;align-items:stretch;background:var(--card);
+    border-radius:22px;padding:8px;box-shadow:var(--shadow-card);
+    transition:box-shadow .18s,transform .18s;}
+  .tk:hover{box-shadow:0 10px 20px rgba(0,0,0,.09),0 3px 6px rgba(0,0,0,.05);}
 
-  /* the text blocks keep their own breathing room now the row has none.
-     Stretched and stacked so the reference can sit on the row's baseline
-     rather than trailing the details it belongs to. */
-  .r-main{flex:1;min-width:0;padding:13px 0;align-self:stretch;display:flex;flex-direction:column;}
-  /* the ownership chip reads as part of the name, not a separate row */
-  .r-title{display:flex;align-items:center;flex-wrap:wrap;gap:6px 11px;}
-  .r-name{font-family:Georgia,serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin:0;}
-  /* A button on a card means there is something to do. Cards whose only
-     destination is the booking itself rely on the row being the link. */
-  .r-name a{text-decoration:none;}
-  .row:hover .r-name a{text-decoration:underline;text-underline-offset:2px;}
-  .r-name a::after{content:"";position:absolute;inset:0;}
-  .r-name a:focus-visible{outline:none;}
-  .r-name a:focus-visible::after{outline:2px solid var(--jade);outline-offset:-3px;border-radius:8px;}
-  /* Icon-led meta, carried over from the old trips card: the gold glyphs chunk
-     three facts into scannable groups, which plain text separated by dots did
-     not do at this density. */
-  .r-meta{display:flex;flex-wrap:wrap;gap:5px 18px;margin-top:8px;font-size:13.5px;color:#4b463f;}
-  .r-meta .m{display:flex;align-items:center;gap:7px;}
-  .r-meta svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.8;
+  .tk-body{flex:1;min-width:0;display:flex;flex-direction:column;padding:18px 10px 14px 18px;}
+  /* the ownership tell reads as part of the name, not as a mark over the card */
+  .tk-title{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;}
+  .tk-name{font-size:20px;font-weight:700;line-height:1.35;min-width:0;}
+  .tk-name a{text-decoration:none;}
+  .tk:hover .tk-name a{text-decoration:underline;text-underline-offset:3px;}
+  .tk-name a::after{content:"";position:absolute;inset:0;border-radius:22px;}
+  .tk-name a:focus-visible{outline:none;}
+  .tk-name a:focus-visible::after{outline:2px solid var(--jade);outline-offset:-3px;}
+  /* one dotted line of facts, the way a ticket prints them */
+  .tk-meta{margin-top:3px;font-size:14px;font-weight:500;color:var(--muted);
+    display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;}
+  .tk-meta .sep{color:#c8c8c3;}
+  /* the case and its action, pinned to the foot of the stub */
+  .tk-foot{margin-top:auto;padding-top:16px;display:flex;align-items:flex-end;
+    justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .tk-acts{display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:2;}
+  /* only pushed right when there is a case on the left to sit opposite */
+  .tk-status + .tk-acts{margin-left:auto;}
+  .tk-status{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+
+  /* the perforation */
+  .tk-perf{flex:none;width:34px;position:relative;align-self:stretch;}
+  .tk-perf::before{content:"";position:absolute;left:50%;top:16px;bottom:16px;
+    border-left:1.6px dashed var(--perf);}
+  .notch{position:absolute;left:50%;width:20px;height:20px;border-radius:50%;
+    background:var(--bg);}
+  .notch.t{top:-8px;transform:translate(-50%,-50%);}
+  .notch.b{bottom:-8px;transform:translate(-50%,50%);}
+
+  /* the stub */
+  .tk-stub{flex:none;width:222px;align-self:stretch;min-height:152px;
+    border-radius:15px;overflow:hidden;background:#eceae5;}
+  .tk-stub img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* ============ SOURCE LABEL ============
+     Which of the two bookings this is. Information, not a warning — so it is a
+     quiet chip beside the name rather than a mark struck over the card. */
+  .src{display:inline-flex;align-items:center;gap:6px;flex:none;
+    border-radius:20px;padding:3px 10px 3px 8px;
+    font-size:12px;font-weight:700;letter-spacing:.01em;white-space:nowrap;}
+  .src.own{background:var(--jade-soft);color:var(--jade-deep);}
+  .src.own .dot{width:7px;height:7px;border-radius:50%;background:var(--jade);flex:none;}
+  .src.trk{background:var(--chip-bg);color:#5f5f59;}
+  .src.trk svg{width:12px;height:12px;stroke:#8a877f;fill:none;stroke-width:2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  /* a detail of the booking, so it sits under the other details — pushed to
-     the foot of the card, clear of the meta line */
-  .r-ref{margin-top:auto;padding-top:10px;font-size:13px;color:var(--muted);}
-  .r-ref b{color:var(--ink);font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;
-    margin-left:6px;}
 
-  /* The photo fills the row's height with only a hairline inset, so the image
-     does the work rather than the whitespace around it. The row's own padding
-     drops to that inset and the text blocks carry their own instead. */
-  .r-thumb{flex:none;width:166px;align-self:stretch;min-height:124px;
-    border-radius:12px;overflow:hidden;background:#e7e1d6;}
-  .r-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-
-  /* source label — the ownership tell. Information, not a warning. */
-  .src{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:2px 10px 2px 8px;
-    font-size:12.5px;font-weight:700;letter-spacing:.01em;}
-  .src.owned{background:var(--jade-soft);color:var(--jade-deep);}
-  .src.owned .dot{width:7px;height:7px;border-radius:50%;background:var(--jade);flex:none;}
-  .src.tracked{background:#fff;border:1px solid #d7d0c2;color:#5b5650;}
-  .src.tracked svg{width:13px;height:13px;stroke:#8a857d;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;}
-
-  /* status block */
-  .r-side{flex:none;width:266px;display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:11px;padding:13px 0;}
-  .st{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
-  .st-good{display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:var(--jade-deep);}
-  .st-good svg{width:16px;height:16px;stroke:var(--jade);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  .st-ink{font-size:15px;font-weight:600;color:var(--ink);}
-  /* What they paid, then what we'd charge. The two numbers are the whole
-     pitch, so they carry it themselves — our price takes the weight, theirs
-     is struck through beside it at reading size. */
-  .st-prices{display:inline-flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums;}
-  .st-prices .was{font-size:15px;color:var(--muted);font-weight:500;text-decoration:line-through;
-    text-decoration-thickness:1px;text-underline-offset:0;}
-  .st-prices .now{font-size:22px;font-weight:700;letter-spacing:-.015em;color:var(--jade);}
-  .st-note{font-size:13px;color:var(--muted);max-width:250px;}
-  /* the deadline is also the way out, so it is the link — lifted clear of the
-     row's own full-bleed click target */
+  /* ============ STATUS ============ */
+  .st-good{display:inline-flex;align-items:center;gap:7px;font-size:14.5px;font-weight:700;
+    color:var(--jade-deep);}
+  .st-good svg{width:16px;height:16px;stroke:var(--jade);fill:none;stroke-width:2.4;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .st-ink{font-size:14.5px;font-weight:700;color:var(--ink);}
+  /* what they paid, then what we'd charge — the two numbers are the whole pitch */
+  /* Both prices stated plainly and labelled. Striking one through made the
+     comparison a piece of styling; naming them makes it a fact. */
+  /* one two-column grid rather than two independent rows, so the labels and the
+     figures each line up with their opposite number */
+  /* Each price is a labelled figure — the label over the number it names — and
+     the two sit side by side so the comparison is read across, not down. One
+     shared two-row grid rather than two stacks: the figures differ in size, so
+     only a common row can sit them on the same baseline. */
+  .st-prices{display:grid;grid-auto-flow:column;grid-template-rows:auto auto;
+    column-gap:26px;row-gap:1px;align-items:baseline;font-variant-numeric:tabular-nums;}
+  .st-prices .pr{display:contents;}
+  .st-prices .pr-k{font-size:12.5px;font-weight:600;color:var(--muted);}
+  .st-prices .pr-v{font-size:16px;font-weight:700;color:var(--chip-ink);}
+  .st-prices .pr.ours .pr-k{color:var(--jade-deep);font-weight:700;}
+  .st-prices .pr.ours .pr-v{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--jade);}
+  .st-note{font-size:13px;font-weight:500;color:var(--muted);max-width:260px;}
+  /* the deadline is also the way out, so it is the link */
   .st-clock{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;
     font-size:13px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums;
-    text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(162,97,10,.35);}
+    text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(162,97,10,.35);}
   .st-clock:hover{text-decoration-color:currentColor;}
   .st-clock svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
 
-  /* the row a cancellation just settled: a single pass of the jade it has
-     become, so the change is noticed on the row rather than only in the toast */
-  .row.settled{animation:settle 1.5s ease-out;}
-  @keyframes settle{
-    0%{background:var(--jade-soft);border-color:#bfdfd0;}
-    100%{background:var(--card);border-color:var(--line);}
-  }
-  @media(prefers-reduced-motion:reduce){.row.settled{animation:none;}}
+  /* ============ RAIL ============ */
+  .rail{position:sticky;top:88px;display:flex;flex-direction:column;gap:14px;}
+  .fwd{background:var(--card);border-radius:20px;padding:22px;box-shadow:var(--shadow-card);}
+  .fwd-ic{width:40px;height:40px;border-radius:12px;background:var(--jade-soft);
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+  .fwd-ic svg{width:20px;height:20px;stroke:var(--jade);fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .fwd-h{font-size:16px;font-weight:700;margin:0 0 5px;letter-spacing:-.01em;}
+  .fwd-p{font-size:13.5px;font-weight:500;color:var(--muted);margin:0 0 16px;line-height:1.55;}
+  .fwd-p b{color:var(--chip-ink);font-weight:700;font-variant-numeric:tabular-nums;}
+  .fwd .btn{width:100%;justify-content:center;}
 
-  /* toast — carries the undo, so it outlives a glance (7s) */
-  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
-    background:#1b211e;color:#fff;font-size:13.5px;font-weight:600;padding:11px 12px 11px 18px;
-    border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;
-    transition:opacity .2s,transform .2s;z-index:90;display:flex;align-items:center;gap:14px;}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
-  .t-undo{border:none;background:none;font-family:inherit;font-size:13.5px;font-weight:700;
-    color:#8fd6b4;cursor:pointer;padding:4px 8px;border-radius:8px;}
-  .t-undo:hover{background:rgba(255,255,255,.1);}
-  .r-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;position:relative;z-index:2;}
-
-  /* forward entry point — persistent, at the end of the list */
-  .fwd{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);
-    border-radius:16px;padding:20px 22px;margin-top:16px;}
-  .fwd-ic{flex:none;width:38px;height:38px;border-radius:50%;background:var(--jade-soft);display:flex;align-items:center;justify-content:center;}
-  .fwd-ic svg{width:20px;height:20px;stroke:var(--jade);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  .fwd-body{flex:1;min-width:220px;}
-  .fwd-h{font-size:15.5px;font-weight:700;margin:0 0 2px;}
-  .fwd-p{font-size:14px;color:var(--muted);margin:0;}
-  .fwd-p b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;}
-
-  .foot{margin-top:26px;text-align:center;}
-  .foot button{background:none;border:none;font-family:inherit;font-size:12.5px;color:#b8b0a2;cursor:pointer;padding:6px 10px;}
+  .foot{grid-column:1/-1;margin-top:8px;text-align:center;}
+  .foot button{background:none;border:none;font-size:12.5px;color:#b8b8b2;cursor:pointer;padding:6px 10px;}
   .foot button:hover{color:var(--muted);text-decoration:underline;}
 
   @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important;} }
 
-  @media(max-width:860px){
-    .page{padding:24px 18px 64px;}
-    .h1{font-size:29px;}
-    /* photo stays beside the name; the status block wraps to its own line */
-    .row{flex-wrap:wrap;gap:14px;padding:18px 18px 18px 20px;}
-    .r-thumb{width:112px;min-height:84px;}
-    .r-main{flex:1 1 180px;}
-    .r-side{flex:1 1 100%;width:auto;align-items:flex-start;text-align:left;
-      border-top:1px solid var(--line);padding-top:14px;}
-    .st{align-items:flex-start;}
+  @media(max-width:1080px){
+    .page{grid-template-columns:minmax(0,1fr);}
+    .rail{position:static;}
+  }
+  @media(max-width:820px){
+    .page{padding:24px 18px 64px;gap:24px;}
+    .h1{font-size:30px;}
+    /* the tear turns horizontal: photo on top, stub below */
+    .tk{flex-direction:column;}
+    .tk-stub{width:auto;min-height:180px;order:-1;}
+    .tk-perf{width:auto;height:30px;}
+    .tk-perf::before{left:16px;right:16px;top:50%;bottom:auto;border-left:none;
+      border-top:1.6px dashed var(--perf);}
+    .notch{left:auto;top:50%;}
+    .notch.t{left:-8px;transform:translate(-50%,-50%);}
+    .notch.b{right:-8px;bottom:auto;transform:translate(50%,-50%);}
+    .tk-body{padding:4px 14px 12px;}
+    .tk-foot{flex-direction:column;align-items:stretch;}
+    .tk-status{margin-left:0;align-items:flex-start;text-align:left;order:-1;}
     .st-note{max-width:none;}
-    .r-acts,.row.amber .r-acts{justify-content:flex-start;align-items:stretch;width:100%;}
-    .r-acts .btn{flex:1 1 auto;justify-content:center;}
-    .row.amber .r-acts{flex-direction:row;flex-wrap:wrap;align-items:center;}
-    .tn-links{display:none;}
+    .tk-acts .btn{flex:1 1 auto;justify-content:center;}
   }
   @media(max-width:520px){
     .topnav-in{padding:0 18px;}
+    .crumb-here{display:none;}
+    .crumb-sep{display:none;}
   }
 </style>
 </head>
 <body>
   <nav class="topnav">
     <div class="topnav-in">
-      <a class="tn-brand" href="home2.html">onto<span>.</span></a>
-      <div class="tn-links">
-        <a href="home2.html">Stays</a>
-        <a href="bookings.html" class="active">Bookings</a>
+      <div class="crumb">
+        <a class="tn-brand" href="home2.html">ONTO</a>
+        <span class="crumb-sep">/</span>
+        <span class="crumb-here">Bookings</span>
       </div>
       <div class="tn-right">
-        <button type="button" class="tn-avatar" id="profileBtn" aria-haspopup="true" aria-expanded="false">Y</button>
+        <button type="button" class="tn-who" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+          Saanvi
+          <svg class="cv" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
+        </button>
         <div class="menu" id="profileMenu" role="menu">
-          <a class="menu-id" href="profile.html">
-            <span class="tn-avatar" id="menuAvatar">Y</span>
-            <div><b id="menuName">Saanvi</b><small>xyz@email.com</small></div>
-            <span class="menu-id-ar">›</span>
-          </a>
-          <div class="menu-sec">
-            <a class="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span class="ar">›</span></a>
-            <a class="item" href="help.html"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span class="ar">›</span></a>
-            <a class="item" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
+          <div class="pm-top">
+            <div class="pm-band" aria-hidden="true"></div>
+            <span class="pm-av" id="menuAvatar">S</span>
+            <b class="pm-name" id="menuName">Saanvi</b>
+            <span class="pm-mail">xyz@email.com</span>
+          </div>
+
+          <div class="pm-sec">
+            <a class="pm-item on" href="bookings.html">
+              <svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="13.5" rx="2.5"/><path d="M8.5 7V5.2a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7"/></svg>
+              <span class="pm-tx">Bookings<em id="pmNext"></em></span>
+              <span class="pm-ar">&rsaquo;</span>
+            </a>
+            <a class="pm-item" href="#">
+              <svg viewBox="0 0 24 24"><path d="M12 20.3S3.8 15.4 3.8 9.9A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 8.2 1.9c0 5.5-8.2 10.4-8.2 10.4Z"/></svg>
+              Saved stays
+            </a>
+          </div>
+
+          <div class="pm-sec">
+            <a class="pm-item" href="#">
+              <svg viewBox="0 0 24 24"><path d="M6 3.5v5M6 14.5v6M12 3.5v8M12 17.5v3M18 3.5v2M18 11.5v9"/><circle cx="6" cy="11.5" r="2.6"/><circle cx="12" cy="14.5" r="2.6"/><circle cx="18" cy="8.5" r="2.6"/></svg>
+              Travel preferences
+            </a>
+            <a class="pm-item" href="companions.html">
+              <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg>
+              Travellers
+            </a>
+          </div>
+
+          <div class="pm-sec">
+            <a class="pm-item" href="#">
+              <svg viewBox="0 0 24 24"><path d="M3 9V7.2a2 2 0 0 1 1.6-2l11-2.1A1.4 1.4 0 0 1 17.3 4.5V6"/><rect x="3" y="6.8" width="18" height="13.4" rx="2.6"/><circle cx="16.6" cy="13.5" r="1.4"/></svg>
+              Payments and refunds
+            </a>
+            <a class="pm-item" href="profile.html">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.3"/><path d="M12 2.6v2.3M12 19.1v2.3M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.6 12h2.3M19.1 12h2.3M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg>
+              Account settings
+            </a>
+          </div>
+
+          <div class="pm-sec">
+            <a class="pm-item" href="help.html">
+              <svg viewBox="0 0 24 24"><path d="M4 14v-2.2a8 8 0 1 1 16 0V14"/><rect x="2" y="13.4" width="4.4" height="6.4" rx="2.2"/><rect x="17.6" y="13.4" width="4.4" height="6.4" rx="2.2"/><path d="M19.8 19.8a2.8 2.8 0 0 1-2.8 2.8h-3"/></svg>
+              Help and support
+            </a>
+            <a class="pm-item danger" href="home-loggedout.html">
+              <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+              Log out
+            </a>
           </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <div class="page">
+  <main class="page">
     <h1 class="h1">Bookings</h1>
     <div class="list" id="list"></div>
-    <div id="fwd"></div>
+    <aside class="rail" id="fwd"></aside>
     <div class="foot"><button type="button" id="reset">Reset prototype data</button></div>
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  </div>
+  </main>
 
 <script src="tracking-data.js"></script>
 <script>
@@ -251,68 +335,58 @@
         menu.classList.remove('open'); btn.setAttribute('aria-expanded','false');
       }
     });
+    /* the soonest stay, so the row says what is behind it rather than only
+       where it goes — sorted() is already in check-in order */
+    var next = T.sorted()[0];
+    if(next) $('pmNext').textContent =
+      next.property_name_raw + ' — ' + fmt.day(next.check_in);
   })();
 
   var ICON = {
     ext:  '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
-    tick: '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>',    chat: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 20.5l1.4-4.1A8.3 8.3 0 0 1 3.5 11.5a8.5 8.5 0 1 1 17.5 0z"/></svg>',
-    /* the same three the old trips card used */
-    cal:  '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>',
-    gst:  '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg>',
-    bed:  '<svg viewBox="0 0 24 24"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4M3 18v2M21 18v2M6 12V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/></svg>'
+    tick: '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>',
+    chat: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 20.5l1.4-4.1A8.3 8.3 0 0 1 3.5 11.5a8.5 8.5 0 1 1 17.5 0z"/></svg>'
   };
 
-  /* ---------- one row ---------- */
-  /* Once a stay has been switched, the card belongs to us — that is the booking
-     the guest will actually turn up on. The old one is still live until they
-     cancel it, which the amber status block says outright. */
+  /* ---------- the source label ---------- */
+  /* Once a stay has been switched, the ticket belongs to us — that is the
+     booking the guest will actually turn up on. The old one is still live until
+     they cancel it, which the amber deadline says outright. */
   function sourceLabel(b){
-    if(b.ownership === 'owned' || b.counterpart)
-      return '<span class="src owned"><span class="dot"></span>Booked with us</span>';
-    /* The platform name isn't doing work here — what the row needs to say is
-       which of the two bookings this is, and that reads the same whoever it
-       was made with. The name is on the booking itself. */
-    return '<span class="src tracked">' + ICON.ext + 'Your original booking</span>';
+    /* Whose booking this is, and nothing else — an outstanding cancellation is
+       urgent, but it is a task, and the deadline beside the actions carries it. */
+    if(b.ownership === 'owned' || b.counterpart){
+      return '<span class="src own"><span class="dot"></span>Booked with us</span>';
+    }
+    /* A booking we are only watching carries no label. There is nothing to tell
+       it apart from until we hold one of our own for the same stay — until then
+       "your original booking" would name a distinction the guest cannot see. */
+    return '';
   }
 
   /* Status block + actions, driven entirely by ownership then status.
-     A tracked row never offers cancel, voucher, or manage. */
-  /* A booking of ours carries a reference, and a reference is a detail of the
-     booking rather than a status — so it sits with the dates and the room, not
-     in the column that exists for things needing a decision. */
-  function refFor(b){
-    var ref = b.ownership === 'owned' ? b.booking_ref
-      : (b.counterpart && b.status !== 'cancel_pending') ? b.counterpart.booking_ref
-      : null;
-    return ref ? '<div class="r-ref">Booking reference <b>' + esc(ref) + '</b></div>' : '';
-  }
-
+     A tracked ticket never offers cancel, voucher, or manage. */
   function sideFor(b){
     var st = '', acts = '';
 
-    /* Nothing outstanding and nothing to decide: the card is the link, and the
+    /* Nothing outstanding and nothing to decide: the ticket is the link, and the
        voucher and management are both inside it. */
     if(b.ownership === 'owned') return { st: '', acts: '' };
 
-    /* ---- switched: one card, now ours, with whatever is still outstanding ---- */
+    /* ---- switched: one ticket, now ours, with whatever is still outstanding ---- */
     if(b.counterpart){
-      var own = b.counterpart, ev = b.switch_event;
+      var ev = b.switch_event;
 
       if(b.status === 'cancel_pending'){
         var left = fmt.countdown(ev.cancel_deadline);
-        /* Reminder, then where to act on it, then the confirmation — the way
-           out belongs with the deadline it applies to, not under the button. */
         /* The deadline and the place it is cancelled are one thing, so they are
            one control: the reminder is the way out. */
-        st = '<div class="st">' +
-               '<a class="st-clock" href="' + esc(b.platform.manage) + '" target="_blank" ' +
-                 'rel="noopener">' + esc(left.label) + ICON.ext + '</a>' +
-             '</div>';
-        /* A self-report, not a commitment — it doesn't take the jade the
-           booking actions use, and it doesn't need a fill of its own. */
-        acts = '<button type="button" class="btn sm" data-cancelled="' + esc(b.id) +
-                 '">I’ve cancelled this</button>';
-        return { st: st, acts: acts };
+        /* The deadline and the place it is cancelled are one thing, so they are
+           one control: the reminder is the way out. It sits with the actions on
+           the left, because it is the one thing on this ticket to be done. */
+        acts = '<a class="st-clock" href="' + esc(b.platform.manage) + '" target="_blank" ' +
+                 'rel="noopener">' + esc(left.label) + ICON.ext + '</a>';
+        return { st: '', acts: acts };
       }
 
       /* Cancelled on the platform, so nothing is outstanding: this is simply a
@@ -326,58 +400,47 @@
     switch(b.status){
       case 'saving_available':
         if(c && c.isSaving){
-          st = '<div class="st">' +
-                 '<span class="st-prices">' +
-                   '<span class="was">' + fmt.inr(c.theirTotal) + '</span>' +
-                   '<span class="now">' + fmt.inr(c.ourTotal) + '</span>' +
-                 '</span>' +
-               '</div>';
-          acts = '<a class="btn jade sm" href="booking-tracked.html?id=' + esc(b.id) + '">Switch</a>';
+          st = '<span class="st-prices">' +
+                 '<span class="pr"><span class="pr-k">You paid</span>' +
+                   '<b class="pr-v">' + fmt.inr(c.theirTotal) + '</b></span>' +
+                 '<span class="pr ours"><span class="pr-k">Our price</span>' +
+                   '<b class="pr-v">' + fmt.inr(c.ourTotal) + '</b></span>' +
+               '</span>';
+          acts = '<button type="button" class="btn jade" data-switch="' + esc(b.id) +
+                   '">Switch</button>';
         } else if(c){
           /* Cheaper with us, but worse on an attribute. We don't offer it and we
              don't show the number — for the room they actually booked, what they
              have is still the best rate we can put against it. */
-          st = '<div class="st">' +
-                 '<span class="st-good">' + ICON.tick + 'Still your best rate</span>' +
-               '</div>';
+          st = '<span class="st-good">' + ICON.tick + 'Still your best rate</span>';
         }
         break;
 
       case 'no_saving_up':
-        st = '<div class="st">' +
-               '<span class="st-good">' + ICON.tick + 'Still your best rate</span>' +
-               '<span class="st-note">Up ' + fmt.inr(b.rose_by) + ' with us since ' +
-                 esc(fmt.day(b.rose_since)) + '</span>' +
-             '</div>';
+        st = '<span class="st-good">' + ICON.tick + 'Still your best rate</span>' +
+             '<span class="st-note">Up ' + fmt.inr(b.rose_by) + ' with us since ' +
+               esc(fmt.day(b.rose_since)) + '</span>';
         break;
 
       case 'no_saving_flat':
-        st = '<div class="st">' +
-               '<span class="st-good">' + ICON.tick + 'Still your best rate</span>' +
-             '</div>';
+        st = '<span class="st-good">' + ICON.tick + 'Still your best rate</span>';
         break;
 
       case 'sold_out':
-        st = '<div class="st">' +
-               '<span class="st-ink">Sold out for your dates</span>' +
-               '<span class="st-note">We’ll keep checking</span>' +
-             '</div>';
+        st = '<span class="st-ink">Sold out for your dates</span>' +
+             '<span class="st-note">We’ll keep checking</span>';
         break;
 
       case 'not_carried':
-        st = '<div class="st">' +
-               '<span class="st-ink">Not on onto</span>' +
-               '<span class="st-note">We don’t have this property, so we can’t watch its price</span>' +
-             '</div>';
-        acts = '<a class="btn sm" href="' + esc(T.WA.forward()) + '" target="_blank" rel="noopener">' +
+        st = '<span class="st-ink">Not on onto</span>' +
+             '<span class="st-note">We don’t have this property, so we can’t watch its price</span>';
+        acts = '<a class="btn" href="' + esc(T.WA.forward()) + '" target="_blank" rel="noopener">' +
                  ICON.chat + 'Forward another booking</a>';
         break;
 
       case 'pending':
-        st = '<div class="st">' +
-               '<span class="st-ink">Checking your booking</span>' +
-               '<span class="st-note">We’ll confirm shortly</span>' +
-             '</div>';
+        st = '<span class="st-ink">Checking your booking</span>' +
+             '<span class="st-note">We’ll confirm shortly</span>';
         break;
 
       /* cancel_pending and switched_cancelled are handled above: both always
@@ -388,37 +451,37 @@
 
   function rowHTML(b){
     var side = sideFor(b);
-    var link;
-    if(b.counterpart)              /* switched: the card is our booking now */
-      link = 'href="booking-details.html" data-owned="' + esc(b.counterpart.id) + '"';
-    else if(b.ownership === 'owned')
-      link = 'href="booking-details.html" data-owned="' + esc(b.id) + '"';
-    else
-      link = 'href="booking-tracked.html?id=' + encodeURIComponent(b.id) + '"';
+    /* Every ticket opens the booking itself. A tracked one opens read-only —
+       the offer to switch stays on its own button, so the row click never
+       decides anything. */
+    var open = b.counterpart ? b.counterpart.id : b.id;
+    var link = 'href="booking-details.html" data-owned="' + esc(open) + '"';
 
-    var cls = ['row'];
-    if(b.ownership === 'owned' || b.counterpart) cls.push('own');
-    if(b.status === 'cancel_pending') cls.push('amber');
-
-    return '<article class="' + cls.join(' ') + '" data-row="' + esc(b.id) + '">' +
-      /* Property, when, and who it is with. Room and meal plan are one tap away
-         on the booking itself — on the list they crowd out the status. */
-      (b.image ? '<div class="r-thumb"><img src="' + esc(b.image) + '" alt=""></div>' : '') +
-      '<div class="r-main">' +
-        '<div class="r-title">' +
-          '<h3 class="r-name"><a ' + link + '>' + esc(b.property_name_raw) + '</a></h3>' +
+    return '<article class="tk" data-row="' + esc(b.id) + '">' +
+      '<div class="tk-body">' +
+        '<div class="tk-title">' +
+          '<h3 class="tk-name"><a ' + link + '>' + esc(b.property_name_raw) + '</a></h3>' +
           sourceLabel(b) +
         '</div>' +
-        '<div class="r-meta">' +
-          '<span class="m">' + ICON.cal + esc(fmt.dateRange(b.check_in, b.check_out)) +
-            ' · ' + esc(b.nights) + '</span>' +
-          '<span class="m">' + ICON.gst + esc(b.occupancy) + '</span>' +
-          '<span class="m">' + ICON.bed + esc(b.room_category) + '</span>' +
+        /* When, and for how many. The room, the meal plan and the reference are
+           all one tap away on the booking itself, and none of them is what the
+           list is scanned for. */
+        '<div class="tk-meta">' +
+          '<span>' + esc(fmt.dateRange(b.check_in, b.check_out)) + '</span>' +
+          '<span class="sep">·</span><span>' + esc(b.occupancy) + '</span>' +
         '</div>' +
-        refFor(b) +
+        /* The case on the left, the thing to do about it on the right. With
+           nothing to weigh up, whatever is left falls back to the left edge. */
+        (side.st || side.acts
+          ? '<div class="tk-foot">' +
+              (side.st ? '<div class="tk-status">' + side.st + '</div>' : '') +
+              (side.acts ? '<div class="tk-acts">' + side.acts + '</div>' : '') +
+            '</div>'
+          : '') +
       '</div>' +
-      '<div class="r-side">' + side.st +
-        (side.acts ? '<div class="r-acts">' + side.acts + '</div>' : '') +
+      '<div class="tk-perf"><span class="notch t"></span><span class="notch b"></span></div>' +
+      '<div class="tk-stub">' +
+        (b.image ? '<img src="' + esc(b.image) + '" alt="">' : '') +
       '</div>' +
     '</article>';
   }
@@ -426,34 +489,45 @@
   function renderList(){
     $('list').innerHTML = T.sorted().map(rowHTML).join('');
 
-    /* Forward entry point — persistent, at the end of the list. */
+    /* Forward entry point — persistent, in the rail beside the list. */
     $('fwd').innerHTML =
       '<section class="fwd">' +
         '<div class="fwd-ic">' + ICON.chat + '</div>' +
-        '<div class="fwd-body">' +
-          '<p class="fwd-h">Booked a hotel somewhere else?</p>' +
-          '<p class="fwd-p">Forward it to us on WhatsApp at <b>' + esc(T.WA.display) +
-            '</b> and we’ll watch the price for you.</p>' +
-        '</div>' +
+        '<p class="fwd-h">Booked a hotel somewhere else?</p>' +
+        '<p class="fwd-p">Forward it to us on WhatsApp at <b>' + esc(T.WA.display) +
+          '</b> and we’ll watch the price for you.</p>' +
         '<a class="btn jade" href="' + esc(T.WA.forward()) + '" target="_blank" rel="noopener">' +
           ICON.chat + 'Forward on WhatsApp</a>' +
       '</section>';
   }
 
+  /* ---------- switching from the list ----------
+     Straight to the gateway. The stay, the room and the price are all settled
+     by the time this button is on screen, so there is nothing left to choose.
+     The switch itself is only recorded on the way back, once it is paid —
+     booking-details.html resolves the marker this leaves behind. */
+  function startSwitch(id){
+    var b = T.get(id), c = b && b.comparison;
+    if(!c || !c.isSaving) return;
+    var charge = T.toLegacy(b) || {};
+    charge.amount = fmt.inr(c.ourTotal);   /* our price, not the one already paid */
+    charge.paid = false;
+    try {
+      sessionStorage.setItem('booking', JSON.stringify(charge));
+      sessionStorage.setItem('pendingSwitch', JSON.stringify({ id: id, price: c.ourTotal }));
+      sessionStorage.setItem('payReturn', 'booking-details.html');
+    } catch(e){}
+    location.href = 'razorpay.html';
+  }
+
   document.addEventListener('click', function(e){
-    var done = e.target.closest('[data-cancelled]');
-    if(done){
+    var sw = e.target.closest('[data-switch]');
+    if(sw){
       e.preventDefault();
-      /* Taken on the user's word. No proof, no upload, no verification — so
-         the way back is a click, not a support conversation. */
-      var id = done.getAttribute('data-cancelled');
-      T.markCancelled(id);
-      render();
-      settle(id);
-      toast('Cancellation noted', function(){ T.undoCancelled(id); render(); });
+      startSwitch(sw.getAttribute('data-switch'));
       return;
     }
-    /* hand the owned booking to the existing voucher page */
+    /* hand the booking to the details page in the shape it reads */
     var own = e.target.closest('[data-owned]');
     if(own){
       T.openOwned(own.getAttribute('data-owned'));
@@ -463,33 +537,6 @@
   $('reset').addEventListener('click', function(){ T.reset(); render(); });
 
   function render(){ renderList(); }
-
-  /* ---------- confirming a cancellation ----------
-     The row changes from an outstanding task to a settled one, which is a
-     bigger change than the list usually makes on its own. It gets a beat of
-     attention so the change is seen where it happened, and an undo so a
-     mistaken tap costs nothing. */
-  function settle(id){
-    var row = document.querySelector('[data-row="' + id + '"]');
-    if(row) row.classList.add('settled');
-  }
-
-  var toastT = null;
-  function toast(msg, undo){
-    var el = $('toast');
-    el.innerHTML = '<span>' + esc(msg) + '</span>' +
-      (undo ? '<button type="button" class="t-undo">Undo</button>' : '');
-    el.classList.add('show');
-    if(undo){
-      el.querySelector('.t-undo').addEventListener('click', function(){
-        clearTimeout(toastT);
-        el.classList.remove('show');
-        undo();
-      });
-    }
-    clearTimeout(toastT);
-    toastT = setTimeout(function(){ el.classList.remove('show'); }, 7000);
-  }
   render();
 
   /* Countdowns are in days and hours, so re-render only when one of them would

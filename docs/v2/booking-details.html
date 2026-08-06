@@ -4,417 +4,693 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Taj Exotica · Your booking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* v2 neutral system, same tokens as results.html and bookings.html. */
   :root{
-    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
-    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --green:#0f8a63;
-    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+    --bg:#f7f7f5; --card:#ffffff; --ink:#111827; --muted:#737373;
+    --line:#e8e8e6; --chip-bg:#f3f4f6; --chip-ink:#393939;
+    --jade:#0f8a63; --jade-deep:#0b6d4e; --jade-soft:#eef6f1;
+    --hero:#2b9068; --hero-deep:#1d7754;
+    --amber:#a2610a; --red:#b23b32;
+    --perf:#dcdcd8;
+    --shadow-card:0 6px 11px rgba(0,0,0,.07), 0 1.809px 3.316px rgba(0,0,0,.05),
+                  0 .751px 1.377px rgba(0,0,0,.04), 0 .272px .498px rgba(0,0,0,.02);
   }
   *{box-sizing:border-box;}
-  /* column flex so the nav sits on top and .pagewrap takes the rest — the cards stay optically
-     centred in the space below the nav, which is what the page did before it had one. */
-  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    line-height:1.5;-webkit-font-smoothing:antialiased;
-    display:flex;flex-direction:column;}
-  .pagewrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
-  h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
-
-  /* ---------- top nav (ported from trips.html — same component, same measurements) ---------- */
-  .topnav{position:sticky;top:0;z-index:80;background:rgba(250,247,241,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
-  .topnav-in{max-width:1180px;margin:0 auto;padding:0 28px;height:62px;display:flex;align-items:center;gap:26px;}
-  .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);text-decoration:none;letter-spacing:-.01em;}
-  .tn-brand span{color:var(--gold);}
-  .tn-links{display:flex;align-items:center;gap:2px;}
-  .tn-links a{font-size:14.5px;color:#5b5650;text-decoration:none;padding:8px 14px;border-radius:9px;transition:background .15s,color .15s;}
-  .tn-links a:hover{background:rgba(255,255,255,.62);color:var(--ink);}
-  .tn-links a.active{color:var(--jade);font-weight:600;}
-  .tn-right{margin-left:auto;display:flex;align-items:center;gap:9px;position:relative;}
-  .tn-avatar{width:34px;height:34px;border:none;padding:0;border-radius:50%;background:var(--jade);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:Georgia,serif;line-height:1;text-decoration:none;cursor:pointer;transition:box-shadow .12s;}
-  .tn-avatar:hover{box-shadow:0 0 0 3px rgba(15,138,99,.15);}
-  .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
-    border-radius:14px;box-shadow:0 14px 40px rgba(40,30,10,.2);padding:8px;opacity:0;transform:translateY(-6px);
-    pointer-events:none;transition:opacity .15s,transform .15s;}
-  .menu.open{opacity:1;transform:none;pointer-events:auto;}
-  .menu-id{display:flex;align-items:center;gap:11px;padding:11px 12px 13px;border-bottom:1px solid var(--line);margin-bottom:6px;text-decoration:none;color:inherit;cursor:pointer;border-radius:10px 10px 0 0;transition:background .15s;}
-  .menu-id:hover{background:#faf7f1;}
-  .menu-id-ar{margin-left:auto;color:#b8b0a2;font-size:17px;}
-  .menu-id .tn-avatar{width:38px;height:38px;font-size:20px;}
-  .menu-id b{font-size:14.5px;display:block;}
-  .menu-id small{font-size:12.5px;color:var(--muted);}
-  .menu .item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font-size:14px;color:var(--ink);
-    text-decoration:none;cursor:pointer;}
-  .menu .item:hover{background:#faf7f1;}
-  .menu .item svg{width:19px;height:19px;stroke:#6b655c;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
-  .menu .item .ar{margin-left:auto;color:#b8b0a2;}
-
-  .card{width:520px;max-width:100%;background:#faf8f3;border-radius:20px;box-shadow:var(--shadow);
-    overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 30px 32px;position:relative;}
-  .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
-    color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
-    transition:color .15s,background .15s;}
-  .backlink:hover{color:var(--jade);background:#faf8f3;}
-  .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-  .head{text-align:center;padding:26px 0 0;}
-  .head h1{font-family:Georgia,serif;font-size:32px;line-height:1.1;color:#063f2f;margin:0 0 12px;letter-spacing:-.015em;}
-  .head p{color:var(--muted);font-size:15.5px;margin:0 auto;max-width:400px;}
-  .head p b{color:#063f2f;font-weight:700;}
-
-  /* booking-reference panel */
-  .ref{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:#faf8f3;
-    border:1px solid var(--line);border-radius:30px;padding:9px 8px 9px 18px;font-size:13.5px;
-    color:#6b6459;font-weight:600;}
-  .ref b{color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;font-weight:700;margin-left:2px;}
-  .ref-copy{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
-    border-radius:50%;border:none;background:none;color:var(--muted);cursor:pointer;transition:background .15s,color .15s;}
-  .ref-copy:hover{background:#f1ede3;color:var(--jade);}
-  .ref-copy.done{color:var(--green);}
-  .ref-copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
-
-  /* paid panel */
-  /* payment + rewards live in ONE neutral box; colour comes only from the small icons */
-  .paybox{margin-top:24px;border-radius:14px;overflow:hidden;background:#fff;text-align:left;
-    box-shadow:0 1px 3px rgba(40,30,10,.06), 0 10px 24px -14px rgba(40,30,10,.22);}
-  .paid{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 17px;}
-  .paid .pl{display:inline-flex;align-items:center;gap:9px;font-size:15px;color:#3a6a4d;font-weight:600;}
-  .paid .pl svg{width:17px;height:17px;stroke:var(--green);stroke-width:2.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  .pl-tx{display:flex;flex-direction:column;}
-  .pl-tx em{font-style:normal;font-size:11.5px;font-weight:600;color:#3a6a4d;letter-spacing:.01em;margin-top:2px;}
-  .pl-tx em:empty{display:none;}
-  .paid .amt{font-family:Georgia,serif;font-size:23px;font-weight:600;color:#20321f;letter-spacing:-.01em;}
-  .paybox .paid + .paid{border-top:1px solid #efe8da;}
-  .paid.neutral .pl{color:var(--muted);}
-  .paid.neutral .pl svg{stroke:var(--muted);}
-  .paid.neutral .amt{color:var(--ink);}
-  .paid.neutral .pl-tx em{color:var(--muted);}
-
-  /* rewards nudge — sits just above the CTAs; shown only when booked as a guest */
+  html,body{margin:0;}
+  body{min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:inherit;font-weight:700;letter-spacing:-.015em;margin:0;}
+  button,input{font-family:inherit;}
   [hidden]{display:none !important;}
-  .rewards{display:none;align-items:center;gap:12px;padding:12px 15px;
-    background:#fff;border:1px solid #e7e0d2;border-radius:14px;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:4px;}
+
+  /* ============================================================
+     HERO — the booking announces itself. Green band, the status on
+     it, and the three things you do at the hotel rather than on the
+     page: carry the voucher, call ahead, find the door.
+     ============================================================ */
+  /* no overflow:hidden here — the account menu drops out of the nav and would
+     be clipped by it. The pattern gets its own clipping layer instead. */
+  .hero{position:relative;background:var(--hero);color:#fff;
+    padding:0 0 24px;transition:background .3s;}
+  .hero-bg{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
+  /* a diagonal band of the brand's rounded diamonds, masked so it crosses
+     the band rather than tiling the whole field */
+  .hero-bg::before{content:"";position:absolute;inset:-30%;opacity:.14;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect x='31' y='31' width='34' height='34' rx='10' transform='rotate(45 48 48)' fill='%23ffffff'/%3E%3C/svg%3E");
+    background-size:96px 96px;transform:rotate(-13deg);
+    -webkit-mask-image:linear-gradient(107deg,transparent 24%,#000 36%,#000 47%,transparent 60%);
+    mask-image:linear-gradient(107deg,transparent 24%,#000 36%,#000 47%,transparent 60%);}
+  .hero-in{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:0 32px;}
+
+  .hero-nav{display:flex;align-items:center;gap:10px;height:54px;}
+  .tn-brand{font-size:17px;font-weight:800;letter-spacing:.01em;color:#fff;text-decoration:none;}
+  .crumb-sep{color:rgba(255,255,255,.5);font-size:16px;}
+  .crumb-here{font-size:16px;font-weight:500;color:rgba(255,255,255,.82);}
+  /* the way back to the list — the crumb is the only route out of a booking */
+  .crumb-up{font-size:16px;font-weight:500;color:rgba(255,255,255,.82);text-decoration:none;
+    padding:3px 2px;border-radius:6px;transition:color .15s;}
+  .crumb-up:hover{color:#fff;text-decoration:underline;text-underline-offset:3px;}
+  .tn-right{margin-left:auto;display:flex;align-items:center;position:relative;}
+  .tn-who{display:inline-flex;align-items:center;gap:7px;border:none;background:none;padding:7px 10px;
+    border-radius:10px;font-size:14.5px;font-weight:600;color:#fff;cursor:pointer;transition:background .15s;}
+  .tn-who:hover{background:rgba(255,255,255,.14);}
+  .tn-who .cv{width:9px;height:9px;stroke:rgba(255,255,255,.8);fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* the headline block, centred between the two stamps */
+  .hero-mid{text-align:center;padding:2px 0 0;}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 12px 4px 9px;
+    font-size:12.5px;font-weight:700;}
+  .status-pill svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.6;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .hero-h1{font-size:30px;line-height:1.2;margin:8px 0 3px;letter-spacing:-.025em;}
+  .hero-place{font-size:14px;font-weight:500;color:rgba(255,255,255,.85);margin:0;}
+  .hero-acts{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:14px;}
+  .hbtn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 17px;
+    font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;
+    border:1px solid rgba(255,255,255,.55);background:transparent;color:#fff;transition:background .15s;}
+  .hbtn:hover{background:rgba(255,255,255,.16);}
+  .hbtn.solid{background:#fff;color:var(--hero-deep);border-color:#fff;}
+  .hbtn.solid:hover{background:#f2f2ef;}
+  .hbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* ============ RUBBER STAMPS ============
+     A booking is a document. The stamps are how a document says what it is:
+     where it is for, and what standing it has. Struck at an angle, worn. */
+  .rstamp{position:absolute;z-index:2;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;border:2.5px solid currentColor;text-align:center;
+    font-size:12px;font-weight:800;letter-spacing:.14em;line-height:1.15;text-transform:uppercase;
+    pointer-events:none;user-select:none;}
+  .rstamp::before{content:"";position:absolute;inset:5px;border:1.4px solid currentColor;border-radius:50%;}
+  .hero .rstamp{width:96px;height:96px;color:#fff;opacity:.42;font-size:10.5px;}
+  .hero .rs-place{left:32px;top:48px;transform:rotate(-15deg);}
+  .hero .rs-status{right:32px;top:42px;transform:rotate(13deg);}
+  .rs-tx{max-width:68px;}
+
+  /* cancelled: the hero loses its colour and the stamp turns */
+  body.is-cancelled .hero{background:#6b6f6d;}
+  body.is-cancelled .rs-status{color:#ffd9d5;}
+
+  /* ============================================================
+     BODY
+     ============================================================ */
+  .page{max-width:1240px;margin:0 auto;padding:24px 32px 48px;position:relative;z-index:1;
+    display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;}
+  /* bento: two column stacks rather than a strict row grid, so tiles keep the
+     height their content wants and no cell is padded out to match a neighbour.
+     The last tile in each column takes the slack, so both columns end flush. */
+  .main{display:flex;flex-direction:column;gap:18px;}
+  .cols{display:flex;gap:20px;align-items:stretch;}
+  .mcol{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;}
+  .mcol > section{display:flex;flex-direction:column;min-width:0;}
+  .mcol > section:last-child{flex:1;}
+  .mcol > section:last-child > .card,
+  .mcol > section:last-child > #roomList{flex:1;}
+  .sec-h{font-size:17px;font-weight:700;margin:0 0 9px;letter-spacing:-.015em;}
+  .main .sec-h,.rail .sec-h{padding-left:2px;}
+  .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow-card);padding:18px;}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #dededa;background:#fff;
+    color:var(--ink);border-radius:11px;padding:9px 15px;font-size:13.5px;font-weight:700;
+    cursor:pointer;text-decoration:none;white-space:nowrap;
+    transition:background .15s,border-color .15s,color .15s;}
+  .btn:hover{background:#f7f7f5;border-color:#cdcdc7;}
+  .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .btn.jade{background:var(--jade);border-color:var(--jade);color:#fff;}
+  .btn.jade:hover{background:var(--jade-deep);border-color:var(--jade-deep);}
+  .btn.danger{background:var(--red);border-color:var(--red);color:#fff;}
+  .btn.danger:hover{background:#9c322a;border-color:#9c322a;}
+  .btn.wide{width:100%;justify-content:center;}
+
+  /* ============ THE TICKET ============
+     Body and photo torn along a perforation, exactly as the list draws it —
+     the row you tapped opens into the same object, larger. */
+  .tk{position:relative;display:flex;align-items:stretch;background:var(--card);
+    border-radius:20px;padding:8px;box-shadow:var(--shadow-card);}
+  .tk-body{flex:1;min-width:0;padding:16px 12px 16px 16px;}
+  .tk-h{font-size:19px;font-weight:700;letter-spacing:-.015em;}
+  .tk-sub{margin-top:5px;font-size:13.5px;font-weight:500;color:var(--muted);
+    display:flex;flex-wrap:wrap;align-items:center;gap:2px 7px;}
+  .tk-sub .sep{color:#c8c8c3;}
+  .tk-ref{font-variant-numeric:tabular-nums;}
+  .tk-ref b{color:var(--chip-ink);font-weight:700;letter-spacing:.03em;margin-left:5px;}
+  .ref-copy{border:none;background:none;padding:3px;margin-left:2px;cursor:pointer;color:#a8a8a2;
+    border-radius:6px;vertical-align:middle;transition:color .15s,background .15s;}
+  .ref-copy:hover{color:var(--chip-ink);background:var(--chip-bg);}
+  .ref-copy svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;display:block;}
+  .ref-copy.done{color:var(--jade);}
+  /* check-in and check-out are one span, so they are one block with the
+     dash carrying the distance between them */
+  .tk-when{display:flex;align-items:flex-end;gap:16px;margin-top:20px;}
+  .tk-when .k{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:#9a9a94;}
+  .tk-when .v{font-size:15px;font-weight:700;margin-top:2px;}
+  .tk-when .v span{font-weight:500;color:var(--muted);}
+  .tk-dash{color:#c8c8c3;padding-bottom:2px;}
+
+  .tk-perf{flex:none;width:34px;position:relative;align-self:stretch;}
+  .tk-perf::before{content:"";position:absolute;left:50%;top:16px;bottom:16px;
+    border-left:1.6px dashed var(--perf);}
+  .notch{position:absolute;left:50%;width:20px;height:20px;border-radius:50%;background:var(--bg);}
+  .notch.t{top:-8px;transform:translate(-50%,-50%);}
+  .notch.b{bottom:-8px;transform:translate(-50%,50%);}
+
+  .tk-stub{flex:none;width:206px;align-self:stretch;min-height:148px;border-radius:14px;
+    overflow:hidden;background:#eceae5;}
+  .tk-stub img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* ============ ROOMS ============ */
+  .room{padding:11px;background:var(--card);border-radius:16px;box-shadow:var(--shadow-card);}
+  .room + .room{margin-top:12px;}
+  .room-top{display:flex;align-items:center;gap:14px;}
+  .room-ph{flex:none;width:74px;height:64px;border-radius:12px;overflow:hidden;background:#eceae5;}
+  .room-ph img{width:100%;height:100%;object-fit:cover;display:block;}
+  .room-n{font-size:15.5px;font-weight:700;letter-spacing:-.01em;}
+  .room-s{font-size:13px;font-weight:500;color:var(--muted);margin-top:1px;}
+  /* what the rate includes — the two things that change what the stay costs
+     if plans move, so they belong on the room rather than in the receipt */
+  .room-facts{border-top:1px solid var(--line);margin:12px 3px 0;padding-top:11px;
+    display:flex;flex-direction:column;gap:9px;}
+  .room-f{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;
+    color:var(--chip-ink);}
+  .room-f svg{width:16px;height:16px;stroke:var(--jade);fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .room-f em{font-style:normal;font-weight:500;color:var(--muted);}
+
+  /* ============ GUESTS ============ */
+  .guest{display:flex;align-items:center;gap:11px;padding:9px 4px;}
+  .guest + .guest{border-top:1px solid var(--line);}
+  .g-av{flex:none;width:28px;height:28px;border-radius:50%;background:#eaeef7;
+    display:flex;align-items:center;justify-content:center;}
+  .g-av svg{width:15px;height:15px;stroke:#5b7bb5;fill:none;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .g-n{font-size:14.5px;font-weight:600;}
+  .g-you{margin-left:auto;background:var(--chip-bg);color:var(--chip-ink);border-radius:7px;
+    padding:3px 9px;font-size:12px;font-weight:700;}
+
+  /* ============ GETTING THERE ============ */
+  .go{display:flex;gap:16px;align-items:flex-start;}
+  .go-tx{flex:1;min-width:0;}
+  .go-n{font-size:15.5px;font-weight:700;letter-spacing:-.01em;}
+  .go-a{font-size:13.5px;font-weight:500;color:var(--muted);margin:5px 0 13px;line-height:1.5;}
+  .go-map{flex:none;width:172px;height:132px;border-radius:13px;overflow:hidden;background:#dfeaf2;}
+  .go-map svg{width:100%;height:100%;display:block;}
+
+  /* ============ GUIDELINES ============ */
+  .rules{list-style:none;margin:0 0 15px;padding:0;}
+  .rules li{position:relative;padding-left:17px;font-size:13.5px;font-weight:500;
+    color:var(--chip-ink);line-height:1.55;margin-bottom:7px;}
+  .rules li::before{content:"";position:absolute;left:2px;top:8px;width:6px;height:6px;
+    border-radius:50%;background:var(--jade);}
+
+  /* ============ PAYMENT ============ */
+  .rail{display:flex;flex-direction:column;gap:14px;}
+  .pay-l{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+    font-size:13.5px;font-weight:500;color:var(--chip-ink);padding:5px 0;}
+  .pay-l b{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .pay-rule{border:none;border-top:1px solid var(--line);margin:12px 0;}
+  .pay-total{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .pay-total .t{font-size:17px;font-weight:700;}
+  .pay-total .a{font-size:22px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+  .pay-how{display:inline-flex;align-items:center;gap:6px;margin-top:3px;font-size:13px;
+    font-weight:500;color:var(--muted);}
+  .pay-how b{color:var(--jade-deep);font-weight:700;}
+  .pay-how svg{width:15px;height:15px;flex:none;}
+  .pay-who{font-size:13.5px;font-weight:600;color:var(--chip-ink);}
+  .pay-c{font-size:13px;font-weight:500;color:var(--muted);margin:2px 0 13px;}
+  .pay-c .dot{margin:0 6px;color:#c8c8c3;}
+  /* reserved but not paid — the deadline is the point, so it sits on the total */
+  .paywarn{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0;padding:10px 12px;
+    background:#fdf3e2;border-radius:11px;font-size:12.5px;font-weight:600;color:var(--amber);line-height:1.45;}
+  .paywarn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;margin-top:1px;}
+
+  /* ============ THE OFFER ============
+     Shown only on a stay we are tracking that we can actually beat. What they
+     paid, then what we would charge — ours takes the weight, theirs is struck
+     through above it. */
+  /* ============ THE OUTSTANDING CANCELLATION ============
+     An amber edge and the deadline. The deadline is also the way out, so it is
+     the link — the card states the date and hands over the place to act on it. */
+  .card.old{border-left:3px solid var(--amber);}
+  .old-when{display:flex;align-items:center;gap:8px;margin-bottom:14px;
+    font-size:14px;font-weight:700;color:var(--amber);text-decoration:none;
+    font-variant-numeric:tabular-nums;}
+  .old-when:hover{text-decoration:underline;text-underline-offset:3px;}
+  .old-when svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  .offer-row{display:flex;align-items:baseline;gap:9px;padding:9px 0;}
+  .offer-row:first-child{padding-top:2px;}
+  .offer-row + .offer-row{border-top:1px solid var(--line);}
+  .offer-row svg{width:15px;height:15px;stroke:var(--jade);fill:none;stroke-width:2.6;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;align-self:center;}
+  .offer-k{font-size:14px;font-weight:600;color:var(--chip-ink);}
+  .offer-row.good .offer-k{color:var(--jade-deep);font-weight:700;}
+  .offer-now{margin-left:auto;font-variant-numeric:tabular-nums;white-space:nowrap;
+    font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--jade);}
+  .offer .btn{margin-top:16px;}
+  .offer-stop{display:block;margin-top:8px;text-align:center;font-size:13px;font-weight:600;
+    color:var(--muted);text-decoration:none;}
+  .offer-stop:hover{color:var(--chip-ink);text-decoration:underline;text-underline-offset:3px;}
+
+  .help-h{font-size:15.5px;font-weight:700;letter-spacing:-.01em;}
+  .help-p{font-size:13.5px;font-weight:500;color:var(--muted);margin:5px 0 14px;line-height:1.5;}
+  .help-acts{display:flex;flex-direction:column;gap:9px;align-items:stretch;}
+
+  /* rewards nudge — a guest booking has something to claim */
+  .rewards{display:none;gap:12px;align-items:center;}
   .rewards.show{display:flex;}
-  .rw-ic{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(193,154,75,.18);
-    display:flex;align-items:center;justify-content:center;color:#b8923f;}
-  .rw-ic svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-  .rw-tx{flex:1;min-width:0;}
-  .rw-h{font-size:13.5px;font-weight:600;color:#4a4641;line-height:1.35;}
-  .rw-h b{font-weight:700;color:#8a6a2e;}
-  .rw-sub{font-size:12px;color:var(--muted);margin-top:2px;}
-  .rw-btn{flex:none;display:inline-flex;align-items:center;gap:5px;background:none;color:#a07d2e;
-    font-size:13px;font-weight:700;padding:7px 4px 7px 10px;border-radius:8px;cursor:pointer;
-    font-family:inherit;text-decoration:none;white-space:nowrap;border:none;transition:color .15s;}
-  .rw-btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
-  .rw-btn:hover{color:#7c5e22;}
-  .rw-btn:hover svg{transform:translateX(2px);}
-  @media(max-width:420px){ .rw-h{font-size:12.5px;} .rw-btn{padding-left:6px;} }
+  .rw-ic{flex:none;width:38px;height:38px;border-radius:11px;background:var(--jade-soft);
+    display:flex;align-items:center;justify-content:center;}
+  .rw-ic svg{width:19px;height:19px;stroke:var(--jade);fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .rw-h{font-size:14px;font-weight:600;}
+  .rw-h b{font-weight:800;}
+  .rw-sub{font-size:12.5px;font-weight:500;color:var(--muted);}
 
-  /* actions */
-  .actions{margin-top:24px;display:flex;flex-direction:column;gap:12px;}
-  .btnrow{display:flex;gap:12px;}
-  .btn{flex:1;border:none;background:var(--jade);color:#fff;font-size:15px;font-weight:600;
-    padding:13px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;
-    display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s;}
-  .btn:hover{background:var(--jade-deep);}
-  .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
-  .ghostbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
-    border:1px solid #e2dac9;border-radius:12px;padding:13px;font-family:inherit;font-size:14.5px;font-weight:600;
-    color:var(--jade);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
-  .ghostbtn:hover{background:#faf8f3;border-color:#d3c9b4;}
-  .ghostbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  /* tertiary — plain text link (used for Download voucher on the logged-out screen) */
-  .textbtn{display:flex;align-items:center;justify-content:center;gap:7px;background:none;border:none;
-    padding:6px;margin-top:-2px;font-family:inherit;font-size:14px;font-weight:600;color:var(--jade);
-    cursor:pointer;text-decoration:none;transition:color .15s;}
-  .textbtn:hover{color:var(--jade-deep);text-decoration:underline;}
-  .textbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  /* secondary cancel — danger-toned ghost button beside the wider Download CTA */
-  .actions-cta .btn{flex:2;}
-  /* Pay now — attached as a footer to the "To pay" box (clubbed into one unit) */
-  .paybox-pay{display:flex;align-items:center;justify-content:center;gap:8px;
-    background:var(--green);color:#fff;border:none;font-family:inherit;font-size:16px;font-weight:700;
-    padding:17px;cursor:pointer;text-decoration:none;transition:background .15s;}
-  .paybox-pay:hover{background:var(--jade-deep);}
-  .paywarn{margin:0;padding:12px 17px;font-size:12.5px;font-weight:600;color:#8a5518;
-    background:#fff;border-top:1px solid #efe8da;display:flex;align-items:center;gap:8px;}
-  .paywarn svg{width:15px;height:15px;flex:none;stroke:#c0862c;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-  .paywarn b{color:#6f4413;font-weight:800;}
-  .paywarn[hidden]{display:none;}
-  .cancel-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;
-    border:1px solid #e6cfc9;border-radius:12px;padding:13px;font-family:inherit;font-size:14.5px;font-weight:600;
-    color:#b23b32;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
-  .cancel-btn:hover{background:#fbf3f1;border-color:#dcbab3;}
-  .cancel-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
-  .txtlinks{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:6px;}
-  .txtlinks a{color:var(--jade);font-size:14px;font-weight:600;text-decoration:none;}
-  .txtlinks a:hover{text-decoration:underline;}
-  .txtlinks .dot{color:#c9c1b2;}
-
-  /* cancelled state — left hero title struck through, share hidden */
-  body.is-cancelled .sum-hero-tx h1{text-decoration:line-through;text-decoration-color:#c9c1b2;}
-  body.is-cancelled .hero-share{display:none;}
+  /* ============ CANCEL CONFIRMATION ============
+     The one destructive decision on the page, so it stops the page rather
+     than living in it — and it shows the two numbers that decide it. */
+  .scrim{position:fixed;inset:0;z-index:95;background:rgba(17,24,39,.42);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    opacity:0;pointer-events:none;transition:opacity .18s;}
+  .scrim.open{opacity:1;pointer-events:auto;}
+  .dlg{width:100%;max-width:420px;background:var(--card);border-radius:20px;padding:24px;
+    box-shadow:0 24px 60px rgba(0,0,0,.28);transform:translateY(10px);transition:transform .18s;}
+  .scrim.open .dlg{transform:none;}
+  .dlg-ic{width:42px;height:42px;border-radius:12px;background:#fdeceb;
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+  .dlg-ic svg{width:21px;height:21px;stroke:var(--red);fill:none;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .dlg h2{font-size:20px;margin-bottom:16px;}
+  .dlg-acts{display:flex;gap:9px;margin-top:20px;}
+  .dlg-acts .btn{flex:1;justify-content:center;}
 
   /* toast */
   .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
-    background:#1b211e;color:#fff;font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:12px;
-    box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;
-    display:flex;align-items:center;gap:9px;}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-  .toast svg{width:16px;height:16px;stroke:#8fd6b4;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
-  @media(max-width:480px){ .txtlinks{flex-wrap:wrap;} }
+    background:var(--ink);color:#fff;font-size:13.5px;font-weight:600;padding:11px 18px;
+    border-radius:13px;box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;
+    transition:opacity .2s,transform .2s;z-index:99;display:flex;align-items:center;gap:9px;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .toast svg{width:16px;height:16px;stroke:#8fd6b4;fill:none;stroke-width:2.6;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
 
-  /* two-column layout: confirmation + stay details */
-  .layout{display:flex;gap:24px;align-items:stretch;justify-content:center;flex-wrap:wrap;width:100%;}
-  .rightcol{order:2;width:520px;max-width:100%;display:flex;}
-  .rightcol > .card{width:100%;flex:1;}
-  .stay-card{order:1;width:480px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
-    padding:20px 20px 22px;display:flex;flex-direction:column;}
+  /* ============ ACCOUNT MENU ============
+     A card, not a list: a green crown carrying the brand pattern, the person
+     on it, then the account grouped by what each group is for. */
+  .menu{position:absolute;top:calc(100% + 8px);right:0;width:308px;background:#fff;
+    border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 48px rgba(0,0,0,.18);
+    padding:0;overflow:hidden;text-align:left;color:var(--ink);
+    opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .15s,transform .15s;}
+  .menu.open{opacity:1;transform:none;pointer-events:auto;}
 
-  /* state cards (cancel / cancelled) reuse the confirmed-card frame */
-  .statecard{text-align:center;}
-  .warn{width:72px;height:72px;border-radius:50%;background:#fbeeec;border:1px solid #f2d5d0;
-    display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
-  .warn svg{width:32px;height:32px;stroke:#b23b32;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-  .xmark{width:72px;height:72px;border-radius:50%;background:#f3efe8;border:1px solid #e3dccf;
-    display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
-  .xmark svg{width:32px;height:32px;stroke:#7c7771;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-  .btn.danger{background:#b23b32;}
-  .btn.danger:hover{background:#9c332b;}
+  .pm-top{padding-bottom:16px;text-align:center;}
+  .pm-band{height:78px;position:relative;overflow:hidden;background:#2b9068;}
+  .pm-band::before{content:"";position:absolute;inset:-40%;opacity:.16;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58'%3E%3Crect x='19' y='19' width='20' height='20' rx='6' transform='rotate(45 29 29)' fill='%23ffffff'/%3E%3C/svg%3E");
+    background-size:58px 58px;transform:rotate(-13deg);
+    -webkit-mask-image:linear-gradient(107deg,transparent 18%,#000 34%,#000 52%,transparent 70%);
+    mask-image:linear-gradient(107deg,transparent 18%,#000 34%,#000 52%,transparent 70%);}
+  /* the person sits astride the crown */
+  .pm-av{position:relative;display:flex;align-items:center;justify-content:center;
+    width:80px;height:80px;margin:-40px auto 0;border-radius:50%;
+    background:var(--jade);color:#fff;font-size:30px;font-weight:800;line-height:1;
+    border:4px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+  .pm-name{display:block;margin-top:11px;font-size:16.5px;font-weight:700;letter-spacing:-.01em;}
+  .pm-mail{display:block;margin-top:1px;font-size:13.5px;font-weight:500;color:var(--muted);}
 
-  /* stay-detail card (ported from the checkout summary) */
-  .sum-hero{position:relative;border-radius:16px;overflow:hidden;height:248px;box-shadow:var(--shadow);}
-  .sum-hero img{width:100%;height:100%;object-fit:cover;display:block;}
-  .sum-hero::after{content:"";position:absolute;inset:0;
-    background:linear-gradient(to top,rgba(20,16,26,.92) 0%,rgba(20,16,26,.55) 42%,rgba(20,16,26,.40) 72%,rgba(20,16,26,.52) 100%);}
-  .hero-share{position:absolute;top:14px;right:14px;z-index:3;width:38px;height:38px;border-radius:50%;
-    border:1px solid rgba(255,255,255,.28);background:rgba(20,16,26,.38);
-    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;transition:background .15s,transform .12s;}
-  .hero-share:hover{background:rgba(20,16,26,.62);}
-  .hero-share:active{transform:scale(.93);}
-  .hero-share svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
-  .sum-hero-tx{position:absolute;left:20px;right:18px;bottom:16px;z-index:2;color:#fff;}
-  .sum-hero-tx .stars{color:#f0c66a;letter-spacing:3px;font-size:14px;line-height:1;margin-bottom:6px;}
-  .sum-hero-tx h1{font-family:Georgia,serif;font-size:27px;line-height:1.08;margin:0 0 6px;color:#fff;letter-spacing:-.01em;}
-  .sum-hero-tx .place{color:rgba(255,255,255,.86);font-weight:600;font-size:11.5px;letter-spacing:.09em;}
-  .stay-sum{margin-top:16px;}
-  .sum-top{display:flex;align-items:center;justify-content:space-between;padding:0 2px 8px;}
-  .sum-top .sh{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
-  .sum-edit{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--jade);text-decoration:none;}
-  .sum-edit:hover{text-decoration:underline;}
-  .sum-edit svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  .row-cancel{flex:none;display:inline-flex;align-items:center;gap:5px;color:#d64545;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap;}
-  .row-cancel:hover{text-decoration:underline;}
-  .row-cancel svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
-  .sum-row{display:flex;gap:12px;align-items:center;padding:9px 2px;}
-  .sum-row+.sum-row{border-top:1px solid #f1ede5;}
-  .sum-ic{flex:none;width:34px;height:34px;border-radius:10px;background:#f1ede3;color:#b3893f;
-    display:flex;align-items:center;justify-content:center;}
-  .sum-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  .sum-c{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
-  .sum-k{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;}
-  .sum-v{min-width:0;font-size:14.5px;color:var(--ink);font-weight:600;text-align:left;}
-  .sum-v span{display:inline;font-weight:400;color:var(--muted);}
-  .sum-v span:not(.av-title)::before{content:" · ";}
-  .sum-v .av-title{font-weight:600;color:var(--ink);}
-  .co-price{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;
-    background:#f1ede3;border:1px solid #ece3d2;border-radius:15px;padding:14px 20px;text-align:left;}
-  .cp-left{display:flex;flex-direction:column;gap:5px;}
-  .cp-nights{font-size:13px;color:var(--muted);}
-  .tax-ok{font-size:12.5px;color:#8a6a24;font-weight:600;}
-  .tax-ok b{color:#8a6a24;font-weight:700;}
-  .cp-right{text-align:right;}
-  .cp-amt{font-family:Georgia,serif;font-size:30px;font-weight:600;color:var(--ink);letter-spacing:-.015em;line-height:1;}
-  .cp-tot{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:7px;}
-  @media(max-width:920px){ .layout{flex-direction:column;align-items:center;} .rightcol{order:0;} .stay-card{order:1;} }
+  .pm-sec{padding:6px;}
+  .pm-sec + .pm-sec{border-top:1px solid var(--line);}
+  .pm-item{display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:12px;
+    font-size:15px;font-weight:600;color:var(--ink);text-decoration:none;cursor:pointer;
+    transition:background .14s;}
+  .pm-item:hover{background:#f7f7f5;}
+  /* where you already are */
+  .pm-item.on{background:var(--jade-soft);}
+  .pm-item svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .pm-tx{display:flex;flex-direction:column;min-width:0;}
+  .pm-tx em{font-style:normal;font-size:12.5px;font-weight:500;color:var(--muted);
+    margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pm-ar{margin-left:auto;color:#b8b8b2;font-size:18px;line-height:1;}
+  .pm-item.danger{color:#c0392b;}
+
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important;} }
+
+  @media(max-width:1080px){
+    .page{grid-template-columns:minmax(0,1fr);}
+    .hero .rstamp{display:none;}
+  }
+  @media(max-width:860px){
+    .hero-in,.page{padding-left:18px;padding-right:18px;}
+    .hero-h1{font-size:30px;}
+    .cols{flex-direction:column;}
+    .mcol > section:last-child{flex:0 1 auto;}
+    /* the tear turns horizontal: photo on top, stub below */
+    .tk{flex-direction:column;}
+    .tk-stub{width:auto;min-height:180px;order:-1;}
+    .tk-perf{width:auto;height:30px;}
+    .tk-perf::before{left:16px;right:16px;top:50%;bottom:auto;border-left:none;
+      border-top:1.6px dashed var(--perf);}
+    .notch{left:auto;top:50%;}
+    .notch.t{left:-8px;transform:translate(-50%,-50%);}
+    .notch.b{right:-8px;bottom:auto;transform:translate(50%,-50%);}
+    .tk .rstamp{display:none;}
+    .go{flex-direction:column;}
+    .go-map{width:100%;height:150px;order:-1;}
+  }
 </style>
 </head>
 <body>
-  <nav class="topnav">
-    <div class="topnav-in">
-      <a class="tn-brand" href="home2.html">onto<span>.</span></a>
-      <div class="tn-links">
-        <a href="home2.html">Stays</a>
-        <a href="trips.html" class="active">Bookings</a>
-      </div>
-      <div class="tn-right">
-        <button type="button" class="tn-avatar" id="profileBtn" aria-haspopup="true" aria-expanded="false">Y</button>
-        <div class="menu" id="profileMenu" role="menu">
-          <a class="menu-id" href="profile.html">
-            <span class="tn-avatar" id="menuAvatar">Y</span>
-            <div><b id="menuName">Saanvi</b><small>xyz@email.com</small></div>
-            <span class="menu-id-ar">&rsaquo;</span>
-          </a>
-          <div class="menu-sec">
-            <a class="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span class="ar">&rsaquo;</span></a>
-            <a class="item" href="help.html"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span class="ar">&rsaquo;</span></a>
-            <a class="item" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-in">
+      <nav class="hero-nav">
+        <a class="tn-brand" href="home2.html">ONTO</a>
+        <span class="crumb-sep">/</span>
+        <a class="crumb-up" href="bookings.html">Bookings</a>
+        <span class="crumb-sep">/</span>
+        <span class="crumb-here">Your booking</span>
+        <div class="tn-right">
+          <button type="button" class="tn-who" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+            <span id="whoName">Saanvi</span>
+            <svg class="cv" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
+          </button>
+          <div class="menu" id="profileMenu" role="menu">
+          <div class="pm-top">
+            <div class="pm-band" aria-hidden="true"></div>
+            <span class="pm-av" id="menuAvatar">S</span>
+            <b class="pm-name" id="menuName">Saanvi</b>
+            <span class="pm-mail">xyz@email.com</span>
           </div>
+
+          <div class="pm-sec">
+            <a class="pm-item" href="bookings.html">
+              <svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="13.5" rx="2.5"/><path d="M8.5 7V5.2a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7"/></svg>
+              <span class="pm-tx">Bookings<em id="pmNext"></em></span>
+              <span class="pm-ar">&rsaquo;</span>
+            </a>
+            <a class="pm-item" href="#">
+              <svg viewBox="0 0 24 24"><path d="M12 20.3S3.8 15.4 3.8 9.9A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 8.2 1.9c0 5.5-8.2 10.4-8.2 10.4Z"/></svg>
+              Saved stays
+            </a>
+          </div>
+
+          <div class="pm-sec">
+            <a class="pm-item" href="#">
+              <svg viewBox="0 0 24 24"><path d="M6 3.5v5M6 14.5v6M12 3.5v8M12 17.5v3M18 3.5v2M18 11.5v9"/><circle cx="6" cy="11.5" r="2.6"/><circle cx="12" cy="14.5" r="2.6"/><circle cx="18" cy="8.5" r="2.6"/></svg>
+              Travel preferences
+            </a>
+            <a class="pm-item" href="companions.html">
+              <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg>
+              Travellers
+            </a>
+          </div>
+
+          <div class="pm-sec">
+            <a class="pm-item" href="#">
+              <svg viewBox="0 0 24 24"><path d="M3 9V7.2a2 2 0 0 1 1.6-2l11-2.1A1.4 1.4 0 0 1 17.3 4.5V6"/><rect x="3" y="6.8" width="18" height="13.4" rx="2.6"/><circle cx="16.6" cy="13.5" r="1.4"/></svg>
+              Payments and refunds
+            </a>
+            <a class="pm-item" href="profile.html">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.3"/><path d="M12 2.6v2.3M12 19.1v2.3M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.6 12h2.3M19.1 12h2.3M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg>
+              Account settings
+            </a>
+          </div>
+
+          <div class="pm-sec">
+            <a class="pm-item" href="help.html">
+              <svg viewBox="0 0 24 24"><path d="M4 14v-2.2a8 8 0 1 1 16 0V14"/><rect x="2" y="13.4" width="4.4" height="6.4" rx="2.2"/><rect x="17.6" y="13.4" width="4.4" height="6.4" rx="2.2"/><path d="M19.8 19.8a2.8 2.8 0 0 1-2.8 2.8h-3"/></svg>
+              Help and support
+            </a>
+            <a class="pm-item danger" href="home-loggedout.html">
+              <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+              Log out
+            </a>
+          </div>
+        </div>
+        </div>
+      </nav>
+
+      <div class="hero-mid">
+        <span class="status-pill">
+          <svg id="statusIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/></svg>
+          <span id="statusTitle">Booking confirmed</span>
+        </span>
+        <h1 class="hero-h1" id="csHotel">Taj Exotica Resort &amp; Spa</h1>
+        <p class="hero-place" id="csPlace">Benaulim Beach, South Goa</p>
+        <div class="hero-acts">
+          <button type="button" class="hbtn solid" id="dlVoucher">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M2.5 10h19M6.5 14h4"/></svg>
+            Download Voucher
+          </button>
+          <a class="hbtn" id="callBtn" href="tel:+918326683333">
+            <svg viewBox="0 0 24 24"><path d="M6.5 3h3l1.5 4-2 1.4a12 12 0 0 0 5.6 5.6L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 3 6.2 2 2 0 0 1 5 4z"/></svg>
+            Call
+          </a>
+          <a class="hbtn" id="navBtn" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M21 3L3 10.5l7.5 3L14 21z"/></svg>
+            Navigate
+          </a>
         </div>
       </div>
     </div>
-  </nav>
 
-  <div class="pagewrap">
-  <div class="layout">
-  <div class="rightcol">
-  <!-- ===== state 1: confirmed ===== -->
-  <div class="card" id="confirmedCard">
-    <a class="backlink" href="home2.html">
-      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to home
-    </a>
-    <div class="conf-top">
-    <div class="head">
-      <h1 id="statusTitle">Booking confirmed</h1>
-      <div class="ref">Booking reference <b id="ref">TAJ-000000</b>
-        <button type="button" class="ref-copy" id="copyRef" aria-label="Copy booking reference">
-          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-        </button>
+    <span class="rstamp rs-place"><span class="rs-tx">Goa<br>India</span></span>
+    <span class="rstamp rs-status"><span class="rs-tx" id="heroStamp">Confirmed</span></span>
+  </header>
+
+  <!-- ================= BODY ================= -->
+  <div class="page">
+    <div class="main">
+
+      <!-- ---- the ticket ---- -->
+      <section class="span2">
+        <h2 class="sec-h">Your stay</h2>
+        <article class="tk">
+          <div class="tk-body">
+            <div class="tk-h" id="tkHead">3 nights, 2 guests</div>
+            <div class="tk-sub">
+              <span id="tkHotel">Taj Exotica Resort &amp; Spa</span>
+              <span id="refWrap" style="display:contents;">
+                <span class="sep">&middot;</span>
+                <span class="tk-ref">Booking reference<b id="ref">TAJ-000000</b></span>
+                <button type="button" class="ref-copy" id="copyRef" aria-label="Copy booking reference">
+                  <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                </button>
+              </span>
+            </div>
+            <div class="tk-when">
+              <div>
+                <div class="k">Check-in</div>
+                <div class="v" id="ciDate">Fri 10 Jul, <span>2:00 pm</span></div>
+              </div>
+              <span class="tk-dash">&ndash;</span>
+              <div>
+                <div class="k">Check-out</div>
+                <div class="v" id="coDate">Mon 13 Jul, <span>12:00 pm</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="tk-perf"><span class="notch t"></span><span class="notch b"></span></div>
+          <div class="tk-stub">
+            <img id="tkPhoto" src="images/04-pool-sunset.png" alt="">
+          </div>
+        </article>
+      </section>
+
+      <div class="cols">
+      <div class="mcol">
+      <!-- ---- rooms ---- -->
+      <section>
+        <h2 class="sec-h">Rooms booked</h2>
+        <div id="roomList"></div>
+      </section>
+
+      <!-- ---- guests ---- -->
+      <section>
+        <h2 class="sec-h">Guest details</h2>
+        <div class="card" id="guestList" style="padding:6px 14px;"></div>
+      </section>
+      </div>
+
+      <div class="mcol">
+      <!-- ---- getting there ---- -->
+      <section>
+        <h2 class="sec-h">Getting there</h2>
+        <div class="card go">
+          <div class="go-tx">
+            <div class="go-n" id="goHotel">Taj Exotica Resort &amp; Spa</div>
+            <p class="go-a" id="goAddr">Benaulim Beach, Goa</p>
+            <a class="btn" id="goNav" href="#" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M21 3L3 10.5l7.5 3L14 21z"/></svg>
+              Navigate
+            </a>
+          </div>
+          <div class="go-map" aria-hidden="true">
+            <!-- a drawn map, not a tile service: the prototype has no key and the
+                 shape of the coast is the only thing this needs to convey -->
+            <svg viewBox="0 0 172 132" preserveAspectRatio="xMidYMid slice">
+              <rect width="172" height="132" fill="#eef3ee"/>
+              <path d="M0 0h58c-6 22-10 44-6 66 4 20 2 46-10 66H0z" fill="#bcd9ea"/>
+              <path d="M58 0c-6 22-10 44-6 66 4 20 2 46-10 66" fill="none" stroke="#9dc4da" stroke-width="1.5"/>
+              <path d="M60 0c8 26 30 40 62 44l50 4" fill="none" stroke="#dcdcd6" stroke-width="7" stroke-linecap="round"/>
+              <path d="M74 132c4-30 20-52 46-60l52-14" fill="none" stroke="#dcdcd6" stroke-width="7" stroke-linecap="round"/>
+              <path d="M96 8c2 40 6 84 4 120" fill="none" stroke="#e8e8e2" stroke-width="4"/>
+              <path d="M124 30c18 8 32 26 40 48" fill="none" stroke="#e8e8e2" stroke-width="4"/>
+              <path d="M86 52a11 11 0 1 1 22 0c0 8-11 22-11 22S86 60 86 52z" fill="#0f8a63"/>
+              <circle cx="97" cy="52" r="4.2" fill="#fff"/>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- guidelines ---- -->
+      <section>
+        <h2 class="sec-h">Check-in/out guidelines</h2>
+        <div class="card">
+          <ul class="rules">
+            <li>Each adult must present a valid photo ID at check-in.</li>
+            <li>The booking name must match the lead guest&rsquo;s ID.</li>
+            <li>Keep your booking voucher ready at reception.</li>
+          </ul>
+          <a class="btn" href="help.html">View full guidelines</a>
+        </div>
+      </section>
+      </div>
       </div>
     </div>
 
-    <div class="paybox">
-    <div class="paid" id="paidBox">
-      <div class="pl"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"></path></svg><span class="pl-tx"><span id="paidLabel">Paid</span><em id="refundNote"></em></span></div>
-      <div class="amt" id="amount">₹55,500</div>
-    </div>
-    <p class="paywarn" id="payWarn" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 1.8"/></svg><span>Pay by <b>9 Jul</b> or this booking will be cancelled.</span></p>
-    <a class="paybox-pay" id="payNowBtn" href="razorpay.html" hidden>Pay now</a>
-    </div>
-    </div>
+    <!-- ---- rail ---- -->
+    <aside class="rail">
+      <!-- The one thing on this page with a deadline and money behind it, so it
+           precedes the booking's own detail. It leaves once it is done. -->
+      <section id="cancelOld" hidden>
+        <h2 class="sec-h">Your original booking</h2>
+        <div class="card old">
+          <a class="old-when" id="oldWhen" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 1.8"/></svg>
+            <span id="oldDeadline">Cancel old booking by 12 Aug</span>
+          </a>
+          <a class="btn wide" id="oldGo" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+            <span id="oldGoLabel">Cancel on MakeMyTrip</span>
+          </a>
+        </div>
+      </section>
 
-    <div class="actions">
-      <div class="rewards" id="rewards">
+      <div>
+        <h2 class="sec-h">Payment</h2>
+        <div class="card">
+          <div id="payLines"></div>
+          <hr class="pay-rule">
+          <div class="pay-total">
+            <div>
+              <div class="t" id="totalLabel">Total</div>
+              <span class="pay-how" id="payHow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#0f8a63" stroke-width="2.4"
+                     stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/></svg>
+                <b id="paidLabel">Fully paid</b><span id="refundNote"></span>
+              </span>
+            </div>
+            <div class="a" id="amount">&#8377;55,500</div>
+          </div>
+          <p class="paywarn" id="payWarn" hidden>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 1.8"/></svg>
+            <span>Pay by <b>9 Jul</b> or this booking will be cancelled.</span>
+          </p>
+          <a class="btn jade wide" id="payNowBtn" href="razorpay.html" hidden
+             style="margin-top:12px;">Pay now</a>
+          <hr class="pay-rule">
+          <div class="pay-who" id="payWho">Booking under Saanvi</div>
+          <div class="pay-c"><span id="payMail">xyz@email.com</span><span class="dot">&bull;</span><span>+91 98765 43210</span></div>
+          <button type="button" class="btn" id="dlInvoice">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
+            Download Invoice
+          </button>
+        </div>
+      </div>
+
+      <!-- the standing offer on a tracked stay: it follows what they paid,
+           because the saving only means anything against that number -->
+      <section id="offer" hidden>
+        <h2 class="sec-h">We&rsquo;ve got a lower price</h2>
+        <div class="card offer">
+          <div class="offer-row good">
+            <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>
+            <span class="offer-k">With us</span>
+            <b class="offer-now" id="offerOurs">&#8377;52,900</b>
+          </div>
+          <a class="btn jade wide" id="offerGo" href="#">Book with us</a>
+          <a class="offer-stop" id="offerStop" href="#">No longer have this booking?</a>
+        </div>
+      </section>
+
+      <div class="card rewards" id="rewards">
         <span class="rw-ic" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
         </span>
-        <div class="rw-tx">
+        <div>
           <div class="rw-h" id="rwHead">You&rsquo;ve earned <b>&#8377;2,775</b> in rewards</div>
           <div class="rw-sub">Redeemable on your next stay</div>
         </div>
       </div>
-      <a class="btn" id="loginBtn" href="google-login.html" hidden>
+      <a class="btn jade wide" id="loginBtn" href="google-login.html" hidden>
         <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
         Log in to claim
       </a>
-      <div class="btnrow actions-cta">
-        <a class="cancel-btn" id="cancelLink" href="cancel-booking.html">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-          Cancel
-        </a>
-        <button type="button" class="btn" id="dlVoucher">
-          <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"></path></svg>
-          Download voucher
-        </button>
+
+      <div class="card" id="helpCard">
+        <div class="help-h">Need help with your booking?</div>
+        <p class="help-p">Our support team can help with arrival, changes, or special requests.</p>
+        <div class="help-acts">
+          <a class="btn" href="help.html">
+            <svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg>
+            Contact Support
+          </a>
+          <a class="btn" id="cancelLink" href="cancel-booking.html">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+            Cancel Booking
+          </a>
+          <a class="btn" id="browseBtn" href="results.html" hidden>Browse other stays</a>
+        </div>
       </div>
-    </div>
+    </aside>
   </div>
 
-  <!-- ===== state 2: cancel confirmation ===== -->
-  <div class="card statecard" id="cancelCard" hidden>
-    <div class="conf-top">
-    <div class="head">
-      <div class="warn" aria-hidden="true">
+  <!-- ================= CANCEL CONFIRMATION ================= -->
+  <div class="scrim" id="cancelScrim" role="dialog" aria-modal="true" aria-labelledby="cancelH">
+    <div class="dlg">
+      <div class="dlg-ic" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z"/><path d="M12 9.5v4"/><path d="M12 17.2v.01"/></svg>
       </div>
-      <h1>Cancel this booking?</h1>
-    </div>
-
-    <div class="paybox">
-    <div class="paid neutral">
-      <div class="pl"><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18"/></svg><span class="pl-tx"><span>Amount paid</span></span></div>
-      <div class="amt" id="cancelPaidAmt">₹55,500</div>
-    </div>
-    <div class="paid">
-      <div class="pl"><svg viewBox="0 0 24 24"><path d="M9 14l-5-5 5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg><span class="pl-tx"><span>Refund amount</span></span></div>
-      <div class="amt" id="cancelRefundAmt">₹55,500</div>
-    </div>
-    </div>
-    </div>
-
-    <div class="actions">
-      <div class="btnrow">
-        <button type="button" class="ghostbtn" id="keepBooking">Keep the booking</button>
+      <h2 id="cancelH">Cancel this booking?</h2>
+      <div class="pay-l"><span>Amount paid</span><b id="cancelPaidAmt">&#8377;55,500</b></div>
+      <div class="pay-l"><span>Refund amount</span><b id="cancelRefundAmt">&#8377;55,500</b></div>
+      <div class="dlg-acts">
+        <button type="button" class="btn" id="keepBooking">Keep the booking</button>
         <button type="button" class="btn danger" id="confirmCancel">Cancel booking</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== state 3: cancelled ===== -->
-  <div class="card statecard" id="cancelledCard" hidden>
-    <a class="backlink" href="home2.html">
-      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to home
-    </a>
-    <div class="conf-top">
-    <div class="head">
-      <div class="xmark" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-      </div>
-      <h1>Booking cancelled</h1>
-      <div class="ref">Booking reference <b id="cnRef">TAJ-000000</b></div>
-    </div>
-
-    <div class="paybox">
-    <div class="paid neutral">
-      <div class="pl"><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18"/></svg><span class="pl-tx"><span>Amount paid</span></span></div>
-      <div class="amt" id="cnPaidAmt">₹55,500</div>
-    </div>
-    <div class="paid">
-      <div class="pl"><svg viewBox="0 0 24 24"><path d="M9 14l-5-5 5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg><span class="pl-tx"><span>Refund amount</span><em id="cnRefundNote">Back to your original payment method</em></span></div>
-      <div class="amt" id="cnAmt">₹55,500</div>
-    </div>
-    </div>
-    </div>
-
-    <div class="actions">
-      <a class="btn" href="results.html">Browse other stays</a>
-    </div>
-  </div>
-  </div>
-
-  <aside class="stay-card">
-    <div class="sum-hero">
-      <img src="images/04-pool-sunset.png" alt="Taj Exotica Resort &amp; Spa at sunset">
-      <button type="button" class="hero-share" id="shareBtn" aria-label="Share booking" title="Share booking">
-        <svg viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4l4 4"/><path d="M4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>
-      </button>
-      <div class="sum-hero-tx">
-        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <h1 id="csHotel">Taj Exotica Resort &amp; Spa</h1>
-        <div class="place">BENAULIM BEACH · GOA, INDIA</div>
-      </div>
-    </div>
-    <div class="stay-sum">
-      <div class="sum-top"><span class="sh">Your stay</span></div>
-      <div class="sum-row">
-        <span class="sum-ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></svg></span>
-        <div class="sum-c"><div class="sum-k">Check-in</div><div class="sum-v">Fri 10 Jul<span>2:00 PM</span></div></div>
-      </div>
-      <div class="sum-row">
-        <span class="sum-ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/><path d="M9 14.5l2 2 3.5-3.5"/></svg></span>
-        <div class="sum-c"><div class="sum-k">Check-out</div><div class="sum-v">Mon 13 Jul · 3 nights<span>12:00 PM</span></div></div>
-      </div>
-      <div class="sum-row">
-        <span class="sum-ic"><svg viewBox="0 0 24 24"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M3 18v2.5M21 18v2.5"/><path d="M3 15h18"/><path d="M6.5 12V9.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V12"/></svg></span>
-        <div class="sum-c"><div class="sum-k">Room</div><div class="sum-v"><span class="av-title" id="csRoom">Villa Room</span></div></div>
-      </div>
-      <div class="sum-row">
-        <span class="sum-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.1"/><path d="M3.5 20c.6-3.1 3-4.8 5.5-4.8s4.9 1.7 5.5 4.8"/><path d="M16.2 5.3a3 3 0 0 1 0 5.6M21 20c-.4-2.1-1.7-3.5-3.4-4.2"/></svg></span>
-        <div class="sum-c"><div class="sum-k">Guests</div><div class="sum-v"><span class="av-title" id="csGuests">Saanvi</span></div></div>
-      </div>
-      <div class="sum-row">
-        <span class="sum-ic"><svg viewBox="0 0 24 24"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg></span>
-        <div class="sum-c"><div class="sum-k">Cancellation</div><div class="sum-v"><span class="av-title" id="leftCancelVal">Free till 9 July</span></div></div>
-      </div>
-      <div class="sum-row">
-        <span class="sum-ic"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/><path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg></span>
-        <div class="sum-c"><div class="sum-k">Breakfast</div><div class="sum-v"><span class="av-title">Included</span></div></div>
-      </div>
-    </div>
-  </aside>
-  </div>
-  </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="tracking-data.js"></script>
 <script>
   // Returning from a declined charge: razorpay hands control back to payReturn (this page, for the
   // Pay-now button below) and only flags the failure in sessionStorage. Nothing here reads that flag,
@@ -426,217 +702,376 @@
     }
   } catch(e){}
 
+  /* ---------- landing back from a switch ----------
+     Book-with-us sends the guest straight to the gateway with a marker for the
+     stay being switched. The switch itself is only made here, on the way back,
+     and only if the charge actually went through — so an abandoned or declined
+     payment leaves both bookings exactly as they were. */
+  try {
+    var ps = JSON.parse(sessionStorage.getItem('pendingSwitch') || 'null');
+    if(ps){
+      var charged = false;
+      try { charged = (JSON.parse(sessionStorage.getItem('booking')) || {}).paid === true; } catch(e){}
+      sessionStorage.removeItem('pendingSwitch');
+      if(charged && window.Tracking){
+        var newId = window.Tracking.completeSwitch(ps.id, ps.price);
+        /* hand the booking we just made to the page, in place of the tracked
+           one that was here when the guest left for the gateway */
+        if(newId) window.Tracking.openOwned(newId);
+      }
+    }
+  } catch(e){}
+
   var b = {};
   try { b = JSON.parse(sessionStorage.getItem('booking')) || {}; } catch(e){}
-  function set(id, val){ var el = document.getElementById(id); if(el && val){ el.textContent = val; } }
-  function setHTML(id, val){ if(val){ document.getElementById(id).innerHTML = val; } }
+  function $(id){ return document.getElementById(id); }
+  function set(id, val){ var el = $(id); if(el && val){ el.textContent = val; } }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function rupees(s){ return parseInt(String(s || '').replace(/[^\d]/g, ''), 10) || 0; }
+  function inr(n){ return '₹' + Math.round(n).toLocaleString('en-IN'); }
 
-  set('hotel', b.hotel);
-  set('amount', b.amount);
-  // amounts on the cancel / cancelled states
-  var refundAmt = b.refund || b.amount;
-  set('cancelPaidAmt', b.amount);
-  set('cnPaidAmt', b.amount);
-  set('cancelRefundAmt', refundAmt);
-  set('cnAmt', refundAmt);
-  // right-side stay-detail card
-  set('csHotel', b.hotel);
-  set('csRoom', b.room);
-  set('csGuests', b.guests);
+  var HOTEL = b.hotel || 'Taj Exotica Resort & Spa';
+  /* The locality the booking carries is the whole address we hold — the
+     prototype has no street lines, and a guessed one would be worse than the
+     locality that is actually true. */
+  var PLACE = b.place || 'Benaulim Beach · Goa';
+  var PAY_BY = b.freeCancelUntil || '9 Jul';   // the free-cancellation cutoff
 
-  // book now, pay later: reserved but not yet paid — settle online before the free-cancellation date
-  var PAY_BY = '9 Jul';                       // day before check-in — the free-cancellation cutoff
-  var unpaidReserve = (b.payMode === 'later' && !b.paid);
-  if(unpaidReserve){
-    var pbox = document.getElementById('paidBox');
-    if(pbox){
-      pbox.classList.add('neutral');
-      var plab = document.getElementById('paidLabel'); if(plab) plab.textContent = 'To pay';
-      var rnote = document.getElementById('refundNote'); if(rnote) rnote.textContent = '';
-      var psvg = pbox.querySelector('.pl svg');
-      if(psvg) psvg.style.display = 'none';   // no icon next to "To pay"
-    }
-    set('amount', b.dueAmount || b.amount);
-    // reserved, not paid — say so, and warn it's cancelled if unpaid by the cutoff
-    var st = document.getElementById('statusTitle'); if(st) st.textContent = 'Room reserved';
-    var pw = document.getElementById('payWarn'); if(pw) pw.hidden = false;
-    // attach Pay now to the "To pay" box as the primary action
-    var payNow = document.getElementById('payNowBtn');
-    if(payNow){
-      payNow.hidden = false;
-      set('payNowAmt', b.dueAmount || b.amount);
-      payNow.addEventListener('click', function(){
-        try { sessionStorage.setItem('payReturn', 'booking-details.html'); } catch(e){}
-      });
-    }
-    // keep Download voucher available, but demote it to an outline button so the green Pay now leads
-    var dlb = document.getElementById('dlVoucher'); if(dlb){ dlb.classList.remove('btn'); dlb.classList.add('ghostbtn'); }
-    // nothing paid yet → cancelling just releases the hold, no refund
-    set('cancelPaidAmt', '₹0');
-    set('cnPaidAmt', '₹0');
-    set('cancelRefundAmt', '₹0');
-    set('cnAmt', '₹0');
-    var crn = document.getElementById('cnRefundNote'); if(crn) crn.textContent = 'No payment was taken';
+  set('csHotel', HOTEL);
+  set('tkHotel', HOTEL);
+  set('goHotel', HOTEL);
+  set('csPlace', PLACE.replace(/\s*·\s*/g, ', '));
+  set('goAddr', PLACE.replace(/\s*·\s*/g, ', '));
+  $('callBtn').href = 'tel:' + (b.phone || '+919019090190');
+
+  /* the photo the list showed, so the row opens into the same stay */
+  if(b.img){
+    $('tkPhoto').src = b.img;
+    $('tkPhoto').alt = HOTEL;
   }
 
-  // booking reference — stable per confirmed booking (kept in sessionStorage)
+  /* Navigate — a maps query, since the prototype has no place ID */
+  var mapsHref = 'https://www.google.com/maps/search/?api=1&query=' +
+    encodeURIComponent(HOTEL + ', ' + PLACE.replace(/\s*·\s*/g, ', '));
+  $('navBtn').href = mapsHref;
+  $('goNav').href = mapsHref;
+
+  /* ---------- the ticket head ---------- */
+  var nights = b.nights || '3 nights';
+  var guestsRaw = String(b.guests || 'Saanvi');
+  /* the guests field carries either a count ("2 adults") or the names on the
+     booking — both have to end up as a count on the ticket and as rows below */
+  var names = guestsRaw.split(/,|&|\band\b/i).map(function(s){ return s.trim(); })
+                .filter(function(s){ return s && !/\d/.test(s) && !/guest|room|adult|child|infant|travell?er/i.test(s); });
+  var guestCount = /\d/.test(guestsRaw) ? (parseInt(guestsRaw, 10) || names.length || 1)
+                                        : (names.length || 1);
+  set('tkHead', nights + ', ' + guestCount + (guestCount === 1 ? ' guest' : ' guests'));
+
+  /* dates: b.dates is a printed range, so it is split back for the two ends */
+  if(b.dates){
+    var ends = String(b.dates).split(/\s*[–—-]\s*/);
+    if(ends.length === 2){
+      $('ciDate').innerHTML = esc(ends[0]) + ', <span>2:00 pm</span>';
+      $('coDate').innerHTML = esc(ends[1]) + ', <span>12:00 pm</span>';
+    }
+  }
+
+  /* ---------- rooms ---------- */
+  var ROOM_PHOTO = {
+    'Villa Room': 'images/08-villa-exterior.png',
+    'Luxury Room': 'images/01-bedroom-twin.png',
+    'Deluxe Room': 'images/02-bedroom-arch.png'
+  };
+  var room = b.room || 'Villa Room';
+  var IC_MEAL = '<svg viewBox="0 0 24 24"><path d="M4.5 8.5h12v4.5a5 5 0 0 1-5 5H9.5a5 5 0 0 1-5-5V8.5Z"/>' +
+    '<path d="M16.5 9.5H18a2.4 2.4 0 0 1 0 4.8h-1.5"/><path d="M7.5 3.2c-.4.6-.4 1.4 0 2M11 3.2c-.4.6-.4 1.4 0 2"/></svg>';
+  var IC_CXL = '<svg viewBox="0 0 24 24"><path d="M12 3v1.5"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/>' +
+    '<path d="M12 12v6a2.4 2.4 0 0 0 4.8 0"/></svg>';
+  var roomPhoto = ROOM_PHOTO[room] || b.img || 'images/08-villa-exterior.png';
+  var mealPlan = b.mealPlan || 'Breakfast included';
+  $('roomList').innerHTML =
+    '<div class="room">' +
+      '<div class="room-top">' +
+        '<div class="room-ph"><img src="' + esc(roomPhoto) + '" alt=""></div>' +
+        '<div><div class="room-n">' + esc(room) + '</div>' +
+        '<div class="room-s">1 King bed &middot; sleeps ' + Math.max(2, guestCount) + '</div></div>' +
+      '</div>' +
+      '<div class="room-facts">' +
+        '<div class="room-f">' + IC_MEAL + esc(mealPlan) + '</div>' +
+        '<div class="room-f" id="roomCxl">' + IC_CXL + 'Free cancellation <em>&nbsp;until ' +
+          esc(PAY_BY) + '</em></div>' +
+      '</div>' +
+    '</div>';
+
+  /* ---------- guests ---------- */
+  var G_AV = '<span class="g-av"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.4"/>' +
+             '<path d="M5 20c.8-3.4 3.5-5.2 7-5.2s6.2 1.8 7 5.2"/></svg></span>';
+  function renderGuests(lead){
+    var rows = names.length ? names.slice() : [lead];
+    if(rows[0] !== lead) rows.unshift(lead);
+    /* pad to the count the booking was made for, so the list matches the ticket */
+    while(rows.length < guestCount) rows.push('Guest ' + (rows.length + 1));
+    $('guestList').innerHTML = rows.map(function(n, i){
+      return '<div class="guest">' + G_AV + '<span class="g-n">' + esc(n) + '</span>' +
+             (i === 0 ? '<span class="g-you">You</span>' : '') + '</div>';
+    }).join('');
+  }
+
+  /* ---------- payment ---------- */
+  var unpaidReserve = (b.payMode === 'later' && !b.paid);
+  var total = rupees(unpaidReserve ? (b.dueAmount || b.amount) : b.amount) || 55500;
+  var base = Math.round(total / 1.12);
+  var taxes = total - base;
+  $('payLines').innerHTML =
+    '<div class="pay-l"><span>' + esc(room) + ' &middot; ' + esc(nights) + '</span><b>' + inr(base) + '</b></div>' +
+    '<div class="pay-l"><span>Taxes and fees</span><b>' + inr(taxes) + '</b></div>';
+  set('amount', inr(total));
+
+  /* book now, pay later: reserved but not yet paid — settle online before the free-cancellation date */
+  if(unpaidReserve){
+    set('statusTitle', 'Room reserved');
+    set('heroStamp', 'Reserved');
+    $('statusIcon').innerHTML = '<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 1.8"/>';
+    $('totalLabel').textContent = 'To pay';
+    $('payHow').hidden = true;
+    $('payWarn').hidden = false;
+    var payNow = $('payNowBtn');
+    payNow.hidden = false;
+    payNow.addEventListener('click', function(){
+      try { sessionStorage.setItem('payReturn', 'booking-details.html'); } catch(e){}
+    });
+    /* nothing paid yet → cancelling just releases the hold, no refund */
+    set('cancelPaidAmt', '₹0');
+    set('cancelRefundAmt', '₹0');
+  }
+
+  /* booking reference — stable per confirmed booking (kept in sessionStorage).
+     A tracked booking has no reference of ours, and inventing one would put a
+     number on screen the guest cannot quote to anybody. */
   var ref = b.ref;
-  if(!ref){
+  if(!ref && !b.tracked){
     var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s = '';
     for(var i=0;i<6;i++){ s += chars.charAt(Math.floor(Math.random()*chars.length)); }
     ref = 'TAJ-' + s;
     b.ref = ref;
     try { sessionStorage.setItem('booking', JSON.stringify(b)); } catch(e){}
   }
-  document.getElementById('ref').textContent = ref;
-  document.getElementById('cnRef').textContent = ref;
+  if(ref) $('ref').textContent = ref;
+  else $('refWrap').hidden = true;
 
-  // guest booking (not yet logged in) → keep offering the rewards sign-up nudge
-  // (?guest=1 forces it on for previewing without walking the whole flow)
+  if(!unpaidReserve){
+    set('cancelPaidAmt', inr(total));
+    set('cancelRefundAmt', inr(rupees(b.refund) || total));
+  }
+
+  /* guest booking (not yet logged in) → keep offering the rewards sign-up nudge
+     (?guest=1 forces it on for previewing without walking the whole flow) */
   var forceGuest = new URLSearchParams(location.search).get('guest') === '1';
   var signedIn = false;
   try { signedIn = sessionStorage.getItem('phoneVerified') === '1'; } catch(e){}
   if((forceGuest || (b.guest && !signedIn)) && !unpaidReserve){
-    var amt = parseInt(String(b.amount || '').replace(/[^\d]/g, ''), 10) || 0;
-    if(amt){
-      var pts = Math.round(amt * 0.05);   // 5% back in reward points
-      document.getElementById('rwHead').innerHTML =
-        'You&rsquo;ve earned <b>&#8377;' + pts.toLocaleString('en-IN') + '</b> in rewards';
-    }
-    document.getElementById('rewards').classList.add('show');
-    // promote Log in to the primary CTA; demote Download voucher to secondary
-    var loginBtn = document.getElementById('loginBtn');
+    var pts = Math.round(total * 0.05);   // 5% back in reward points
+    $('rwHead').innerHTML = 'You&rsquo;ve earned <b>&#8377;' + pts.toLocaleString('en-IN') + '</b> in rewards';
+    $('rewards').classList.add('show');
+    var loginBtn = $('loginBtn');
     loginBtn.hidden = false;
-    var dl = document.getElementById('dlVoucher');
-    dl.classList.remove('btn'); dl.classList.add('textbtn');
-    // return here after the mock login completes
+    /* return here after the mock login completes */
     loginBtn.addEventListener('click', function(){
       try { sessionStorage.setItem('authReturn', 'booking-details.html'); } catch(e){}
     });
   }
 
-  // ----- right-column state machine: confirmed ⇄ cancel → cancelled -----
-  var confirmedCard = document.getElementById('confirmedCard');
-  var cancelCard = document.getElementById('cancelCard');
-  var cancelledCard = document.getElementById('cancelledCard');
-  function showState(name){
-    confirmedCard.hidden = name !== 'confirmed';
-    cancelCard.hidden    = name !== 'cancel';
-    cancelledCard.hidden = name !== 'cancelled';
-  }
+  /* ---------- cancelled state ----------
+     Not a separate screen: the same booking, restamped. The hero loses its
+     colour, the stamp turns, and the payment card becomes a refund. */
   function markCancelledUI(){
     document.body.classList.add('is-cancelled');
-    var row = document.getElementById('leftCancelVal');
-    if(row) row.textContent = unpaidReserve ? 'Cancelled' : 'Cancelled · full refund';
+    set('statusTitle', 'Booking cancelled');
+    set('heroStamp', 'Cancelled');
+    $('statusIcon').innerHTML = '<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>';
+    var refund = unpaidReserve ? 0 : (rupees(b.refund) || total);
+    $('totalLabel').textContent = 'Refund';
+    $('amount').textContent = inr(refund);
+    $('payHow').hidden = false;
+    $('paidLabel').textContent = unpaidReserve ? 'No payment was taken' : 'Refund on its way';
+    $('refundNote').textContent = unpaidReserve ? '' : 'to your original payment method';
+    $('payWarn').hidden = true;
+    $('payNowBtn').hidden = true;
+    $('cancelLink').hidden = true;
+    $('browseBtn').hidden = false;
+    /* the room's cancellation line is now a fact about what happened */
+    var rc = $('roomCxl');
+    if(rc) rc.innerHTML = IC_CXL + 'Cancelled' + (unpaidReserve ? '' : ' <em>&nbsp;&middot; full refund</em>');
   }
 
-  // land straight in the cancelled state if this booking was already cancelled
-  if(b.status === 'cancelled'){
-    markCancelledUI();
-    showState('cancelled');
+  /* ---------- a booking we did not make ----------
+     Everything the page states about the stay is still true, so the stay is
+     shown in full. What changes is standing: there is no reference of ours to
+     quote, no voucher to hand over, and nothing here we could cancel. */
+  if(b.tracked){
+    /* Only once we hold a booking of our own for the same stay is this one the
+       "original" — before that it is simply their booking, and the pill would
+       be naming a distinction that does not exist yet. */
+    if(b.switched){
+      set('statusTitle', 'Your original booking');
+      $('statusIcon').innerHTML =
+        '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>';
+    } else {
+      $('statusTitle').closest('.status-pill').hidden = true;
+    }
+    set('heroStamp', 'Tracked');
+    $('dlVoucher').hidden = true;
+    $('dlInvoice').hidden = true;
+    $('cancelLink').hidden = true;
+    /* our support cannot act on a booking made somewhere else — arrival,
+       changes and special requests are all the other platform's to handle */
+    $('helpCard').hidden = true;
+    $('totalLabel').textContent = 'You paid';
+    $('paidLabel').textContent = b.platform ? 'Paid on ' + b.platform : 'Paid elsewhere';
+    $('refundNote').textContent = '';
+    set('payWho', 'Booked with ' + (b.platform || 'another site'));
+    $('payMail').closest('.pay-c').hidden = true;
+
+    if(b.saving){
+      /* what they paid is already broken down in the payment card above, so the
+         offer states only the number that is new */
+      set('offerOurs', b.saving.ours);
+      $('offer').hidden = false;
+
+      /* Straight to the gateway. The stay, the room and the price are all
+         already settled — there is nothing left to choose, so a checkout step
+         in between would only be a page asking them to confirm what they just
+         pressed. The switch is recorded on the way back, once it is paid. */
+      $('offerGo').addEventListener('click', function(e){
+        e.preventDefault();
+        try {
+          sessionStorage.setItem('pendingSwitch',
+            JSON.stringify({ id: b.id, price: b.saving.oursNum }));
+          sessionStorage.setItem('payReturn', 'booking-details.html');
+          /* the gateway quotes from `booking`, and what is being charged is our
+             price, not the one they already paid elsewhere */
+          var charge = JSON.parse(JSON.stringify(b));
+          charge.amount = b.saving.ours;
+          charge.paid = false;
+          sessionStorage.setItem('booking', JSON.stringify(charge));
+        } catch(err){}
+        location.href = 'razorpay.html';
+      });
+
+      /* Their word alone that the booking is gone — so it costs one click and
+         the row simply stops being watched. */
+      $('offerStop').addEventListener('click', function(e){
+        e.preventDefault();
+        if(window.Tracking) window.Tracking.stopTracking(b.id);
+        location.href = 'bookings.html';
+      });
+    }
   }
 
-  // open the cancel confirmation inline (no page navigation)
-  document.getElementById('cancelLink').addEventListener('click', function(e){
+  /* ---------- the original booking, still live ----------
+     Only after a switch, and only until they say it is done. Taken on their
+     word — no proof, no verification — so the card simply leaves. */
+  if(b.cancelOld){
+    set('oldDeadline', b.cancelOld.deadline);
+    if(b.cancelOld.platform) set('oldGoLabel', 'Cancel on ' + b.cancelOld.platform);
+    if(b.cancelOld.manage){
+      $('oldWhen').href = b.cancelOld.manage;
+      $('oldGo').href = b.cancelOld.manage;
+    }
+    $('cancelOld').hidden = false;
+  }
+
+  if(b.status === 'cancelled') markCancelledUI();
+
+  /* open the cancel confirmation over the page (no navigation) */
+  var scrim = $('cancelScrim');
+  function closeDlg(){ scrim.classList.remove('open'); }
+  $('cancelLink').addEventListener('click', function(e){
     e.preventDefault();
-    showState('cancel');
+    scrim.classList.add('open');
   });
-  document.getElementById('keepBooking').addEventListener('click', function(){
-    showState('confirmed');
+  $('keepBooking').addEventListener('click', closeDlg);
+  scrim.addEventListener('click', function(e){ if(e.target === scrim) closeDlg(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && scrim.classList.contains('open')) closeDlg();
   });
-  document.getElementById('confirmCancel').addEventListener('click', function(){
+  $('confirmCancel').addEventListener('click', function(){
     b.status = 'cancelled';
     if(unpaidReserve){ b.refund = '₹0'; b.refundType = 'none'; }
     else { b.refund = b.refund || b.amount || ''; b.refundType = 'full'; }
     try { sessionStorage.setItem('booking', JSON.stringify(b)); } catch(e){}
+    closeDlg();
     markCancelledUI();
-    showState('cancelled');
-    if(typeof toast === 'function') toast(unpaidReserve ? 'Booking cancelled' : 'Booking cancelled — refund on its way');
+    toast(unpaidReserve ? 'Booking cancelled' : 'Booking cancelled — refund on its way');
   });
 
-  // ----- toast helper -----
+  /* ----- toast helper ----- */
   function toast(msg){
-    var t = document.getElementById('toast');
-    t.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' + msg;
+    var t = $('toast');
+    t.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' + esc(msg);
     t.classList.add('show');
     clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
   }
 
-  // ----- copy the booking reference -----
-  document.getElementById('copyRef').addEventListener('click', function(){
+  /* ----- copy the booking reference ----- */
+  $('copyRef').addEventListener('click', function(){
     var btn = this;
     function done(){
       btn.classList.add('done');
-      if(typeof toast === 'function') toast('Reference copied');
+      toast('Reference copied');
       clearTimeout(btn._t); btn._t = setTimeout(function(){ btn.classList.remove('done'); }, 1500);
     }
     if(navigator.clipboard){ navigator.clipboard.writeText(ref).then(done).catch(done); }
     else { done(); }
   });
 
-  // ----- share the booking (personalised to the first companion) -----
-  function firstCompanion(guests){
-    if(!guests) return null;
-    var parts = guests.split(/,|&|\band\b/i);
-    for(var i=0;i<parts.length;i++){
-      var p = parts[i].trim();
-      if(!p || /^you$/i.test(p) || /\d/.test(p)) continue;
-      if(/guest|room|adult|child|infant|travell?er/i.test(p)) continue;
-      return p.split(/\s+/)[0];
-    }
-    return null;
-  }
-  var companion = firstCompanion(b.guests);
-  if(companion){
-    var _sb = document.getElementById('shareBtn');
-    _sb.setAttribute('aria-label', 'Share with ' + companion);
-    _sb.setAttribute('title', 'Share with ' + companion);
-  }
-
-  document.getElementById('shareBtn').addEventListener('click', function(e){
-    e.preventDefault();
-    var data = {
-      title: (b.hotel || 'Taj Exotica Resort & Spa') + ' — booking',
-      text: 'My stay at ' + (b.hotel || 'Taj Exotica Resort & Spa') + ' (' + ref + ')' + (b.dates ? ', ' + b.dates : '') + '.',
-      url: location.href
-    };
-    if(navigator.share){ navigator.share(data).catch(function(){}); }
-    else if(navigator.clipboard){
-      navigator.clipboard.writeText(data.text + ' ' + data.url)
-        .then(function(){ toast('Booking link copied'); })
-        .catch(function(){ toast('Couldn’t copy — try again'); });
-    } else { toast('Sharing isn’t available here'); }
-  });
-
-  // download a simple text voucher (prototype)
-  document.getElementById('dlVoucher').addEventListener('click', function(){
-    var lines = [
-      'TAJ EXOTICA RESORT & SPA — BOOKING VOUCHER',
+  /* ----- the voucher (prototype: a text file) ----- */
+  function voucherLines(){
+    return [
+      HOTEL.toUpperCase() + ' — BOOKING VOUCHER',
       '==========================================',
       '',
       'Booking reference : ' + ref,
-      'Hotel             : ' + (b.hotel || 'Taj Exotica Resort & Spa'),
+      'Hotel             : ' + HOTEL,
       'Dates             : ' + (b.dates || '') + (b.nights ? ' (' + b.nights + ')' : ''),
-      'Room              : ' + (b.room || 'Villa Room'),
-      'Guests            : ' + (b.guests || ''),
+      'Room              : ' + room,
+      'Guests            : ' + guestsRaw,
       (unpaidReserve
-        ? 'Amount due        : ' + (b.dueAmount || b.amount || '') + '  · pay by ' + PAY_BY + ' (Razorpay)'
-        : 'Amount paid       : ' + (b.amount || '') + '  · paid via Razorpay'),
+        ? 'Amount due        : ' + inr(total) + '  · pay by ' + PAY_BY + ' (Razorpay)'
+        : 'Amount paid       : ' + inr(total) + '  · paid via Razorpay'),
       '',
       'Present this voucher at check-in. Prototype — not a real booking.'
     ];
+  }
+  function download(name, lines){
     var blob = new Blob([lines.join('\n')], {type:'text/plain'});
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url; a.download = 'Taj-Exotica-voucher-' + ref + '.txt';
+    a.href = url; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 0);
+  }
+  $('dlVoucher').addEventListener('click', function(){
+    download('Taj-Exotica-voucher-' + ref + '.txt', voucherLines());
+  });
+  $('dlInvoice').addEventListener('click', function(){
+    download('Taj-Exotica-invoice-' + ref + '.txt', [
+      HOTEL.toUpperCase() + ' — TAX INVOICE',
+      '==========================================',
+      '',
+      'Booking reference : ' + ref,
+      room + ' · ' + nights + ' : ' + inr(base),
+      'Taxes and fees      : ' + inr(taxes),
+      'Total               : ' + inr(total),
+      '',
+      'Prototype — not a real invoice.'
+    ]);
   });
 
   /* profile menu — same behaviour and same saved-traveller lookup as trips.html */
   (function(){
-    var btn = document.getElementById('profileBtn'), menu = document.getElementById('profileMenu');
-    if(!btn || !menu) return;
+    var btn = $('profileBtn'), menu = $('profileMenu');
     btn.addEventListener('click', function(e){
       e.stopPropagation();
       var o = menu.classList.toggle('open');
@@ -647,15 +1082,24 @@
         menu.classList.remove('open'); btn.setAttribute('aria-expanded','false');
       }
     });
+    var nm = 'Saanvi';
     try{
       var all = JSON.parse(localStorage.getItem('onto:travellers:v3')) || [];
       var me = all.find(function(t){ return t.relation === 'Myself' || t.id === 't-you'; });
-      var nm = (me && me.name && me.name.toLowerCase() !== 'you' && me.name.indexOf('@') === -1) ? me.name : 'Saanvi';
-      var ini = (nm[0] || 'Y').toUpperCase();
-      btn.textContent = ini;
-      document.getElementById('menuAvatar').textContent = ini;
-      var mn = document.getElementById('menuName'); if(mn) mn.textContent = nm;
+      if(me && me.name && me.name.toLowerCase() !== 'you' && me.name.indexOf('@') === -1) nm = me.name;
     }catch(e){}
+    set('whoName', nm);
+    set('menuName', nm);
+    set('menuAvatar', (nm[0] || 'S').toUpperCase());
+    set('payWho', 'Booking under ' + nm);
+    renderGuests(nm);
+    /* the soonest stay, so the row says what is behind it rather than only
+       where it goes — sorted() is already in check-in order */
+    try {
+      var next = window.Tracking && window.Tracking.sorted()[0];
+      if(next) set('pmNext', next.property_name_raw + ' — ' +
+        window.Tracking.fmt.day(next.check_in));
+    } catch(e){}
   })();
 </script>
 </body>
