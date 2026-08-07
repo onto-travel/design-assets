@@ -3,577 +3,436 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>onto · Profile</title>
+<title>onto · Account settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* v2 neutral system, same tokens as bookings.html and results.html. */
   :root{
-    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
-    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --pill:#f1ede3; --green:#0f8a63; --danger:#b23b32;
-    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+    --bg:#f7f7f5; --card:#ffffff; --ink:#111827; --muted:#737373;
+    --line:#e8e8e6; --chip-ink:#393939;
+    --jade:#0f8a63; --jade-deep:#0b6d4e; --jade-soft:#eef6f1;
+    --danger:#c0392b;
+    --shadow-card:0 6px 11px rgba(0,0,0,.07), 0 1.809px 3.316px rgba(0,0,0,.05),
+                  0 .751px 1.377px rgba(0,0,0,.04), 0 .272px .498px rgba(0,0,0,.02);
   }
   *{box-sizing:border-box;}
-  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  html,body{margin:0;}
+  body{min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     line-height:1.5;-webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:inherit;font-weight:700;letter-spacing:-.02em;margin:0;}
+  button,input{font-family:inherit;}
   [hidden]{display:none !important;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:4px;}
 
-  /* top nav — shared with trips/stays */
-  .topnav{position:sticky;top:0;z-index:80;background:rgba(250,247,241,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
-  .topnav-in{max-width:1180px;margin:0 auto;padding:0 28px;height:62px;display:flex;align-items:center;gap:26px;}
-  .tn-brand{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);text-decoration:none;letter-spacing:-.01em;}
-  .tn-brand span{color:var(--gold);}
-  .tn-links{display:flex;align-items:center;gap:2px;}
-  .tn-links a{font-size:14.5px;color:#5b5650;text-decoration:none;padding:8px 14px;border-radius:9px;transition:background .15s,color .15s;}
-  .tn-links a:hover{background:rgba(255,255,255,.62);color:var(--ink);}
-  .tn-links a.active{color:var(--jade);font-weight:600;}
-  .tn-right{margin-left:auto;display:flex;align-items:center;gap:9px;position:relative;}
-  .tn-profile{height:40px;border-radius:22px;border:1px solid #d9d1c1;background:#fff;display:flex;align-items:center;
-    gap:9px;padding:0 6px 0 12px;cursor:pointer;transition:border-color .15s,background .15s;}
-  .tn-profile:hover{border-color:#c2b8a4;background:#faf7f1;}
-  .tn-profile .burger{display:flex;flex-direction:column;gap:3px;}
-  .tn-profile .burger i{display:block;width:15px;height:1.7px;background:#8a857d;border-radius:2px;}
-  .tn-avatar{width:34px;height:34px;border:none;padding:0;border-radius:50%;background:var(--jade);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:Georgia,serif;line-height:1;text-decoration:none;cursor:pointer;transition:box-shadow .12s;}
-  .tn-avatar:hover{box-shadow:0 0 0 3px rgba(15,138,99,.15);}
-  .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
-    border-radius:14px;box-shadow:0 14px 40px rgba(40,30,10,.2);padding:8px;opacity:0;transform:translateY(-6px);
-    pointer-events:none;transition:opacity .15s,transform .15s;}
-  .menu.open{opacity:1;transform:none;pointer-events:auto;}
-  .menu-id{display:flex;align-items:center;gap:11px;padding:11px 12px 13px;border-bottom:1px solid var(--line);margin-bottom:6px;text-decoration:none;color:inherit;cursor:pointer;border-radius:10px 10px 0 0;transition:background .15s;}
-  .menu-id:hover{background:#faf7f1;}
-  .menu-id-ar{margin-left:auto;color:#b8b0a2;font-size:17px;}
-  .menu-id .tn-avatar{width:38px;height:38px;font-size:20px;}
-  .menu-id b{font-size:14.5px;display:block;}
-  .menu-id small{font-size:12.5px;color:var(--muted);}
-  .menu .item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font-size:14px;color:var(--ink);
-    text-decoration:none;cursor:pointer;}
-  .menu .item:hover{background:#faf7f1;}
-  .menu .item.active{color:var(--jade);font-weight:600;}
-  .menu .item svg{width:19px;height:19px;stroke:#6b655c;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
-  .menu .item.active svg{stroke:var(--jade);}
-  .menu .item .ar{margin-left:auto;color:#b8b0a2;}
+  /* ============ TOP NAV ============
+     Height, face and anchoring come from topnav.js. The container matches the
+     other v2 crumb pages exactly, so the wordmark lands where it does on
+     bookings rather than moving when you arrive here from the menu. */
+  .topnav{position:sticky;top:0;z-index:80;background:rgba(247,247,245,.88);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topnav-in{max-width:1240px;margin:0 auto;padding:0 32px;}
+  .crumb{display:flex;align-items:center;gap:10px;min-width:0;}
+  .crumb-sep{color:#c4c4bf;font-size:16px;}
+  .crumb-here{font-size:16px;font-weight:500;color:#6b6b66;}
 
-  /* page */
-  .page{max-width:860px;margin:0 auto;padding:36px 28px 72px;}
-  .h1{font-family:Georgia,serif;font-size:36px;letter-spacing:-.015em;margin:0 0 24px;}
+  /* ============ PAGE ============
+     A narrow column of its own, centred rather than aligned to the bar: there
+     is one card on this page and nothing to sit beside it. */
+  .page{max-width:968px;margin:0 auto;padding:56px 40px 96px;}
+  .h1{font-size:40px;line-height:1.15;}
+  .lede{margin:10px 0 0;font-size:17px;font-weight:500;color:var(--muted);}
 
-  /* section card */
-  .sec{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);
-    padding:6px 26px 8px;margin-bottom:20px;}
-  .sec-hd{display:flex;align-items:center;gap:12px;padding:20px 0 6px;}
-  .sec-ic{flex:none;width:38px;height:38px;border-radius:11px;background:#f1ede3;color:#b3893f;
-    display:flex;align-items:center;justify-content:center;}
-  .sec-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  .sec-hd h2{font-family:Georgia,serif;font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0;}
+  .card{margin-top:38px;background:var(--card);border-radius:16px;
+    box-shadow:var(--shadow-card);overflow:hidden;}
+  .card-hd{padding:24px 28px;font-size:19px;font-weight:700;letter-spacing:-.01em;}
 
-  /* ledger rows — icon tile + label left, value right, editable in place */
-  .rows{padding:2px 0 8px;}
-  .frow{display:flex;gap:14px;align-items:center;padding:11px 2px;}
-  .frow+.frow{border-top:1px solid #f1ede5;}
-  .ric{flex:none;width:40px;height:40px;border-radius:11px;background:#f1ede3;color:#b3893f;display:flex;align-items:center;justify-content:center;}
-  .ric svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
-  .rc{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:16px;}
-  .rk{flex:none;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;}
-  .rv{flex:1;min-width:0;display:flex;justify-content:flex-end;}
-  .rv .dd,.rv .dp{width:100%;}
+  /* label, value, control — one grid so every row's columns line up down the
+     card however long a value runs */
+  /* 65 is about what the content asks for on its own, so the floor mostly just
+     holds the row steady: an input is a shade taller than a line of text, and
+     without it every Edit would nudge the card. */
+  .row{display:grid;grid-template-columns:212px minmax(0,1fr) auto;align-items:center;
+    gap:20px;padding:12px 28px;border-top:1px solid var(--line);min-height:65px;}
+  .rk{font-size:15.5px;font-weight:500;color:var(--muted);}
+  .rv{font-size:15.5px;font-weight:600;color:var(--ink);word-break:break-word;}
+  .rv.empty{font-weight:500;color:#a5a5a0;}
+  .ra{display:flex;align-items:center;gap:8px;justify-content:flex-end;}
 
-  /* right-aligned inline text value — no box, just editable text */
-  .rin{width:100%;border:none;padding:6px 2px;font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);
-    background:transparent;text-align:right;font-variant-numeric:tabular-nums;}
-  .rin::placeholder{color:#c0b9ac;font-weight:500;}
-  .rin.mono{letter-spacing:.02em;}
-  .rin:focus{outline:none;}
-  .rin.ro{color:var(--ink);cursor:default;}
-  .rtrig:focus,.rtrig:focus-visible,.dd-opt:focus,.cal-d:focus,.cal-nav:focus,.cal-yr:focus,.cal-title:focus,.cal-link:focus{outline:none;}
+  .btn{border:1px solid #e2e2de;background:#fff;color:var(--ink);border-radius:10px;
+    padding:8px 18px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;
+    transition:background .15s,border-color .15s,color .15s;}
+  .btn:hover{background:#f7f7f5;border-color:#cdcdc7;}
+  .btn.jade{background:var(--jade);border-color:var(--jade);color:#fff;}
+  .btn.jade:hover{background:var(--jade-deep);border-color:var(--jade-deep);}
+  .btn.quiet{border-color:transparent;background:none;color:var(--muted);font-weight:600;}
+  .btn.quiet:hover{background:#f0f0ed;border-color:transparent;color:var(--ink);}
 
-  /* right-aligned dropdown / date value — no box */
-  .rtrig{width:100%;display:flex;align-items:center;justify-content:flex-end;gap:7px;border:none;padding:6px 2px;
-    font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);background:transparent;cursor:pointer;}
-  .rtrig .dd-val,.rtrig .dp-val{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;}
-  .rtrig.ph .dd-val,.rtrig.ph .dp-val{color:#c0b9ac;font-weight:500;}
-  .rv .dd-trigger,.rv .dp-trigger{justify-content:flex-end;text-align:right;}
-  .rv .dd-pop{left:auto;right:0;width:232px;}
-  .rv .dp-pop{left:auto;right:0;}
+  .rin{width:100%;max-width:440px;border:1px solid #d8d8d4;border-radius:10px;
+    padding:8px 13px;font-size:15.5px;font-weight:600;color:var(--ink);background:#fff;
+    transition:border-color .15s,box-shadow .15s;}
+  .rin:focus{outline:none;border-color:var(--jade);box-shadow:0 0 0 3px rgba(15,138,99,.13);}
+  /* two boxes reading as one field, sharing the width a single one would take */
+  .rpair{display:flex;gap:10px;max-width:440px;}
+  .rpair .rin{max-width:none;min-width:0;flex:1;}
+  /* the native control, wearing the same box as the text ones */
+  .sel{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:38px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23737373' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5L6 6.5l5-5'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;}
+  /* a date is ten characters wide and never more */
+  .rin.dmy{max-width:190px;font-variant-numeric:tabular-nums;letter-spacing:.02em;}
+  .rin.bad{border-color:var(--danger);box-shadow:0 0 0 3px rgba(192,57,43,.10);}
+  /* the reason it was refused, under the thing that was refused */
+  .err{margin-top:7px;font-size:13px;font-weight:600;color:var(--danger);}
 
-  /* custom dropdown — matches the design-system popover list */
-  .dd{position:relative;}
-  .dd-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;cursor:pointer;}
-  .dd-trigger .dd-val{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .dd-trigger.ph .dd-val{color:#a39c90;}
-  .dd-caret{flex:none;width:14px;height:14px;stroke:#6d726c;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
-  .dd.open .dd-caret{transform:rotate(180deg);}
-  .dd-pop{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:40;background:var(--card);
-    border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 44px rgba(40,30,10,.18);
-    padding:0;max-height:252px;overflow-y:auto;animation:ddrise .14s ease both;}
-  .dd.up .dd-pop{top:auto;bottom:calc(100% + 6px);animation:ddrise-up .14s ease both;}
-  .dd-search{position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:8px;background:var(--card);
-    padding:11px 13px 9px;border-bottom:1px solid var(--line);border-radius:14px 14px 0 0;}
-  .dd-sic{flex:none;width:16px;height:16px;stroke:#a39c90;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-  .dd-si{flex:1;min-width:0;border:none;outline:none;background:none;font-family:inherit;font-size:14.5px;color:var(--ink);padding:0;}
-  .dd-si::placeholder{color:#a39c90;}
-  .dd-list{padding:6px;}
-  .dd-empty{padding:12px;text-align:center;font-size:13.5px;color:var(--muted);}
-  @keyframes ddrise{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
-  @keyframes ddrise-up{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-  .dd-opt{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;
-    border:none;background:none;font-family:inherit;font-size:14.5px;color:var(--ink);padding:10px 12px;
-    border-radius:9px;cursor:pointer;transition:background .12s;}
-  .dd-opt:hover{background:#faf7f1;}
-  .dd-opt.sel{color:var(--jade);font-weight:600;}
-  .dd-check{flex:none;width:15px;height:15px;stroke:var(--jade);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:0;}
-  .dd-opt.sel .dd-check{opacity:1;}
+  .toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,14px);
+    background:var(--ink);color:#fff;font-size:14px;font-weight:600;
+    padding:11px 18px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.22);
+    opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:120;}
+  .toast.on{opacity:1;transform:translate(-50%,0);}
 
-  /* custom date picker — reuses the design-system calendar */
-  .dp{position:relative;}
-  .dp-trigger{width:100%;display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;}
-  .dp-val{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .dp-trigger.ph .dp-val{color:#a39c90;}
-  .dp.open .dd-caret{transform:rotate(180deg);}
-  .dp-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:40;width:296px;max-width:calc(100vw - 40px);
-    background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 44px rgba(40,30,10,.18);
-    padding:16px;animation:ddrise .14s ease both;}
-  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .cal-title{border:none;background:none;font-family:Georgia,serif;font-size:14.5px;font-weight:600;color:var(--ink);
-    cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:8px;transition:background .13s;}
-  .cal-title:hover{background:#faf7f1;}
-  .cal-title svg{width:12px;height:12px;stroke:#8a857d;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
-  .cal-navs{display:flex;gap:6px;}
-  .cal-nav{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;
-    color:var(--ink);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .13s;}
-  .cal-nav:hover:not(:disabled){border-color:#c2b8a4;background:#faf7f1;}
-  .cal-nav:disabled{opacity:.3;cursor:default;}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-  .cal-dow{font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;padding:3px 0;text-transform:uppercase;}
-  .cal-d{aspect-ratio:1;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink);
-    border-radius:9px;font-family:inherit;transition:background .1s;}
-  .cal-d.out{cursor:default;}
-  .cal-d:hover:not(:disabled):not(.out){background:#f0eadd;}
-  .cal-d.sel{background:var(--jade);color:#fff;font-weight:600;}
-  .cal-d:disabled{color:#cfc8bb;cursor:default;}
-  .cal-years{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:230px;overflow-y:auto;padding:2px 0;}
-  .cal-yr{border:none;background:none;font-family:inherit;font-size:13.5px;color:var(--ink);padding:10px 0;border-radius:9px;cursor:pointer;transition:background .12s;}
-  .cal-yr:hover{background:#faf7f1;}
-  .cal-yr.sel{background:var(--jade);color:#fff;font-weight:600;}
-  .cal-foot{display:flex;justify-content:flex-end;margin-top:10px;padding-top:10px;border-top:1px solid #f1ede5;}
-  .cal-link{border:none;background:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--jade);cursor:pointer;padding:5px 9px;border-radius:8px;transition:background .13s;}
-  .cal-link:hover{background:#eef6f1;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
 
-  @media(max-width:640px){ .tn-links{display:none;} }
+  @media(max-width:720px){
+    .topnav-in{padding:0 18px;}
+    .page{padding:36px 18px 72px;}
+    .h1{font-size:31px;}
+    /* the control drops under the pair it acts on rather than squeezing it */
+    .row{grid-template-columns:minmax(0,1fr);gap:6px;padding:18px 20px;min-height:0;}
+    .card-hd{padding:20px;}
+    .ra{justify-content:flex-start;margin-top:8px;}
+    .rin{max-width:none;}
+    .rpair{max-width:none;}
+  }
 </style>
 </head>
 <body>
   <nav class="topnav">
     <div class="topnav-in">
-      <a class="tn-brand" href="home2.html">onto<span>.</span></a>
-      <div class="tn-links">
-        <a href="home2.html">Stays</a>
-        <a href="bookings.html?all=1">Bookings</a>
+      <div class="crumb">
+        <a class="tn-brand" href="home2.html">ONTO</a>
+        <span class="crumb-sep">/</span>
+        <span class="crumb-here">Account settings</span>
       </div>
       <div class="tn-right">
-        <button type="button" class="tn-avatar" id="profileBtn" aria-haspopup="true" aria-expanded="false">Y</button>
-        <div class="menu" id="profileMenu" role="menu">
-          <a class="menu-id" href="profile.html">
-            <span class="tn-avatar" id="menuAvatar">Y</span>
-            <div><b id="menuName">Saanvi</b><small>xyz@email.com</small></div>
-            <span class="menu-id-ar">›</span>
-          </a>
-          <div class="menu-sec">
-            <a class="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span class="ar">›</span></a>
-            <a class="item" href="help.html"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span class="ar">›</span></a>
-            <a class="item" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
-          </div>
-        </div>
+        <button type="button" class="tn-who" id="profileBtn" aria-haspopup="true" aria-expanded="false">Saanvi</button>
+        <div class="menu" id="profileMenu" role="menu"></div>
       </div>
     </div>
   </nav>
 
-  <div class="page">
-    <h1 class="h1">Profile</h1>
+  <main class="page">
+    <h1 class="h1">Account settings</h1>
+    <p class="lede">The details we use for your bookings.</p>
 
-    <!-- personal details -->
-    <section class="sec" id="secPersonal">
-      <div class="sec-hd">
-        <div><h2>Personal details</h2></div>
-      </div>
-      <div class="sec-content" id="cPersonal"></div>
+    <section class="card">
+      <h2 class="card-hd">Your details</h2>
+      <div id="rows"></div>
     </section>
+  </main>
 
-    <!-- identification -->
-    <section class="sec" id="secId">
-      <div class="sec-hd">
-        <div><h2>Documents</h2></div>
-      </div>
-      <div class="sec-content" id="cId"></div>
-    </section>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  </div>
-
-<script>
-  (function(){
-    const $ = id => document.getElementById(id);
-    const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
-    const KEY = 'onto:profile:v1';
-    const EMAIL = 'xyz@email.com';
-
-    const COUNTRIES = ['India','United States','United Kingdom','United Arab Emirates','Australia','Canada',
-      'Singapore','Germany','France','Japan','Nepal','Sri Lanka','Bangladesh','Other'];
-    const GENDERS = ['Female','Male','Prefer not to say'];
-
-    // field schema
-    const PERSONAL = [
-      {k:'name',   label:'Full name',      type:'text',   ph:'As on your ID', icon:'user'},
-      {k:'phone',  label:'Phone number',   type:'tel',    ph:'+91 ', mono:true, icon:'phone'},
-      {k:'email',  label:'Email',          type:'email',  readonly:true, icon:'mail'},
-      {k:'dob',    label:'Date of birth',  type:'dmask',  mode:'past', icon:'cake'},
-      {k:'gender', label:'Gender',         type:'select', opts:GENDERS, icon:'person'},
-      {k:'nationality', label:'Nationality', type:'select', opts:COUNTRIES, search:true, icon:'globe'},
-    ];
-    const IDENT = [
-      {k:'passport',  label:'Passport no.',    type:'text',   ph:'Number on the document', mono:true, icon:'passport'},
-      {k:'idExpiry',  label:'Expiry date',     type:'dmask',  mode:'future', opt:true, icon:'calendar'},
-      {k:'idCountry', label:'Issuing country', type:'select', opts:COUNTRIES, search:true, icon:'globe'},
-      {k:'pan',       label:'PAN card number', type:'text',   ph:'10-character PAN', mono:true, icon:'card'},
-    ];
-    const SCHEMA = { personal: PERSONAL, id: IDENT };
-
-    const ICONS = {
-      user:     '<circle cx="12" cy="8" r="3.4"/><path d="M5 20c.9-3.5 3.6-5.3 7-5.3s6.1 1.8 7 5.3"/>',
-      phone:    '<path d="M6 3h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 15l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2z"/>',
-      mail:     '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
-      cake:     '<path d="M4 21h16v-8H4z"/><path d="M4 16c1.4 0 1.4 1 2.7 1s1.3-1 2.7-1 1.4 1 2.6 1 1.4-1 2.7-1 1.4 1 2.6 1"/><path d="M6 13v-2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M12 9V6"/><circle cx="12" cy="4" r=".7"/>',
-      person:   '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="2.6"/><path d="M6.8 18a5.4 5.4 0 0 1 10.4 0"/>',
-      globe:    '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18"/>',
-      passport: '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="9.5" r="2.4"/><path d="M9 15c.6-1.2 1.7-1.8 3-1.8s2.4.6 3 1.8"/>',
-      calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>',
-      card:     '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/>',
-    };
-
-    const CARET = '<svg class="dd-caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
-    const CHECK = '<svg class="dd-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
-    const SEARCHIC = '<svg class="dd-sic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
-
-    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const DOW = ['S','M','T','W','T','F','S'];
-
-    const FUN_EMOJI = ['🦊','🐨','🐼','🦁','🐧','🐬','🦉','🐢','🐝','🦩'];
-    function emojiFor(name){ let h=0; const s=String(name||''); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return FUN_EMOJI[h % FUN_EMOJI.length]; }
-
-    // seed from the Companions "Myself" record where we can
-    let me = null;
-    try{ const a = JSON.parse(localStorage.getItem('onto:travellers:v3'))||[]; me = a.find(t => t.relation==='Myself'||t.id==='t-you'); }catch(e){}
-
-    let data = {};
-    try{ data = JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){}
-    data.email = EMAIL;
-    if(!data.name && me && me.name && me.name.toLowerCase()!=='you') data.name = me.name;
-
-    function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){} }
-
-    const monthShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const pad2 = n => (n<10?'0':'')+n;
-    function fmtDate(v){ // yyyy-mm-dd -> "12 Aug 1990"
-      if(!v || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return v || '';
-      const [y,m,d] = v.split('-'); return (+d)+' '+monthShort[(+m)-1]+' '+y;
-    }
-    // dd/mm/yyyy <-> yyyy-mm-dd
-    function isoToDMY(iso){ if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||'')) return ''; const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; }
-    function dmyToISO(s){
-      const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec((s||'').trim()); if(!m) return null;
-      const d=+m[1], mo=+m[2], y=+m[3];
-      if(mo<1||mo>12||d<1) return null;
-      const dt=new Date(y,mo-1,d);
-      if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d) return null; // rejects 31/02 etc.
-      return y+'-'+pad2(mo)+'-'+pad2(d);
-    }
-    function maskDate(el){ // live: "17072000" -> "17/07/2000"
-      const g = el.value.replace(/\D/g,'').slice(0,8);
-      el.value = g.length>=5 ? g.slice(0,2)+'/'+g.slice(2,4)+'/'+g.slice(4)
-               : g.length>=3 ? g.slice(0,2)+'/'+g.slice(2)
-               : g;
-    }
-    function commitDate(inp){ // parse dd/mm/yyyy, store ISO if a real date within its mode's range
-      const iso = dmyToISO(inp.value);
-      let ok = false;
-      if(iso){
-        const p = iso.split('-').map(Number), rk = p[0]*10000+p[1]*100+p[2];
-        const t = new Date(), today = t.getFullYear()*10000+(t.getMonth()+1)*100+(t.getDate());
-        ok = inp.dataset.mode==='future' ? (p[0]>=1950 && p[0]<=2100) : (p[0]>=1920 && rk<=today);
-      }
-      if(ok){ data[inp.dataset.k]=iso; inp.value=isoToDMY(iso); }
-      else { delete data[inp.dataset.k]; inp.value=''; }
-      data.email=EMAIL; persist();
-    }
-    function display(f){
-      const v = data[f.k];
-      if(f.type==='date') return fmtDate(v);
-      return v || '';
-    }
-
-    /* ---------- nav identity ---------- */
-    function paintIdentity(){
-      const nm = data.name || (me && me.name && me.name.toLowerCase()!=='you' ? me.name : 'Saanvi');
-      const ini = (nm[0]||'S').toUpperCase();
-      $('profileBtn').textContent = ini;
-      const ma=$('menuAvatar'); if(ma) ma.textContent = ini;
-      const mn=$('menuName'); if(mn) mn.textContent = nm;
-    }
-
-    /* ---------- render: ledger rows, editable in place ---------- */
-    function control(f){
-      const id='in_'+f.k, cur=data[f.k]||'';
-      if(f.type==='select'){
-        const opts=f.opts.map(o=>'<button type="button" class="dd-opt'+(o===cur?' sel':'')+'" data-v="'+esc(o)+'"><span>'+esc(o)+'</span>'+CHECK+'</button>').join('');
-        const search=f.search
-          ? '<div class="dd-search">'+SEARCHIC+'<input type="text" class="dd-si" placeholder="Search…" autocomplete="off" spellcheck="false"></div>'
-          : '';
-        return '<div class="dd'+(f.search?' has-search':'')+'" data-dd="'+f.k+'">'+
-          '<input type="hidden" id="'+id+'" value="'+esc(cur)+'">'+
-          '<button type="button" class="dd-trigger rtrig'+(cur?'':' ph')+'" aria-haspopup="listbox" aria-expanded="false">'+
-            '<span class="dd-val">'+(cur?esc(cur):'Add')+'</span>'+CARET+'</button>'+
-          '<div class="dd-pop" role="listbox" hidden>'+search+'<div class="dd-list">'+opts+'<div class="dd-empty" hidden>No matches</div></div></div></div>';
-      }
-      if(f.type==='date'){
-        return '<div class="dp" data-dp="'+f.k+'">'+
-          '<input type="hidden" id="'+id+'" value="'+esc(cur)+'">'+
-          '<button type="button" class="dp-trigger rtrig'+(cur?'':' ph')+'">'+
-            '<span class="dp-val">'+(cur?esc(fmtDate(cur)):'Add')+'</span>'+CARET+'</button>'+
-          '<div class="dp-pop" hidden></div></div>';
-      }
-      if(f.type==='dmask'){
-        return '<input class="rin" id="'+id+'" data-k="'+f.k+'" data-mask="date" data-mode="'+(f.mode||'past')+'" type="text" inputmode="numeric" maxlength="10" value="'+esc(cur?isoToDMY(cur):'')+'" placeholder="dd/mm/yyyy" autocomplete="off">';
-      }
-      if(f.readonly) return '<input class="rin ro" id="'+id+'" type="text" value="'+esc(cur)+'" readonly>';
-      return '<input class="rin'+(f.mono?' mono':'')+'" id="'+id+'" data-k="'+f.k+'" type="'+f.type+'" value="'+esc(cur)+'" placeholder="Add" autocomplete="off">';
-    }
-    function renderFields(sec){
-      const fields=SCHEMA[sec];
-      const html='<div class="rows">'+fields.map(f=>
-        '<div class="frow"><span class="ric"><svg viewBox="0 0 24 24">'+(ICONS[f.icon]||'')+'</svg></span>'+
-          '<div class="rc"><span class="rk">'+esc(f.label)+'</span>'+
-          '<div class="rv">'+control(f)+'</div></div></div>'
-      ).join('')+'</div>';
-      $(sec==='personal'?'cPersonal':'cId').innerHTML=html;
-    }
-    function commit(k,v){
-      v=(v==null?'':String(v)).trim();
-      if(v) data[k]=v; else delete data[k];
-      data.email=EMAIL;
-      persist();
-      if(k==='name') paintIdentity();
-    }
-
-    /* ---------- custom dropdowns ---------- */
-    function closeAllDd(except){
-      document.querySelectorAll('.dd.open').forEach(dd => {
-        if(dd===except) return;
-        dd.classList.remove('open','up');
-        const p=dd.querySelector('.dd-pop'); if(p){ p.hidden=true; p.style.maxHeight=''; }
-        const t=dd.querySelector('.dd-trigger'); if(t) t.setAttribute('aria-expanded','false');
-      });
-    }
-    // flip up when there's no room below, and cap height to the space available
-    function placeDdPop(dd){
-      const pop=dd.querySelector('.dd-pop'), trig=dd.querySelector('.dd-trigger');
-      dd.classList.remove('up'); pop.style.maxHeight='';
-      const r=trig.getBoundingClientRect(), margin=14;
-      const below=window.innerHeight - r.bottom - margin, above=r.top - margin;
-      const natural=pop.scrollHeight;
-      if(below>=Math.min(natural,300) || below>=above){
-        pop.style.maxHeight=Math.max(150, Math.min(natural, below))+'px';
-      } else {
-        dd.classList.add('up');
-        pop.style.maxHeight=Math.max(150, Math.min(natural, above))+'px';
-      }
-    }
-    function toggleDd(dd){
-      const willOpen = !dd.classList.contains('open');
-      closeDp(); closeAllDd(dd);
-      dd.classList.toggle('open', willOpen);
-      const pop=dd.querySelector('.dd-pop');
-      pop.hidden = !willOpen;
-      dd.querySelector('.dd-trigger').setAttribute('aria-expanded', willOpen?'true':'false');
-      if(willOpen){
-        const si=dd.querySelector('.dd-si');
-        if(si){ si.value=''; filterDd(dd,''); }
-        placeDdPop(dd);
-        if(si){ setTimeout(()=>si.focus(),20); }
-        else { const sel=dd.querySelector('.dd-opt.sel'); if(sel) sel.scrollIntoView({block:'nearest'}); }
-      }
-    }
-    function firstVisibleOpt(dd){ return dd.querySelector('.dd-opt:not([hidden])'); }
-    function filterDd(dd,q){
-      q=(q||'').trim().toLowerCase();
-      let any=false;
-      dd.querySelectorAll('.dd-opt').forEach(o=>{
-        const show = !q || o.dataset.v.toLowerCase().includes(q);
-        o.hidden = !show; if(show) any=true;
-      });
-      const empty=dd.querySelector('.dd-empty'); if(empty) empty.hidden = any;
-    }
-    function selectDd(opt){
-      const dd = opt.closest('.dd');
-      const v = opt.dataset.v;
-      dd.querySelector('input[type=hidden]').value = v;
-      const trig = dd.querySelector('.dd-trigger');
-      trig.querySelector('.dd-val').textContent = v;
-      trig.classList.remove('ph');
-      dd.querySelectorAll('.dd-opt').forEach(o => o.classList.toggle('sel', o===opt));
-      dd.classList.remove('open');
-      dd.querySelector('.dd-pop').hidden = true;
-      trig.setAttribute('aria-expanded','false');
-      commit(dd.dataset.dd, v);
-    }
-
-    /* ---------- custom date picker ---------- */
-    const pad = n => (n<10?'0':'')+n;
-    const isoOf = (y,m,d) => y+'-'+pad(m+1)+'-'+pad(d);            // m is 0-based
-    const parseISO = v => { if(!/^\d{4}-\d{2}-\d{2}$/.test(v||'')) return null; const p=v.split('-').map(Number); return {y:p[0],m:p[1]-1,d:p[2]}; };
-    const daysInMonth = (y,m) => new Date(y,m+1,0).getDate();
-    const firstDow = (y,m) => new Date(y,m,1).getDay();
-    const rank = o => o.y*10000 + o.m*100 + o.d;
-    function dpBounds(mode){
-      const t=new Date(), ty=t.getFullYear();
-      return mode==='future'
-        ? {min:{y:ty,m:t.getMonth(),d:t.getDate()}, max:{y:ty+15,m:11,d:31}, minYear:ty, maxYear:ty+15}
-        : {min:{y:1920,m:0,d:1}, max:{y:ty,m:t.getMonth(),d:t.getDate()}, minYear:1920, maxYear:ty};
-    }
-    let dpState = null;
-    function clampDpMonth(){
-      const b=dpBounds(dpState.mode);
-      if(dpState.year<=b.minYear && dpState.month<b.min.m) dpState.month=b.min.m;
-      if(dpState.year>=b.maxYear && dpState.month>b.max.m) dpState.month=b.max.m;
-    }
-    function renderDp(){
-      const st=dpState; if(!st) return;
-      const pop=st.dp.querySelector('.dp-pop');
-      const b=dpBounds(st.mode);
-      const sel=parseISO(st.dp.querySelector('input[type=hidden]').value);
-      if(st.view==='years'){
-        let ys='';
-        for(let y=b.maxYear;y>=b.minYear;y--) ys+='<button type="button" class="cal-yr'+(sel&&sel.y===y?' sel':'')+'" data-yr="'+y+'">'+y+'</button>';
-        pop.innerHTML='<div class="cal-head"><button type="button" class="cal-title" data-view="days">'+MONTHS[st.month]+' '+st.year+
-          ' <svg viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg></button></div><div class="cal-years">'+ys+'</div>';
-        const cur=pop.querySelector('.cal-yr.sel'); if(cur) cur.scrollIntoView({block:'center'});
-        return;
-      }
-      const dim=daysInMonth(st.year,st.month), fd=firstDow(st.year,st.month);
-      let cells='';
-      for(let i=0;i<fd;i++) cells+='<span class="cal-d out"></span>';
-      for(let d=1;d<=dim;d++){
-        const day={y:st.year,m:st.month,d:d};
-        const dis = rank(day)<rank(b.min) || rank(day)>rank(b.max);
-        const on = sel && sel.y===st.year && sel.m===st.month && sel.d===d;
-        cells+='<button type="button" class="cal-d'+(on?' sel':'')+'" data-d="'+d+'"'+(dis?' disabled':'')+'>'+d+'</button>';
-      }
-      const prevDis = (st.year<b.minYear) || (st.year===b.minYear && st.month<=b.min.m);
-      const nextDis = (st.year>b.maxYear) || (st.year===b.maxYear && st.month>=b.max.m);
-      pop.innerHTML='<div class="cal-head">'+
-          '<button type="button" class="cal-title" data-view="years">'+MONTHS[st.month]+' '+st.year+
-            ' <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>'+
-          '<div class="cal-navs"><button type="button" class="cal-nav" data-nav="-1"'+(prevDis?' disabled':'')+'>‹</button>'+
-            '<button type="button" class="cal-nav" data-nav="1"'+(nextDis?' disabled':'')+'>›</button></div>'+
-        '</div>'+
-        '<div class="cal-grid">'+DOW.map(d=>'<div class="cal-dow">'+d+'</div>').join('')+cells+'</div>'+
-        '<div class="cal-foot"><button type="button" class="cal-link" data-clear="1">Clear</button></div>';
-    }
-    function openDp(dp){
-      closeAllDd(); closeDp();
-      const mode = dp.dataset.dp==='idExpiry' ? 'future' : 'past';
-      const sel = parseISO(dp.querySelector('input[type=hidden]').value);
-      const t=new Date();
-      let year, month;
-      if(sel){ year=sel.y; month=sel.m; }
-      else if(mode==='future'){ year=t.getFullYear(); month=t.getMonth(); }
-      else { year=t.getFullYear()-25; month=0; }
-      dpState={ dp, year, month, mode, view:'days' };
-      dp.classList.add('open');
-      dp.querySelector('.dp-pop').hidden=false;
-      renderDp();
-    }
-    function closeDp(){
-      if(!dpState) return;
-      dpState.dp.classList.remove('open');
-      const p=dpState.dp.querySelector('.dp-pop'); if(p){ p.hidden=true; p.innerHTML=''; }
-      dpState=null;
-    }
-    function navDp(delta){
-      let m=dpState.month+delta, y=dpState.year;
-      if(m<0){ m=11; y--; } if(m>11){ m=0; y++; }
-      dpState.month=m; dpState.year=y; renderDp();
-    }
-    function pickDp(d){
-      const st=dpState, iso=isoOf(st.year,st.month,d), k=st.dp.dataset.dp;
-      st.dp.querySelector('input[type=hidden]').value=iso;
-      const trig=st.dp.querySelector('.dp-trigger');
-      trig.querySelector('.dp-val').textContent=fmtDate(iso);
-      trig.classList.remove('ph');
-      commit(k, iso);
-      closeDp();
-    }
-    function clearDp(){
-      const st=dpState, k=st.dp.dataset.dp;
-      st.dp.querySelector('input[type=hidden]').value='';
-      const trig=st.dp.querySelector('.dp-trigger');
-      trig.querySelector('.dp-val').textContent='Select date';
-      trig.classList.add('ph');
-      commit(k, '');
-      closeDp();
-    }
-    function handleDpPop(e){
-      const nav=e.target.closest('[data-nav]'); if(nav){ if(!nav.disabled) navDp(+nav.dataset.nav); return; }
-      const vt=e.target.closest('[data-view]'); if(vt){ dpState.view=vt.dataset.view; renderDp(); return; }
-      const yr=e.target.closest('[data-yr]'); if(yr){ dpState.year=+yr.dataset.yr; dpState.view='days'; clampDpMonth(); renderDp(); return; }
-      const dd=e.target.closest('.cal-d[data-d]'); if(dd){ if(!dd.disabled) pickDp(+dd.dataset.d); return; }
-      const cl=e.target.closest('[data-clear]'); if(cl){ clearDp(); return; }
-    }
-
-    /* ---------- events ---------- */
-    document.addEventListener('click', e => {
-      const trig = e.target.closest('.dd-trigger'); if(trig){ toggleDd(trig.closest('.dd')); return; }
-      const opt = e.target.closest('.dd-opt'); if(opt){ selectDd(opt); return; }
-      if(e.target.closest('.dd-pop')){ return; }   // clicks inside the open list (e.g. search box) keep it open
-      const dtrig = e.target.closest('.dp-trigger'); if(dtrig){ const dp=dtrig.closest('.dp'); dp.classList.contains('open')?closeDp():openDp(dp); return; }
-      if(e.target.closest('.dp-pop')){ handleDpPop(e); return; }
-      closeAllDd(); closeDp();
-    });
-    // live: dropdown search filter + dd/mm/yyyy date masking
-    document.addEventListener('input', e => {
-      const si = e.target.closest('.dd-si');
-      if(si){ filterDd(si.closest('.dd'), si.value); return; }
-      const el = e.target.closest('.rin[data-mask="date"]');
-      if(el) maskDate(el);
-    });
-    // autosave text fields on blur / edit
-    document.addEventListener('change', e => {
-      const inp = e.target.closest('.rin[data-k]');
-      if(!inp) return;
-      if(inp.dataset.mask==='date') commitDate(inp); else commit(inp.dataset.k, inp.value);
-    });
-    document.addEventListener('keydown', e => {
-      const si=e.target.closest('.dd-si');
-      if(si){
-        if(e.key==='Enter'){ e.preventDefault(); const first=firstVisibleOpt(si.closest('.dd')); if(first) selectDd(first); }
-        else if(e.key==='Escape'){ closeAllDd(); }
-        return;
-      }
-      if(e.key==='Enter'){ const inp=e.target.closest('.rin[data-k]'); if(inp){ if(inp.dataset.mask==='date') commitDate(inp); else commit(inp.dataset.k, inp.value); inp.blur(); } return; }
-      if(e.key!=='Escape') return;
-      if(dpState){ closeDp(); return; }
-      if(document.querySelector('.dd.open')) closeAllDd();
-    });
-
-    /* profile menu */
-    (function(){
-      const btn=$('profileBtn'), menu=$('profileMenu');
-      btn.addEventListener('click', e => { e.stopPropagation(); const o=menu.classList.toggle('open'); btn.setAttribute('aria-expanded',o?'true':'false'); });
-      document.addEventListener('click', e => { if(!menu.contains(e.target)&&!btn.contains(e.target)){ menu.classList.remove('open'); btn.setAttribute('aria-expanded','false'); } });
-    })();
-
-    /* boot */
-    renderFields('personal');
-    renderFields('id');
-    paintIdentity();
-  })();
-</script>
 <script src="topnav.js"></script>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+
+  var KEY  = 'onto:profile:v1';
+  /* the same record the guest picker and the account menu read, so a name
+     changed here is the name everywhere */
+  var TKEY = 'onto:travellers:v3';
+
+  var GENDERS = ['Female', 'Male', 'Prefer not to say'];
+  var COUNTRIES = ['India','United States','United Kingdom','United Arab Emirates','Australia',
+    'Canada','Singapore','Germany','France','Japan','Nepal','Sri Lanka','Bangladesh','Other'];
+
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  /* 1994-03-12 -> 12 Mar 1994. Stored as the machine form, read as the human
+     one: a date of birth is checked against a passport, not sorted. */
+  function fmtDate(iso){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return iso || '';
+    var p = iso.split('-');
+    return (+p[2]) + ' ' + MONTHS[(+p[1]) - 1] + ' ' + p[0];
+  }
+
+  /* ---------- a date of birth is typed, not browsed ----------
+     Nobody pages back thirty years through a calendar to find the year they
+     were born, and the browser's own picker arrives in its own colours on
+     whatever platform it lands. So: a plain box that takes digits and puts the
+     slashes in, storing the machine form underneath. */
+  function isoToDMY(iso){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return '';
+    var p = iso.split('-');
+    return p[2] + '/' + p[1] + '/' + p[0];
+  }
+  function dmyToISO(s){
+    var m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(s || '').trim());
+    return m ? m[3] + '-' + m[2] + '-' + m[1] : '';
+  }
+  function maskDMY(s){
+    var d = String(s || '').replace(/\D/g, '').slice(0, 8);
+    var out = d.slice(0, 2);
+    if(d.length > 2) out += '/' + d.slice(2, 4);
+    if(d.length > 4) out += '/' + d.slice(4, 8);
+    return out;
+  }
+  /* 31/02 parses as 3 March everywhere if you let Date have it — so the parts
+     have to survive the round trip unchanged to count as a real date. */
+  function realDate(iso){
+    var p = iso.split('-'), y = +p[0], m = +p[1], d = +p[2];
+    var dt = new Date(Date.UTC(y, m - 1, d));
+    return dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d;
+  }
+  function todayISO(){
+    var t = new Date();
+    return t.getFullYear() + '-' + ('0' + (t.getMonth() + 1)).slice(-2) + '-' + ('0' + t.getDate()).slice(-2);
+  }
+
+  var FIELDS = [
+    /* One line at rest, two boxes to change it. A booking has to match the ID
+       it is checked against, and an ID keeps the two apart — so the moment
+       someone is actually typing a name is the moment to ask for both. */
+    { k:'name', label:'Name', fallback:'Saanvi',
+      parts:[ { k:'first', ph:'First name' }, { k:'last', ph:'Last name' } ] },
+    { k:'email', label:'Email', type:'email', ph:'you@example.com',  fallback:'xyz@email.com' },
+    { k:'phone', label:'Phone', type:'tel',   ph:'+91 98765 43210',  fallback:'+91 98765 43210' },
+    { k:'gender', label:'Gender', type:'select', opts:GENDERS, fallback:'Female' },
+    { k:'dob', label:'Date of birth', type:'dmy', ph:'dd/mm/yyyy', fallback:'1994-03-12', display:fmtDate },
+    { k:'nationality', label:'Nationality', type:'select', opts:COUNTRIES, fallback:'India' }
+  ];
+
+  /* ---------- the store ---------- */
+  var data = {};
+  try { data = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){}
+
+  function readTraveller(){
+    try {
+      var a = JSON.parse(localStorage.getItem(TKEY)) || [];
+      return a.filter(function(t){ return t.relation === 'Myself' || t.id === 't-you'; })[0] || null;
+    } catch(e){ return null; }
+  }
+  /* A name set here has to reach the travellers record too, or the bar keeps
+     showing the old one and the two disagree with no way to tell which is
+     right. The account is one real person, so "You" is never the answer. */
+  function writeTraveller(name){
+    try {
+      var a = JSON.parse(localStorage.getItem(TKEY));
+      if(!Array.isArray(a)) a = [];
+      var me = a.filter(function(t){ return t.relation === 'Myself' || t.id === 't-you'; })[0];
+      if(me) me.name = name;
+      else a.unshift({ id:'t-you', name:name, relation:'Myself', interests:[] });
+      localStorage.setItem(TKEY, JSON.stringify(a));
+    } catch(e){}
+  }
+
+  var me = readTraveller();
+  if(!data.name && me && me.name && me.name.toLowerCase() !== 'you') data.name = me.name;
+
+  /* Everything before this held one name string, and everywhere else still
+     reads one. Split it once on the way in — first word first, the remainder
+     last, so double-barrelled surnames survive — and keep writing the joined
+     form back out. */
+  if(data.first === undefined && data.last === undefined){
+    var whole = String(data.name || '').trim();
+    var sp = whole.indexOf(' ');
+    data.first = sp === -1 ? whole : whole.slice(0, sp);
+    data.last  = sp === -1 ? ''    : whole.slice(sp + 1).trim();
+  }
+
+  function joined(){
+    return [data.first, data.last].filter(Boolean).join(' ').trim();
+  }
+
+  function valueOf(f){
+    if(f.parts) return joined() || f.fallback;
+    return data[f.k] || f.fallback;
+  }
+  /* What the row reads at rest, which is not always what the control holds. */
+  function shown(f){
+    var v = valueOf(f);
+    return v && f.display ? f.display(v) : v;
+  }
+  function persist(){ try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e){} }
+
+  /* ---------- what counts as usable ----------
+     Enough to catch a slip, and no more: these are details we will read back
+     to a hotel, not credentials to be enforced. */
+  function complain(f, v){
+    v = String(v || '').trim();
+    if(!v) return f.label + ' can’t be empty';
+    if(f.k === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'That doesn’t look like an email address';
+    if(f.k === 'phone' && (v.replace(/\D/g, '').length < 8)) return 'That doesn’t look like a phone number';
+    if(f.type === 'dmy'){
+      var iso = dmyToISO(v);
+      if(!iso) return 'Use dd/mm/yyyy';
+      if(!realDate(iso)) return 'That date doesn’t exist';
+      /* Compared as text against today's own ISO form, so no timezone gets to
+         decide whether a birthday has happened yet. */
+      if(iso > todayISO()) return 'That date hasn’t happened yet';
+      if(+iso.slice(0, 4) < 1900) return 'Check the year';
+    }
+    return '';
+  }
+
+  /* ---------- rendering ----------
+     One row is either at rest or being edited; nothing else has state, so the
+     row is simply re-drawn rather than mutated in place. */
+  var editing = null;
+
+  function rowHTML(f){
+    var v = valueOf(f);
+    if(editing !== f.k){
+      var disp = shown(f);
+      return '<div class="row" data-row="' + f.k + '">' +
+               '<div class="rk">' + esc(f.label) + '</div>' +
+               '<div class="rv' + (disp ? '' : ' empty') + '">' + esc(disp || 'Not set') + '</div>' +
+               '<div class="ra"><button type="button" class="btn" data-edit="' + f.k + '">Edit</button></div>' +
+             '</div>';
+    }
+
+    var input;
+    if(f.parts){
+      input = '<div class="rpair">' + f.parts.map(function(p){
+        return '<input class="rin" id="in-' + p.k + '" type="text" value="' +
+               esc(data[p.k] || '') + '" placeholder="' + esc(p.ph) +
+               '" aria-label="' + esc(p.ph) + '" autocomplete="off">';
+      }).join('') + '</div>';
+    } else if(f.type === 'select'){
+      /* A closed list, so it is a list — nothing here is worth the weight of a
+         searchable menu when the whole set fits on one screen. */
+      input = '<select class="rin sel" id="in-' + f.k + '" aria-label="' + esc(f.label) + '">' +
+        f.opts.map(function(o){
+          return '<option value="' + esc(o) + '"' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>';
+        }).join('') + '</select>';
+    } else if(f.type === 'dmy'){
+      input = '<input class="rin dmy" id="in-' + f.k + '" type="text" inputmode="numeric" ' +
+              'maxlength="10" value="' + esc(isoToDMY(v)) + '" placeholder="' + esc(f.ph) +
+              '" aria-label="' + esc(f.label) + '" autocomplete="off">';
+    } else {
+      input = '<input class="rin" id="in-' + f.k + '" type="' + f.type + '" value="' + esc(v) +
+              '"' + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : '') +
+              ' aria-label="' + esc(f.label) + '" autocomplete="off">';
+    }
+
+    return '<div class="row" data-row="' + f.k + '">' +
+             '<div class="rk">' + esc(f.label) + '</div>' +
+             '<div>' + input +
+               '<div class="err" id="err-' + f.k + '" hidden></div>' +
+             '</div>' +
+             '<div class="ra">' +
+               '<button type="button" class="btn quiet" data-cancel="1">Cancel</button>' +
+               '<button type="button" class="btn jade" data-save="' + f.k + '">Save</button>' +
+             '</div>' +
+           '</div>';
+  }
+
+  function render(){
+    $('rows').innerHTML = FIELDS.map(rowHTML).join('');
+    if(editing){
+      var f = FIELDS.filter(function(x){ return x.k === editing; })[0];
+      var el = $('in-' + (f && f.parts ? f.parts[0].k : editing));
+      if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+    }
+  }
+
+  var toastT;
+  function toast(msg){
+    var t = $('toast');
+    t.textContent = msg; t.classList.add('on');
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ t.classList.remove('on'); }, 2400);
+  }
+
+  function refuse(k, el, msg){
+    if(el) el.classList.add('bad');
+    var e = $('err-' + k);
+    if(e){ e.textContent = msg; e.hidden = false; }
+    if(el) el.focus();
+  }
+
+  function save(k){
+    var f = FIELDS.filter(function(x){ return x.k === k; })[0];
+    if(!f) return;
+
+    if(f.parts){
+      var first = ($('in-first') || {}).value || '';
+      var last  = ($('in-last')  || {}).value || '';
+      first = first.trim(); last = last.trim();
+      /* A single name is a real name here, so only the first is insisted on. */
+      if(!first) return refuse(k, $('in-first'), 'First name can’t be empty');
+      data.first = first;
+      data.last  = last;
+      data.name  = [first, last].filter(Boolean).join(' ');
+      persist();
+      writeTraveller(data.name);
+    } else {
+      var el = $('in-' + k);
+      if(!el) return;
+      var v = el.value.trim();
+      var bad = complain(f, v);
+      if(bad) return refuse(k, el, bad);
+      /* typed as dd/mm/yyyy, kept as yyyy-mm-dd */
+      data[k] = f.type === 'dmy' ? dmyToISO(v) : v;
+      persist();
+    }
+
+    editing = null;
+    render();
+    toast(f.label + ' updated');
+  }
+
+  $('rows').addEventListener('click', function(e){
+    var ed = e.target.closest('[data-edit]');
+    if(ed){ editing = ed.getAttribute('data-edit'); render(); return; }
+    if(e.target.closest('[data-cancel]')){ editing = null; render(); return; }
+    var sv = e.target.closest('[data-save]');
+    if(sv){ save(sv.getAttribute('data-save')); }
+  });
+
+  /* Enter commits, Escape abandons — the row is a one-field form and behaves
+     like one, so nobody has to reach for the button. */
+  $('rows').addEventListener('keydown', function(e){
+    if(!editing) return;
+    if(e.key === 'Enter'){ e.preventDefault(); save(editing); }
+    else if(e.key === 'Escape'){ e.preventDefault(); editing = null; render(); }
+  });
+
+  /* clear the refusal as soon as they start addressing it */
+  $('rows').addEventListener('input', function(e){
+    if(!e.target.classList.contains('rin')) return;
+    /* the slashes appear as they type, so the shape of the thing is never in
+       question and there is nothing to punctuate by hand */
+    if(e.target.classList.contains('dmy')){
+      var masked = maskDMY(e.target.value);
+      if(masked !== e.target.value) e.target.value = masked;
+    }
+    e.target.classList.remove('bad');
+    var er = $('err-' + editing);
+    if(er) er.hidden = true;
+  });
+
+  render();
+
+  /* the bar's own trigger is built by topnav.js; keep it honest if the name
+     changes while the page is open */
+  var btn = $('profileBtn'), menu = $('profileMenu');
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    var o = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', o ? 'true' : 'false');
+  });
+  document.addEventListener('click', function(e){
+    if(!menu.contains(e.target) && !btn.contains(e.target)){
+      menu.classList.remove('open'); btn.setAttribute('aria-expanded','false');
+    }
+  });
+})();
+</script>
 </body>
 </html>
