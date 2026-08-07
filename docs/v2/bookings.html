@@ -303,12 +303,11 @@
            '</span>';
   }
 
-  /* 3.9 and 3.11 — the offer expires and our price drifts, and the model still
-     tracks both (w.expiresAt, w.drift). Neither is stated on the card. A price
-     with a clock on it is a warning, and a saving is not something to be
-     hurried into: the offer is either live or it is gone, and when it goes the
-     card simply stops offering it. Anything that needs a date belongs on the
-     booking itself, where someone has gone looking for it. */
+  /* 3.9 and 3.11 — the offer expires and our price drifts, and neither is
+     stated here. A price with a clock on it is a warning, and a saving is not
+     something to be hurried into: the offer is either live or it is gone, and
+     when it goes the card simply stops offering it. Anything that needs a date
+     belongs on the booking itself, where someone has gone looking for it. */
 
   /* Status block + actions, driven entirely by ownership then watch case.
      A tracked ticket never offers cancel, voucher, or manage. */

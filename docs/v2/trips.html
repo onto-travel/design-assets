@@ -31,18 +31,10 @@
   .tn-profile:hover{border-color:#c2b8a4;background:#faf7f1;}
   .tn-profile .burger{display:flex;flex-direction:column;gap:3px;}
   .tn-profile .burger i{display:block;width:15px;height:1.7px;background:#8a857d;border-radius:2px;}
-  .tn-avatar{width:34px;height:34px;border:none;padding:0;border-radius:50%;background:var(--jade);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:Georgia,serif;line-height:1;text-decoration:none;cursor:pointer;transition:box-shadow .12s;}
-  .tn-avatar:hover{box-shadow:0 0 0 3px rgba(15,138,99,.15);}
   .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
     border-radius:14px;box-shadow:0 14px 40px rgba(40,30,10,.2);padding:8px;opacity:0;transform:translateY(-6px);
     pointer-events:none;transition:opacity .15s,transform .15s;}
   .menu.open{opacity:1;transform:none;pointer-events:auto;}
-  .menu-id{display:flex;align-items:center;gap:11px;padding:11px 12px 13px;border-bottom:1px solid var(--line);margin-bottom:6px;text-decoration:none;color:inherit;cursor:pointer;border-radius:10px 10px 0 0;transition:background .15s;}
-  .menu-id:hover{background:#faf7f1;}
-  .menu-id-ar{margin-left:auto;color:#b8b0a2;font-size:17px;}
-  .menu-id .tn-avatar{width:38px;height:38px;font-size:20px;}
-  .menu-id b{font-size:14.5px;display:block;}
-  .menu-id small{font-size:12.5px;color:var(--muted);}
   .menu .item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font-size:14px;color:var(--ink);
     text-decoration:none;cursor:pointer;}
   .menu .item:hover{background:#faf7f1;}
@@ -130,19 +122,8 @@
         <a href="trips.html" class="active">Bookings</a>
       </div>
       <div class="tn-right">
-        <button type="button" class="tn-avatar" id="profileBtn" aria-haspopup="true" aria-expanded="false">Y</button>
-        <div class="menu" id="profileMenu" role="menu">
-          <a class="menu-id" href="profile.html">
-            <span class="tn-avatar" id="menuAvatar">Y</span>
-            <div><b id="menuName">Saanvi</b><small>xyz@email.com</small></div>
-            <span class="menu-id-ar">›</span>
-          </a>
-          <div class="menu-sec">
-            <a class="item" href="companions.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg> Companions <span class="ar">›</span></a>
-            <a class="item" href="help.html"><svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg> Help centre <span class="ar">›</span></a>
-            <a class="item" href="home-loggedout.html"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> Sign out</a>
-          </div>
-        </div>
+        <button type="button" class="tn-who" id="profileBtn" aria-haspopup="true" aria-expanded="false">Saanvi</button>
+        <div class="menu" id="profileMenu" role="menu"></div>
       </div>
     </div>
   </nav>

@@ -58,24 +58,10 @@
 
   .tn-links{display:none;}
   .tn-right{display:flex;align-items:center;gap:3px;position:relative;}
-  .tn-name{display:flex;align-items:center;gap:3px;border:none;background:none;padding:0;cursor:pointer;
-    font-family:inherit;font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;}
-  .tn-name img{width:16px;height:16px;display:block;flex:none;}
-  .tn-avatar{width:34px;height:34px;border:none;padding:0;border-radius:50%;background:var(--jade);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:inherit;
-    line-height:1;text-decoration:none;cursor:pointer;transition:box-shadow .12s;}
-  .tn-avatar:hover{box-shadow:0 0 0 3px rgba(15,138,99,.15);}
   .menu{position:absolute;top:calc(100% + 8px);right:0;width:250px;background:#fff;border:1px solid var(--line);
     border-radius:14px;box-shadow:0 14px 40px rgba(40,30,10,.2);padding:8px;opacity:0;transform:translateY(-6px);
     pointer-events:none;transition:opacity .15s,transform .15s;z-index:90;}
   .tn-right:focus-within .menu{opacity:1;transform:none;pointer-events:auto;}
-  .menu-id{display:flex;align-items:center;gap:11px;padding:11px 12px 13px;border-bottom:1px solid var(--line);margin-bottom:6px;
-    text-decoration:none;color:inherit;cursor:pointer;border-radius:10px 10px 0 0;transition:background .15s;}
-  .menu-id:hover{background:#faf7f1;}
-  .menu-id-ar{margin-left:auto;color:#b8b0a2;font-size:17px;}
-  .menu-id .tn-avatar{width:38px;height:38px;font-size:20px;}
-  .menu-id b{font-size:14.5px;display:block;}
-  .menu-id small{font-size:12.5px;color:var(--muted);}
   .menu .item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font-size:14px;color:var(--ink);
     text-decoration:none;cursor:pointer;}
   .menu .item:hover{background:#faf7f1;}
@@ -253,7 +239,6 @@
     display:flex;flex-direction:column;gap:16px;}
   .side-h{font-family:inherit;font-size:20px;font-weight:700;color:var(--ink);margin:0 0 16px;letter-spacing:-.01em;}
   .rail{display:flex;flex-direction:column;gap:0;}
-
 
   /* ---- rail sections (Figma 1:714): hairline-separated collapsible rows.
      "Popular filters" is the one section drawn as a raised card. ---- */
@@ -985,7 +970,6 @@ function Chip({active, onClick, children}){
     <button className="chip" aria-pressed={active} onClick={onClick}>{children}</button>
   );
 }
-
 
 /* ---- Popular filters: the six amenity pills the design leads with. Each maps
    onto an amenity already carried in LOCATIONS so the pill actually filters. ---- */

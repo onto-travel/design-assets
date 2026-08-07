@@ -31,12 +31,6 @@
         'Hi onto — I need some help with my booking at ' +
         b.property_name_raw + ', ' + fmt.dateRange(b.check_in, b.check_out) + '.'
       );
-    },
-    fix: function (b) {
-      return WA.link(
-        'Hi onto — something looks wrong on the booking you\'re tracking for me: ' +
-        b.property_name_raw + ', ' + fmt.dateRange(b.check_in, b.check_out) + '.'
-      );
     }
   };
 
@@ -634,7 +628,6 @@
          carried for the refund path and is never rendered on the price. */
       price_paid_total: 28900,
       paid_with: 'points',
-      points_detail: '68,000 Bonvoy points',
       currency: 'INR',
       status: 'saving_available',
       raw_artifact_ref: 'wa/2026-08-02/mmt-fwd-0114.pdf',
@@ -759,10 +752,6 @@
       if (!cur || cur === 'INR') return fmt.inr(n);
       return (SYMBOL[cur] || cur + ' ') + Math.round(n).toLocaleString('en-US');
     },
-    /* signed, for deltas */
-    inrDelta: function (n) {
-      return (n < 0 ? '−' : '') + fmt.inr(Math.abs(n));
-    },
     day: function (iso) {
       var d = new Date(iso);
       return d.getDate() + ' ' + MONTHS[d.getMonth()];
@@ -788,12 +777,6 @@
       var ap = h >= 12 ? 'PM' : 'AM';
       h = h % 12; if (h === 0) h = 12;
       return d.getDate() + ' ' + MONTHS[d.getMonth()] + ', ' + h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
-    },
-    clock: function (d) {
-      var h = d.getHours(), m = d.getMinutes();
-      var ap = h >= 12 ? 'PM' : 'AM';
-      h = h % 12; if (h === 0) h = 12;
-      return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
     },
     /* days + hours remaining, per the brief.
        `label` is the whole phrase a screen shows, and it changes shape at the
@@ -923,7 +906,6 @@
       /* the room, board and terms still match even when the money cannot be
          put side by side — that is what makes the switch sellable at all */
       crossCurrency: crossCurrency,
-      noCashPrice: noCashPrice,
       comparable: comparable,
       /* Every attribute matches or ours is better. Nothing is shown, compared,
          or offered unless this is true — we never ask someone to give up
@@ -955,29 +937,6 @@
   function windowClosed(b) {
     if (b.cancellation_policy !== 'free_until' || !b.free_cancellation_until) return false;
     return new Date(b.free_cancellation_until) <= new Date();
-  }
-
-  /* An offer cannot outlive either the rate behind it or the window the guest
-     needs in order to take it. Whichever ends first ends the offer. */
-  function offerExpiry(b) {
-    var ends = [];
-    if (b.our_offer && b.our_offer.rate_expires_at) ends.push(b.our_offer.rate_expires_at);
-    if (b.cancellation_policy === 'free_until' && b.free_cancellation_until) {
-      ends.push(b.free_cancellation_until);
-    }
-    if (!ends.length) return null;
-    return ends.sort(function (x, y) { return new Date(x) - new Date(y); })[0];
-  }
-
-  /* How far our price has travelled since we started watching. `observations`
-     is our price over time, so the first entry is what the stay cost with us
-     on the day it entered the watch. */
-  function drift(b) {
-    var obs = b.observations || [];
-    var priced = obs.filter(function (o) { return o[1] !== null && o[1] !== undefined; });
-    if (priced.length < 2) return null;
-    var first = priced[0][1], last = priced[priced.length - 1][1];
-    return first === last ? null : { from: first, to: last, by: first - last };
   }
 
   function watch(b) {
@@ -1014,8 +973,7 @@
     if (b.cancellation_policy === 'non_refundable') {
       var beats = c && c.comparable && c.delta > 0;
       return { kind: beats ? 'unreachable' : 'level', ref: beats ? '3.7' : '3.2',
-               switchable: false, ourTotal: ours, theirTotal: b.price_paid_total,
-               delta: beats ? c.delta : null };
+               switchable: false, ourTotal: ours, theirTotal: b.price_paid_total };
     }
 
     /* 3.13 — charged in another currency. Both figures go on the card as they
@@ -1024,22 +982,15 @@
        number are not ours to guess at, so we state and let them read. */
     if (c && c.crossCurrency) {
       return { kind: 'cross_currency', ref: '3.13', switchable: match, ourTotal: ours,
-               theirTotal: b.price_paid_total, theirCurrency: b.currency,
-               expiresAt: offerExpiry(b) };
+               theirTotal: b.price_paid_total, theirCurrency: b.currency };
     }
 
     /* 3.1 / 3.5 — the offer. 3.5 is the same case carrying more than one room:
-       nothing changes except that the figures being compared are sums.
-       The expiry (3.9) and the drift (3.11) ride along with it — an offer left
-       untouched is re-priced rather than left standing, and when our price has
-       moved since we first flagged it, the offer says so. */
+       nothing changes except that the figures being compared are sums, which
+       is `compare`'s business and not something the card restates. */
     if (c && c.isSaving) {
       return { kind: 'saving', ref: b.rooms > 1 ? '3.5' : '3.1', switchable: true,
-               ourTotal: c.ourTotal, theirTotal: c.theirTotal, delta: c.delta,
-               rooms: b.rooms || 1,
-               /* the window on the original is what they have to act inside */
-               actBy: b.cancellation_policy === 'free_until' ? b.free_cancellation_until : null,
-               expiresAt: offerExpiry(b), drift: drift(b) };
+               ourTotal: c.ourTotal, theirTotal: c.theirTotal };
     }
 
     /* 3.6 — cheaper, but not the same thing. We only ever switch an exact
@@ -1052,8 +1003,7 @@
     /* 3.2 — our price is higher, or level. The common case, and the one that
        decides whether being watched feels alive or dead. */
     if (c && c.comparable && c.delta < 0) {
-      return { kind: 'dearer', ref: '3.2', switchable: false,
-               by: b.rose_by || -c.delta, since: b.rose_since || null };
+      return { kind: 'dearer', ref: '3.2', switchable: false };
     }
     return { kind: 'level', ref: '3.2', switchable: false };
   }
@@ -1248,16 +1198,11 @@
 
   var api = {
     WA: WA,
-    PLATFORMS: PLATFORMS,
-    ATTRS: ATTRS,
     fmt: fmt,
     all: all,
     get: get,
     sorted: sorted,
-    groups: function () { return groups(all()); },
     compare: compare,
-    watch: watch,
-    windowClosed: windowClosed,
     cancellationText: cancellationText,
     occupancyText: occupancyText,
     openCancelTasks: openCancelTasks,
