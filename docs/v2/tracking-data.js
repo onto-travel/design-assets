@@ -173,44 +173,6 @@
       ]
     },
 
-    /* 4 — no saving, price flat. The majority outcome. */
-    {
-      id: 'bk-westend-blr',
-      ownership: 'tracked',
-      source_platform: 'makemytrip',
-      property_id: 'prop-taj-west-end',
-      property_name_raw: 'Taj West End, Bengaluru',
-      location: 'Race Course Road · Bengaluru',
-      stars: 5,
-      check_in: '2026-10-03', check_out: '2026-10-05',
-      room_category: 'Luxury Room',
-      occupancy: '2 adults',
-      meal_plan: 'Breakfast included',
-      cancellation_policy: 'free_until',
-      free_cancellation_until: '2026-10-01T18:00:00+05:30',
-      price_paid_total: 31000,
-      currency: 'INR',
-      status: 'no_saving_flat',
-      raw_artifact_ref: 'wa/2026-07-22/mmt-conf-9103.jpg',
-      parse_confidence: 0.98,
-      created_at: '2026-07-22T20:15:00+05:30',
-      last_checked_at: null,
-      image: 'images/pr-01-bedroom.png',
-      our_offer: {
-        room_category: 'Luxury Room',
-        occupancy: '2 adults',
-        meal_plan: 'Breakfast included',
-        cancellation_policy: 'free_until',
-        free_cancellation_until: '2026-10-01T18:00:00+05:30',
-        our_price_total: 31000,
-        room_matched: true,
-        availability: 'available'
-      },
-      observations: [
-        ['2026-07-22', 31000], ['2026-07-26', 30900], ['2026-07-30', 31000],
-        ['2026-08-03', 31000]
-      ]
-    },
 
     /* 5 — sold out with us for their dates */
     {
