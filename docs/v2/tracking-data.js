@@ -1119,6 +1119,16 @@
         platform: old.platform ? old.platform.label : null,
         manage: old.platform ? old.platform.manage : null,
         deadline: fmt.countdown(owes.cancel_deadline).label,
+        /* the two bookings that already exist, dated, so the details page can
+           draw the sequence the guest is standing in the middle of */
+        bookedOld: fmt.day(old.created_at),
+        bookedOurs: fmt.day(b.created_at),
+        /* the same deadline as `deadline`, shortened to sit under a timeline step */
+        deadlineShort: (function () {
+          var c = fmt.countdown(owes.cancel_deadline);
+          if (c.expired) return 'Deadline passed';
+          return c.urgent ? c.short + ' left' : 'by ' + fmt.day(owes.cancel_deadline);
+        })(),
         expired: !!fmt.countdown(owes.cancel_deadline).expired
       } : null,
       id: b.id,

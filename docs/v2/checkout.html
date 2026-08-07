@@ -348,11 +348,26 @@
   footer{padding:40px 0 60px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:20px;}
 
   /* ---------- fullscreen lightbox + reviews (always shown) ---------- */
+  /* the bar + frame centre as one stack, so the gap between them stays put
+     instead of soaking up whatever vertical space is left over */
   .lbx{position:fixed;inset:0;z-index:200;background:rgba(16,18,20,.92);
-    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;}
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:16px 0;}
   .lbx[hidden]{display:none;}
-  .lbx-inner{position:relative;margin:auto;width:min(1180px,96vw);height:min(760px,92vh);
+  .lbx-inner{position:relative;width:min(1180px,96vw);height:min(760px,calc(92vh - 68px));
     border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55);}
+  /* category filter across the top — scrolls sideways rather than wrapping */
+  .lbx-cats{flex:none;display:flex;gap:9px;width:min(1180px,96vw);padding:0 56px 14px 2px;
+    overflow-x:auto;scrollbar-width:none;}
+  .lbx-cats::-webkit-scrollbar{display:none;}
+  .lbx-cat{flex:none;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;cursor:pointer;
+    font-family:inherit;font-size:13.5px;font-weight:600;padding:9px 15px;border-radius:11px;border:none;
+    background:rgba(255,255,255,.13);color:#e8e6e1;transition:background .15s,color .15s;}
+  .lbx-cat:hover{background:rgba(255,255,255,.24);}
+  .lbx-cat.active{background:#fff;color:#16181a;}
+  .lbx-cat svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .lbx-cat .n{opacity:.6;}
   .lbx-stage{position:absolute;inset:0;background:#0c0e10;display:flex;align-items:center;justify-content:center;}
   .lbx-stage img{width:100%;height:100%;object-fit:cover;display:block;}
   /* left-side wash for arrows/tag only — keep the right clear so the glass reads */
@@ -373,63 +388,56 @@
     border:none;cursor:pointer;background:rgba(20,22,24,.6);color:#fff;font-size:18px;
     backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .15s;}
   .lbx-close:hover{background:rgba(20,22,24,.9);}
-  /* floating frosted review card, overlapping the photo */
+  /* floating white review card, overlapping the photo */
   .lbx-panel{position:absolute;z-index:5;top:18px;right:18px;bottom:18px;width:372px;
-    background:linear-gradient(158deg,rgba(255,255,255,.42),rgba(247,244,239,.64) 55%,rgba(242,238,231,.62));
-    backdrop-filter:blur(30px) saturate(.85) brightness(1.05);
-    -webkit-backdrop-filter:blur(30px) saturate(.85) brightness(1.05);
-    border:1px solid rgba(255,255,255,.6);border-radius:18px;overflow-y:auto;padding:22px 22px 26px;
-    box-shadow:0 18px 55px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.65);}
-  /* trust panel */
-  .tr-head{display:flex;align-items:flex-start;gap:15px;}
-  .tr-score{flex:none;width:74px;height:74px;border-radius:50%;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;color:#fff;line-height:1;}
-  .tr-score b{font-size:23px;font-family:Georgia,serif;}
-  .tr-score span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:3px;opacity:.9;}
-  .tr-score.s-good{background:#0f8a63;}
-  .tr-score.s-mid{background:#c08a2d;}
-  .tr-score.s-low{background:#b4483f;}
-  .tr-score.s-rev{background:var(--jade);}
-  .tr-headtx h3{margin:0 0 5px;font-size:17px;color:#211f1b;}
-  .tr-headtx p{margin:0;font-size:13.5px;color:#3d3934;line-height:1.5;}
-  .tr-sec{margin-top:18px;border-top:1px solid rgba(120,110,95,.28);padding-top:15px;}
-  .tr-sec h4{margin:0 0 9px;font-size:11px;letter-spacing:.09em;font-weight:700;color:#6b6459;}
-  .tr-gphotos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
-  .tr-gphotos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:block;}
-  .tr-gcap{margin:8px 0 0;font-size:11.5px;color:#6b6459;}
-  .tr-summary{margin:0;font-size:14px;color:#33302a;line-height:1.6;font-weight:500;}
-  .tr-keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
-  .tr-key{font-size:12px;font-weight:600;padding:4px 10px;border-radius:7px;
-    background:rgba(15,138,99,.16);color:#256b51;border:1px solid rgba(15,138,99,.26);}
-  .tr-key.neg{background:rgba(176,86,45,.15);color:#a1502c;border-color:rgba(176,86,45,.28);}
-  .tr-chips{display:flex;flex-wrap:wrap;gap:7px;}
-  .tr-chips .tc{background:var(--pill);color:#5b5650;font-size:12.5px;padding:4px 11px;border-radius:8px;}
-  .tr-chips .tc b{color:var(--jade);font-weight:700;}
-  .tr-rev{margin-bottom:13px;}
-  .tr-rev:last-child{margin-bottom:0;}
-  .tr-rev .rv-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-  .tr-rev .rv-name{font-size:13px;font-weight:600;}
-  .tr-rev .rv-stars{color:var(--gold);font-size:12px;letter-spacing:1px;}
-  .tr-rev .rv-when{font-size:11px;color:#6b6459;margin-left:auto;}
-  .tr-rev .rv-tx{margin:0;font-size:13px;color:#3a3733;line-height:1.45;}
-  .tr-rev .rv-tx mark{background:#fdf3d6;color:inherit;padding:0 2px;border-radius:3px;}
-
-  /* ---------- redesigned reality panel (pool + bathroom only) ---------- */
+    background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;overflow-y:auto;padding:22px 22px 26px;
+    box-shadow:0 18px 55px rgba(0,0,0,.4);}
+  /* ---------- review overlay panel (headline score, then a review feed) ---------- */
   .lbx-panel[hidden]{display:none;}
-  .rp-head{display:flex;align-items:center;gap:14px;}
-  .rp-score{flex:none;display:flex;align-items:baseline;gap:2px;font-family:Georgia,serif;color:#0f8a63;font-weight:600;}
-  .rp-score b{font-size:34px;line-height:1;}
-  .rp-score span{font-size:15px;color:#6b6459;font-family:-apple-system,sans-serif;font-weight:600;}
-  .rp-htx h3{margin:0 0 2px;font-size:17px;color:#211f1b;}
-  .rp-htx p{margin:0;font-size:12.5px;color:#6b6459;}
-  .rp-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+  /* dismisses the review panel only — the photo stays fullscreen */
+  .rp-close{position:absolute;z-index:6;top:28px;right:28px;width:30px;height:30px;border-radius:50%;
+    border:none;cursor:pointer;background:rgba(28,26,23,.09);color:#46423b;font-size:13px;line-height:1;
+    font-family:inherit;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+  .rp-close:hover{background:rgba(28,26,23,.2);}
+  .rp-close[hidden]{display:none;}
+  .rp-title{font-family:Georgia,serif;margin:0 0 16px;font-size:22px;font-weight:700;letter-spacing:-.015em;color:#1b1a17;line-height:1.2;}
+  .rp-score{display:flex;align-items:baseline;gap:9px;color:#1b1a17;}
+  .rp-score .rp-star{font-size:29px;line-height:1;}
+  .rp-score b{font-family:Georgia,serif;font-size:42px;line-height:1;font-weight:700;letter-spacing:-.03em;}
+  .rp-score .rp-den{font-size:17px;font-weight:600;color:#6b6459;}
+  .rp-count{margin:11px 0 0;font-size:15px;font-weight:700;color:#1b1a17;}
+  .rp-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px;}
   .rp-pill{font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:20px;
-    background:#f1ede3;color:#5b5650;border:none;}
+    background:#f1ede3;color:#5b5650;border:1px solid transparent;cursor:pointer;font-family:inherit;transition:all .13s;}
+  .rp-pill:hover{background:#e9e3d5;}
   .rp-pill.neg{background:#f7f0e0;color:#8a6a24;border:1px solid #ebddbf;font-weight:600;}
-  .rp-sec{margin-top:20px;border-top:1px solid rgba(120,110,95,.28);padding-top:15px;}
-  .rp-sec h4{margin:0 0 11px;font-size:11px;letter-spacing:.09em;font-weight:700;color:#6b6459;}
-  .rp-gphotos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
-  .rp-gphotos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:block;}
+  .rp-pill.active{background:var(--jade);color:#fff;border-color:var(--jade);font-weight:600;}
+  .rp-pill.neg.active{background:#8a6a24;border-color:#8a6a24;color:#fff;}
+  .rp-mentions{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px;}
+  .rp-mentions .tc{background:#f4f2ed;color:#5b5650;font-size:12.5px;padding:5px 11px;border-radius:8px;
+    border:1px solid rgba(120,110,95,.16);}
+  .rp-mentions .tc b{color:var(--jade);font-weight:700;}
+  /* the rule under the header block — the review feed starts below it */
+  .rp-rule{height:1px;border:0;background:rgba(120,110,95,.3);margin:19px 0 0;}
+  .rp-rev{padding-top:17px;}
+  .rp-rev + .rp-rev{margin-top:17px;border-top:1px solid rgba(120,110,95,.2);}
+  .rp-rvhead{display:flex;align-items:center;gap:10px;}
+  .rp-av{flex:none;width:34px;height:34px;border-radius:50%;background:#f1efe9;
+    border:1px solid rgba(120,110,95,.18);display:flex;align-items:center;justify-content:center;
+    font-size:11.5px;font-weight:700;color:#5b5650;}
+  .rp-name{display:block;font-size:14px;font-weight:700;color:#1b1a17;line-height:1.25;}
+  .rp-when{display:block;font-size:12px;color:#6b6459;margin-top:2px;}
+  .rp-stars{margin-top:11px;color:var(--gold);font-size:13px;letter-spacing:2px;line-height:1;}
+  .rp-stars .off{color:#cfc7b7;}
+  .rp-rev .rv-tx{margin:9px 0 0;font-size:13.5px;line-height:1.55;color:#3a3733;}
+  /* highlights read as emphasis, not as a marker pen */
+  .rp-rev .rv-tx mark{background:none;color:#1b1a17;font-weight:700;padding:0;}
+  .rv-tx mark.rp-hit{background:#cdeadd;color:#1b1a17;font-weight:700;padding:1px 3px;border-radius:3px;
+    box-shadow:0 0 0 1px rgba(15,138,99,.35);animation:hitflash .6s ease;}
+  @keyframes hitflash{0%{background:#8fd6b4;}100%{background:#cdeadd;}}
+  /* fixed-size thumbs so a lone photo doesn't stretch the width of the panel */
+  .rp-shots{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .rp-shots img{width:98px;height:98px;object-fit:cover;border-radius:10px;display:block;}
   .rp-readall{width:100%;margin-top:18px;background:none;border:none;color:var(--jade);font-family:inherit;
     font-size:14.5px;font-weight:600;cursor:pointer;padding:9px 0;text-align:left;transition:opacity .15s;}
   .rp-readall:hover{text-decoration:underline;}
@@ -580,6 +588,8 @@
   @media(max-width:820px){
     .lbx-inner{width:96vw;height:92vh;}
     .lbx-panel{top:auto;left:12px;right:12px;bottom:12px;width:auto;max-height:54%;}
+    /* the panel is a bottom sheet here — ride its top edge at full height */
+    .rp-close{top:auto;bottom:calc(54% - 28px);right:22px;}
     .lbx-next{right:18px;}
     .lbx-nav{top:38%;}
     .lbx-stage::after{background:linear-gradient(180deg,rgba(0,0,0,.25) 0%,rgba(0,0,0,0) 30%,rgba(10,12,14,.4) 100%);}
@@ -1142,6 +1152,7 @@
 <!-- ================= FULLSCREEN LIGHTBOX + REVIEWS ================= -->
 <div class="lbx" id="lbx" hidden>
   <button class="lbx-close" id="lbxClose" aria-label="Close">&#10005;</button>
+  <div class="lbx-cats" id="lbxCats" aria-label="Filter photos by category"></div>
   <div class="lbx-inner">
     <div class="lbx-stage">
       <span class="lbx-tag" id="lbxTag"></span>
@@ -1150,6 +1161,7 @@
       <button class="lbx-nav lbx-next" id="lbxNext" aria-label="Next photo">&#8250;</button>
     </div>
     <aside class="lbx-panel" id="lbxPanel"></aside>
+    <button class="rp-close" id="rpClose" type="button" aria-label="Hide reviews" hidden>&#10005;</button>
   </div>
 </div>
 
@@ -1470,95 +1482,185 @@
     const TRUST = {
       pool: {
         label:"Swimming pool", rating:"9.2", score:92, verdict:"Photos match what guests found", count:214,
-        gphotos:["images/05-pool-day.png","images/04-pool-sunset.png","images/06-aerial-pool.png"],
-        keys:[{t:"Matches photos"},{t:"Vast & spotless"},{t:"Rarely crowded"},{t:"Sunset view"},{t:"Closes 7pm",neg:true}],
+        keys:[{t:"Matches photos",c:180,hl:"exactly like the photos"},{t:"Vast & spotless",c:156,hl:"huge, spotless"},{t:"Rarely crowded",c:120,hl:"rarely crowded"},{t:"Sunset view",c:98,hl:"beach view at sunset"},{t:"Closes 7pm",c:22,neg:true,hl:"closes a touch early at 7pm"}],
         reviews:[
-          {name:"Ananya R.", when:"Feb 2026", stars:5, tx:"The <mark>pool</mark> is exactly like the photos — huge, spotless, and the beach view at sunset is unreal."},
-          {name:"Karan M.",  when:"Jan 2026", stars:4, tx:"Main <mark>pool</mark> is gorgeous and rarely crowded. Only downside is it closes a touch early at 7pm."},
+          {name:"Ananya R.", when:"Feb 2026", stars:5, photos:["images/04-pool-sunset.png","images/05-pool-day.png"], tx:"The <mark>pool</mark> is exactly like the photos — huge, spotless, and the beach view at sunset is unreal."},
+          {name:"Karan M.",  when:"Jan 2026", stars:4, photos:["images/06-aerial-pool.png"], tx:"Main <mark>pool</mark> is gorgeous and rarely crowded. Only downside is it closes a touch early at 7pm."},
           {name:"Meghna T.", when:"Dec 2025", stars:5, tx:"Two <mark>pools</mark>, both warm and clean. Kids happily spent all day in the shallow one."}
         ]
       },
       bathroom: {
         label:"Bathroom", rating:"7.8", score:78, verdict:"Mostly matches — a couple of gaps", count:96,
-        gphotos:["images/03-bathroom.png","images/gv-03-bathroom.png","images/sv-03-bathroom.png"],
-        keys:[{t:"Marble & elegant"},{t:"Great rain shower"},{t:"Lovely products"},{t:"Tub smaller",neg:true},{t:"Dimmer lighting",neg:true}],
+        keys:[{t:"Marble & elegant",c:61,hl:"marble and elegant"},{t:"Great rain shower",c:44,hl:"Rain shower was excellent"},{t:"Lovely products",c:29,hl:"products smell amazing"},{t:"Tub smaller",c:12,neg:true,hl:"tub is a bit smaller"},{t:"Dimmer lighting",c:6,neg:true,hl:"Lighting is dimmer"}],
         reviews:[
-          {name:"Rohit S.",  when:"Feb 2026", stars:4, tx:"<mark>Bathroom</mark> is marble and elegant just like the photo — though the tub is a bit smaller in person."},
-          {name:"Nisha P.",  when:"Jan 2026", stars:4, tx:"Rain shower was excellent and the products smell amazing. Lighting is dimmer than the listing shot."},
+          {name:"Rohit S.",  when:"Feb 2026", stars:4, photos:["images/03-bathroom.png","images/gv-03-bathroom.png"], tx:"<mark>Bathroom</mark> is marble and elegant just like the photo — though the tub is a bit smaller in person."},
+          {name:"Nisha P.",  when:"Jan 2026", stars:4, photos:["images/sv-03-bathroom.png"], tx:"Rain shower was excellent and the products smell amazing. Lighting is dimmer than the listing shot."},
           {name:"Devang A.", when:"Nov 2025", stars:3, tx:"Clean and well kept, but our room's <mark>bathroom</mark> felt more compact than the gallery photo suggested."}
         ]
       }
     };
     // General panel — shown for every untagged photo so reviews are always in view.
     const GENERAL = {
-      score:"8.7", count:"1,284",
-      gphotos:["images/06-aerial-pool.png","images/07-garden-view.png","images/08-villa-exterior.png"],
+      label:"What guests say", score:"8.7", count:"1,284",
       mentions:[["Service","10"],["Food","4"],["Beachfront","3"],["Family","4"]],
       reviews:[
-        {name:"Gaurav",  when:"May 2026", stars:5, tx:"Beautifully maintained with lush <mark>gardens</mark>, spacious rooms and direct access to Benaulim Beach. Every staff member was warm and attentive."},
+        {name:"Gaurav",  when:"May 2026", stars:5, photos:["images/07-garden-view.png","images/08-villa-exterior.png"], tx:"Beautifully maintained with lush <mark>gardens</mark>, spacious rooms and direct access to Benaulim Beach. Every staff member was warm and attentive."},
         {name:"Arne",    when:"Mar 2026", stars:5, tx:"All the <mark>staff</mark> were polite, friendly and attentive. Breakfast was excellent, especially the Indian food, and the lawns were lush."},
-        {name:"Sunil K.", when:"Jan 2026", stars:5, tx:"Sea-facing room with a private pool — awesome. A very huge property with extraordinary <mark>service</mark> and very tasty food."}
+        {name:"Sunil K.", when:"Jan 2026", stars:5, photos:["images/06-aerial-pool.png"], tx:"Sea-facing room with a private pool — awesome. A very huge property with extraordinary <mark>service</mark> and very tasty food."}
       ]
     };
-    const scoreClass = s => s >= 85 ? 's-good' : s >= 65 ? 's-mid' : 's-low';
-    const starRow = n => '★★★★★'.slice(0,n) + '<span style="color:#d9d2c4">' + '★★★★★'.slice(n) + '</span>';
-    const revBlock = r => '<div class="tr-rev"><div class="rv-top">'+
-      '<span class="rv-name">'+r.name+'</span>'+
-      '<span class="rv-stars">'+starRow(r.stars)+'</span>'+
-      '<span class="rv-when">'+r.when+'</span></div>'+
-      '<p class="rv-tx">'+r.tx+'</p></div>';
+    const starRow = n => '★★★★★'.slice(0,n) + '<span class="off">' + '★★★★★'.slice(n) + '</span>';
+    // "Ananya R." → "AR"; a single-word name falls back to its first letter
+    const initials = name => name.replace(/[^A-Za-z ]/g,'').trim().split(/\s+/).slice(0,2)
+      .map(w => w[0].toUpperCase()).join('');
+    // wrap the first occurrence of `phrase` in the review text with a highlight mark
+    const hlText = (tx, phrase) => {
+      if(!phrase || typeof phrase !== 'string') return tx;
+      const i = tx.toLowerCase().indexOf(phrase.toLowerCase());
+      if(i < 0) return tx;
+      return tx.slice(0,i) + '<mark class="rp-hit">' + tx.slice(i, i+phrase.length) + '</mark>' + tx.slice(i+phrase.length);
+    };
+    const revBlock = (r, phrase) => '<article class="rp-rev">'+
+      '<div class="rp-rvhead"><span class="rp-av">'+initials(r.name)+'</span>'+
+        '<div><span class="rp-name">'+r.name+'</span><span class="rp-when">'+r.when+'</span></div></div>'+
+      '<div class="rp-stars">'+starRow(r.stars)+'</div>'+
+      '<p class="rv-tx">'+hlText(r.tx, phrase)+'</p>'+
+      (r.photos && r.photos.length
+        ? '<div class="rp-shots">'+r.photos.map(s=>'<img src="'+s+'" alt="Guest photo from '+r.name+'">').join('')+'</div>'
+        : '')+
+      '</article>';
+    // shared header: title, headline score, count — all left-aligned
+    const panelHead = (label, rating, count) => ''+
+      '<h3 class="rp-title">'+label+'</h3>'+
+      '<div class="rp-score"><span class="rp-star">&#9733;</span><b>'+rating+'</b><span class="rp-den">/10</span></div>'+
+      '<p class="rp-count">'+count+' Reviews</p>';
 
-    function matchPanel(t){
+    function matchPanel(t, activeKey){
+      const active = activeKey ? t.keys.find(k=>k.t===activeKey) : null;
+      const phrase = active ? active.hl : null;
+      const revs = phrase
+        ? t.reviews.filter(r => r.tx.toLowerCase().indexOf(phrase.toLowerCase()) >= 0)
+        : t.reviews;
       return ''+
-        '<div class="rp-head">'+
-          '<div class="rp-score"><b>'+t.rating+'</b><span>/10</span></div>'+
-          '<div class="rp-htx"><h3>'+t.label+'</h3><p>From '+t.count+' guest reviews</p></div>'+
-        '</div>'+
+        panelHead(t.label, t.rating, t.count)+
         '<div class="rp-pills">'+
-          t.keys.map(k=>'<span class="rp-pill'+(k.neg?' neg':'')+'">'+k.t+'</span>').join('')+
+          t.keys.map(k=>'<button type="button" class="rp-pill'+(k.neg?' neg':'')+(k.t===activeKey?' active':'')+'" data-key="'+k.t+'">'+k.t+'</button>').join('')+
         '</div>'+
-        '<div class="rp-sec"><h4>GUEST PHOTOS</h4><div class="rp-gphotos">'+
-          t.gphotos.map(s=>'<img src="'+s+'" alt="Guest photo of the '+t.label.toLowerCase()+'">').join('')+
-          '</div></div>'+
-        '<div class="rp-sec"><h4>LATEST REVIEWS</h4>'+
-          t.reviews.slice(0,2).map(revBlock).join('')+'</div>'+
+        '<hr class="rp-rule">'+
+        revs.map(r=>revBlock(r, phrase)).join('')+
         '<button class="rp-readall" type="button">Read all '+t.count+' reviews &rarr;</button>';
     }
     function generalPanel(g){
       return ''+
-        '<div class="tr-head">'+
-          '<div class="tr-score s-rev"><b>'+g.score+'</b><span>/ 10</span></div>'+
-          '<div class="tr-headtx"><h3>What guests say</h3>'+
-          '<p>From '+g.count+' verified guest reviews of this resort.</p></div>'+
-        '</div>'+
-        '<div class="tr-sec"><h4>GUEST PHOTOS</h4><div class="tr-gphotos">'+
-          g.gphotos.map(s=>'<img src="'+s+'" alt="Guest photo of the resort">').join('')+
-          '</div><p class="tr-gcap">Uploaded by verified guests who stayed here.</p></div>'+
-        '<div class="tr-sec"><h4>MOST MENTIONED</h4><div class="tr-chips">'+
-          g.mentions.map(m=>'<span class="tc">'+m[0]+' <b>'+m[1]+'</b></span>').join('')+'</div></div>'+
-        '<div class="tr-sec"><h4>RECENT REVIEWS</h4>'+g.reviews.map(revBlock).join('')+'</div>';
+        panelHead(g.label, g.score, g.count)+
+        '<div class="rp-mentions">'+
+          g.mentions.map(m=>'<span class="tc">'+m[0]+' <b>'+m[1]+'</b></span>').join('')+'</div>'+
+        '<hr class="rp-rule">'+
+        g.reviews.map(r=>revBlock(r)).join('')+
+        '<button class="rp-readall" type="button">Read all '+g.count+' reviews &rarr;</button>';
     }
 
-    const lbx = $('lbx'), lbxImg = $('lbxImg'), lbxTag = $('lbxTag'), lbxPanel = $('lbxPanel');
-    let lbi = 0;
+    const lbx = $('lbx'), lbxImg = $('lbxImg'), lbxTag = $('lbxTag'), lbxPanel = $('lbxPanel'), rpClose = $('rpClose');
+    let lbi = 0, activeKey = null, panelOff = false;   // panelOff: reviews dismissed for the photo in view
+
+    // ---- category filter across the top of the fullscreen view ----
+    const CAT_ICON = {
+      all:'<svg viewBox="0 0 24 24"><rect x="3.4" y="3.4" width="7.2" height="7.2" rx="1.6"/><rect x="13.4" y="3.4" width="7.2" height="7.2" rx="1.6"/><rect x="3.4" y="13.4" width="7.2" height="7.2" rx="1.6"/><rect x="13.4" y="13.4" width="7.2" height="7.2" rx="1.6"/></svg>',
+      rooms:'<svg viewBox="0 0 24 24"><path d="M3 18v-4.1a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2V18"/><path d="M5.6 11.9V8.5a2 2 0 0 1 2-2h8.8a2 2 0 0 1 2 2v3.4"/><path d="M3 18v2.2M21 18v2.2"/></svg>',
+      exterior:'<svg viewBox="0 0 24 24"><path d="M2.8 20.2h18.4"/><path d="M5.2 20.2V9.6L12 5.1l6.8 4.5v10.6"/><path d="M10 20.2v-5h4v5"/></svg>',
+      leisure:'<svg viewBox="0 0 24 24"><path d="M4.2 5.2h15.6L12 13.2z"/><path d="M12 13.2v5.9"/><path d="M8.6 19.1h6.8"/></svg>',
+      dining:'<svg viewBox="0 0 24 24"><path d="M7.1 3.2v8.1M7.1 11.3v9.5M4.6 3.2v4.3a2.5 2.5 0 0 0 5 0V3.2"/><path d="M17.3 3.2c-1.5 0-2.5 2-2.5 4.5s1 3.6 2.5 3.6v9.5"/></svg>'
+    };
+    const CATS = [
+      {k:'all',      label:'All'},
+      {k:'rooms',    label:'Rooms'},
+      {k:'exterior', label:'Exterior'},
+      {k:'leisure',  label:'Leisure &amp; Recreation'},
+      {k:'dining',   label:'Dining'}
+    ];
+    // categorise off the filename — the gallery is assembled from several image sets
+    // (room-specific shots, generic property shots, the taj-gallery set)
+    function catOf(p){
+      const s = ((p && p.src) || '').toLowerCase();
+      if(/dine-/.test(s))                                      return 'dining';
+      if(/pool|plunge|spa-/.test(s))                           return 'leisure';
+      if(/exterior|ext-|garden|villa/.test(s))                 return 'exterior';
+      if(/bedroom|bathroom|balcony|living|robes|room/.test(s)) return 'rooms';
+      return 'exterior';
+    }
+    let cat = 'all';
+    const inCat  = i => cat === 'all' || catOf(photos[i]) === cat;
+    const viewIdx = () => photos.map((p,i) => i).filter(inCat);
+
+    const lbxCats = $('lbxCats');
+    // counts come off photos[], which is rebuilt whenever a room is picked
+    function renderCats(){
+      const n = {all: photos.length};
+      photos.forEach(p => { const k = catOf(p); n[k] = (n[k]||0) + 1; });
+      lbxCats.innerHTML = CATS.filter(c => n[c.k]).map(c =>
+        '<button type="button" class="lbx-cat'+(c.k===cat?' active':'')+'" data-cat="'+c.k+'">'+
+        CAT_ICON[c.k]+c.label+' <span class="n">('+n[c.k]+')</span></button>').join('');
+    }
+    lbxCats.addEventListener('click', e => {
+      const b = e.target.closest('.lbx-cat');
+      if(!b || b.dataset.cat === cat) return;
+      cat = b.dataset.cat;
+      if(!inCat(lbi)){ const v = viewIdx(); if(v.length) lbi = v[0]; }   // land on the first of the new set
+      activeKey = null;
+      renderCats(); render();
+    });
+
 
     function render(){
       const p = photos[lbi];
       lbxImg.src = p.src; lbxImg.alt = p.alt;
       const t = p.tag && TRUST[p.tag];
-      if(t){
+      if(t && !panelOff){
         lbx.classList.add('has-panel');
-        lbxPanel.hidden = false; lbxPanel.innerHTML = matchPanel(t);
+        lbxPanel.hidden = false; rpClose.hidden = false;
+        lbxPanel.innerHTML = matchPanel(t, activeKey);
         lbxTag.hidden = false; lbxTag.textContent = t.label;
+        if(activeKey){
+          const hit = lbxPanel.querySelector('.rp-hit');
+          if(hit){ const rev = hit.closest('.rp-rev'); (rev||hit).scrollIntoView({block:'center', behavior:'smooth'}); }
+        } else {
+          lbxPanel.scrollTop = 0;
+        }
       } else {
         lbx.classList.remove('has-panel');
-        lbxPanel.hidden = true; lbxPanel.innerHTML = '';
-        lbxTag.hidden = true;
+        lbxPanel.hidden = true; lbxPanel.innerHTML = ''; rpClose.hidden = true;
+        // a dismissed panel still leaves the photo's amenity tag in place
+        lbxTag.hidden = !t;
+        if(t) lbxTag.textContent = t.label;
       }
     }
-    function open(i){ lbi = (i + photos.length) % photos.length; render(); lbx.hidden = false; document.body.style.overflow = 'hidden'; }
+    rpClose.addEventListener('click', e => {
+      e.stopPropagation();
+      panelOff = true; activeKey = null; render();
+    });
+    function open(i, key){
+      lbi = (i + photos.length) % photos.length;
+      if(!inCat(lbi)) cat = 'all';   // opening a specific photo always wins over a stale filter
+      activeKey = key || null; panelOff = false;
+      renderCats(); render();
+      lbx.hidden = false; document.body.style.overflow = 'hidden';
+    }
     function close(){ lbx.hidden = true; document.body.style.overflow = ''; }
-    function step(d){ lbi = (lbi + d + photos.length) % photos.length; render(); }
+    // the arrows page through the active category, not the whole gallery
+    function step(d){
+      const v = viewIdx();
+      if(!v.length) return;
+      const at = v.indexOf(lbi);
+      lbi = at < 0 ? v[0] : v[(at + d + v.length) % v.length];
+      activeKey = null; panelOff = false;   // reviews come back on the next photo
+      render();
+    }
+
+    // clicking a keyword pill inside the panel highlights its matching review
+    lbxPanel.addEventListener('click', e => {
+      const pill = e.target.closest('.rp-pill');
+      if(pill){ activeKey = (activeKey === pill.dataset.key) ? null : pill.dataset.key; render(); }
+    });
 
     document.querySelector('.gallery .main').addEventListener('click', e => {
       if(e.target.closest('.nav')) return;
