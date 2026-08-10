@@ -127,10 +127,6 @@
 
 
   /* ============ STATUS ============ */
-  .st-good{display:inline-flex;align-items:center;gap:7px;font-size:14.5px;font-weight:700;
-    color:var(--jade-deep);}
-  .st-good svg{width:16px;height:16px;stroke:var(--jade);fill:none;stroke-width:2.4;
-    stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .st-ink{font-size:14.5px;font-weight:700;color:var(--ink);}
   /* what they paid, then what we'd charge — the two numbers are the whole pitch */
   /* Both prices stated plainly and labelled. Striking one through made the
@@ -277,7 +273,6 @@
 
   var ICON = {
     ext:  '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
-    tick: '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>',
     chat: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 20.5l1.4-4.1A8.3 8.3 0 0 1 3.5 11.5a8.5 8.5 0 1 1 17.5 0z"/></svg>'
   };
 
@@ -337,7 +332,11 @@
 
     var switchBtn = '<button type="button" class="btn jade" data-switch="' + esc(b.id) +
                       '">Switch</button>';
-    var best = '<span class="st-good">' + ICON.tick + 'Your rate is still the best we see</span>';
+    /* Every case with nothing to act on says this and only this. Naming the
+       finding — level, dearer, sold out — answered a question the guest has not
+       asked and cannot do anything with. What they are owed is that someone is
+       still looking, so that is the whole line. */
+    var watching = '<span class="st-ink">Watching your booking</span>';
 
     switch(w.kind){
       /* 3.1 / 3.5 — the offer. Two prices and a button, and nothing else: the
@@ -350,27 +349,17 @@
         acts = switchBtn;
         break;
 
-      /* 3.2 / 3.6 — three different findings, one answer. Our price is level,
-         or above theirs, or below it on a room they did not book; the model
-         keeps them apart because they are not the same fact, but there is
-         nothing for the guest to do about any of them. By how much and since
-         when is our problem, not theirs — a number here only invites a
-         comparison against a price they cannot have. */
+      /* 3.2 / 3.6 / 3.4 — four findings, one answer. Our price is level, or
+         above theirs, or below it on a room they did not book, or we have
+         nothing free for these dates at all. The model keeps them apart
+         because they are not the same fact, but there is nothing for the
+         guest to do about any of them, and the difference between them is our
+         problem rather than theirs. */
       case 'near_miss':
       case 'level':
       case 'dearer':
-        st = best;
-        acts = '';
-        break;
-
-      /* 3.4 — in our inventory, nothing free for these dates. Availability
-         comes back, and it can come back a grade up; that we also look above
-         the room they booked is how the watch works, not something the card
-         has to promise. The dates are on the line above, so the whole case
-         fits in the one clause that distinguishes it from 3.3: we are still
-         looking. */
       case 'sold_out':
-        st = '<span class="st-ink">Sold out, but still watching</span>';
+        st = watching;
         acts = '';
         break;
 
@@ -406,11 +395,21 @@
         acts = w.switchable ? switchBtn : '';
         break;
 
-      /* 3.12 — the window shut. The booking keeps its place; it has just
-         stopped being switchable, and there is no watch left to stop. */
+      /* 3.12 — the window shut. The booking keeps its place and it keeps its
+         figures; what it has lost is the button, so the date it went stands
+         where that button stood. The same shape as 3.7, which is right: the
+         two differ in why the saving cannot be taken, not in what the guest
+         is being shown. */
       case 'window_closed':
-        st = '<span class="st-ink">Free cancellation ended ' + esc(fmt.day(w.closedAt)) + '</span>' +
-             '<span class="st-note">No longer switchable</span>';
+        /* nothing of ours to compare against — no price slot to fill */
+        if(w.ourTotal == null){
+          st = '<span class="st-ink">Free cancellation ended ' + esc(fmt.day(w.closedAt)) +
+               '</span><span class="st-note">No longer switchable</span>';
+          break;
+        }
+        st = prices('You paid', fmt.inr(w.theirTotal),
+                    'Our price', fmt.inr(w.ourTotal));
+        acts = '<span class="tag">Free cancellation ended ' + esc(fmt.day(w.closedAt)) + '</span>';
         break;
 
       case 'pending':

@@ -913,10 +913,19 @@
        on the trip and it is not a failure that it is quiet. */
     if (!b.property_id) return { kind: 'not_carried', ref: '3.3', switchable: false };
 
-    /* 3.12 — the window shut. The booking stays; it stops being switchable. */
+    /* 3.12 — the window shut. The booking stays; it stops being switchable.
+       The figures go with it where we have them: the guest is owed the same two
+       numbers as anyone else, and a gap that has moved out of reach is a thing
+       to be told rather than one to be spared. Availability is not checked
+       first here — the window closing outranks it — so there may be no price of
+       ours to state, and then there simply isn't one. */
     if (windowClosed(b)) {
+      var open = b.our_offer && b.our_offer.availability === 'available'
+        ? b.our_offer.our_price_total : null;
       return { kind: 'window_closed', ref: '3.12', switchable: false,
-               closedAt: b.free_cancellation_until };
+               closedAt: b.free_cancellation_until,
+               ourTotal: open,
+               theirTotal: open == null ? null : b.price_paid_total };
     }
 
     /* 3.4 — we do sell it, and have nothing for these dates. Availability
@@ -1060,29 +1069,19 @@
     writeState(s);
   }
 
-  /* What the list shows by default: two tracked bookings, each with a
-     like-for-like saving we would actually sell. An owned card appears as soon
-     as either one is switched.
-     Everything else in SEED is a status-state fixture — reachable at ?all=1 for
-     design review, but not what an account actually looks like. */
-  var DEFAULT_IDS = ['bk-taj-exotica', 'bk-leela-jaipur'];
-
-  function showAll() {
-    try { return new URLSearchParams(location.search).get('all') === '1'; }
-    catch (e) { return false; }
-  }
+  /* The list is the whole account. Every status state in SEED is a case the
+     page has to answer for, so all of them are on it — holding the rest behind
+     ?all=1 meant the states nobody had to look at were the ones free to rot. */
 
   /* Upcoming only, by check-in ascending. A stay that has already happened has
      nothing left to track and no decision attached to it, so it does not belong
      on this page — past bookings stay in the model for history elsewhere. */
   function sorted() {
     var today = new Date(); today.setHours(0, 0, 0, 0);
-    var everything = showAll();
     return all()
       .filter(function (b) { return new Date(b.check_out) >= today; })
       /* folded into the tracked card for the same stay */
       .filter(function (b) { return !b.merged_into; })
-      .filter(function (b) { return everything || DEFAULT_IDS.indexOf(b.id) !== -1; })
       .sort(function (a, b) { return new Date(a.check_in) - new Date(b.check_in); });
   }
 

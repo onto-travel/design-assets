@@ -92,7 +92,7 @@
 
   /* Grouped by what each group is for, not by importance. */
   var GROUPS = [
-    [ { href: 'bookings.html?all=1', label: 'Bookings', icon: 'bag', sub: true, arrow: true },
+    [ { href: 'bookings.html', label: 'Bookings', icon: 'bag', sub: true, arrow: true },
       { href: '#', label: 'Saved stays', icon: 'heart' } ],
     [ { href: '#', label: 'Payments and refunds', icon: 'card' },
       { href: 'profile.html', label: 'Account settings', icon: 'gear' } ],

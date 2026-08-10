@@ -363,7 +363,7 @@
       <nav class="hero-nav">
         <a class="tn-brand" href="home2.html">ONTO</a>
         <span class="crumb-sep">/</span>
-        <a class="crumb-up" href="bookings.html?all=1">Bookings</a>
+        <a class="crumb-up" href="bookings.html">Bookings</a>
         <span class="crumb-sep">/</span>
         <span class="crumb-here">Your booking</span>
         <div class="tn-right">
@@ -914,7 +914,7 @@
       $('offerStop').addEventListener('click', function(e){
         e.preventDefault();
         if(window.Tracking) window.Tracking.stopTracking(b.id);
-        location.href = 'bookings.html?all=1';
+        location.href = 'bookings.html';
       });
     }
   }
