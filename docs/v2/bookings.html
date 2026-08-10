@@ -48,6 +48,12 @@
   .tn-who:hover{background:rgba(0,0,0,.045);}
   .tn-who .cv{width:9px;height:9px;stroke:#8a8a85;fill:none;stroke-width:2.2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  /* The panel's own styles live in topnav.js and arrive with it — which means
+     that until the script has run, this div has none, and a filled one would
+     paint as a static white card in the middle of the bar. Hidden here, in
+     markup the parser sees before its first paint, so there is no frame in
+     which it can show. topnav.js's .menu.open outranks this and still opens it. */
+  .menu{opacity:0;pointer-events:none;}
 
   /* ============ PAGE — list + a rail ============ */
   .page{max-width:1240px;margin:0 auto;padding:34px 32px 80px;
@@ -67,24 +73,12 @@
     stroke-linecap:round;stroke-linejoin:round;}
   .btn.jade{background:var(--jade);border-color:var(--jade);color:#fff;}
   .btn.jade:hover{background:var(--jade-deep);border-color:var(--jade-deep);}
-  /* Stands where the Switch button would stand, and answers for its absence.
-     Not a control — there is nothing to press — so it takes the button's place
-     and its height with none of its affordance. */
-  .tag{display:inline-flex;align-items:center;height:36px;padding:1px 12px;border-radius:12px;
-    background:var(--chip-bg);color:var(--chip-ink);font-size:13.5px;font-weight:700;
-    white-space:nowrap;}
-
   /* ============ THE TICKET ============
      Body and photo are two halves of one stub, torn along a perforation: a
      dashed rule with a notch punched out of the card's top and bottom edge. */
-  /* Whose booking it is decides the section, so it no longer has to be said
-     on every card inside one. */
-  .stack{display:flex;flex-direction:column;gap:34px;}
-  .grp-h{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:700;
-    letter-spacing:-.01em;margin:0 0 14px;}
-  /* how many, so the heading is a fact about the account and not just a label */
-  .grp-n{flex:none;background:var(--chip-bg);color:#5f5f59;font-size:12.5px;
-    font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:0;}
+  /* One list. Where a booking was made is a property of that booking, not a
+     reason to file it somewhere else — so the ones made elsewhere carry a mark
+     and everything stays in one date order. */
   .list{display:flex;flex-direction:column;gap:16px;}
   .tk{position:relative;display:flex;align-items:stretch;background:var(--card);
     border-radius:22px;padding:8px;box-shadow:var(--shadow-card);
@@ -93,23 +87,71 @@
 
   .tk-body{flex:1;min-width:0;display:flex;flex-direction:column;padding:18px 10px 14px 18px;}
   /* the ownership tell reads as part of the name, not as a mark over the card */
-  .tk-name{font-size:20px;font-weight:700;line-height:1.35;min-width:0;}
+  .tk-name{font-size:18px;font-weight:700;line-height:1.35;min-width:0;}
   .tk-name a{text-decoration:none;}
   .tk:hover .tk-name a{text-decoration:underline;text-underline-offset:3px;}
   .tk-name a::after{content:"";position:absolute;inset:0;border-radius:22px;}
+  /* Booked somewhere else. Sits against the name because it qualifies the
+     booking, not the row: it is the one thing the name alone doesn't say. */
+  .pill{display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:7px;
+    background:var(--chip-bg);color:#6f6f69;font-size:11.5px;font-weight:700;
+    letter-spacing:.01em;vertical-align:2px;margin-left:2px;}
   .tk-name a:focus-visible{outline:none;}
   .tk-name a:focus-visible::after{outline:2px solid var(--jade);outline-offset:-3px;}
   /* one dotted line of facts, the way a ticket prints them */
-  .tk-meta{margin-top:3px;font-size:14px;font-weight:500;color:var(--muted);
+  .tk-meta{margin-top:3px;font-size:13px;font-weight:500;color:var(--muted);
     display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;}
   .tk-meta .sep{color:#c8c8c3;}
   /* the case and its action, pinned to the foot of the stub */
+  /* No wrapping here. When the foot could break, the same card laid out two
+     different ways depending on how wide that month's name happened to be —
+     "Wed, 19 Aug" pushed the voucher onto its own line and "Mon, 2 Nov" did
+     not. Which line it sits on is now a decision the card makes, not one the
+     text falls into. */
   .tk-foot{margin-top:auto;padding-top:16px;display:flex;align-items:flex-end;
-    justify-content:space-between;gap:16px;flex-wrap:wrap;}
-  .tk-acts{display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:2;}
-  /* only pushed right when there is a case on the left to sit opposite */
-  .tk-status + .tk-acts{margin-left:auto;}
+    justify-content:space-between;gap:16px;flex-wrap:nowrap;}
+  /* The check-in block is wide enough that it and the action have to take a
+     line each. Always — never only when they happen not to fit. */
+  .tk-foot.stack{flex-direction:column;align-items:flex-start;gap:14px;}
+  .tk-foot.stack .tk-acts{align-self:flex-end;}
+  /* a text link and a button can share this row, so they centre on each other
+     rather than sitting on a common bottom edge */
+  .tk-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
+    position:relative;z-index:2;}
+  /* with nothing on the left to sit opposite, the row is the whole width, so
+     the two ends of it are the two ends of the card */
+  .tk-foot > .tk-acts:only-child{flex:1;}
+  /* the task goes to the far edge, away from the button it is not a variant of */
+  .tk-acts .btn + .st-clock{margin-left:auto;}
+  /* only pushed right when there is a case on the left to sit opposite, and
+     never squeezed by it — the dates wrap before the button does */
+  .tk-status + .tk-acts{margin-left:auto;flex:none;}
   .tk-status{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+
+  /* Check-in and check-out, on the bookings we hold. Only there: on someone
+     else's booking the times are theirs to state, and we did not take them.
+     It stands where a status would, so the voucher opposite it is pushed to
+     the card's edge by the same rule that moves every other action. */
+  .tk-when{display:flex;align-items:flex-end;flex-wrap:wrap;gap:8px 14px;min-width:0;}
+  .tk-when .k{font-size:12.5px;font-weight:500;color:var(--muted);}
+  .tk-when .v{font-size:14.5px;font-weight:700;margin-top:2px;white-space:nowrap;}
+  .tk-when .v span{font-weight:500;color:var(--muted);}
+  .tk-when .dash{color:#c8c8c3;padding-bottom:3px;}
+
+  /* ============ THE STAMP ============
+     A finding, not a control: there is nothing to press on this row, and the
+     booking it belongs to is one click away where the switch actually lives.
+     The banner carries the single word and the ring carries the qualifier,
+     which is the division of labour on any real stamp. It sits on the body's
+     white rather than on the photo — ink on paper, and legible. */
+  .stamp{position:absolute;top:50%;right:272px;width:80px;height:80px;
+    transform:translateY(-50%) rotate(-6deg);color:var(--jade);opacity:.92;
+    pointer-events:none;}
+  .stamp text{font-family:inherit;font-weight:800;fill:currentColor;}
+  .stamp .ring-t{font-size:10.5px;letter-spacing:2.4px;}
+  .stamp .word{font-size:21px;letter-spacing:1.6px;}
+  /* the banner's paper, so the rings stop under it the way an ink stamp lands */
+  .stamp .banner{fill:var(--card);stroke:currentColor;stroke-width:2.4;}
 
   /* the perforation */
   .tk-perf{flex:none;width:34px;position:relative;align-self:stretch;}
@@ -127,24 +169,11 @@
 
 
   /* ============ STATUS ============ */
+  /* Every status is one line. A second line under it only ever restated the
+     first in softer words. */
   .st-ink{font-size:14.5px;font-weight:700;color:var(--ink);}
-  /* what they paid, then what we'd charge — the two numbers are the whole pitch */
-  /* Both prices stated plainly and labelled. Striking one through made the
-     comparison a piece of styling; naming them makes it a fact. */
-  /* one two-column grid rather than two independent rows, so the labels and the
-     figures each line up with their opposite number */
-  /* Each price is a labelled figure — the label over the number it names — and
-     the two sit side by side so the comparison is read across, not down. One
-     shared two-row grid rather than two stacks: the figures differ in size, so
-     only a common row can sit them on the same baseline. */
-  .st-prices{display:grid;grid-auto-flow:column;grid-template-rows:auto auto;
-    column-gap:26px;row-gap:1px;align-items:baseline;font-variant-numeric:tabular-nums;}
-  .st-prices .pr{display:contents;}
-  .st-prices .pr-k{font-size:12.5px;font-weight:600;color:var(--muted);}
-  .st-prices .pr-v{font-size:16px;font-weight:700;color:var(--chip-ink);}
-  .st-prices .pr.ours .pr-k{color:var(--jade-deep);font-weight:700;}
-  .st-prices .pr.ours .pr-v{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--jade);}
-  .st-note{font-size:13px;font-weight:500;color:var(--muted);max-width:260px;}
+  /* No money on this page at all now. A figure on a row is either an argument
+     or a decision asked for too early; the booking page is where both belong. */
   /* the deadline is also the way out, so it is the link */
   .st-clock{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;
     font-size:13px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums;
@@ -154,19 +183,36 @@
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
 
   /* ============ RAIL ============ */
-  /* The list column opens with a section heading and the rail does not, so
-     without this the rail's card would sit a heading higher than the first
-     ticket. 28.5 is the heading's own line (19px at 1.5) plus its 14px margin
-     — if either changes, this follows. */
-  .rail{position:sticky;top:88px;display:flex;flex-direction:column;gap:14px;
-    margin-top:calc(19px * 1.5 + 14px);}
-  .up{position:relative;background:var(--card);border-radius:20px;padding:22px;
-    box-shadow:var(--shadow-card);transition:background .15s;}
+  /* Both columns now open with a card, so the rail starts level with the first
+     ticket on its own. */
+  .rail{position:sticky;top:88px;display:flex;flex-direction:column;gap:26px;}
+
+  /* ---- the year ----
+     The list is what is ahead. This is the same account read backwards, and
+     it is the only thing on the page that counts rather than watches. */
+  .yr-h{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:0 0 14px;}
+  .yr-card{background:var(--card);border-radius:20px;padding:0 18px;
+    box-shadow:var(--shadow-card);}
+  /* the row's own padding is the rule's inset, so the hairline stops short of
+     the card's corners without a second measurement to keep in step */
+  .yr-row{display:flex;align-items:center;gap:14px;padding:15px 0;}
+  .yr-row + .yr-row{border-top:1px solid var(--line);}
+  .yr-ic{flex:none;width:40px;height:40px;border-radius:12px;background:var(--jade-soft);
+    display:grid;place-items:center;}
+  .yr-ic svg{width:19px;height:19px;stroke:var(--jade-deep);fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .yr-t{min-width:0;}
+  .yr-k{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.01em;}
+  .yr-v{font-size:13px;font-weight:500;color:var(--muted);margin-top:1px;}
+
+  /* ---- getting a booking in ----
+     Still here, and no longer dressed as the thing to do: most visits have no
+     voucher to hand over, so it keeps its place and loses its weight. */
+  .up{position:relative;border:1px dashed #d8d8d3;border-radius:16px;padding:16px 18px;
+    transition:background .15s,border-color .15s;}
   /* the whole card is the drop target, so a dragged file has somewhere obvious to land */
-  .up.drag{background:var(--jade-soft);}
-  .up.drag::after{content:"";position:absolute;inset:6px;border:2px dashed var(--jade);
-    border-radius:15px;pointer-events:none;}
-  .up-h{font-size:16px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em;}
+  .up.drag{background:var(--jade-soft);border-color:var(--jade);}
+  .up-h{font-size:13.5px;font-weight:600;color:var(--muted);margin:0 0 10px;letter-spacing:0;}
   .up .btn{width:100%;justify-content:center;}
   .up-file{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;
     font-weight:600;color:var(--jade-deep);word-break:break-all;}
@@ -184,7 +230,7 @@
   @media(max-width:1080px){
     .page{grid-template-columns:minmax(0,1fr);}
     /* stacked under the list now, so the grid gap is the whole spacing */
-    .rail{position:static;margin-top:0;}
+    .rail{position:static;}
   }
   @media(max-width:820px){
     .page{padding:24px 18px 64px;gap:24px;}
@@ -199,9 +245,12 @@
     .notch.t{left:-8px;transform:translate(-50%,-50%);}
     .notch.b{right:-8px;bottom:auto;transform:translate(50%,-50%);}
     .tk-body{padding:4px 14px 12px;}
+    /* the body is full width now, so the stamp lands in its bottom corner
+       rather than out to the right of nothing */
+    .stamp{top:auto;bottom:10px;right:14px;width:72px;height:72px;
+      transform:rotate(-6deg);}
     .tk-foot{flex-direction:column;align-items:stretch;}
     .tk-status{margin-left:0;align-items:flex-start;text-align:left;order:-1;}
-    .st-note{max-width:none;}
     .tk-acts .btn{flex:1 1 auto;justify-content:center;}
   }
   @media(max-width:520px){
@@ -232,13 +281,18 @@
 
   <main class="page">
     <h1 class="h1">Bookings</h1>
-    <div class="stack" id="list"></div>
+    <div class="list" id="list"></div>
     <aside class="rail">
+      <!-- The account counted up, filled from the same model the list reads. -->
+      <section id="yrSec">
+        <h2 class="yr-h">Your year in stays</h2>
+        <div class="yr-card" id="yrCard"></div>
+      </section>
       <!-- Getting a booking in. It is the guest's own paperwork, so the card
            takes the document rather than asking them to retype it. -->
       <section class="up" id="upCard">
         <p class="up-h">Booked a hotel somewhere else?</p>
-        <button type="button" class="btn jade" id="upBtn">Upload voucher</button>
+        <button type="button" class="btn" id="upBtn">Upload voucher</button>
         <input type="file" id="upInput" accept="image/*,application/pdf" hidden>
         <div class="up-file" id="upFile" hidden></div>
       </section>
@@ -273,19 +327,39 @@
 
   var ICON = {
     ext:  '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
-    chat: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 20.5l1.4-4.1A8.3 8.3 0 0 1 3.5 11.5a8.5 8.5 0 1 1 17.5 0z"/></svg>'
+    chat: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 20.5l1.4-4.1A8.3 8.3 0 0 1 3.5 11.5a8.5 8.5 0 1 1 17.5 0z"/></svg>',
+    dl:   '<svg viewBox="0 0 24 24"><path d="M12 3.5v11m0 0l4-4m-4 4l-4-4M4 16.5v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>',
+    cal:  '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/>' +
+            '<path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>',
+    pin:  '<svg viewBox="0 0 24 24"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/>' +
+            '<circle cx="12" cy="10" r="2.6"/></svg>',
+    heart:'<svg viewBox="0 0 24 24"><path d="M12 20s-7.5-4.7-7.5-9.6A4.4 4.4 0 0 1 12 7.4a4.4 4.4 0 0 1 7.5 3A11.6 11.6 0 0 1 12 20z"/></svg>'
   };
 
-  /* Two labelled figures side by side. Every state that has money to show uses
-     this, so "our price" always lands in the same place on every card whether
-     or not it is being compared to anything. */
-  function prices(theirK, theirV, ourK, ourV){
-    return '<span class="st-prices">' +
-             '<span class="pr"><span class="pr-k">' + esc(theirK) + '</span>' +
-               '<b class="pr-v">' + theirV + '</b></span>' +
-             '<span class="pr ours"><span class="pr-k">' + esc(ourK) + '</span>' +
-               '<b class="pr-v">' + ourV + '</b></span>' +
-           '</span>';
+  /* The stamp. Two arcs off one circle of radius 44 about (60,60): the top one
+     runs 160°→20° for the ring text, the bottom one 200°→340° under it for the
+     marks. The banner is tilted against the rings rather than with them —
+     upright type on a tilted stamp looks printed, not stamped.
+     The path ids have to be unique per card, so the row's id goes in them. */
+  function stamp(id, word, ring){
+    var u = 'st-' + String(id).replace(/[^a-z0-9]/gi, '');
+    return '<svg class="stamp" viewBox="0 0 120 120" role="img" aria-label="' +
+             esc(word + ' — ' + ring) + '">' +
+      '<defs>' +
+        '<path id="' + u + '-t" fill="none" d="M18.7,45 A44,44 0 0 1 101.3,45"/>' +
+        '<path id="' + u + '-b" fill="none" d="M18.7,75 A44,44 0 0 0 101.3,75"/>' +
+      '</defs>' +
+      '<circle cx="60" cy="60" r="55" fill="none" stroke="currentColor" stroke-width="2.6"/>' +
+      '<circle cx="60" cy="60" r="49.5" fill="none" stroke="currentColor" stroke-width="1.1"/>' +
+      '<text class="ring-t"><textPath href="#' + u + '-t" startOffset="50%" ' +
+        'text-anchor="middle">' + esc(ring) + '</textPath></text>' +
+      '<text class="ring-t"><textPath href="#' + u + '-b" startOffset="50%" ' +
+        'text-anchor="middle">· · ·</textPath></text>' +
+      '<g transform="rotate(-9 60 60)">' +
+        '<rect class="banner" x="7" y="46" width="106" height="29" rx="6"/>' +
+        '<text class="word" x="60" y="65.5" text-anchor="middle">' + esc(word) + '</text>' +
+      '</g>' +
+    '</svg>';
   }
 
   /* 3.9 and 3.11 — the offer expires and our price drifts, and neither is
@@ -294,16 +368,50 @@
      when it goes the card simply stops offering it. Anything that needs a date
      belongs on the booking itself, where someone has gone looking for it. */
 
+  /* "Thu, 30 Jul" — the weekday earns its place here in a way it doesn't in a
+     range: this is the line someone checks the night before. */
+  var WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function dayName(iso){ return WD[new Date(iso).getDay()] + ', ' + fmt.day(iso); }
+
+  /* The hotel's own clock, stated the same way the booking page states it. */
+  function whenBlock(b){
+    function end(k, iso, time){
+      return '<div><div class="k">' + k + '</div>' +
+               '<div class="v">' + esc(dayName(iso)) + ', <span>' + time + '</span></div></div>';
+    }
+    return '<div class="tk-when">' +
+             end('Check-in', b.check_in, '2:00 pm') +
+             '<span class="dash">&ndash;</span>' +
+             end('Check-out', b.check_out, '12:00 pm') +
+           '</div>';
+  }
+
   /* Status block + actions, driven entirely by ownership then watch case.
      A tracked ticket never offers cancel, voucher, or manage. */
   function sideFor(b){
     var st = '', acts = '';
 
-    /* Nothing outstanding and nothing to decide: the ticket is the link, and the
-       voucher and management are both inside it. */
-    if(b.ownership === 'owned') return { st: '', acts: '' };
+    /* The paperwork for a booking we hold. It is the one thing a guest wants
+       off this page without opening anything — at the door, on the way in —
+       so it comes out to the row rather than staying one tap inside it. Only
+       ever ours: a tracked booking's voucher is the platform's to issue. */
+    var voucher = function(id){
+      return '<button type="button" class="btn jade" data-voucher="' + esc(id) + '">' +
+               ICON.dl + 'Download voucher</button>';
+    };
 
-    /* ---- switched: one ticket, now ours, with whatever is still outstanding ---- */
+    /* Nothing outstanding and nothing to decide. What the card owes them is
+       when to turn up and the paperwork to turn up with — the two facts this
+       page is opened for on the morning of the stay. Managing the booking is
+       still inside the ticket. */
+    if(b.ownership === 'owned'){
+      return { st: whenBlock(b), acts: voucher(b.id), stack: true };
+    }
+
+    /* ---- switched: their booking, still live, with ours now beside it ----
+       Both records are on the list, so this row answers only for the original.
+       It has no voucher of ours to give and nothing of ours to manage; what it
+       has is one thing left to do, and that sits on the row it belongs to. */
     if(b.counterpart){
       var ev = b.switch_event;
 
@@ -311,17 +419,12 @@
         var left = fmt.countdown(ev.cancel_deadline);
         /* The deadline and the place it is cancelled are one thing, so they are
            one control: the reminder is the way out. */
-        /* The deadline and the place it is cancelled are one thing, so they are
-           one control: the reminder is the way out. It sits with the actions on
-           the left, because it is the one thing on this ticket to be done. */
         acts = '<a class="st-clock" href="' + esc(b.platform.manage) + '" target="_blank" ' +
                  'rel="noopener">' + esc(left.label) + ICON.ext + '</a>';
         return { st: '', acts: acts };
       }
 
-      /* Cancelled on the platform, so nothing is outstanding: this is simply a
-         booking with us now, and it reads like every other one — the saving is
-         a fact about how it was made, not its standing state. */
+      /* Released on the platform, so nothing is outstanding on it either. */
       return { st: '', acts: '' };
     }
 
@@ -330,8 +433,6 @@
     var w = b.watch;
     if(!w) return { st: '', acts: '' };
 
-    var switchBtn = '<button type="button" class="btn jade" data-switch="' + esc(b.id) +
-                      '">Switch</button>';
     /* Every case with nothing to act on says this and only this. Naming the
        finding — level, dearer, sold out — answered a question the guest has not
        asked and cannot do anything with. What they are owed is that someone is
@@ -339,14 +440,11 @@
     var watching = '<span class="st-ink">Watching your booking</span>';
 
     switch(w.kind){
-      /* 3.1 / 3.5 — the offer. Two prices and a button, and nothing else: the
-         two numbers are the whole argument. One room or five changes nothing
-         at all here — both figures are what the whole booking costs either
-         way, and the line above already says how many rooms that is. */
+      /* 3.1 / 3.5 — the offer. Nothing in the foot: the stamp marks the row
+         and the booking page makes the case, with the figures and the button
+         to act on them. A price and a pay button on a list item asked for a
+         decision at the exact moment nobody has the facts to make one. */
       case 'saving':
-        st = prices('You paid', fmt.inr(w.theirTotal),
-                    'Our price', fmt.inr(w.ourTotal));
-        acts = switchBtn;
         break;
 
       /* 3.2 / 3.6 / 3.4 — four findings, one answer. Our price is level, or
@@ -375,46 +473,32 @@
                  ICON.chat + 'Contact us</a>';
         break;
 
-      /* 3.7 — the saving is real, correct, and permanently out of reach. It is
-         still shown, because a guest who finds out later that we saw it and
-         said nothing is the worse outcome. The two prices read exactly as they
-         do on an offer; what changes is where the button would be, which
-         carries the one word that explains why there isn't one. */
+      /* 3.7 — we have a price and it can never be taken: cancelling forfeits
+         the original, so the guest would pay for the nights twice. With no
+         figures on the row there is nothing to dangle, and the reason the
+         button is missing is the only thing worth saying. */
       case 'unreachable':
-        st = prices('You paid', fmt.inr(w.theirTotal),
-                    'Our price', fmt.inr(w.ourTotal));
-        acts = '<span class="tag">Non-refundable</span>';
+        st = '<span class="st-ink">Non-refundable</span>';
         break;
 
-      /* 3.13 — charged in another currency. Their figure sits in what it was
-         charged in and ours in rupees, side by side and unconverted. The
-         currency on their number says everything the sentence would have. */
+      /* 3.13 — charged in another currency. Nothing on the row turns on which
+         currency it was: either the stay can move to us, and it is stamped
+         like any other, or it cannot and we are watching. The two figures and
+         the currency they are in belong on the booking. */
       case 'cross_currency':
-        st = prices('You paid', esc(fmt.money(w.theirTotal, w.theirCurrency)),
-                    'Our price', fmt.inr(w.ourTotal));
-        acts = w.switchable ? switchBtn : '';
+        if(!w.switchable) st = watching;
         break;
 
-      /* 3.12 — the window shut. The booking keeps its place and it keeps its
-         figures; what it has lost is the button, so the date it went stands
-         where that button stood. The same shape as 3.7, which is right: the
-         two differ in why the saving cannot be taken, not in what the guest
-         is being shown. */
+      /* 3.12 — the window shut. The booking keeps its place and loses its
+         button; the date it went stands in the status, which is the only part
+         of this the guest can still check against their own paperwork. */
       case 'window_closed':
-        /* nothing of ours to compare against — no price slot to fill */
-        if(w.ourTotal == null){
-          st = '<span class="st-ink">Free cancellation ended ' + esc(fmt.day(w.closedAt)) +
-               '</span><span class="st-note">No longer switchable</span>';
-          break;
-        }
-        st = prices('You paid', fmt.inr(w.theirTotal),
-                    'Our price', fmt.inr(w.ourTotal));
-        acts = '<span class="tag">Free cancellation ended ' + esc(fmt.day(w.closedAt)) + '</span>';
+        st = '<span class="st-ink">Free cancellation ended ' + esc(fmt.day(w.closedAt)) +
+             '</span>';
         break;
 
       case 'pending':
-        st = '<span class="st-ink">Checking your booking</span>' +
-             '<span class="st-note">We’ll confirm shortly</span>';
+        st = '<span class="st-ink">Checking your booking</span>';
         break;
     }
     return { st: st, acts: acts };
@@ -422,31 +506,41 @@
 
   function rowHTML(b){
     var side = sideFor(b);
-    /* Every ticket opens the booking itself. A tracked one opens read-only —
-       the offer to switch stays on its own button, so the row click never
-       decides anything. */
-    var open = b.counterpart ? b.counterpart.id : b.id;
-    var link = 'href="booking-details.html" data-owned="' + esc(open) + '"';
+    /* Every ticket opens its own booking, including the original of a switched
+       pair — that page is where the sequence and the cancel link live. */
+    var link = 'href="booking-details.html" data-owned="' + esc(b.id) + '"';
+    /* Booked on someone else's platform and still theirs, switched or not: the
+       booking we made by switching is a separate row and carries no pill. */
+    var external = b.ownership === 'tracked'
+      ? ' <span class="pill">External</span>' : '';
+    /* `switchable` is the model's own word for it — the saving is real and the
+       stay can actually be moved. Nothing else on the page earns a stamp. */
+    var mark = b.watch && b.watch.switchable ? stamp(b.id, 'OPEN', '· TO SWITCH ·') : '';
 
     return '<article class="tk" data-row="' + esc(b.id) + '">' +
       '<div class="tk-body">' +
-        '<h3 class="tk-name"><a ' + link + '>' + esc(b.property_name_raw) + '</a></h3>' +
+        '<h3 class="tk-name"><a ' + link + '>' + esc(b.property_name_raw) + '</a>' +
+          external + '</h3>' +
         /* When, and for how many. The room, the meal plan and the reference are
            all one tap away on the booking itself, and none of them is what the
            list is scanned for. */
+        /* The dates are printed in full below on a booking we hold, so up here
+           it says how long instead of saying when twice. */
         '<div class="tk-meta">' +
-          '<span>' + esc(fmt.dateRange(b.check_in, b.check_out)) + '</span>' +
+          '<span>' + esc(b.ownership === 'owned'
+            ? fmt.nights(b.check_in, b.check_out)
+            : fmt.dateRange(b.check_in, b.check_out)) + '</span>' +
           '<span class="sep">·</span><span>' + esc(T.occupancyText(b)) + '</span>' +
         '</div>' +
         /* The case on the left, the thing to do about it on the right. With
            nothing to weigh up, whatever is left falls back to the left edge. */
         (side.st || side.acts
-          ? '<div class="tk-foot">' +
+          ? '<div class="tk-foot' + (side.stack ? ' stack' : '') + '">' +
               (side.st ? '<div class="tk-status">' + side.st + '</div>' : '') +
               (side.acts ? '<div class="tk-acts">' + side.acts + '</div>' : '') +
             '</div>'
           : '') +
-      '</div>' +
+      '</div>' + mark +
       '<div class="tk-perf"><span class="notch t"></span><span class="notch b"></span></div>' +
       '<div class="tk-stub">' +
         (b.image ? '<img src="' + esc(b.image) + '" alt="">' : '') +
@@ -454,16 +548,9 @@
     '</article>';
   }
 
-  /* Ours and everyone else's, in that order. A stay that has been switched
-     counts as ours from the moment we hold the booking — that is the one the
-     guest will turn up on, whatever is still outstanding on the original. */
-  var SECTIONS = [
-    { title: 'Booked with us',
-      has: function(b){ return b.ownership === 'owned' || !!b.counterpart; } },
-    { title: 'Tracked bookings',
-      has: function(b){ return b.ownership === 'tracked' && !b.counterpart; } }
-  ];
-
+  /* One list, in the order the stays happen. Splitting it by who holds the
+     booking sorted the page by our business rather than by the guest's year,
+     and put two headings between them and the trip they were looking for. */
   function renderList(){
     var rows = T.sorted();
     /* An account with nothing ahead of it: every stay watched has already
@@ -472,19 +559,75 @@
       $('list').innerHTML = '<p class="empty">Nothing being watched.</p>';
       return;
     }
-    /* A heading with nothing under it says an account has a kind of booking
-       it does not have, so an empty section is simply absent. */
-    $('list').innerHTML = SECTIONS.map(function(sec){
-      var mine = rows.filter(sec.has);
-      if(!mine.length) return '';
-      var n = mine.length;
-      return '<section class="grp">' +
-               '<h2 class="grp-h">' + esc(sec.title) +
-                 '<span class="grp-n">' + n + (n === 1 ? ' stay' : ' stays') + '</span>' +
-               '</h2>' +
-               '<div class="list">' + mine.map(rowHTML).join('') + '</div>' +
-             '</section>';
+    $('list').innerHTML = rows.map(rowHTML).join('');
+  }
+
+  /* ---------- the year ----------
+     Counted off the same model the list reads, so it stays true when a booking
+     is switched, added or reset. Everything with a check-in inside this
+     calendar year counts, travelled or not — the list is only what is ahead,
+     and this is the part of the account that page can't show. */
+  function names(list, keep){
+    var head = list.slice(0, keep), rest = list.length - head.length;
+    var s = head.length > 1
+      ? head.slice(0, -1).join(', ') + (rest ? ', ' : ' and ') + head[head.length - 1]
+      : head[0];
+    return rest ? s + ' and ' + rest + ' more' : s;
+  }
+
+  function yearRows(){
+    var year = new Date().getFullYear();
+    var stays = T.all().filter(function(b){
+      return !b.merged_into && new Date(b.check_in).getFullYear() === year;
+    });
+    if(!stays.length) return [];
+
+    var nights = stays.reduce(function(n, b){
+      return n + Math.round((new Date(b.check_out) - new Date(b.check_in)) / 86400000);
+    }, 0);
+
+    /* "Benaulim Beach · Goa" — the city is the part worth counting */
+    var city = function(b){ return String(b.location || '').split('·').pop().trim(); };
+    var byCity = {}, order = [];
+    stays.forEach(function(b){
+      var c = city(b);
+      if(!c) return;
+      if(!byCity[c]){ byCity[c] = []; order.push(c); }
+      byCity[c].push(b);
+    });
+    order.sort(function(a, b){ return byCity[b].length - byCity[a].length; });
+
+    var out = [
+      { ic: ICON.cal, k: nights + (nights === 1 ? ' night away' : ' nights away'),
+        v: 'across ' + stays.length + (stays.length === 1 ? ' stay' : ' stays') + ' this year' }
+    ];
+    if(order.length){
+      out.push({ ic: ICON.pin,
+                 k: order.length + (order.length === 1 ? ' place' : ' places'),
+                 v: names(order, 3) });
+    }
+    /* Somewhere returned to. Only a fact when it has actually happened twice. */
+    var top = order[0];
+    if(top && byCity[top].length > 1){
+      out.push({ ic: ICON.heart, k: byCity[top].length + ' stays in ' + top,
+                 v: names(byCity[top].map(function(b){
+                      return String(b.property_name_raw).split(',')[0];
+                    }), 3) });
+    }
+    return out;
+  }
+
+  function renderYear(){
+    var rows = yearRows();
+    $('yrCard').innerHTML = rows.map(function(r){
+      return '<div class="yr-row"><span class="yr-ic">' + r.ic + '</span>' +
+               '<span class="yr-t"><span class="yr-k">' + esc(r.k) + '</span>' +
+                 '<div class="yr-v">' + esc(r.v) + '</div></span>' +
+             '</div>';
     }).join('');
+    /* An account with no stays this year has nothing to count, and an empty
+       card counting nothing is worse than no card. */
+    $('yrSec').hidden = !rows.length;
   }
 
   /* ---------- taking a voucher in ----------
@@ -522,30 +665,53 @@
     });
   })();
 
-  /* ---------- switching from the list ----------
-     Straight to the gateway. The stay, the room and the price are all settled
-     by the time this button is on screen, so there is nothing left to choose.
-     The switch itself is only recorded on the way back, once it is paid —
-     booking-details.html resolves the marker this leaves behind. */
-  function startSwitch(id){
-    var b = T.get(id), c = b && b.comparison;
-    if(!c || !c.isSaving) return;
-    var charge = T.toLegacy(b) || {};
-    charge.amount = fmt.inr(c.ourTotal);   /* our price, not the one already paid */
-    charge.paid = false;
-    try {
-      sessionStorage.setItem('booking', JSON.stringify(charge));
-      sessionStorage.setItem('pendingSwitch', JSON.stringify({ id: id, price: c.ourTotal }));
-      sessionStorage.setItem('payReturn', 'booking-details.html');
-    } catch(e){}
-    location.href = 'razorpay.html';
+  /* Switching no longer starts here. The list marks the row and the booking
+     page carries the offer, the figures and the button that pays for it —
+     booking-details.html has held that path all along, so this page dropped
+     its own shortcut to the gateway rather than keeping a second one. */
+
+  /* ---------- the voucher ----------
+     Same text file booking-details.html hands over, built from the same model,
+     so the document is the document wherever it is taken from. */
+  function voucherFor(id){
+    var b = T.toLegacy(T.get(id));
+    if(!b) return null;
+    var ref = b.ref || '—';
+    return {
+      name: b.hotel.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') +
+            '-voucher-' + ref + '.txt',
+      lines: [
+        b.hotel.toUpperCase() + ' — BOOKING VOUCHER',
+        '==========================================',
+        '',
+        'Booking reference : ' + ref,
+        'Hotel             : ' + b.hotel,
+        'Location          : ' + b.place,
+        'Dates             : ' + b.dates + (b.nights ? ' (' + b.nights + ')' : ''),
+        'Room              : ' + b.room,
+        'Guests            : ' + b.guests,
+        'Amount paid       : ' + b.amount + '  · paid via Razorpay',
+        '',
+        'Present this voucher at check-in. Prototype — not a real booking.'
+      ]
+    };
+  }
+
+  function download(name, lines){
+    var blob = new Blob([lines.join('\n')], {type:'text/plain'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 0);
   }
 
   document.addEventListener('click', function(e){
-    var sw = e.target.closest('[data-switch]');
-    if(sw){
+    var dl = e.target.closest('[data-voucher]');
+    if(dl){
       e.preventDefault();
-      startSwitch(sw.getAttribute('data-switch'));
+      var v = voucherFor(dl.getAttribute('data-voucher'));
+      if(v) download(v.name, v.lines);
       return;
     }
     /* hand the booking to the details page in the shape it reads */
@@ -557,7 +723,7 @@
 
   $('reset').addEventListener('click', function(){ T.reset(); render(); });
 
-  function render(){ renderList(); }
+  function render(){ renderList(); renderYear(); }
   render();
 
   /* Countdowns are in days and hours, so re-render only when one of them would

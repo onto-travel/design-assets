@@ -29,6 +29,10 @@
   [hidden]{display:none !important;}
   a{color:inherit;}
   :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:4px;}
+  /* The account panel's styles arrive inside topnav.js, so until that has run
+     this div has none and a filled one would paint as a static white card in
+     the bar. Hidden here, before the first paint; .menu.open still outranks it. */
+  .menu{opacity:0;pointer-events:none;}
 
   /* ============================================================
      HERO — the booking announces itself. Green band, the status on
@@ -248,39 +252,127 @@
      An amber edge and the deadline. The deadline is also the way out, so it is
      the link — the card states the date and hands over the place to act on it. */
   .card.old{border-left:3px solid var(--amber);}
-  /* what has happened, and the one step left — the open dot is the guest's move */
-  .tl{display:grid;grid-template-columns:repeat(3,1fr);list-style:none;margin:0;padding:0;}
-  .tl-step{position:relative;padding-right:8px;}
-  .tl-tx{display:flex;flex-direction:column;gap:3px;min-height:44px;}
-  .tl-tx b{font-size:11.5px;font-weight:700;line-height:1.32;color:var(--ink);}
-  .tl-tx span{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;}
+  /* What has happened, and the one step left — the open dot is the guest's move.
+     Read down rather than across: three steps in a 340 rail gave each of them a
+     third of it, which is where the wrapping came from, and a sequence in time
+     is the one thing a column says better than a row. */
+  .tl{display:flex;flex-direction:column;list-style:none;margin:0;padding:0;}
+  .tl-step{position:relative;display:grid;grid-template-columns:18px 1fr;
+    column-gap:12px;padding-bottom:20px;}
+  .tl-step:last-child{padding-bottom:0;}
+  /* the date first, then what happened on it */
+  .tl-tx{display:flex;flex-direction:column;gap:1px;}
+  .tl-tx b{font-size:14.5px;font-weight:700;line-height:1.4;color:var(--ink);}
+  .tl-tx span{font-size:13px;font-weight:500;color:var(--muted);
+    font-variant-numeric:tabular-nums;}
   .tl-step.todo .tl-tx span{color:var(--amber);font-weight:700;}
   /* the last step is the action — the label itself opens the other platform */
-  .tl-go{align-self:flex-start;font-size:11.5px;font-weight:700;line-height:1.32;color:var(--amber);
-    text-decoration:none;}
+  .tl-go{align-self:flex-start;font-size:14.5px;font-weight:700;line-height:1.4;
+    color:var(--amber);text-decoration:none;}
   .tl-go:hover{text-decoration:underline;text-underline-offset:2.5px;}
-  .tl-go svg{display:inline-block;vertical-align:-1px;width:10px;height:10px;margin-left:3px;
+  .tl-go svg{display:inline-block;vertical-align:-1px;width:12px;height:12px;margin-left:4px;
     stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
-  .tl-mark{position:relative;height:16px;display:flex;align-items:center;}
-  /* the connector runs from this dot across to the next one */
-  .tl-step:not(:last-child) .tl-mark::after{content:"";position:absolute;left:17px;right:-8px;top:50%;
-    margin-top:-.75px;height:1.5px;background:var(--line);}
-  .tl-dot{position:relative;z-index:1;flex:none;width:16px;height:16px;border-radius:50%;
+  .tl-mark{position:relative;display:flex;justify-content:center;padding-top:2px;}
+  /* the connector drops from this dot into the next one */
+  .tl-step:not(:last-child) .tl-mark::after{content:"";position:absolute;left:50%;
+    margin-left:-.75px;top:22px;bottom:-22px;width:1.5px;background:var(--line);}
+  .tl-dot{position:relative;z-index:1;flex:none;width:18px;height:18px;border-radius:50%;
     background:var(--jade);display:flex;align-items:center;justify-content:center;}
-  .tl-dot svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3.4;
+  .tl-dot svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3.4;
     stroke-linecap:round;stroke-linejoin:round;}
   .tl-step.todo .tl-dot{background:var(--card);border:2px solid var(--amber);}
 
-  .offer-row{display:flex;align-items:baseline;gap:9px;padding:9px 0;}
-  .offer-row:first-child{padding-top:2px;}
-  .offer-row + .offer-row{border-top:1px solid var(--line);}
-  .offer-row svg{width:15px;height:15px;stroke:var(--jade);fill:none;stroke-width:2.6;
-    stroke-linecap:round;stroke-linejoin:round;flex:none;align-self:center;}
-  .offer-k{font-size:14px;font-weight:600;color:var(--chip-ink);}
-  .offer-row.good .offer-k{color:var(--jade-deep);font-weight:700;}
-  .offer-now{margin-left:auto;font-variant-numeric:tabular-nums;white-space:nowrap;
-    font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--jade);}
-  .offer .btn{margin-top:16px;}
+  /* ============ THE CART ============
+     Figma "Section - Booking summary" (node 1:3707), copied to the measure:
+     each line is its own 20-radius card on a 12px gap rather than rows inside
+     one, the labels are #808080 at 14/600 and the values 14/700, and the foot
+     is the black Reserve block. What changes is only what the rows say — here
+     nothing is being chosen, they are the lines we read off their voucher and
+     matched, stated back for checking before any money moves.
+     The design's shadow is this page's --shadow-card already: Figma's blur is
+     half CSS's, so its 6px/1.809px/.751px/.272px stack is the same ink. */
+  .cart{display:flex;flex-direction:column;gap:12px;}
+  .cart-h{font-size:20px;font-weight:700;line-height:1.5;color:#111827;
+    padding-left:20px;margin:0 0 12px;letter-spacing:0;}
+  /* 68 exactly, and the padding follows from it rather than setting it: the
+     design fixes the card's height and centres a 50px stack inside. */
+  .cart-row{display:flex;align-items:center;gap:12px;background:#fff;
+    border:.8px solid #e3e3df;border-radius:20px;box-shadow:var(--shadow-card);
+    padding:0 16.8px;height:68px;}
+  /* the design hangs the glyph in a 40x24 well, not on a tinted tile */
+  .cart-ic{flex:none;width:40px;height:24px;display:flex;align-items:center;
+    justify-content:center;}
+  .cart-ic svg{display:block;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  /* 16px from the icon well to the text, which is this 12 plus the 4 */
+  .cart-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;margin-left:4px;}
+  /* the dates sit straight under their label with no gap at all */
+  .cart-row.when .cart-t{gap:0;}
+  .cart-k{font-size:14px;font-weight:600;line-height:1.5;color:#808080;}
+  .cart-val{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;
+    line-height:1.5;color:#111827;}
+  /* the nights, boxed beside the dates */
+  .cart-n{border:1px solid #e3e3e3;border-radius:5px;padding:4px;font-size:14px;
+    font-weight:700;line-height:1.5;text-align:center;}
+  /* one chip per discrete thing off the voucher — each guest, each room.
+     20 tall with the 21px line overhanging it half a pixel each side, which is
+     what the design does and what keeps the row inside 68. */
+  .cart-v{display:flex;flex-wrap:wrap;gap:4px 6px;}
+  .cart-v span{display:inline-flex;align-items:center;height:20px;padding:0 6px;
+    background:#e7eaf1;color:#111827;border-radius:8px;
+    font-size:14px;font-weight:700;line-height:1.5;text-align:center;}
+  /* the chevrons are the design's own: on the PDP each row opens its picker */
+  .cart-cv{flex:none;width:20px;height:20px;}
+
+  /* the rooms row is taller and leads with the rooms themselves, two prints
+     dropped on the pile at the angles they were dropped at */
+  .cart-row.rooms{height:84px;}
+  .cart-row.rooms .cart-t{gap:6px;}
+  .cart-row.rooms .cart-v{gap:8px;}
+  /* not in the design, but it holds 68 like the rest now that the label is
+     gone: two chips stacked is 44, which the row has room for */
+  .cart-ph{flex:none;position:relative;width:44px;height:54px;}
+  .cart-ph i{position:absolute;display:block;background-size:cover;background-position:center;
+    background-color:#eceae5;border:1.513px solid #fff;border-radius:6.809px;
+    box-shadow:0 2.27px 6.809px rgba(17,24,39,.13);
+    width:30.261px;height:37.827px;left:-.7px;top:6.35px;transform:rotate(-4deg);}
+  .cart-ph i + i,
+  .cart-ph.solo i{width:31.308px;height:39.135px;left:8.4px;top:6.15px;
+    border-width:1.565px;border-radius:7.044px;
+    box-shadow:0 2.348px 7.044px rgba(17,24,39,.13);transform:rotate(2.5deg);}
+  /* one print has no pile to sit on the front of, so it centres in the well */
+  .cart-ph.solo i{left:6.3px;}
+
+  /* the foot: who it is under, what it comes to, and the one control */
+  .cart-foot{background:#fff;border:.8px solid #ededed;border-radius:20px;
+    box-shadow:var(--shadow-card);padding:16.8px;display:flex;flex-direction:column;
+    gap:12px;min-height:60px;}
+  .cart-name{border:.8px solid #e8e8e6;border-radius:16px;padding:12.8px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .cart-name .who{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .cart-who{display:flex;gap:2px;font-size:14px;font-weight:700;line-height:1.5;
+    color:#111827;}
+  .cart-who i{font-style:normal;opacity:.6;}
+  .cart-total{display:flex;align-items:center;gap:7px;}
+  .cart-total .in{flex:1;min-width:0;display:flex;align-items:center;
+    justify-content:space-between;line-height:1.5;}
+  .cart-total .k{font-size:17px;font-weight:600;color:#808080;}
+  .cart-total b{font-size:20px;font-weight:700;color:#000;
+    font-variant-numeric:tabular-nums;}
+  /* black, per the design — the only control in the card */
+  .cart-go{display:flex;align-items:center;justify-content:center;height:40px;
+    padding:0 12px;border:none;border-radius:12px;background:#000;color:#fff;
+    font-size:14px;font-weight:700;line-height:1.5;text-decoration:none;cursor:pointer;
+    transition:background .15s;}
+  .cart-go:hover{background:#1f1f1f;}
+
+  /* what the same stay already cost them, in the column the booking they hold
+     is described in. Their figure is plain black: it is a fact about their
+     booking, not an offer, and colouring it would make it argue. */
+  .paid-total{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .paid-total span{font-size:15.5px;font-weight:700;}
+  .paid-total b{font-size:22px;font-weight:800;letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums;}
+
   .offer-stop{display:block;margin-top:8px;text-align:center;font-size:13px;font-weight:600;
     color:var(--muted);text-decoration:none;}
   .offer-stop:hover{color:var(--chip-ink);text-decoration:underline;text-underline-offset:3px;}
@@ -446,9 +538,17 @@
       <div class="cols">
       <div class="mcol">
       <!-- ---- rooms ---- -->
-      <section>
-        <h2 class="sec-h">Rooms booked</h2>
+      <!-- With an offer running, the room is confirmed back to them in the cart
+           on the right, and this block carries the number that is not over
+           there: what the stay already cost them somewhere else. -->
+      <section id="roomSec">
+        <h2 class="sec-h" id="roomSecH">Rooms booked</h2>
         <div id="roomList"></div>
+        <div class="card paid" id="paidCard" hidden>
+          <div id="paidLines"></div>
+          <hr class="pay-rule">
+          <div class="paid-total"><span id="paidWhere">You paid</span><b id="paidAmt"></b></div>
+        </div>
       </section>
 
       <!-- ---- guests ---- -->
@@ -518,32 +618,32 @@
                the other platform is the only one that can release its own booking. -->
           <ol class="tl">
             <li class="tl-step done">
-              <div class="tl-tx"><b id="tlOldName">Booked at MakeMyTrip</b><span id="tlOldWhen">16 Jul</span></div>
               <div class="tl-mark"><span class="tl-dot">
                 <svg viewBox="0 0 24 24"><path d="M5 12.6l4.4 4.4L19 7"/></svg>
               </span></div>
+              <div class="tl-tx"><span id="tlOldWhen">16 Jul</span><b id="tlOldName">Booked with MakeMyTrip</b></div>
             </li>
             <li class="tl-step done">
-              <div class="tl-tx"><b>Booked with onto</b><span id="tlNewWhen">2 Aug</span></div>
               <div class="tl-mark"><span class="tl-dot">
                 <svg viewBox="0 0 24 24"><path d="M5 12.6l4.4 4.4L19 7"/></svg>
               </span></div>
+              <div class="tl-tx"><span id="tlNewWhen">2 Aug</span><b>Booked with onto</b></div>
             </li>
             <li class="tl-step todo">
+              <div class="tl-mark"><span class="tl-dot"></span></div>
               <div class="tl-tx">
+                <span id="tlCancelWhen">by 12 Aug</span>
                 <a class="tl-go" id="oldGo" href="#" target="_blank" rel="noopener">
-                  <span id="tlCancelName">Cancel at MakeMyTrip</span>
+                  <span id="tlCancelName">Cancel on MakeMyTrip</span>
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
                 </a>
-                <span id="tlCancelWhen">by 12 Aug</span>
               </div>
-              <div class="tl-mark"><span class="tl-dot"></span></div>
             </li>
           </ol>
         </div>
       </section>
 
-      <div>
+      <div id="paySec">
         <h2 class="sec-h">Payment</h2>
         <div class="card">
           <div id="payLines"></div>
@@ -575,17 +675,79 @@
         </div>
       </div>
 
-      <!-- the standing offer on a tracked stay: it follows what they paid,
-           because the saving only means anything against that number -->
-      <section id="offer" hidden>
-        <h2 class="sec-h">We&rsquo;ve got a lower price</h2>
-        <div class="card offer">
-          <div class="offer-row good">
-            <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>
-            <span class="offer-k">With us</span>
-            <b class="offer-now" id="offerOurs">&#8377;52,900</b>
+      <!-- The offer, as a cart. Every row is something we read off their
+           voucher and matched, put back to them to check before they commit:
+           the stay we would book is theirs, line for line, and the only figure
+           that differs is the one at the foot. What they paid is not in here —
+           it is on the left, where the booking they already hold is. -->
+      <section id="cart" hidden>
+        <h2 class="cart-h">Your stay</h2>
+        <div class="cart">
+          <div class="cart-row when">
+            <span class="cart-ic">
+              <svg width="22" height="22" viewBox="0 0 22 22" stroke="black" stroke-width="1.375"><path d="M14.6667 1.83333V5.5M7.33333 1.83333V5.5"/><path d="M11.9167 3.66667H10.0833C6.62636 3.66667 4.89789 3.66667 3.82394 4.74061C2.75 5.81455 2.75 7.54303 2.75 11V12.8333C2.75 16.2903 2.75 18.0188 3.82394 19.0927C4.89789 20.1667 6.62636 20.1667 10.0833 20.1667H11.9167C15.3736 20.1667 17.1022 20.1667 18.176 19.0927C19.25 18.0188 19.25 16.2903 19.25 12.8333V11C19.25 7.54303 19.25 5.81455 18.176 4.74061C17.1022 3.66667 15.3736 3.66667 11.9167 3.66667Z"/><path d="M2.75 9.16667H19.25"/><path d="M11.1153 12.8333H11.0007M11.1153 16.5H11.0007M6.98958 12.8333H6.875M6.98958 16.5H6.875M15.2396 12.8333H15.125M11.2299 12.8333C11.2299 12.9599 11.1273 13.0625 11.0007 13.0625C10.8742 13.0625 10.7716 12.9599 10.7716 12.8333C10.7716 12.7067 10.8742 12.6042 11.0007 12.6042C11.1273 12.6042 11.2299 12.7067 11.2299 12.8333ZM11.2299 16.5C11.2299 16.6266 11.1273 16.7292 11.0007 16.7292C10.8742 16.7292 10.7716 16.6266 10.7716 16.5C10.7716 16.3734 10.8742 16.2708 11.0007 16.2708C11.1273 16.2708 11.2299 16.3734 11.2299 16.5ZM7.10417 12.8333C7.10417 12.9599 7.00156 13.0625 6.875 13.0625C6.74844 13.0625 6.64583 12.9599 6.64583 12.8333C6.64583 12.7067 6.74844 12.6042 6.875 12.6042C7.00156 12.6042 7.10417 12.7067 7.10417 12.8333ZM7.10417 16.5C7.10417 16.6266 7.00156 16.7292 6.875 16.7292C6.74844 16.7292 6.64583 16.6266 6.64583 16.5C6.64583 16.3734 6.74844 16.2708 6.875 16.2708C7.00156 16.2708 7.10417 16.3734 7.10417 16.5ZM15.3542 12.8333C15.3542 12.9599 15.2516 13.0625 15.125 13.0625C14.9984 13.0625 14.8958 12.9599 14.8958 12.8333C14.8958 12.7067 14.9984 12.6042 15.125 12.6042C15.2516 12.6042 15.3542 12.7067 15.3542 12.8333Z"/></svg>
+            </span>
+            <span class="cart-t">
+              <span class="cart-k">When</span>
+              <span class="cart-val" id="cartWhen"></span>
+            </span>
+            <span class="cart-cv">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 7.50004C15 7.50004 11.3176 12.5 10 12.5C8.68233 12.5 5 7.5 5 7.5" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
           </div>
-          <a class="btn jade wide" id="offerGo" href="#">Book with us</a>
+          <div class="cart-row">
+            <span class="cart-ic">
+              <svg width="24" height="24" viewBox="0 0 24 24" stroke="#141B34" stroke-width="1.5"><path d="M13 11C13 8.79086 11.2091 7 9 7C6.79086 7 5 8.79086 5 11C5 13.2091 6.79086 15 9 15C11.2091 15 13 13.2091 13 11Z"/><path d="M11.0386 7.55773C11.0131 7.37547 11 7.18927 11 7C11 4.79086 12.7909 3 15 3C17.2091 3 19 4.79086 19 7C19 9.20914 17.2091 11 15 11C14.2554 11 13.5584 10.7966 12.9614 10.4423"/><path d="M15 21C15 17.6863 12.3137 15 9 15C5.68629 15 3 17.6863 3 21"/><path d="M21 17C21 13.6863 18.3137 11 15 11"/></svg>
+            </span>
+            <span class="cart-t">
+              <span class="cart-k">Who all</span>
+              <span class="cart-v" id="cartWho"></span>
+            </span>
+            <span class="cart-cv">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 7.50004C15 7.50004 11.3176 12.5 10 12.5C8.68233 12.5 5 7.5 5 7.5" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <div class="cart-row rooms">
+            <span class="cart-ph" id="cartPhoto"></span>
+            <span class="cart-t">
+              <span class="cart-k">Room you&rsquo;ll be staying in</span>
+              <span class="cart-v" id="cartRoom"></span>
+            </span>
+            <span class="cart-cv">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 7.50004C15 7.50004 11.3176 12.5 10 12.5C8.68233 12.5 5 7.5 5 7.5" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <div class="cart-row terms">
+            <span class="cart-ic">
+              <svg width="22" height="22" viewBox="0 0 22 22" stroke="black" stroke-width="1.375"><path d="M4 11.5l4.6 4.6L18 6.5"/></svg>
+            </span>
+            <!-- no label: the two chips are the terms, and naming them was a
+                 heading for a list of two things that already read as facts -->
+            <span class="cart-t">
+              <span class="cart-v" id="cartTerms"></span>
+            </span>
+          </div>
+          <div class="cart-foot">
+            <div class="cart-name">
+              <span class="who">
+                <span class="cart-k">Booking under the name of</span>
+                <span class="cart-who"><span id="cartName">Saanvi</span><i>&bull; 987&bull;&bull;&bull;356</i></span>
+              </span>
+              <span class="cart-cv">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 7.50004C15 7.50004 11.3176 12.5 10 12.5C8.68233 12.5 5 7.5 5 7.5" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+            <div class="cart-total">
+              <span class="in">
+                <span class="k">Total (incl. taxes)</span>
+                <b id="cartTotal">&#8377;52,900</b>
+              </span>
+              <span class="cart-cv">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18.3332C14.6024 18.3332 18.3333 14.6023 18.3333 9.99992C18.3333 5.39754 14.6024 1.66658 10 1.66658C5.39763 1.66658 1.66667 5.39754 1.66667 9.99992C1.66667 14.6023 5.39763 18.3332 10 18.3332Z"/><path d="M10 13.3332V9.99992"/><path d="M9.89583 6.87495H10M9.79167 6.87495C9.79167 6.75989 9.88492 6.66662 10 6.66662C10.1151 6.66662 10.2083 6.75989 10.2083 6.87495C10.2083 6.99001 10.1151 7.08328 10 7.08328C9.88492 7.08328 9.79167 6.99001 9.79167 6.87495Z"/></svg>
+              </span>
+            </div>
+            <a class="cart-go" id="offerGo" href="#">Book with us</a>
+          </div>
           <a class="offer-stop" id="offerStop" href="#">No longer have this booking?</a>
         </div>
       </section>
@@ -884,10 +1046,45 @@
     $('payMail').closest('.pay-c').hidden = true;
 
     if(b.saving){
-      /* what they paid is already broken down in the payment card above, so the
-         offer states only the number that is new */
-      set('offerOurs', b.saving.ours);
-      $('offer').hidden = false;
+      /* ---- the cart ----
+         Read back what we matched. Each row is a claim we are making about
+         their voucher, so a wrong one is visible before any money moves. */
+      var chip = function(list){
+        return list.filter(Boolean).map(function(v){
+          return '<span>' + esc(v) + '</span>';
+        }).join('');
+      };
+      /* the design puts the range in plain type and boxes the night count
+         beside it — "30 Jul - 2 Aug | 3N" */
+      $('cartWhen').innerHTML = '<span>' + esc(b.dates) + '</span>' +
+        '<span class="cart-n">' + esc((parseInt(nights, 10) || 1) + 'N') + '</span>';
+      /* the names where the voucher carried them; where it only carried counts
+         they split on their own separator — "2 adults · 1 room" is two facts */
+      $('cartWho').innerHTML = chip(names.length ? names
+        : guestsRaw.split('·').map(function(s){ return s.trim(); }));
+      $('cartRoom').innerHTML = chip([room]);
+      $('cartTerms').innerHTML = chip([mealPlan,
+        b.freeCancelUntil ? 'Free cancellation until ' + b.freeCancelUntil : null]);
+      /* the design stacks two prints because that booking holds two room types.
+         This one holds one, so it gets the front print's geometry alone rather
+         than the same photo dealt twice. */
+      $('cartPhoto').className = 'cart-ph solo';
+      $('cartPhoto').innerHTML = '<i style="background-image:url(' + esc(roomPhoto) + ')"></i>';
+      set('cartTotal', b.saving.ours);
+      $('cart').hidden = false;
+
+      /* ---- their side of it ----
+         The payment card and the room card both say things the cart now says
+         better, so what is left of them is the one number the cart does not
+         carry: what this stay has already cost them. It goes where the room
+         card was, in the column about the booking they hold. */
+      $('paySec').hidden = true;
+      $('roomList').hidden = true;
+      set('roomSecH', b.platform ? 'Paid on ' + b.platform : 'Paid elsewhere');
+      $('paidLines').innerHTML = $('payLines').innerHTML;
+      set('paidWhere', 'You paid');
+      set('paidAmt', inr(total));
+      $('paidCard').hidden = false;
 
       /* Straight to the gateway. The stay, the room and the price are all
          already settled — there is nothing left to choose, so a checkout step
@@ -925,8 +1122,8 @@
   if(b.cancelOld){
     var co = b.cancelOld;
     if(co.platform){
-      set('tlOldName',    'Booked at ' + co.platform);
-      set('tlCancelName', 'Cancel at ' + co.platform);
+      set('tlOldName',    'Booked with ' + co.platform);
+      set('tlCancelName', 'Cancel on ' + co.platform);
     }
     set('tlOldWhen',    co.bookedOld);
     set('tlNewWhen',    co.bookedOurs);
@@ -1045,6 +1242,9 @@
     set('menuName', nm);
     set('menuAvatar', (nm[0] || 'S').toUpperCase());
     set('payWho', 'Booking under ' + nm);
+    /* the cart asks whose name the new booking goes in, and it is the same
+       person the page has just resolved for everything else */
+    set('cartName', nm);
     renderGuests(nm);
     /* the soonest stay, so the row says what is behind it rather than only
        where it goes — sorted() is already in check-in order */

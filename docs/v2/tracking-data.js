@@ -133,39 +133,11 @@
     },
 
 
-    /* 5 — sold out with us for their dates */
-    {
-      id: 'bk-rambagh-jaipur',
-      ownership: 'tracked',
-      source_platform: 'booking',
-      property_id: 'prop-rambagh-palace',
-      property_name_raw: 'Rambagh Palace, Jaipur',
-      location: 'Bhawani Singh Road · Jaipur',
-      stars: 5,
-      check_in: '2026-11-12', check_out: '2026-11-14',
-      room_category: 'Palace Room',
-      occupancy: '2 adults',
-      meal_plan: 'Breakfast included',
-      cancellation_policy: 'free_until',
-      free_cancellation_until: '2026-11-09T18:00:00+05:30',
-      price_paid_total: 64000,
-      currency: 'INR',
-      status: 'sold_out',
-      raw_artifact_ref: 'wa/2026-07-26/bdc-conf-7741.pdf',
-      parse_confidence: 0.95,
-      created_at: '2026-07-26T13:30:00+05:30',
-      last_checked_at: null,
-      image: 'images/pv-01-exterior.png',
-      our_offer: {
-        room_category: null, occupancy: null, meal_plan: null,
-        cancellation_policy: null, free_cancellation_until: null,
-        our_price_total: null, room_matched: false, availability: 'sold_out'
-      },
-      observations: [
-        ['2026-07-26', 66500], ['2026-07-30', 65900], ['2026-08-01', null],
-        ['2026-08-03', null]
-      ]
-    },
+    /* 5 — sold out with us for their dates. Dropped from the seed: on a list
+       that no longer prints prices it renders exactly as 2 and 8 do — one line
+       saying the booking is being watched — so it was a third identical card
+       for a distinction only the model can see. `watch` still answers for the
+       state; nothing in this account happens to be in it. */
 
     /* 6 — property not in our inventory. property_id stays null; raw name kept. */
     {
@@ -446,46 +418,9 @@
       ]
     },
 
-    /* 14 — 3.6: cheaper with us, and not the same room. We only switch an
-       exact match, so this is never offered and never priced on screen. */
-    {
-      id: 'bk-udaivilas',
-      ownership: 'tracked',
-      source_platform: 'booking',
-      property_id: 'prop-oberoi-udaivilas',
-      property_name_raw: 'The Oberoi Udaivilas, Udaipur',
-      location: 'Haridasji Ki Magri · Udaipur',
-      stars: 5,
-      check_in: '2026-10-16', check_out: '2026-10-19',
-      room_category: 'Premier Room with Semi-Private Pool',
-      occupancy: '2 adults',
-      meal_plan: 'Breakfast included',
-      cancellation_policy: 'free_until',
-      free_cancellation_until: '2026-10-14T18:00:00+05:30',
-      price_paid_total: 74000,
-      currency: 'INR',
-      status: 'saving_available',
-      raw_artifact_ref: 'wa/2026-07-31/bdc-conf-6034.pdf',
-      parse_confidence: 0.95,
-      created_at: '2026-07-31T09:40:00+05:30',
-      last_checked_at: null,
-      image: 'images/pv-02-living.png',
-      our_offer: {
-        /* a grade down: no pool on the room. Cheaper, and not the thing they
-           chose — so the difference is the answer, not the price. */
-        room_category: 'Premier Room',
-        occupancy: '2 adults',
-        meal_plan: 'Breakfast included',
-        cancellation_policy: 'free_until',
-        free_cancellation_until: '2026-10-14T18:00:00+05:30',
-        our_price_total: 69500,
-        room_matched: false,
-        availability: 'available'
-      },
-      observations: [
-        ['2026-07-31', 70800], ['2026-08-04', 69500]
-      ]
-    },
+    /* 14 — 3.6: cheaper with us, and not the same room. Dropped from the seed
+       for the same reason as 5: with no prices on the list it reads as another
+       "watching your booking", and one card already says that. */
 
     /* 15 — 3.7: non-refundable original. The saving is real, correct, and
        permanently out of reach — cancelling forfeits the whole of what they
@@ -527,49 +462,10 @@
       ]
     },
 
-    /* 16 — 3.8: paid in points. The voucher still states what the redemption
-       cost in rupees, so there is a figure to compare and this is an ordinary
-       offer. How they paid matters only when a refund has to find its way
-       back; it is not something the price needs to explain. */
-    {
-      id: 'bk-jw-sahar',
-      ownership: 'tracked',
-      source_platform: 'makemytrip',
-      property_id: 'prop-jw-sahar',
-      property_name_raw: 'JW Marriott Mumbai Sahar',
-      location: 'Andheri East · Mumbai',
-      stars: 5,
-      check_in: '2026-09-17', check_out: '2026-09-19',
-      room_category: 'Deluxe Room',
-      occupancy: '2 adults',
-      meal_plan: 'Breakfast included',
-      cancellation_policy: 'free_until',
-      free_cancellation_until: '2026-09-15T18:00:00+05:30',
-      /* what the redemption cost, as the voucher states it. `paid_with` is
-         carried for the refund path and is never rendered on the price. */
-      price_paid_total: 28900,
-      paid_with: 'points',
-      currency: 'INR',
-      status: 'saving_available',
-      raw_artifact_ref: 'wa/2026-08-02/mmt-fwd-0114.pdf',
-      parse_confidence: 0.89,
-      created_at: '2026-08-02T21:05:00+05:30',
-      last_checked_at: null,
-      image: 'images/ls-02-living.png',
-      our_offer: {
-        room_category: 'Deluxe Room',
-        occupancy: '2 adults',
-        meal_plan: 'Breakfast included',
-        cancellation_policy: 'free_until',
-        free_cancellation_until: '2026-09-15T18:00:00+05:30',
-        our_price_total: 24800,
-        room_matched: true,
-        availability: 'available'
-      },
-      observations: [
-        ['2026-08-02', 25600], ['2026-08-05', 24800]
-      ]
-    },
+    /* 16 — 3.8: paid in points. Dropped from the seed: how they paid is never
+       rendered on the price, so on the list it was a third card carrying a
+       "Book at" button and nothing the other two don't already show. Two live
+       offers is enough to see how a list of them reads. */
 
     /* 17 — 3.12: the free-cancellation window shut while we were watching.
        The stay is still ahead of them and stays on the list; it has simply
@@ -1039,8 +935,11 @@
     var today = new Date(); today.setHours(0, 0, 0, 0);
     return all()
       .filter(function (b) { return new Date(b.check_out) >= today; })
-      /* folded into the tracked card for the same stay */
-      .filter(function (b) { return !b.merged_into; })
+      /* Both records stand. A switch leaves two real bookings on two systems —
+         ours, and theirs still live until they release it — and folding them
+         into one card meant the list showed one booking where a guest had two
+         and only one of them could be cancelled. `counterpart` still links
+         them; what has gone is the pretence that they are a single row. */
       .sort(function (a, b) { return new Date(a.check_in) - new Date(b.check_in); });
   }
 
@@ -1066,10 +965,13 @@
     if (!b) return null;
     var tracked = b.ownership !== 'owned';
     /* A booking we made by switching leaves the original live on the other
-       platform until the guest cancels it themselves. That task travels with
-       our booking, because ours is the page they will actually open. */
-    var old = (!tracked && b.switched_from) ? get(b.switched_from) : null;
-    var owes = old && old.switch_event && !old.switch_event.user_marked_cancelled_at
+       platform until the guest cancels it themselves. The task belongs to the
+       booking it is about: it is the original that has to be released, so the
+       original's page carries the sequence and the way out. The booking we
+       made is simply confirmed, and says nothing about anybody else's. */
+    var old = (tracked && b.switch_event) ? b : null;
+    var ours = old ? old.counterpart : null;
+    var owes = old && !old.switch_event.user_marked_cancelled_at
       ? old.switch_event : null;
     return {
       cancelOld: owes ? {
@@ -1080,7 +982,7 @@
         /* the two bookings that already exist, dated, so the details page can
            draw the sequence the guest is standing in the middle of */
         bookedOld: fmt.day(old.created_at),
-        bookedOurs: fmt.day(b.created_at),
+        bookedOurs: ours ? fmt.day(ours.created_at) : '',
         /* the same deadline as `deadline`, shortened to sit under a timeline step */
         deadlineShort: (function () {
           var c = fmt.countdown(owes.cancel_deadline);
@@ -1095,10 +997,16 @@
          booking to be original to — so the page needs to know a switch happened */
       switched: !!(b.counterpart || b.switched_from),
       platform: tracked && b.platform ? b.platform.label : null,
-      /* the standing offer on a tracked stay: what they paid against what we
+      /* The standing offer on a tracked stay: what they paid against what we
          would charge. Only when it is like-for-like and actually cheaper —
-         `compare` has already made that judgement. */
-      saving: tracked && b.comparison && b.comparison.isSaving ? {
+         `compare` has already made that judgement — and only while the offer
+         is still open to take. Once this stay has been switched we hold the
+         booking, and `compare` keeps returning a saving because our price is
+         still lower than theirs; leaving that on the page put a cart offering
+         to book a stay we had already booked. A switch closes the offer.
+         `watch()` has said this all along (kind 'switched'); this is the same
+         judgement, in the shape the details page reads. */
+      saving: tracked && !b.switch_event && b.comparison && b.comparison.isSaving ? {
         theirs: fmt.inr(b.comparison.theirTotal),
         ours: fmt.inr(b.comparison.ourTotal),
         /* the raw figure the switch is actually booked at */
