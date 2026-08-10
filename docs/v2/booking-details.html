@@ -41,8 +41,20 @@
      ============================================================ */
   /* no overflow:hidden here — the account menu drops out of the nav and would
      be clipped by it. The pattern gets its own clipping layer instead. */
-  .hero{position:relative;background:var(--hero);color:#fff;
-    padding:0 0 24px;transition:background .3s;}
+  /* Everything on the band takes its colour from these, so a different band is
+     a different set of six values rather than fourteen rules rewritten. */
+  .hero{position:relative;background:var(--hero);padding:0 0 24px;
+    transition:background .3s;
+    --on-hero:#fff;                        /* the ink itself */
+    --on-hero-soft:rgba(255,255,255,.85);  /* secondary text */
+    --on-hero-dim:rgba(255,255,255,.5);    /* separators */
+    --on-hero-line:rgba(255,255,255,.55);  /* outlined controls */
+    --on-hero-wash:rgba(255,255,255,.16);  /* hover fills */
+    --on-hero-fill:rgba(255,255,255,.18);  /* the status pill's ground */
+    --on-hero-edge:rgba(255,255,255,.28);
+    --hero-solid-ink:var(--hero-deep);     /* text on a solid button */
+    --hero-stamp-op:.42;
+    color:var(--on-hero);}
   .hero-bg{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
   /* a diagonal band of the brand's rounded diamonds, masked so it crosses
      the band rather than tiling the whole field */
@@ -54,35 +66,35 @@
   .hero-in{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:0 32px;}
 
   .hero-nav{display:flex;align-items:center;gap:10px;height:54px;}
-  .tn-brand{font-size:17px;font-weight:800;letter-spacing:.01em;color:#fff;text-decoration:none;}
-  .crumb-sep{color:rgba(255,255,255,.5);font-size:16px;}
-  .crumb-here{font-size:16px;font-weight:500;color:rgba(255,255,255,.82);}
+  .tn-brand{font-size:17px;font-weight:800;letter-spacing:.01em;color:var(--on-hero);text-decoration:none;}
+  .crumb-sep{color:var(--on-hero-dim);font-size:16px;}
+  .crumb-here{font-size:16px;font-weight:500;color:var(--on-hero-soft);}
   /* the way back to the list — the crumb is the only route out of a booking */
-  .crumb-up{font-size:16px;font-weight:500;color:rgba(255,255,255,.82);text-decoration:none;
+  .crumb-up{font-size:16px;font-weight:500;color:var(--on-hero-soft);text-decoration:none;
     padding:3px 2px;border-radius:6px;transition:color .15s;}
-  .crumb-up:hover{color:#fff;text-decoration:underline;text-underline-offset:3px;}
+  .crumb-up:hover{color:var(--on-hero);text-decoration:underline;text-underline-offset:3px;}
   .tn-right{margin-left:auto;display:flex;align-items:center;position:relative;}
   .tn-who{display:inline-flex;align-items:center;gap:7px;border:none;background:none;padding:7px 10px;
-    border-radius:10px;font-size:14.5px;font-weight:600;color:#fff;cursor:pointer;transition:background .15s;}
-  .tn-who:hover{background:rgba(255,255,255,.14);}
-  .tn-who .cv{width:9px;height:9px;stroke:rgba(255,255,255,.8);fill:none;stroke-width:2.2;
+    border-radius:10px;font-size:14.5px;font-weight:600;color:var(--on-hero);cursor:pointer;transition:background .15s;}
+  .tn-who:hover{background:var(--on-hero-wash);}
+  .tn-who .cv{width:9px;height:9px;stroke:var(--on-hero-soft);fill:none;stroke-width:2.2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
 
   /* the headline block, centred between the two stamps */
   .hero-mid{text-align:center;padding:2px 0 0;}
-  .status-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);
-    border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 12px 4px 9px;
+  .status-pill{display:inline-flex;align-items:center;gap:6px;background:var(--on-hero-fill);
+    border:1px solid var(--on-hero-edge);border-radius:999px;padding:4px 12px 4px 9px;
     font-size:12.5px;font-weight:700;}
-  .status-pill svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.6;
+  .status-pill svg{width:14px;height:14px;stroke:var(--on-hero);fill:none;stroke-width:2.6;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .hero-h1{font-size:30px;line-height:1.2;margin:8px 0 3px;letter-spacing:-.025em;}
-  .hero-place{font-size:14px;font-weight:500;color:rgba(255,255,255,.85);margin:0;}
+  .hero-place{font-size:14px;font-weight:500;color:var(--on-hero-soft);margin:0;}
   .hero-acts{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:14px;}
   .hbtn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 17px;
     font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;
-    border:1px solid rgba(255,255,255,.55);background:transparent;color:#fff;transition:background .15s;}
-  .hbtn:hover{background:rgba(255,255,255,.16);}
-  .hbtn.solid{background:#fff;color:var(--hero-deep);border-color:#fff;}
+    border:1px solid var(--on-hero-line);background:transparent;color:var(--on-hero);transition:background .15s;}
+  .hbtn:hover{background:var(--on-hero-wash);}
+  .hbtn.solid{background:var(--on-hero);color:var(--hero-solid-ink);border-color:var(--on-hero);}
   .hbtn.solid:hover{background:#f2f2ef;}
   .hbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
@@ -95,10 +107,30 @@
     font-size:12px;font-weight:800;letter-spacing:.14em;line-height:1.15;text-transform:uppercase;
     pointer-events:none;user-select:none;}
   .rstamp::before{content:"";position:absolute;inset:5px;border:1.4px solid currentColor;border-radius:50%;}
-  .hero .rstamp{width:96px;height:96px;color:#fff;opacity:.42;font-size:10.5px;}
+  .hero .rstamp{width:96px;height:96px;color:var(--on-hero);opacity:var(--hero-stamp-op);font-size:10.5px;}
   .hero .rs-place{left:32px;top:48px;transform:rotate(-15deg);}
   .hero .rs-status{right:32px;top:42px;transform:rotate(13deg);}
   .rs-tx{max-width:68px;}
+
+  /* External: a booking made somewhere else, so the band is not the one we put
+     on our own. Same shape, none of our green — and pale enough that the ink on
+     it has to turn dark, which is the whole tell.
+     The ink and the diamonds are cut from the same hue as the ground, so a
+     change of colour here is this block's four values and the pattern fill
+     below, moved together. */
+  .is-external .hero{background:#D5F5C2;
+    --on-hero:#14321f;
+    --on-hero-soft:rgba(20,50,31,.72);
+    --on-hero-dim:rgba(20,50,31,.42);
+    --on-hero-line:rgba(20,50,31,.3);
+    --on-hero-wash:rgba(20,50,31,.07);
+    --on-hero-fill:rgba(255,255,255,.55);
+    --on-hero-edge:rgba(20,50,31,.14);
+    --hero-solid-ink:#D5F5C2;
+    --hero-stamp-op:.3;}
+  /* the diamonds were white on green; on a pale ground they have to be the ink */
+  .is-external .hero-bg::before{opacity:.09;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect x='31' y='31' width='34' height='34' rx='10' transform='rotate(45 48 48)' fill='%2314321f'/%3E%3C/svg%3E");}
 
   /* cancelled: the hero loses its colour and the stamp turns */
   body.is-cancelled .hero{background:#6b6f6d;}
@@ -445,6 +477,18 @@
     .go-map{width:100%;height:150px;order:-1;}
   }
 </style>
+<script>
+  /* Which band this page wears is a fact about the booking, and the booking is
+     already in sessionStorage before a pixel is drawn. Set it here, on the
+     root, rather than when the main script runs at the end of the body —
+     otherwise the page opens green and turns, which the .3s transition on
+     .hero then draws out into something that looks broken. The main script
+     still owns the decision and corrects this if it guessed wrong. */
+  try {
+    var _b = JSON.parse(sessionStorage.getItem('booking') || 'null');
+    if(_b && _b.tracked) document.documentElement.classList.add('is-external');
+  } catch(e){}
+</script>
 </head>
 <body>
 
@@ -1021,6 +1065,14 @@
      Everything the page states about the stay is still true, so the stay is
      shown in full. What changes is standing: there is no reference of ours to
      quote, no voucher to hand over, and nothing here we could cancel. */
+
+  /* The head has already guessed the band off sessionStorage. This is the same
+     answer from the booking the page actually resolved, which is not always
+     the same one: landing back from a switch, `openOwned` swaps the tracked
+     booking for the one we just made while the page is still loading. Set both
+     ways, so a wrong guess is corrected rather than left standing. */
+  document.documentElement.classList.toggle('is-external', !!b.tracked);
+
   if(b.tracked){
     /* Only once we hold a booking of our own for the same stay is this one the
        "original" — before that it is simply their booking, and the pill would
@@ -1032,7 +1084,8 @@
     } else {
       $('statusTitle').closest('.status-pill').hidden = true;
     }
-    set('heroStamp', 'Tracked');
+    /* what we are doing about it, not what we have filed it as */
+    set('heroStamp', 'Watching');
     $('dlVoucher').hidden = true;
     $('dlInvoice').hidden = true;
     $('cancelLink').hidden = true;
