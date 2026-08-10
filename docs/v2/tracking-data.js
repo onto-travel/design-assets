@@ -91,47 +91,6 @@
       ]
     },
 
-    /* 2 — second like-for-like saving. Paired with #1 as the default account,
-       so the list opens on two live offers rather than one.
-       The cheaper-but-worse case is #14, which is where 3.6 is exercised. */
-    {
-      id: 'bk-leela-jaipur',
-      ownership: 'tracked',
-      source_platform: 'booking',
-      property_id: 'prop-leela-jaipur',
-      property_name_raw: 'The Leela Palace Jaipur',
-      location: 'Kukas · Jaipur',
-      stars: 5,
-      check_in: '2026-09-22', check_out: '2026-09-25',
-      room_category: 'Grand Deluxe Room',
-      occupancy: '2 adults',
-      meal_plan: 'Breakfast included',
-      cancellation_policy: 'free_until',
-      free_cancellation_until: '2026-09-20T18:00:00+05:30',
-      price_paid_total: 47200,
-      currency: 'INR',
-      status: 'saving_available',
-      raw_artifact_ref: 'wa/2026-07-19/bdc-conf-2290.pdf',
-      parse_confidence: 0.94,
-      created_at: '2026-07-19T18:40:00+05:30',
-      last_checked_at: null,
-      image: 'images/pp-01-exterior.png',
-      our_offer: {
-        room_category: 'Grand Deluxe Room',
-        occupancy: '2 adults',
-        meal_plan: 'Breakfast included',
-        cancellation_policy: 'free_until',
-        free_cancellation_until: '2026-09-20T18:00:00+05:30',
-        our_price_total: 43900,
-        room_matched: true,
-        availability: 'available'
-      },
-      observations: [
-        ['2026-07-19', 46800], ['2026-07-24', 46100], ['2026-07-29', 44700],
-        ['2026-08-03', 43900]
-      ]
-    },
-
     /* 3 — no saving, our price rose */
     {
       id: 'bk-vivanta-blr',
