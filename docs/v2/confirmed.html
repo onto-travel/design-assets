@@ -207,5 +207,12 @@
     setTimeout(function(){ URL.revokeObjectURL(url); }, 0);
   });
 </script>
+<!-- The stay is ours as of this screen. That is what arms the auto-track ask
+     waiting on the bookings page: it is asked of someone who has just trusted
+     us with a booking, and only then. -->
+<script src="tracking-data.js"></script>
+<script>
+  if(window.Tracking) Tracking.noteBookingMade();
+</script>
 </body>
 </html>

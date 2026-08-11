@@ -1154,13 +1154,31 @@
        it can say whose mailbox it is reading and stop asking. */
     gmail: function () { return readState().gmail || null; },
 
-    /* Whether they have ever booked with us — the condition for being asked at
-       all. Read access to someone's mail is a large thing to ask, and it is
-       only askable by a party they have already trusted with a stay. Every
-       'owned' record counts, including the one a switch produced: they paid
-       us, whatever route they came by. */
-    bookedWithUs: function () {
-      return all().filter(function (b) { return b.ownership === 'owned'; }).length > 0;
+    /* Read access to someone's mail is a large thing to ask, and the moment it
+       is askable is narrow: just after they booked with us, while the trust
+       that pays for the question is a thing that just happened rather than a
+       fact on file. So the ask is armed by the booking and not by the account
+       having one — an account that has booked and never been asked is not the
+       same as one that booked a minute ago.
+
+       Set by both routes to a stay of ours: paying through checkout, and
+       switching a tracked booking over. */
+    noteBookingMade: function () {
+      var s = readState();
+      s.booked_at = new Date().toISOString();
+      writeState(s);
+    },
+
+    shouldAskGmail: function () {
+      var s = readState();
+      return !!s.booked_at && !s.gmail;
+    },
+
+    /* Asked and answered, either way. The next booking arms it again. */
+    clearGmailAsk: function () {
+      var s = readState();
+      delete s.booked_at;
+      writeState(s);
     },
 
     connectGmail: function (address) {
@@ -1326,6 +1344,9 @@
           proof_verified_at: null
         }
       });
+      /* a stay of ours, made just now — the same event checkout ends on, and
+         it arms the auto-track ask the same way */
+      s.booked_at = new Date().toISOString();
       writeState(s);
       return newId;
     },

@@ -907,13 +907,16 @@
     });
 
     /* Three ways this page can open, and only one of them is the card:
-         just back from Google  — the moment, and then it goes
-         already granted       — nothing to ask and nothing to announce
-         never booked with us  — not our question to put yet */
+         just back from Google — the moment, and then it goes
+         a booking just made   — the ask, until it is answered either way
+         anything else         — no card. Not a fixture of the rail: the
+                                 question is only worth putting while the
+                                 stay that earns it has just happened. */
     syncAuto = function(){
       var back = /[?&]gmail=connected(?:&|$)/.test(location.search);
       if(back){
         T.connectGmail();
+        T.clearGmailAsk();
         /* The redirect has done its job. Taking it off the URL means a reload
            is a visit to the bookings page, not the grant arriving twice. */
         if(window.history && history.replaceState){
@@ -922,7 +925,7 @@
         paint();
         return;
       }
-      if(T.gmail() || !T.bookedWithUs()){
+      if(!T.shouldAskGmail()){
         clearTimeout(timer);
         card.hidden = true;
         return;
@@ -934,8 +937,10 @@
     /* TEMPORARY — the states without a booking to earn them or a trip to
        Google to grant them. Remove with #dev. */
     devAuto = function(state){
-      if(state === 'gone'){ card.hidden = true; return; }
-      if(state === 'idle'){ toIdle(); return; }
+      /* armed and disarmed the way a booking and an answer do it, so the state
+         the bar puts the card in is the one a reload comes back to */
+      if(state === 'gone'){ T.clearGmailAsk(); card.hidden = true; return; }
+      if(state === 'idle'){ T.noteBookingMade(); toIdle(); return; }
       paint();
     };
   })();
