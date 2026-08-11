@@ -307,8 +307,9 @@
      not a decision. */
   .dup-f .x{color:var(--amber);}
 
-  /* What happens next, once the read is in question. A person, the channel
-     they arrive on, and nothing else — there is no step here for the guest. */
+  /* What happens next, once the read is in question. A person, and nothing
+     else — there is no step here for the guest, and naming the channel they
+     come by is a promise about our end that we do not need to make on theirs. */
   .pv-note{display:flex;gap:10px;margin-top:16px;padding-top:15px;
     border-top:1px solid var(--line);font-size:13px;font-weight:600;line-height:1.45;}
   .pv-note .ic{flex:none;width:30px;height:30px;border-radius:9px;background:var(--jade-soft);
@@ -1034,16 +1035,22 @@
     }
 
     /* One line, one icon, and no step for the guest — they have already done
-       the only thing this needed, which was to say so. */
-    function note(text){
+       the only thing this needed, which was to say so.
+
+       Both endings say it in the same words. They are the same event from the
+       guest's side — we are not going to file this on our own reading of it,
+       and a person is coming to go through it — and the two headings above
+       already carry the only difference that is theirs to care about: whether
+       we got anything off the document at all. Wording the sequel differently
+       each time would have been us narrating our own failure modes. */
+    var HANDOFF =
+      '<div class="pv-note"><span class="ic">' + ICON.chat + '</span>' +
+        '<span>Someone will reach out to you to confirm the details.</span></div>' +
       /* "Got it" and not "Done": they have not done anything, and there is
          nothing here to finish. It is an acknowledgement, so it says so. */
-      return '<div class="pv-note"><span class="ic">' + ICON.chat + '</span>' +
-               '<span>' + esc(text) + '</span></div>' +
-             '<div class="pv-acts">' +
-               '<button type="button" class="btn jade" id="pvDone">Got it</button>' +
-             '</div>';
-    }
+      '<div class="pv-acts">' +
+        '<button type="button" class="btn jade" id="pvDone">Got it</button>' +
+      '</div>';
 
     /* The facts a booking is told apart by, off either a draft or a record —
        both carry the same field names, so one reading serves for both. */
@@ -1108,13 +1115,9 @@
            thing that might be wrong — and the name is a line of the parse like
            any other. The filename above is the identifier that is certainly
            right: it is their document, not our reading of it. */
-        body = '<h3 class="pv-h">We’ll check this voucher</h3>' +
-               note('Someone will message you on WhatsApp to go through the ' +
-                    'details with you.');
+        body = '<h3 class="pv-h">We’ll check this voucher</h3>' + HANDOFF;
       }else{
-        body = '<h3 class="pv-h">We couldn’t read this voucher</h3>' +
-               note('Someone will message you on WhatsApp to take the details ' +
-                    'down.');
+        body = '<h3 class="pv-h">We couldn’t read this voucher</h3>' + HANDOFF;
       }
 
       flow.innerHTML = '<div class="up-doc">' + DOC + '<span>' + esc(docName) +
