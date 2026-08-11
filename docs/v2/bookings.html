@@ -84,6 +84,9 @@
     border-radius:22px;padding:8px;box-shadow:var(--shadow-card);
     transition:box-shadow .18s,transform .18s;}
   .tk:hover{box-shadow:0 10px 20px rgba(0,0,0,.09),0 3px 6px rgba(0,0,0,.05);}
+  /* The lift is the card saying it opens. A row with nothing behind it keeps
+     still under the cursor rather than promising a page that isn't there. */
+  .tk.quiet:hover{box-shadow:var(--shadow-card);}
 
   .tk-body{flex:1;min-width:0;display:flex;flex-direction:column;padding:18px 10px 14px 18px;}
   /* the ownership tell reads as part of the name, not as a mark over the card */
@@ -682,8 +685,17 @@
   function rowHTML(b){
     var side = sideFor(b);
     /* Every ticket opens its own booking, including the original of a switched
-       pair — that page is where the sequence and the cancel link live. */
+       pair — that page is where the sequence and the cancel link live. The one
+       exception is a read nobody has stood behind yet: the booking page states
+       the stay as fact and offers our price against it, and on this row that
+       reading is the very thing in question. The row says it is being checked
+       and there is nothing behind it to open until a person has been through
+       it. It comes back on its own when the check does. */
+    var pending = !!(b.watch && b.watch.kind === 'pending');
     var link = 'href="booking-details.html" data-owned="' + esc(b.id) + '"';
+    var name = pending
+      ? esc(b.property_name_raw)
+      : '<a ' + link + '>' + esc(b.property_name_raw) + '</a>';
     /* Booked on someone else's platform and still theirs, switched or not: the
        booking we made by switching is a separate row and carries no pill. */
     var external = b.ownership === 'tracked'
@@ -699,10 +711,10 @@
       mark = stamp(b.id, 'DROP', '· PRICE ·');
     }
 
-    return '<article class="tk" data-row="' + esc(b.id) + '">' +
+    return '<article class="tk' + (pending ? ' quiet' : '') + '" data-row="' +
+        esc(b.id) + '">' +
       '<div class="tk-body">' +
-        '<h3 class="tk-name"><a ' + link + '>' + esc(b.property_name_raw) + '</a>' +
-          external + '</h3>' +
+        '<h3 class="tk-name">' + name + external + '</h3>' +
         /* When, and for how many. The room, the meal plan and the reference are
            all one tap away on the booking itself, and none of them is what the
            list is scanned for. */
