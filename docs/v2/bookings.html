@@ -152,6 +152,12 @@
   .stamp .word{font-size:21px;letter-spacing:1.6px;}
   /* the banner's paper, so the rings stop under it the way an ink stamp lands */
   .stamp .banner{fill:var(--card);stroke:currentColor;stroke-width:2.4;}
+  /* Their booking after we hold the same stay. Not jade: jade is the colour of
+     something worth having on this page, and this is the record that has been
+     superseded. The longer word has to come down to fit the same banner, and
+     drops with it to stay optically centred on the paper. */
+  .stamp.out{color:#E2983D;}
+  .stamp.out .word{font-size:15.5px;letter-spacing:1.1px;transform:translateY(-1.3px);}
 
   /* the perforation */
   .tk-perf{flex:none;width:34px;position:relative;align-self:stretch;}
@@ -214,16 +220,139 @@
   .up.drag{background:var(--jade-soft);border-color:var(--jade);}
   .up-h{font-size:13.5px;font-weight:600;color:var(--muted);margin:0 0 10px;letter-spacing:0;}
   .up .btn{width:100%;justify-content:center;}
-  .up-file{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;
-    font-weight:600;color:var(--jade-deep);word-break:break-all;}
-  .up-file svg{width:15px;height:15px;stroke:var(--jade);fill:none;stroke-width:2.4;
+  /* Once a document is in it there is nothing left to drop, so the dashes go
+     and it becomes a card like the one above it. */
+  .up.busy{border-style:solid;border-color:var(--card-line);background:var(--card);
+    box-shadow:var(--shadow-card);}
+  /* the document, named, for as long as what we read off it is on screen */
+  .up-doc{display:flex;align-items:center;gap:8px;min-width:0;font-size:12.5px;
+    font-weight:600;color:var(--muted);}
+  .up-doc svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .up-doc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* Reading it. An indeterminate rail and not a percentage — we don't know how
+     far through it is, and a number here would be the one invention on a card
+     whose whole job is to be checkable. */
+  .up-bar{margin-top:14px;height:3px;border-radius:2px;background:var(--line);overflow:hidden;}
+  .up-bar i{display:block;width:38%;height:100%;border-radius:2px;background:var(--jade);
+    animation:sweep 1.15s ease-in-out infinite;}
+  @keyframes sweep{0%{transform:translateX(-105%);}100%{transform:translateX(265%);}}
+
+  /* ---- the ask ----
+     It was dressed as the upload card's twin — same dashes, same grey caption —
+     which put the better path and the fallback at the same weight. This is the
+     one that only has to be done once, so it is a card and not an outline: a
+     jade ground, a hairline, and a heading in ink rather than a caption in
+     grey. The button stays white and Google's, because prominence borrowed
+     from a brand mark is prominence taken from the guest's ability to tell
+     whose screen they are about to be on. */
+  .up.at:not(.busy){border-style:solid;border-color:rgba(15,138,99,.26);
+    background:var(--jade-soft);padding:18px;}
+  .at-h{font-size:16.5px;font-weight:700;letter-spacing:-.015em;line-height:1.3;
+    color:var(--ink);margin:0 0 13px;}
+  /* on a tinted ground the button's own hairline is what keeps it a button */
+  .up.at .btn{border-color:rgba(15,138,99,.22);box-shadow:0 1px 2px rgba(16,24,20,.05);}
+  .up.at .btn:hover{background:#fff;border-color:rgba(15,138,99,.45);}
+
+  /* Google's mark, in Google's colours. This is the one button on the page
+     that leaves for somebody else's, and the mark is how that is said before
+     it happens rather than after. The button rule strokes its icons, which
+     would outline every panel of the G — so this one is filled and not drawn. */
+  .btn .g{display:inline-flex;flex:none;}
+  .btn .g svg{width:16px;height:16px;stroke:none;}
+
+  /* ---- the moment it lands ----
+     A white card with a green tick in it is the screen every product shows
+     when a form submits, and this is not that: they left our site, handed a
+     stranger's page their mail, and came back. So the card itself turns —
+     jade end to end, the only filled surface in the rail — and it holds that
+     for the minute it lives.
+
+     What it says is not "done" either. Nothing finished; something started,
+     and it runs from here on without them. That is what the mark is: an eye,
+     with the ring going out from it on a slow pulse, because the promise
+     above it is a watch and not a receipt. */
+  /* What is left is the sentence and the button. The disc, the pill, the
+     address and the mark all came off in turn, and each time the card read
+     better for it — the words were never going to be helped by a picture of
+     an eye above them. */
+  .up.at.win{padding:22px 18px 20px;}
+  .at-win{text-align:center;}
+  .at-win h3{font-size:18.5px;font-weight:700;letter-spacing:-.02em;line-height:1.28;
+    margin:0;}
+  .up.at.win .pv-acts{margin-top:20px;}
+
+  /* and then it is gone. Upward, into the space it was occupying, because the
+     card below it is about to move up into that space anyway. */
+  .up.at-go{opacity:0;transform:translateY(-6px);
+    transition:opacity .38s ease,transform .38s ease;}
+
+  /* ---- what we read, laid out to be checked against the paper it came off ---- */
+  .pv-h{font-size:15px;font-weight:700;letter-spacing:-.01em;line-height:1.3;margin:14px 0 0;}
+  .pv-rows{margin-top:13px;display:flex;flex-direction:column;gap:11px;}
+  .pv-k{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;
+    color:var(--muted);}
+  .pv-v{font-size:13.5px;font-weight:700;margin-top:2px;}
+  /* Two readings of what may be one booking, stacked so that the lines of one
+     fall directly under the lines of the other. */
+  .dup{margin-top:13px;display:flex;flex-direction:column;gap:9px;}
+  .dup-b{padding:11px 12px;border-radius:12px;background:#f8f8f6;border:1px solid var(--line);}
+  .dup-k{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    color:#9c9c95;}
+  .dup-n{margin-top:3px;font-size:13.5px;font-weight:700;line-height:1.3;}
+  .dup-f{margin-top:5px;display:flex;flex-wrap:wrap;align-items:center;gap:1px 6px;
+    font-size:12px;font-weight:600;color:var(--muted);}
+  .dup-f .sep{color:#c8c8c3;}
+  /* what we can see is different. What we can't is why this is a question and
+     not a decision. */
+  .dup-f .x{color:var(--amber);}
+
+  /* What happens next, once the read is in question. A person, the channel
+     they arrive on, and nothing else — there is no step here for the guest. */
+  .pv-note{display:flex;gap:10px;margin-top:16px;padding-top:15px;
+    border-top:1px solid var(--line);font-size:13px;font-weight:600;line-height:1.45;}
+  .pv-note .ic{flex:none;width:30px;height:30px;border-radius:9px;background:var(--jade-soft);
+    display:grid;place-items:center;}
+  .pv-note .ic svg{width:15px;height:15px;stroke:var(--jade-deep);fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;}
+  /* the two answers, ranked */
+  .pv-acts{margin-top:17px;display:flex;flex-direction:column;gap:8px;}
+
+  /* The row that just landed. It is filed by check-in like every other, which
+     can be most of a list away from where they were looking — so it is marked
+     for about as long as it takes to find it, and then it is just a booking. */
+  .tk.fresh{animation:land 2.6s ease-out;}
+  @keyframes land{
+    0%,55%{box-shadow:0 0 0 2px var(--jade),var(--shadow-card);}
+    100%{box-shadow:var(--shadow-card);}
+  }
 
   .empty{margin:0;padding:40px 0;font-size:15px;font-weight:500;color:var(--muted);}
 
   .foot{grid-column:1/-1;margin-top:8px;text-align:center;}
   .foot button{background:none;border:none;font-size:12.5px;color:#b8b8b2;cursor:pointer;padding:6px 10px;}
   .foot button:hover{color:var(--muted);text-decoration:underline;}
+
+  /* TEMPORARY — every state of the voucher card, stacked down the right edge.
+     Dark and floating on purpose: it is scaffolding, and nothing about it
+     should read as a control the product has. On a wide screen it sits in the
+     gutter beside the 1240 page; narrower, it overlaps the rail, which is the
+     price of being able to reach it from anywhere on the page.
+     Remove with #dev in the markup and the script. */
+  .dev{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:120;
+    display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:14px;
+    background:rgba(26,26,24,.93);backdrop-filter:blur(8px);
+    box-shadow:0 10px 26px rgba(0,0,0,.26);
+    max-height:calc(100vh - 32px);overflow-y:auto;}
+  .dev b{padding:4px 10px 7px;font-size:10px;font-weight:800;letter-spacing:.05em;
+    text-transform:uppercase;color:#8a8a82;}
+  .dev button + b{padding-top:14px;}
+  .dev button{flex:none;height:28px;padding:0 12px;border:none;background:none;
+    border-radius:9px;font-size:12px;font-weight:700;color:#c6c6be;cursor:pointer;
+    white-space:nowrap;text-align:left;transition:background .12s,color .12s;}
+  .dev button:hover{color:#fff;background:rgba(255,255,255,.1);}
+  .dev button.on{background:#fff;color:#1a1a18;}
+  .dev button.on:hover{background:#fff;}
 
   @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important;} }
 
@@ -288,17 +417,56 @@
         <h2 class="yr-h">Your year in stays</h2>
         <div class="yr-card" id="yrCard"></div>
       </section>
+      <!-- The way in that is done once. Every booking they make is confirmed by
+           email, so read access to the mailbox is worth more than any number of
+           uploads — which is why it sits above the card that takes them one at
+           a time. -->
+      <section class="up at" id="atCard">
+        <div id="atIdle">
+          <p class="at-h">Bookings sitting in your inbox?</p>
+          <button type="button" class="btn" id="atBtn">
+            <span class="g"><svg viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+              <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+              <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
+              <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+            </svg></span>
+            Enable auto-track
+          </button>
+        </div>
+        <!-- the mailbox, once it is ours to read -->
+        <div id="atOn" aria-live="polite" hidden></div>
+      </section>
       <!-- Getting a booking in. It is the guest's own paperwork, so the card
            takes the document rather than asking them to retype it. -->
       <section class="up" id="upCard">
-        <p class="up-h">Booked a hotel somewhere else?</p>
-        <button type="button" class="btn" id="upBtn">Upload voucher</button>
+        <div id="upIdle">
+          <p class="up-h">Booked a hotel somewhere else?</p>
+          <button type="button" class="btn" id="upBtn">Upload voucher</button>
+        </div>
+        <!-- reading the document, then what came off it -->
+        <div id="upFlow" aria-live="polite" hidden></div>
         <input type="file" id="upInput" accept="image/*,application/pdf" hidden>
-        <div class="up-file" id="upFile" hidden></div>
       </section>
     </aside>
     <div class="foot"><button type="button" id="reset">Reset prototype data</button></div>
   </main>
+
+  <!-- TEMPORARY — every state the voucher card has, jumped to directly. Remove
+       this block with the .dev rules and the devShow section in the script. -->
+  <div class="dev" id="dev">
+    <b>Voucher card</b>
+    <button type="button" data-g="up" data-state="idle">Idle</button>
+    <button type="button" data-g="up" data-state="reading">Reading</button>
+    <button type="button" data-g="up" data-state="check">Parsed</button>
+    <button type="button" data-g="up" data-state="same">Same booking?</button>
+    <button type="button" data-g="up" data-state="off">Something seems off</button>
+    <button type="button" data-g="up" data-state="unread">Can’t read</button>
+    <b>Auto-track</b>
+    <button type="button" data-g="at" data-state="idle">Ask</button>
+    <button type="button" data-g="at" data-state="done">Just connected</button>
+    <button type="button" data-g="at" data-state="gone">Gone</button>
+  </div>
 
 <script src="tracking-data.js"></script>
 <script>
@@ -341,10 +509,14 @@
      marks. The banner is tilted against the rings rather than with them —
      upright type on a tilted stamp looks printed, not stamped.
      The path ids have to be unique per card, so the row's id goes in them. */
-  function stamp(id, word, ring){
+  function stamp(id, word, ring, cls){
     var u = 'st-' + String(id).replace(/[^a-z0-9]/gi, '');
-    return '<svg class="stamp" viewBox="0 0 120 120" role="img" aria-label="' +
-             esc(word + ' — ' + ring) + '">' +
+    /* Read down the middle: the ring sits above the banner, so the two texts
+       make one phrase in that order. The dots are the stamp's ornament and are
+       not part of it, so they come out before it is read aloud. */
+    var label = (ring.replace(/·/g, '').replace(/\s+/g, ' ').trim() + ' ' + word).trim();
+    return '<svg class="stamp' + (cls ? ' ' + cls : '') + '" viewBox="0 0 120 120" ' +
+             'role="img" aria-label="' + esc(label) + '">' +
       '<defs>' +
         '<path id="' + u + '-t" fill="none" d="M18.7,45 A44,44 0 0 1 101.3,45"/>' +
         '<path id="' + u + '-b" fill="none" d="M18.7,75 A44,44 0 0 0 101.3,75"/>' +
@@ -513,9 +685,16 @@
        booking we made by switching is a separate row and carries no pill. */
     var external = b.ownership === 'tracked'
       ? ' <span class="pill">External</span>' : '';
-    /* `switchable` is the model's own word for it — the saving is real and the
-       stay can actually be moved. Nothing else on the page earns a stamp. */
-    var mark = b.watch && b.watch.switchable ? stamp(b.id, 'OPEN', '· TO SWITCH ·') : '';
+    /* Two findings earn a stamp, and no row is ever both. Their booking once we
+       hold the same nights: it is still live on their platform, and it is no
+       longer the one that counts. Otherwise `switchable` — the model's own word
+       for a saving that is real and a stay that can actually be moved. */
+    var mark = '';
+    if(b.ownership === 'tracked' && b.counterpart){
+      mark = stamp(b.id, 'OUTDATED', '· · ·', 'out');
+    }else if(b.watch && b.watch.switchable){
+      mark = stamp(b.id, 'DROP', '· PRICE ·');
+    }
 
     return '<article class="tk" data-row="' + esc(b.id) + '">' +
       '<div class="tk-body">' +
@@ -630,20 +809,367 @@
     $('yrSec').hidden = !rows.length;
   }
 
+  /* TEMPORARY — filled in by the two rail cards below, so the bar can jump
+     straight to any state of either. Remove with #dev. */
+  var devShow = null, devAuto = null;
+
+  /* the auto-track card, put back in step with what is stored — the prototype
+     reset wipes the grant with everything else, and a card still asking for a
+     mailbox it already has, or gone from an account that never granted it,
+     would be the one lie in the rail */
+  var syncAuto = function(){};
+
+  /* ---------- auto-track ----------
+     The upload card takes one booking at a time, and every booking they will
+     ever make arrives in the same place first: a confirmation email. So the
+     shorter path is to be allowed to read that mailbox once, and the card
+     above the upload is where it is asked for.
+
+     Asked only of someone who has booked with us. Read access to a person's
+     mail is a large thing to want, and wanting it from a stranger who has
+     landed on a bookings page is how a product teaches people to say no to it.
+     A stay we have already been trusted with is what makes the question a fair
+     one, so it is the condition for putting it.
+
+     Consent is not ours to take. The button leaves for Google's own page, and
+     what comes back is a redirect saying yes — recorded here, on the way in.
+     Nothing in the prototype reads any mail; what this card holds is the flag
+     and the address, which is all our side of the grant ever holds.
+
+     And once it is on, the card has nothing left to say. It is a thing that
+     happens in the background by definition — a permanent panel announcing
+     that it is still on would be the rail's most prominent card doing the
+     least work, so it takes its moment and then goes. */
+  (function(){
+    var card = $('atCard'), idle = $('atIdle'), on = $('atOn');
+    if(!card) return;
+
+    /* long enough to be read twice, and gone before it is furniture */
+    var STAY_MS = 30000;
+    var timer = null;
+
+    function toIdle(){
+      clearTimeout(timer);
+      on.hidden = true; on.innerHTML = '';
+      idle.hidden = false;
+      card.hidden = false;
+      card.classList.remove('busy', 'win', 'at-go');
+    }
+
+    /* Gone, and not collapsed to a smaller version of itself: there is no
+       state after this one. The account holds the grant; the rail holds
+       bookings. */
+    function dismiss(){
+      clearTimeout(timer);
+      card.classList.add('at-go');
+      var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      setTimeout(function(){ card.hidden = true; }, still ? 0 : 420);
+    }
+
+    function paint(){
+      clearTimeout(timer);
+      idle.hidden = true;
+      on.hidden = false;
+      card.hidden = false;
+      card.classList.remove('at-go');
+      card.classList.add('busy');
+      card.classList.add('win');
+
+      /* Said as the thing we will be doing, not as a setting that changed —
+         the filename line the other panels open with is gone, because the
+         mailbox belongs under the promise here rather than above it. */
+      on.innerHTML =
+        '<div class="at-win">' +
+          '<h3>We’ll keep an eye out for you</h3>' +
+        '</div>' +
+        '<div class="pv-acts">' +
+          '<button type="button" class="btn" id="atDone">Got it</button>' +
+        '</div>';
+      /* It leaves on its own, so the button is not the thing to do — it is for
+         anyone who would rather it left now. Jade is what the page puts on a
+         decision, and dismissing a card that is already dismissing itself is
+         not one. */
+      $('atDone').addEventListener('click', dismiss);
+      timer = setTimeout(dismiss, STAY_MS);
+    }
+
+    $('atBtn').addEventListener('click', function(){
+      /* the page to come back to, so the grant returns where it was asked for
+         and this works the same in whichever lane it is being read from */
+      try {
+        sessionStorage.setItem('gmailReturn',
+          location.pathname.split('/').pop() || 'bookings.html');
+      } catch(e){}
+      location.href = 'google-consent.html';
+    });
+
+    /* Three ways this page can open, and only one of them is the card:
+         just back from Google  — the moment, and then it goes
+         already granted       — nothing to ask and nothing to announce
+         never booked with us  — not our question to put yet */
+    syncAuto = function(){
+      var back = /[?&]gmail=connected(?:&|$)/.test(location.search);
+      if(back){
+        T.connectGmail();
+        /* The redirect has done its job. Taking it off the URL means a reload
+           is a visit to the bookings page, not the grant arriving twice. */
+        if(window.history && history.replaceState){
+          history.replaceState(null, '', location.pathname + location.hash);
+        }
+        paint();
+        return;
+      }
+      if(T.gmail() || !T.bookedWithUs()){
+        clearTimeout(timer);
+        card.hidden = true;
+        return;
+      }
+      toIdle();
+    };
+    syncAuto();
+
+    /* TEMPORARY — the states without a booking to earn them or a trip to
+       Google to grant them. Remove with #dev. */
+    devAuto = function(state){
+      if(state === 'gone'){ card.hidden = true; return; }
+      if(state === 'idle'){ toIdle(); return; }
+      paint();
+    };
+  })();
+
   /* ---------- taking a voucher in ----------
      The booking already exists on someone else's paperwork, so the shortest
-     path is to hand us the document rather than retype it. Taken on the file
-     alone — the prototype reads nothing out of it. */
+     path is to hand us the document rather than retype it: we read it, they
+     check what we read, and it joins the list. Three states in one card —
+     the rail is where the card already lives, and moving the guest to a page
+     to confirm six lines would cost more than the six lines are worth.
+
+     The prototype reads nothing out of the actual file. What comes back is
+     the next voucher in the model's inbox; the file only gives its name. */
   (function(){
-    var card = $('upCard'), input = $('upInput'), out = $('upFile');
+    var card = $('upCard'), input = $('upInput');
+    var idle = $('upIdle'), flow = $('upFlow');
     if(!card || !input) return;
 
+    /* reading -> a read is in flight; draft -> a read is on screen unconfirmed;
+       pending -> it has gone on the list for a person to look at;
+       match   -> something already on the list this might be a second copy of */
+    var reading = false, draft = null, pending = null, match = null, docName = '';
+
+    var DOC = '<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10' +
+              'a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
+    function docLine(){
+      return '<div class="up-doc">' + DOC + '<span>' + esc(docName) + '</span></div>';
+    }
+
+    function toIdle(){
+      reading = false; draft = null; pending = null; match = null; docName = '';
+      flow.hidden = true; flow.innerHTML = '';
+      idle.hidden = false;
+      card.classList.remove('busy');
+      /* so choosing the same file twice still fires a change event */
+      input.value = '';
+    }
+
     function accept(file){
-      if(!file) return;
-      out.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>' +
-                      '<span>' + esc(file.name) + '</span>';
-      out.hidden = false;
-      $('upBtn').textContent = 'Upload another';
+      /* one document at a time: the card is mid-read or mid-check */
+      if(!file || reading || draft) return;
+      reading = true;
+      docName = file.name;
+      idle.hidden = true;
+      flow.hidden = false;
+      card.classList.add('busy');
+      flow.innerHTML = docLine() + '<div class="up-bar"><i></i></div>';
+      setTimeout(function(){ if(reading) review(); }, 1800);
+    }
+
+    /* ---- what we read, put back to them to be checked ----
+       Read out, never typed back in. The upload exists so that nobody retypes
+       a booking they have already made, and a card of prefilled inputs would
+       have handed that job straight back — the guest correcting our misreading
+       of their own paperwork, line by line, in a 330px column.
+
+       So the card asks for a yes or a no, and the no goes to a person. They
+       can see the document and we cannot; a wrong room is one message for them
+       and a hunt for the guest. */
+    function review(){
+      reading = false;
+      draft = T.readVoucher();
+      draft.raw_artifact_ref = 'upload/' + docName;
+      /* Nothing came back off it. There is no booking to put up and so no
+         question to put, and a card of blank rows would only be us showing our
+         working. It says what happened and hands the document to a person. */
+      if(!draft.parsed){ paint('unread'); return; }
+
+      /* Same hotel, same nights, already on the list. Filing it as a second
+         booking asserts they hold two, and dropping it asserts they hold one —
+         both are us deciding something we cannot see. It might be a room they
+         booked separately, an amended copy of the one we have, or the same
+         document sent twice, and what tells them apart may be a line we could
+         not read. So it is asked. */
+      match = T.findSimilar(draft);
+      paint(match ? 'same' : 'check');
+    }
+
+    /* the value as it reads on the card, off whichever fields hold it */
+    function shown(f){
+      if(f.kind === 'dates'){
+        return draft.check_in && draft.check_out
+          ? fmt.dateRange(draft.check_in, draft.check_out) : '';
+      }
+      if(f.kind === 'money'){
+        return draft.price_paid_total == null
+          ? '' : fmt.money(draft.price_paid_total, draft.currency);
+      }
+      if(f.kind === 'platform'){
+        var p = T.platforms[draft.source_platform];
+        return p ? p.label : '';
+      }
+      return draft[f.key] || '';
+    }
+
+    function field(f){
+      return '<div><div class="pv-k">' + esc(f.label) + '</div>' +
+               '<div class="pv-v">' + esc(shown(f)) + '</div></div>';
+    }
+
+    /* One line, one icon, and no step for the guest — they have already done
+       the only thing this needed, which was to say so. */
+    function note(text){
+      /* "Got it" and not "Done": they have not done anything, and there is
+         nothing here to finish. It is an acknowledgement, so it says so. */
+      return '<div class="pv-note"><span class="ic">' + ICON.chat + '</span>' +
+               '<span>' + esc(text) + '</span></div>' +
+             '<div class="pv-acts">' +
+               '<button type="button" class="btn jade" id="pvDone">Got it</button>' +
+             '</div>';
+    }
+
+    /* The facts a booking is told apart by, off either a draft or a record —
+       both carry the same field names, so one reading serves for both. */
+    function facts(x){
+      return [
+        fmt.dateRange(x.check_in, x.check_out),
+        T.occupancyText(x),
+        x.room_category,
+        fmt.money(x.price_paid_total, x.currency),
+        (T.platforms[x.source_platform] || {}).label
+      ];
+    }
+
+    /* One of the two readings, with whatever we can see differing marked. What
+       we can see is rarely the point — if the difference were legible we would
+       not be asking — but a marked line is one they don't have to find. */
+    function copyOf(label, x, against){
+      var f = facts(x), g = against ? facts(against) : null;
+      return '<div class="dup-b"><div class="dup-k">' + esc(label) + '</div>' +
+        '<div class="dup-n">' + esc(x.property_name_raw) + '</div>' +
+        '<div class="dup-f">' + f.map(function(v, i){
+          if(!v) return '';
+          var differs = g && g[i] !== v;
+          return '<span class="' + (differs ? 'x' : '') + '">' + esc(v) + '</span>';
+        }).filter(Boolean).join('<span class="sep">·</span>') + '</div></div>';
+    }
+
+    /* Four states come out of the bar:
+         same   — this might already be on the list. Only they know.
+         check  — we read it, and this is what it says. Yes or no.
+         off    — they say it's wrong. We hold a booking we can't stand behind.
+         unread — nothing came back off the document at all. */
+    function paint(state){
+      var F = T.voucherFields;
+      var body;
+
+      if(state === 'same'){
+        body =
+          '<h3 class="pv-h">Is this the same booking?</h3>' +
+          '<div class="dup">' +
+            copyOf('Already on your list', match, draft) +
+            copyOf('This voucher', draft, match) +
+          '</div>' +
+          '<div class="pv-acts">' +
+            '<button type="button" class="btn jade" id="dupYes">Yes, same booking</button>' +
+            '<button type="button" class="btn" id="dupNo">No, different booking</button>' +
+          '</div>';
+      }else if(state === 'check'){
+        /* Confirming is the whole question, so it is the two buttons and not a
+           line of copy above them: there is nothing else on this card to press,
+           and yes and no put the question by being the only answers. */
+        body =
+          '<h3 class="pv-h">' + esc(shown(F[0])) + '</h3>' +
+          '<div class="pv-rows">' + F.slice(1).map(field).join('') + '</div>' +
+          '<div class="pv-acts">' +
+            '<button type="button" class="btn jade" id="pvYes">Confirm</button>' +
+            '<button type="button" class="btn" id="pvNo">Something seems off</button>' +
+          '</div>';
+      }else if(state === 'off'){
+        /* The hotel name went with the rest of the read. It was the heading
+           here, which meant answering "something's wrong" by repeating the
+           thing that might be wrong — and the name is a line of the parse like
+           any other. The filename above is the identifier that is certainly
+           right: it is their document, not our reading of it. */
+        body = '<h3 class="pv-h">We’ll check this voucher</h3>' +
+               note('Someone will message you on WhatsApp to go through the ' +
+                    'details with you.');
+      }else{
+        body = '<h3 class="pv-h">We couldn’t read this voucher</h3>' +
+               note('Someone will message you on WhatsApp to take the details ' +
+                    'down.');
+      }
+
+      flow.innerHTML = '<div class="up-doc">' + DOC + '<span>' + esc(docName) +
+                       '</span></div>' + body;
+
+      if(state === 'same'){
+        /* Already there. Nothing is filed, and the card takes them to the row
+           they already have rather than leaving them to wonder where it went. */
+        $('dupYes').addEventListener('click', function(){
+          var id = match.id;
+          toIdle(); land(id);
+        });
+        /* Two bookings, on their word. Ours was only ever a suspicion. */
+        $('dupNo').addEventListener('click', function(){ paint('check'); });
+      }else if(state === 'check'){
+        /* Stood behind: on the list, and left to settle into a live watch. */
+        $('pvYes').addEventListener('click', function(){
+          var id = T.addTracked(draft, false);
+          toIdle(); render(); land(id);
+        });
+        $('pvNo').addEventListener('click', flag);
+      }else{
+        $('pvDone').addEventListener('click', function(){
+          var id = pending;
+          toIdle();
+          if(id) land(id);
+        });
+      }
+    }
+
+    /* They say it's wrong. We still have a booking of theirs, and losing it
+       because we misread a line of it would be the worse mistake — so it goes
+       on the list as one being checked, and stays there until a person has
+       been through it. Put there before the promise is made, so "we have it"
+       is true at the moment it is said.
+
+       Nothing is filed on an unread voucher: there is no hotel and no dates to
+       file. The document is with the team and the list stays honest. */
+    function flag(){
+      if(pending) return;
+      pending = T.addTracked(draft, true);
+      render();
+      paint('off');
+    }
+
+    /* It lands as a booking being checked and comes out of that on its own, so
+       the page comes back once to show what the check found. */
+    function land(id){
+      var row = document.querySelector('[data-row="' + id + '"]');
+      if(row){
+        row.classList.add('fresh');
+        var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        row.scrollIntoView({ block: 'center', behavior: still ? 'auto' : 'smooth' });
+      }
+      setTimeout(render, T.settleMs + 300);
     }
 
     $('upBtn').addEventListener('click', function(){ input.click(); });
@@ -651,7 +1177,11 @@
 
     /* dropping the file on the card is the same act as choosing it */
     ['dragenter','dragover'].forEach(function(ev){
-      card.addEventListener(ev, function(e){ e.preventDefault(); card.classList.add('drag'); });
+      card.addEventListener(ev, function(e){
+        e.preventDefault();
+        if(reading || draft) return;
+        card.classList.add('drag');
+      });
     });
     ['dragleave','drop'].forEach(function(ev){
       card.addEventListener(ev, function(e){
@@ -662,6 +1192,59 @@
     });
     card.addEventListener('drop', function(e){
       accept(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]);
+    });
+
+    /* TEMPORARY — any state of this card, without a file and without waiting.
+       'reading' is painted with no timer behind it so it can be looked at; the
+       rest are the real panels, wired to the real buttons. Remove with #dev. */
+    devShow = function(state){
+      if(state === 'idle'){ toIdle(); return; }
+      reading = false; pending = null;
+      docName = 'booking_voucher.pdf';
+      idle.hidden = true; flow.hidden = false;
+      card.classList.add('busy');
+
+      if(state === 'reading'){
+        draft = null;
+        flow.innerHTML = docLine() + '<div class="up-bar"><i></i></div>';
+        return;
+      }
+      draft = T.readVoucher(state === 'unread' ? 1 : 0);
+      draft.raw_artifact_ref = 'upload/' + docName;
+
+      if(state === 'same'){
+        /* On a fresh account there is nothing for it to collide with, so the
+           bar stands one up: the same booking with one line moved, which is
+           the case worth looking at. Fabricated, and only here. */
+        match = T.findSimilar(draft);
+        if(!match){
+          match = JSON.parse(JSON.stringify(draft));
+          match.id = 'dev-match';
+          match.price_paid_total = draft.price_paid_total + 2300;
+        }
+      }
+      paint(state);
+    };
+  })();
+
+  /* TEMPORARY — the bar itself. Remove with #dev. */
+  (function(){
+    var bar = $('dev');
+    if(!bar) return;
+    bar.addEventListener('click', function(e){
+      var b = e.target.closest('button[data-state]');
+      if(!b) return;
+      var g = b.getAttribute('data-g');
+      var show = g === 'at' ? devAuto : devShow;
+      if(!show) return;
+      /* each card's states are its own set, so the marks are kept per group */
+      Array.prototype.forEach.call(
+        bar.querySelectorAll('button[data-g="' + g + '"]'), function(x){
+          x.classList.toggle('on', x === b);
+        });
+      show(b.getAttribute('data-state'));
+      $(g === 'at' ? 'atCard' : 'upCard')
+        .scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   })();
 
@@ -721,7 +1304,7 @@
     }
   });
 
-  $('reset').addEventListener('click', function(){ T.reset(); render(); });
+  $('reset').addEventListener('click', function(){ T.reset(); render(); syncAuto(); });
 
   function render(){ renderList(); renderYear(); }
   render();

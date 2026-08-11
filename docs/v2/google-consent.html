@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in – Google Accounts</title>
+<style>
+  /* Google's screen, not ours. It is reproduced rather than designed: the
+     guest is being asked to hand over their mail, and the one thing that makes
+     that answerable is that the page asking looks like the party they would be
+     trusting. Nothing on it is ours to restyle. */
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:#fff;color:#202124;
+    font-family:"Roboto",Arial,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased;}
+
+  .card{width:450px;max-width:100%;border:1px solid #dadce0;border-radius:8px;
+    padding:48px 40px 36px;}
+  .glogo{height:24px;margin-bottom:16px;}
+  h1{font-size:22px;font-weight:400;line-height:1.36;margin:0 0 20px;letter-spacing:0;}
+  h1 b{font-weight:500;}
+
+  /* whose account this is. Stated before anything is asked for, because the
+     answer changes if it is the wrong one. */
+  .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid #dadce0;
+    border-radius:999px;padding:4px 14px 4px 4px;font-size:14px;color:#3c4043;}
+  .avatar{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:13px;font-weight:500;
+    background:linear-gradient(135deg,#5b8def,#2f4f74);}
+
+  .lead{font-size:14px;color:#3c4043;margin:28px 0 0;line-height:1.5;}
+  .lead b{font-weight:500;}
+
+  /* what is being granted, one line per scope */
+  .scopes{margin:14px 0 0;padding:0;list-style:none;}
+  .scopes li{display:flex;gap:16px;padding:10px 0;font-size:14px;color:#3c4043;line-height:1.5;}
+  .scopes svg{width:20px;height:20px;flex:none;margin-top:1px;stroke:#5f6368;fill:none;
+    stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+  .trust{font-size:14px;color:#3c4043;line-height:1.5;margin:22px 0 0;}
+  .trust b{font-weight:500;}
+  .fine{font-size:12px;color:#5f6368;line-height:1.5;margin:16px 0 0;}
+  a{color:#1a73e8;text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .acts{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:30px;}
+  .btn{font-family:inherit;font-size:14px;font-weight:500;line-height:1;border-radius:4px;
+    padding:11px 24px;cursor:pointer;border:1px solid transparent;transition:background .15s;}
+  .btn.text{background:none;color:#1a73e8;}
+  .btn.text:hover{background:#f2f7fd;}
+  .btn.blue{background:#1a73e8;color:#fff;}
+  .btn.blue:hover{background:#1b66c9;}
+
+  .foot{font-size:12px;color:#5f6368;margin-top:34px;}
+
+  /* granting it */
+  .signing{display:none;flex-direction:column;align-items:center;justify-content:center;
+    padding:40px 0 30px;text-align:center;}
+  .card.busy > *:not(.signing):not(.glogo){display:none;}
+  .card.busy .signing{display:flex;}
+  .spinner{width:40px;height:40px;border-radius:50%;border:3px solid #e0e0e0;border-top-color:#1a73e8;
+    animation:spin .8s linear infinite;margin-bottom:22px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .signing-tx{font-size:15px;color:#5f6368;}
+  @media (prefers-reduced-motion:reduce){ .spinner{animation:none;} }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <!-- Google wordmark -->
+    <svg class="glogo" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg" aria-label="Google">
+      <path fill="#4285F4" d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+      <path fill="#EA4335" d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+      <path fill="#FBBC05" d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z"/>
+      <path fill="#4285F4" d="M225 3v65h-9.5V3h9.5z"/>
+      <path fill="#34A853" d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.05zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z"/>
+      <path fill="#EA4335" d="M35.29 41.41V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.36 53.89.36 34.91.36 15.93 16.32.47 35.3.47c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-22.49.01z"/>
+    </svg>
+
+    <h1><b>onto</b> wants access to your Google Account</h1>
+
+    <span class="chip"><span class="avatar">X</span><span id="who">xyz@email.com</span></span>
+
+    <p class="lead">This will allow <b>onto</b> to:</p>
+    <ul class="scopes">
+      <li>
+        <svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg>
+        <span>Read your email messages and settings</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c0-4 3.4-6.2 7.5-6.2s7.5 2.2 7.5 6.2"/></svg>
+        <span>See your primary Google Account email address</span>
+      </li>
+    </ul>
+
+    <p class="trust"><b>Make sure you trust onto</b></p>
+    <p class="fine">You may be sharing sensitive info with this site or app. You can always see or
+      remove access in your <a href="#">Google Account</a>.</p>
+    <p class="fine">Learn how Google helps you <a href="#">share data safely</a>.<br>
+      See onto's <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>.</p>
+
+    <div class="acts">
+      <button type="button" class="btn text" id="cancel">Cancel</button>
+      <button type="button" class="btn blue" id="allow">Continue</button>
+    </div>
+
+    <div class="foot">English (United States)</div>
+
+    <div class="signing">
+      <div class="spinner"></div>
+      <div class="signing-tx">Taking you back to onto…</div>
+    </div>
+  </div>
+
+<script>
+  (function(){
+    var card = document.getElementById('card');
+
+    /* Where this was entered from. The page that sends them here says so, and
+       nothing about the grant depends on it — so a direct visit still has
+       somewhere to land. */
+    var back = 'bookings.html';
+    try { back = sessionStorage.getItem('gmailReturn') || back; } catch(e){}
+
+    function leave(url){
+      try { sessionStorage.removeItem('gmailReturn'); } catch(e){}
+      setTimeout(function(){ location.href = url; }, 1400);
+    }
+
+    document.getElementById('allow').addEventListener('click', function(){
+      card.classList.add('busy');
+      /* The grant is carried back on the URL, the way a real redirect carries
+         a code: the page that asked is the page that records it. */
+      leave(back + (back.indexOf('?') === -1 ? '?' : '&') + 'gmail=connected');
+    });
+
+    /* No is an answer. It goes back with nothing on it and nothing recorded —
+       the card they left is the card they return to. */
+    document.getElementById('cancel').addEventListener('click', function(){
+      try { sessionStorage.removeItem('gmailReturn'); } catch(e){}
+      location.href = back;
+    });
+  })();
+</script>
+</body>
+</html>

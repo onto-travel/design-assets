@@ -550,6 +550,88 @@
     }
   ];
 
+  /* ---------- 1.x INGEST: what a handed-over voucher reads as ----------
+     The guest gives us a document, not a form. A read either came back or it
+     didn't, and `parsed` is the whole of that: there is no third state where
+     we show four lines of seven and ask them to make up the difference. Either
+     we have a booking to put in front of them or we have a document and a
+     person to hand it to.
+
+     The prototype reads nothing out of the actual file, so uploads take these
+     in turn — the second voucher is the one that came out of a photograph. */
+  var INBOX = [
+    {
+      parsed: true,
+      source_platform: 'booking',
+      property_id: 'prop-leela-udaipur',
+      property_name_raw: 'The Leela Palace Udaipur',
+      location: 'City Palace Road · Udaipur',
+      stars: 5,
+      check_in: '2026-10-09', check_out: '2026-10-12',
+      room_category: 'Grand Heritage Room',
+      occupancy: '2 adults',
+      meal_plan: 'Breakfast included',
+      cancellation_policy: 'free_until',
+      free_cancellation_until: '2026-10-07T18:00:00+05:30',
+      price_paid_total: 74600,
+      currency: 'INR',
+      parse_confidence: 0.96,
+      image: 'images/pp-01-exterior.png',
+      /* what the watch will find once it runs. Held here rather than on the
+         booking because until they confirm the read, there is no booking. */
+      our_price_total: 68900,
+      settles_to: 'saving_available'
+    },
+    {
+      /* Photographed off a screen at an angle, in the dark. Something came back
+         off it, and not enough of it to be a booking: a name we are half sure
+         of and one of two dates is not a stay we can watch, and putting it up
+         as though it were would only move our problem onto them. There is a
+         document, and there is nobody but a person who can read it. */
+      parsed: false,
+      parse_confidence: 0.18
+    }
+  ];
+
+  /* Everything a read has to state, in the order it is checked against the
+     paper it came off. It is read out and never typed back in: the upload
+     exists so that nobody has to retype a booking they have already made, and
+     a card of prefilled inputs would have handed that job straight back. What
+     the guest is asked for is a yes or a no. A no goes to a person — they can
+     see the document, we cannot, and they can fix it in one message where the
+     guest would have had to find and correct the line themselves.
+
+     `kind` is only how a value is read off the draft: three of these are not
+     one plain field. Nothing here is ever half-filled — a read that could not
+     produce all of them did not produce a booking, and never gets this far. */
+  var VOUCHER_FIELDS = [
+    { key: 'property_name_raw', label: 'Hotel', kind: 'text', head: true },
+    { key: 'dates',             label: 'Dates', kind: 'dates' },
+    { key: 'room_category',     label: 'Room', kind: 'text' },
+    { key: 'occupancy',         label: 'Guests', kind: 'text' },
+    { key: 'meal_plan',         label: 'Meal plan', kind: 'text' },
+    { key: 'price_paid_total',  label: 'Paid', kind: 'money' },
+    { key: 'source_platform',   label: 'Booked on', kind: 'platform' }
+  ];
+
+  /* A confirmed read is not yet a watch: the property has to be found in our
+     inventory and priced for those dates, and that takes a moment we do not
+     have a backend to spend. The booking lands as 'pending' and comes out of it
+     on its own — resolved here off a timestamp rather than by a timer, so a
+     reload in the middle of it doesn't strand the row on "checking" forever. */
+  var SETTLE_MS = 6000;
+
+  /* ---------- the mailbox ----------
+     The other way a booking gets in. Every one of them was confirmed by email,
+     so the guest granting read access once does the job the upload card does a
+     document at a time.
+
+     Nothing here reads mail. What the model has to hold is the only part the
+     product owns: whether they said yes, and which mailbox they said it for.
+     The consent itself belongs to Google and happens on Google's page — this
+     side of it is a flag and an address. */
+  var MAILBOX = 'xyz@email.com';
+
   /* ---------- formatting ---------- */
   var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -887,6 +969,14 @@
           }
         });
       }
+      /* A booking that came in off a voucher leaves 'pending' when its first
+         check would have come back. Derived, never written: the record keeps
+         saying pending until the clock says otherwise, so this is true on the
+         first render after it lands and on every reload after that. */
+      if (b.settle_at && b.status === 'pending' &&
+          new Date(b.settle_at) <= new Date()) {
+        b.status = b.settled_status;
+      }
       /* Prices move; the check timestamp is live so the compare screen can state it. */
       b.last_checked_at = new Date(Date.now() - 38 * 60000).toISOString();
       b.platform = b.source_platform ? PLATFORMS[b.source_platform] : null;
@@ -1037,6 +1127,10 @@
   var api = {
     WA: WA,
     fmt: fmt,
+    platforms: PLATFORMS,
+    voucherFields: VOUCHER_FIELDS,
+    settleMs: SETTLE_MS,
+    mailbox: MAILBOX,
     all: all,
     get: get,
     sorted: sorted,
@@ -1052,6 +1146,136 @@
       if (!legacy) return false;
       try { sessionStorage.setItem('booking', JSON.stringify(legacy)); } catch (e) {}
       return true;
+    },
+
+    /* ---------- auto-track ----------
+       Granted on Google's page and recorded here on the way back. `null` until
+       they have, so the rail can ask; an address and a date once they have, so
+       it can say whose mailbox it is reading and stop asking. */
+    gmail: function () { return readState().gmail || null; },
+
+    /* Whether they have ever booked with us — the condition for being asked at
+       all. Read access to someone's mail is a large thing to ask, and it is
+       only askable by a party they have already trusted with a stay. Every
+       'owned' record counts, including the one a switch produced: they paid
+       us, whatever route they came by. */
+    bookedWithUs: function () {
+      return all().filter(function (b) { return b.ownership === 'owned'; }).length > 0;
+    },
+
+    connectGmail: function (address) {
+      var s = readState();
+      s.gmail = {
+        address: address || MAILBOX,
+        connected_at: new Date().toISOString()
+      };
+      writeState(s);
+      return clone(s.gmail);
+    },
+
+    /* Access we were given and can be told to stop using. Bookings already on
+       the list stay: they are the guest's bookings, not ours to withdraw.
+       Nothing on the bookings page offers this — withdrawing belongs with the
+       account, next to everything else they granted, and Google's own account
+       page can revoke it whether we offer it or not. */
+    disconnectGmail: function () {
+      var s = readState();
+      delete s.gmail;
+      writeState(s);
+    },
+
+    /* ---------- 1.x ingest ----------
+       What the voucher they just handed over reads as. Peeked, not consumed:
+       a read they abandon costs them nothing and leaves the queue where it
+       was, so the next upload is still this one. */
+    readVoucher: function (i) {
+      /* `i` is the prototype's state switch forcing a particular read. Nothing
+         in the product passes it — drop the argument and this stays true. */
+      if (typeof i === 'number') return clone(INBOX[i % INBOX.length]);
+      var s = readState();
+      return clone(INBOX[(s.ingest || 0) % INBOX.length]);
+    },
+
+    /* Something on the list that this voucher might already be. Same property,
+       and nights that touch — not nights that match: a booking amended after
+       it was made is still the same booking, and that is precisely the case we
+       cannot tell from a second one.
+
+       It returns a candidate and never a verdict. Two rooms booked separately
+       for the same nights at the same hotel look identical from here, and so
+       does the same booking uploaded twice; what separates them may be a line
+       we failed to read, or one that was never on the document. The guest is
+       the only party who knows, so this finds and they decide. */
+    findSimilar: function (v) {
+      if (!v || !v.parsed) return null;
+      var name = String(v.property_name_raw || '').toLowerCase();
+      return all().filter(function (b) {
+        if (b.merged_into) return false;
+        var same = (v.property_id && b.property_id)
+          ? v.property_id === b.property_id
+          : String(b.property_name_raw || '').toLowerCase() === name;
+        return same &&
+               new Date(v.check_in) < new Date(b.check_out) &&
+               new Date(b.check_in) < new Date(v.check_out);
+      })[0] || null;
+    },
+
+    /* The read becomes a booking on the list either way. `flagged` is the
+       guest saying the read is wrong, or our own parse coming back short —
+       and a booking they have handed us should not disappear because we
+       misread a line of it. It goes on as 'pending', which is the state the
+       model already has for a read nobody has stood behind yet: the list says
+       it is being checked, and it stays there until a person has been through
+       it. Only a confirmed read is given a `settle_at` and allowed to become
+       a live watch on its own. */
+    addTracked: function (v, flagged) {
+      var s = readState();
+      var n = s.ingest || 0;
+      var id = 'bk-ing-' + (n + 1);
+      s.created = (s.created || []).concat([{
+        id: id,
+        ownership: 'tracked',
+        source_platform: v.source_platform,
+        property_id: v.property_id,
+        property_name_raw: v.property_name_raw,
+        location: v.location,
+        stars: v.stars,
+        check_in: v.check_in, check_out: v.check_out,
+        room_category: v.room_category,
+        occupancy: v.occupancy,
+        meal_plan: v.meal_plan,
+        cancellation_policy: v.cancellation_policy,
+        free_cancellation_until: v.free_cancellation_until,
+        price_paid_total: v.price_paid_total,
+        currency: v.currency,
+        status: 'pending',
+        /* the document itself is kept, permanently, whatever happens next */
+        raw_artifact_ref: v.raw_artifact_ref || null,
+        parse_confidence: v.parse_confidence,
+        created_at: new Date().toISOString(),
+        last_checked_at: null,
+        image: v.image,
+        our_offer: v.our_price_total == null ? null : {
+          room_category: v.room_category,
+          occupancy: v.occupancy,
+          meal_plan: v.meal_plan,
+          cancellation_policy: v.cancellation_policy,
+          free_cancellation_until: v.free_cancellation_until,
+          our_price_total: v.our_price_total,
+          room_matched: true,
+          availability: 'available'
+        },
+        /* with a person still to look at it, nothing is owed to the guest but
+           the truth that it is being looked at */
+        flagged_at: flagged ? new Date().toISOString() : null,
+        /* no history on a stay we have only just started watching */
+        observations: [],
+        settle_at: flagged ? null : new Date(Date.now() + SETTLE_MS).toISOString(),
+        settled_status: v.settles_to || 'no_saving_up'
+      }]);
+      s.ingest = n + 1;
+      writeState(s);
+      return id;
     },
 
     /* Book with us. Creates the owned booking and turns the old one into a
