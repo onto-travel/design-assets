@@ -278,8 +278,10 @@
      an eye above them. */
   .up.at.win{padding:22px 18px 20px;}
   .at-win{text-align:center;}
+  /* Jade, because the sentence is the whole card — there is no mark and no
+     button carrying the colour, so the words carry it themselves. */
   .at-win h3{font-size:18.5px;font-weight:700;letter-spacing:-.02em;line-height:1.28;
-    margin:0;}
+    color:var(--jade-deep);margin:0;}
   .up.at.win .pv-acts{margin-top:20px;}
 
   /* and then it is gone. Upward, into the space it was occupying, because the
@@ -881,7 +883,7 @@
          mailbox belongs under the promise here rather than above it. */
       on.innerHTML =
         '<div class="at-win">' +
-          '<h3>We’ll keep an eye out for you</h3>' +
+          '<h3>We’ll keep an eye out for you!</h3>' +
         '</div>' +
         '<div class="pv-acts">' +
           '<button type="button" class="btn" id="atDone">Got it</button>' +
