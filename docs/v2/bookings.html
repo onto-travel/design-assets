@@ -88,7 +88,10 @@
      still under the cursor rather than promising a page that isn't there. */
   .tk.quiet:hover{box-shadow:var(--shadow-card);}
 
-  .tk-body{flex:1;min-width:0;display:flex;flex-direction:column;padding:18px 10px 14px 18px;}
+  /* Even top and bottom. It was 4px shy at the foot, which nothing noticed
+     while a line of text sat there and everything noticed once a button did —
+     a 36px control needs the same air under it that the title has above. */
+  .tk-body{flex:1;min-width:0;display:flex;flex-direction:column;padding:18px 10px 18px 18px;}
   /* the ownership tell reads as part of the name, not as a mark over the card */
   .tk-name{font-size:18px;font-weight:700;line-height:1.35;min-width:0;}
   .tk-name a{text-decoration:none;}
@@ -111,12 +114,27 @@
      "Wed, 19 Aug" pushed the voucher onto its own line and "Mon, 2 Nov" did
      not. Which line it sits on is now a decision the card makes, not one the
      text falls into. */
-  .tk-foot{margin-top:auto;padding-top:16px;display:flex;align-items:flex-end;
+  .tk-foot{margin-top:auto;padding-top:18px;display:flex;align-items:flex-end;
     justify-content:space-between;gap:16px;flex-wrap:nowrap;}
   /* The check-in block is wide enough that it and the action have to take a
      line each. Always — never only when they happen not to fit. */
-  .tk-foot.stack{flex-direction:column;align-items:flex-start;gap:14px;}
-  .tk-foot.stack .tk-acts{align-self:flex-end;}
+  /* The gap carries the whole distinction between these two rows: the dates
+     are the card telling them something and the row under it is the card
+     asking them to do something. At 14 they read as one block of four lines. */
+  .tk-foot.stack{flex-direction:column;align-items:flex-start;gap:22px;}
+  /* The row runs the full width so its two ends are the card's two ends —
+     without that there is no space between them for anything to be pushed
+     across, and the pair just sits together wherever it happens to land.
+
+     The margin has to be reset for that to happen at all. `.tk-status +
+     .tk-acts` sets `margin-left:auto` to push the row right in the side-by-side
+     foot, and the column direction here turns that into a *cross-axis* auto
+     margin — which suppresses `stretch` outright and shrink-wraps the row back
+     to the right, quietly undoing the line above it. */
+  .tk-foot.stack .tk-acts{align-self:stretch;margin-left:0;}
+  /* nothing on the left to sit opposite, so the button keeps the right edge
+     it has always had rather than falling back to the left one */
+  .tk-acts > .btn:only-child{margin-left:auto;}
   /* a text link and a button can share this row, so they centre on each other
      rather than sitting on a common bottom edge */
   .tk-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
@@ -124,8 +142,10 @@
   /* with nothing on the left to sit opposite, the row is the whole width, so
      the two ends of it are the two ends of the card */
   .tk-foot > .tk-acts:only-child{flex:1;}
-  /* the task goes to the far edge, away from the button it is not a variant of */
-  .tk-acts .btn + .st-clock{margin-left:auto;}
+  /* The button goes to the far edge, away from the link it is not a variant
+     of — they share this row but they are not two of a kind, and a gap is the
+     cheapest way to say so. */
+  .tk-acts .st-undo + .btn{margin-left:auto;}
   /* only pushed right when there is a case on the left to sit opposite, and
      never squeezed by it — the dates wrap before the button does */
   .tk-status + .tk-acts{margin-left:auto;flex:none;}
@@ -183,12 +203,16 @@
   .st-ink{font-size:14.5px;font-weight:700;color:var(--ink);}
   /* No money on this page at all now. A figure on a row is either an argument
      or a decision asked for too early; the booking page is where both belong. */
-  /* the deadline is also the way out, so it is the link */
-  .st-clock{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;
-    font-size:13px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums;
+  /* The way out of the booking this one replaced. Amber because it is the only
+     thing on the card with a cost to leaving it alone, and a link rather than a
+     button because the button beside it is the one worth pressing — this is the
+     loose end, not the errand the page is for. No countdown on it: the deadline
+     is a figure, and figures live on the booking. */
+  .st-undo{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;
+    font-size:13px;font-weight:700;color:var(--amber);
     text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(162,97,10,.35);}
-  .st-clock:hover{text-decoration-color:currentColor;}
-  .st-clock svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;
+  .st-undo:hover{text-decoration-color:currentColor;}
+  .st-undo svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
 
   /* ============ RAIL ============ */
@@ -221,10 +245,9 @@
     transition:background .15s,border-color .15s;}
   /* the whole card is the drop target, so a dragged file has somewhere obvious to land */
   .up.drag{background:var(--jade-soft);border-color:var(--jade);}
-  .up-h{font-size:13.5px;font-weight:600;color:var(--muted);margin:0 0 10px;letter-spacing:0;}
   .up .btn{width:100%;justify-content:center;}
   /* Once a document is in it there is nothing left to drop, so the dashes go
-     and it becomes a card like the one above it. */
+     and it becomes a plain card. */
   .up.busy{border-style:solid;border-color:var(--card-line);background:var(--card);
     box-shadow:var(--shadow-card);}
   /* the document, named, for as long as what we read off it is on screen */
@@ -251,11 +274,34 @@
      whose screen they are about to be on. */
   .up.at:not(.busy){border-style:solid;border-color:rgba(15,138,99,.26);
     background:var(--jade-soft);padding:18px;}
+  /* The title sets no space under itself — whichever block stands under it
+     takes its own, and which block that is depends on the card's state. */
   .at-h{font-size:16.5px;font-weight:700;letter-spacing:-.015em;line-height:1.3;
-    color:var(--ink);margin:0 0 13px;}
+    color:var(--ink);margin:0;}
+  #atIdle{margin-top:13px;}
   /* on a tinted ground the button's own hairline is what keeps it a button */
   .up.at .btn{border-color:rgba(15,138,99,.22);box-shadow:0 1px 2px rgba(16,24,20,.05);}
   .up.at .btn:hover{background:#fff;border-color:rgba(15,138,99,.45);}
+  /* the ask is already standing on jade, so the drop tell is the edge going solid */
+  .up.at.drag{border-color:var(--jade);}
+
+  /* ---- the fallback, under the button that should be pressed instead ----
+     No rule between them and no second caption over it. Both are answers to
+     the one line at the top of the card, and a divider would have made the
+     second one a separate matter. So it is a line under the button, in the
+     weight a line gets when it is there for the few visits that need it. On
+     its own — the ask spent, or never earned — the same button stands back up
+     as the card's own, untouched. */
+  .up.at .up-alt{margin-top:11px;text-align:center;}
+  /* the ask gone, so it is the only thing under the title and takes the space
+     the ask's block was taking */
+  .up:not(.at) .up-alt{margin-top:13px;}
+  .up.at .up-alt .btn{width:auto;height:auto;padding:2px 4px;border:none;background:none;
+    border-radius:0;box-shadow:none;font-size:12.5px;font-weight:700;
+    color:var(--jade-deep);text-decoration:underline;text-underline-offset:3px;
+    text-decoration-color:rgba(11,109,78,.32);}
+  .up.at .up-alt .btn:hover{background:none;border:none;box-shadow:none;
+    text-decoration-color:currentColor;}
 
   /* Google's mark, in Google's colours. This is the one button on the page
      that leaves for somebody else's, and the mark is how that is said before
@@ -288,8 +334,10 @@
   .up.at.win .pv-acts{margin-top:20px;}
 
   /* and then it is gone. Upward, into the space it was occupying, because the
-     card below it is about to move up into that space anyway. */
-  .up.at-go{opacity:0;transform:translateY(-6px);
+     line about a voucher is about to move up into that space anyway. It is the
+     panel that leaves and not the card: the card is still the way a booking
+     gets in, and that outlives the minute the mailbox took. */
+  .at-go{opacity:0;transform:translateY(-6px);
     transition:opacity .38s ease,transform .38s ease;}
 
   /* ---- what we read, laid out to be checked against the paper it came off ---- */
@@ -379,7 +427,7 @@
     .notch{left:auto;top:50%;}
     .notch.t{left:-8px;transform:translate(-50%,-50%);}
     .notch.b{right:-8px;bottom:auto;transform:translate(50%,-50%);}
-    .tk-body{padding:4px 14px 12px;}
+    .tk-body{padding:4px 14px 16px;}
     /* the body is full width now, so the stamp lands in its bottom corner
        rather than out to the right of nothing */
     .stamp{top:auto;bottom:10px;right:14px;width:72px;height:72px;
@@ -423,13 +471,24 @@
         <h2 class="yr-h">Your year in stays</h2>
         <div class="yr-card" id="yrCard"></div>
       </section>
-      <!-- The way in that is done once. Every booking they make is confirmed by
-           email, so read access to the mailbox is worth more than any number of
-           uploads — which is why it sits above the card that takes them one at
-           a time. -->
-      <section class="up at" id="atCard">
+      <!-- Getting a booking in — one card, two ways.
+
+           They were two cards, stacked, which put the way in that is done once
+           and the way in that is done every time at the same weight. Every
+           booking a guest makes is confirmed by email, so being allowed to read
+           that mailbox once is worth more than any number of uploads: it is the
+           card's button. The document is the fallback under it, kept because
+           the mailbox will not always be Google's and some paperwork never
+           reaches a mailbox at all. -->
+      <section class="up at" id="getCard">
+        <!-- One question over both answers: the booking exists somewhere that
+             isn't us, and everything under this line is a way of saying where.
+             Its words are the card's state — while the mailbox is worth asking
+             for, the title says what the asking is for, and once it is spent
+             the title is the plain question the upload answers. Set in the
+             script, because that is where the state it names is decided. -->
+        <p class="at-h" id="getH"></p>
         <div id="atIdle">
-          <p class="at-h">Bookings sitting in your inbox?</p>
           <button type="button" class="btn" id="atBtn">
             <span class="g"><svg viewBox="0 0 48 48" aria-hidden="true">
               <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
@@ -437,17 +496,15 @@
               <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
               <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
             </svg></span>
-            Enable auto-track
+            Find my hotel bookings
           </button>
         </div>
         <!-- the mailbox, once it is ours to read -->
         <div id="atOn" aria-live="polite" hidden></div>
-      </section>
-      <!-- Getting a booking in. It is the guest's own paperwork, so the card
-           takes the document rather than asking them to retype it. -->
-      <section class="up" id="upCard">
-        <div id="upIdle">
-          <p class="up-h">Booked a hotel somewhere else?</p>
+        <!-- The fallback. Same button whichever way the card is standing —
+             under the ask it is a line of text, and on its own, once the ask
+             is spent, it stands back up as the card's own button. -->
+        <div class="up-alt" id="upIdle">
           <button type="button" class="btn" id="upBtn">Upload voucher</button>
         </div>
         <!-- reading the document, then what came off it -->
@@ -578,32 +635,32 @@
                ICON.dl + 'Download voucher</button>';
     };
 
-    /* Nothing outstanding and nothing to decide. What the card owes them is
-       when to turn up and the paperwork to turn up with — the two facts this
-       page is opened for on the morning of the stay. Managing the booking is
-       still inside the ticket. */
+    /* What the card owes them is when to turn up and the paperwork to turn up
+       with — the two facts this page is opened for on the morning of a stay.
+       Managing the booking is still inside the ticket. */
     if(b.ownership === 'owned'){
-      return { st: whenBlock(b), acts: voucher(b.id), stack: true };
-    }
+      /* ---- and, for one session, the old booking this one replaced ----
+         The stay is ours; what is left elsewhere is a live reservation only
+         the guest can release, and the card it belongs to is gone from the
+         list. So the way out rides here, beside the voucher rather than
+         instead of it: they are not alternatives, and a card that hid the
+         paperwork until the guest had finished cancelling would be holding
+         one thing hostage to the other.
 
-    /* ---- switched: their booking, still live, with ours now beside it ----
-       Both records are on the list, so this row answers only for the original.
-       It has no voucher of ours to give and nothing of ours to manage; what it
-       has is one thing left to do, and that sits on the row it belongs to. */
-    if(b.counterpart){
-      var ev = b.switch_event;
-
-      if(b.status === 'cancel_pending'){
-        var left = fmt.countdown(ev.cancel_deadline);
-        /* The deadline and the place it is cancelled are one thing, so they are
-           one control: the reminder is the way out. */
-        acts = '<a class="st-clock" href="' + esc(b.platform.manage) + '" target="_blank" ' +
-                 'rel="noopener">' + esc(left.label) + ICON.ext + '</a>';
-        return { st: '', acts: acts };
-      }
-
-      /* Released on the platform, so nothing is outstanding on it either. */
-      return { st: '', acts: '' };
+         Named, because "your old booking" is not something anyone can act on
+         until they know whose site to go and do it on. It is a link and not a
+         button: the booking to be pleased about is ours, and the jade belongs
+         to the voucher. */
+      var old = T.owedRelease(b);
+      var undo = old
+        ? '<a class="st-undo" href="' + esc(old.platform.manage) + '" target="_blank" ' +
+            'rel="noopener">Cancel your ' + esc(old.platform.label) + ' booking' +
+            ICON.ext + '</a>'
+        : '';
+      /* The loose end first and the paperwork last, because the row is read
+         left to right and the voucher is what the guest came for — it is the
+         end of the sentence, not an obstacle in the middle of it. */
+      return { st: whenBlock(b), acts: undo + voucher(b.id), stack: true };
     }
 
     /* ---- everything else is stage 03, and the model has already decided
@@ -700,16 +757,13 @@
        booking we made by switching is a separate row and carries no pill. */
     var external = b.ownership === 'tracked'
       ? ' <span class="pill">External</span>' : '';
-    /* Two findings earn a stamp, and no row is ever both. Their booking once we
-       hold the same nights: it is still live on their platform, and it is no
-       longer the one that counts. Otherwise `switchable` — the model's own word
+    /* One finding earns a stamp now. OUTDATED went with the card it was on:
+       it marked a record the guest was meant to stop looking at, which is a
+       thing better done by not showing it than by showing it with a warning
+       printed across it. What is left is `switchable` — the model's own word
        for a saving that is real and a stay that can actually be moved. */
-    var mark = '';
-    if(b.ownership === 'tracked' && b.counterpart){
-      mark = stamp(b.id, 'OUTDATED', '· · ·', 'out');
-    }else if(b.watch && b.watch.switchable){
-      mark = stamp(b.id, 'DROP', '· PRICE ·');
-    }
+    var mark = b.watch && b.watch.switchable
+      ? stamp(b.id, 'DROP', '· PRICE ·') : '';
 
     return '<article class="tk' + (pending ? ' quiet' : '') + '" data-row="' +
         esc(b.id) + '">' +
@@ -834,6 +888,58 @@
      would be the one lie in the rail */
   var syncAuto = function(){};
 
+  /* ---------- the card the two of them share ----------
+     One card, and one occupant at a time. Two things can want it: the mailbox
+     grant, for the minute after it lands, and a document being read. Either
+     takes the whole card while it has something to show, and what was standing
+     there waits underneath.
+
+     `ask` is whether the mailbox question has been earned — it decides whether
+     the card is the tinted one with a button on it or the plain outline that
+     only takes vouchers. `panel` is whether a read is on screen. The two cards
+     used to answer these separately and could both be mid-something at once;
+     now the answer is in one place, which is the only way one card can be
+     honest about what it is doing. */
+  var Rail = (function(){
+    var card = $('getCard'), h = $('getH');
+    var ask = $('atIdle'), alt = $('upIdle');
+    var asking = false, panel = null;
+
+    /* While the mailbox is worth asking for, the title is the offer that pays
+       for it — what we would do with the access, said before it is wanted, and
+       not what the access is called. Once it is spent there is no offer left
+       to make and the card is back to its plain question. */
+    var H_ASK = 'Booked elsewhere? We’ll watch the price.';
+    var H_ALONE = 'Booked a hotel somewhere else?';
+
+    function apply(){
+      /* the question goes with the answers it was asked over — a panel is a
+         read in progress, and it says what it is about itself */
+      h.textContent = asking ? H_ASK : H_ALONE;
+      h.hidden = !!panel;
+      ask.hidden = !asking || !!panel;
+      alt.hidden = !!panel;
+      /* Tinted while it carries the question, or the answer to it — and not
+         while it is reading a document, which has nothing to do with either.
+         A panel decides this on its own behalf: an upload standing on the
+         jade ground would put the ask's colour on its buttons. */
+      card.classList.toggle('at', panel ? panel === 'at' : asking);
+      /* a panel is a read in progress, and the dashes are for an empty card */
+      card.classList.toggle('busy', !!panel);
+      card.classList.toggle('win', panel === 'at');
+    }
+
+    return {
+      ask: function(on){ asking = !!on; apply(); },
+      panel: function(p){ panel = p || null; apply(); },
+      /* Only stand down if it is still ours. Neither side can see the other's
+         state, so each one puts its own panel away by name rather than by
+         clearing whatever happens to be up. */
+      clear: function(p){ if(panel === p){ panel = null; apply(); } },
+      el: card
+    };
+  })();
+
   /* ---------- auto-track ----------
      The upload card takes one booking at a time, and every booking they will
      ever make arrives in the same place first: a confirmation email. So the
@@ -856,39 +962,42 @@
      that it is still on would be the rail's most prominent card doing the
      least work, so it takes its moment and then goes. */
   (function(){
-    var card = $('atCard'), idle = $('atIdle'), on = $('atOn');
+    var card = $('getCard'), on = $('atOn');
     if(!card) return;
 
     /* long enough to be read twice, and gone before it is furniture */
     var STAY_MS = 30000;
     var timer = null;
 
+    /* the panel put away, without saying anything about what the card should
+       be showing instead — that is the caller's to decide */
+    function shut(){
+      on.hidden = true; on.innerHTML = ''; on.classList.remove('at-go');
+      Rail.clear('at');
+    }
+
     function toIdle(){
       clearTimeout(timer);
-      on.hidden = true; on.innerHTML = '';
-      idle.hidden = false;
-      card.hidden = false;
-      card.classList.remove('busy', 'win', 'at-go');
+      shut();
+      Rail.ask(true);
     }
 
     /* Gone, and not collapsed to a smaller version of itself: there is no
-       state after this one. The account holds the grant; the rail holds
-       bookings. */
+       state after this one. The account holds the grant, so the question does
+       not come back — what is left standing in the card is the voucher line,
+       which was under it the whole time. */
     function dismiss(){
       clearTimeout(timer);
-      card.classList.add('at-go');
+      on.classList.add('at-go');
       var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      setTimeout(function(){ card.hidden = true; }, still ? 0 : 420);
+      setTimeout(function(){ shut(); Rail.ask(false); }, still ? 0 : 420);
     }
 
     function paint(){
       clearTimeout(timer);
-      idle.hidden = true;
       on.hidden = false;
-      card.hidden = false;
-      card.classList.remove('at-go');
-      card.classList.add('busy');
-      card.classList.add('win');
+      on.classList.remove('at-go');
+      Rail.panel('at');
 
       /* Said as the thing we will be doing, not as a setting that changed —
          the filename line the other panels open with is gone, because the
@@ -939,7 +1048,8 @@
       }
       if(!T.shouldAskGmail()){
         clearTimeout(timer);
-        card.hidden = true;
+        shut();
+        Rail.ask(false);
         return;
       }
       toIdle();
@@ -951,7 +1061,7 @@
     devAuto = function(state){
       /* armed and disarmed the way a booking and an answer do it, so the state
          the bar puts the card in is the one a reload comes back to */
-      if(state === 'gone'){ T.clearGmailAsk(); card.hidden = true; return; }
+      if(state === 'gone'){ T.clearGmailAsk(); shut(); Rail.ask(false); return; }
       if(state === 'idle'){ T.noteBookingMade(); toIdle(); return; }
       paint();
     };
@@ -967,8 +1077,8 @@
      The prototype reads nothing out of the actual file. What comes back is
      the next voucher in the model's inbox; the file only gives its name. */
   (function(){
-    var card = $('upCard'), input = $('upInput');
-    var idle = $('upIdle'), flow = $('upFlow');
+    var card = $('getCard'), input = $('upInput');
+    var flow = $('upFlow');
     if(!card || !input) return;
 
     /* reading -> a read is in flight; draft -> a read is on screen unconfirmed;
@@ -985,8 +1095,7 @@
     function toIdle(){
       reading = false; draft = null; pending = null; match = null; docName = '';
       flow.hidden = true; flow.innerHTML = '';
-      idle.hidden = false;
-      card.classList.remove('busy');
+      Rail.clear('up');
       /* so choosing the same file twice still fires a change event */
       input.value = '';
     }
@@ -996,9 +1105,8 @@
       if(!file || reading || draft) return;
       reading = true;
       docName = file.name;
-      idle.hidden = true;
       flow.hidden = false;
-      card.classList.add('busy');
+      Rail.panel('up');
       flow.innerHTML = docLine() + '<div class="up-bar"><i></i></div>';
       setTimeout(function(){ if(reading) review(); }, 1800);
     }
@@ -1223,8 +1331,8 @@
       if(state === 'idle'){ toIdle(); return; }
       reading = false; pending = null;
       docName = 'booking_voucher.pdf';
-      idle.hidden = true; flow.hidden = false;
-      card.classList.add('busy');
+      flow.hidden = false;
+      Rail.panel('up');
 
       if(state === 'reading'){
         draft = null;
@@ -1265,8 +1373,8 @@
           x.classList.toggle('on', x === b);
         });
       show(b.getAttribute('data-state'));
-      $(g === 'at' ? 'atCard' : 'upCard')
-        .scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      /* both groups drive the same card now */
+      Rail.el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   })();
 
@@ -1331,18 +1439,9 @@
   function render(){ renderList(); renderYear(); }
   render();
 
-  /* Countdowns are in days and hours, so re-render only when one of them would
-     actually read differently — a blind interval would steal focus mid-scan. */
-  var sig = function(){
-    return T.openCancelTasks().map(function(b){
-      return b.id + ':' + fmt.countdown(b.switch_event.cancel_deadline).text;
-    }).join('|');
-  };
-  var last = sig();
-  setInterval(function(){
-    var now = sig();
-    if(now !== last){ last = now; render(); }
-  }, 60000);
+  /* There was an interval here, re-rendering whenever a countdown would have
+     read differently. The cancel link states no deadline, so nothing on a row
+     counts down any more and nothing goes stale between renders. */
 })();
 </script>
 <script src="topnav.js"></script>
