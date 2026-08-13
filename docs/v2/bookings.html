@@ -135,6 +135,9 @@
   /* nothing on the left to sit opposite, so the button keeps the right edge
      it has always had rather than falling back to the left one */
   .tk-acts > .btn:only-child{margin-left:auto;}
+  /* and the same for a link standing alone: where an action sits on this page
+     is a property of the list, not of what the card happens to say beside it */
+  .tk-acts > .st-undo:only-child{margin-left:auto;}
   /* a text link and a button can share this row, so they centre on each other
      rather than sitting on a common bottom edge */
   .tk-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
@@ -142,10 +145,6 @@
   /* with nothing on the left to sit opposite, the row is the whole width, so
      the two ends of it are the two ends of the card */
   .tk-foot > .tk-acts:only-child{flex:1;}
-  /* The button goes to the far edge, away from the link it is not a variant
-     of — they share this row but they are not two of a kind, and a gap is the
-     cheapest way to say so. */
-  .tk-acts .st-undo + .btn{margin-left:auto;}
   /* only pushed right when there is a case on the left to sit opposite, and
      never squeezed by it — the dates wrap before the button does */
   .tk-status + .tk-acts{margin-left:auto;flex:none;}
@@ -175,12 +174,6 @@
   .stamp .word{font-size:21px;letter-spacing:1.6px;}
   /* the banner's paper, so the rings stop under it the way an ink stamp lands */
   .stamp .banner{fill:var(--card);stroke:currentColor;stroke-width:2.4;}
-  /* Their booking after we hold the same stay. Not jade: jade is the colour of
-     something worth having on this page, and this is the record that has been
-     superseded. The longer word has to come down to fit the same banner, and
-     drops with it to stay optically centred on the paper. */
-  .stamp.out{color:#E2983D;}
-  .stamp.out .word{font-size:15.5px;letter-spacing:1.1px;transform:translateY(-1.3px);}
 
   /* the perforation */
   .tk-perf{flex:none;width:34px;position:relative;align-self:stretch;}
@@ -196,6 +189,22 @@
     border-radius:15px;overflow:hidden;background:#eceae5;}
   .tk-stub img{width:100%;height:100%;object-fit:cover;display:block;}
 
+  /* Someone else's booking runs shorter than one of ours, because there is
+     less of it to print. A stay we hold states its check-in and check-out and
+     hands over a voucher; a stay we only watch has a line about the watch and
+     nothing to give — so the tall card was 40px of white space held open for
+     facts that were never coming. Same paper, same tear, same photo: the
+     height is the only thing that differs, and it differs because the contents
+     do. Every external booking is this size, including the one we replaced —
+     what marks that one out is what its foot says, not how big it is. */
+  .tk.ext .tk-stub{min-height:112px;}
+  .tk.ext .tk-body{padding:15px 10px 15px 18px;}
+  .tk.ext .tk-foot{padding-top:14px;}
+  /* The stamp is sized against the card it lands on, not against a fixed
+     number: at 80 on a card this height it stops being a mark on the paper and
+     starts being the thing the card is. */
+  .tk.ext .stamp{width:70px;height:70px;}
+
 
   /* ============ STATUS ============ */
   /* Every status is one line. A second line under it only ever restated the
@@ -203,11 +212,11 @@
   .st-ink{font-size:14.5px;font-weight:700;color:var(--ink);}
   /* No money on this page at all now. A figure on a row is either an argument
      or a decision asked for too early; the booking page is where both belong. */
-  /* The way out of the booking this one replaced. Amber because it is the only
-     thing on the card with a cost to leaving it alone, and a link rather than a
-     button because the button beside it is the one worth pressing — this is the
-     loose end, not the errand the page is for. No countdown on it: the deadline
-     is a figure, and figures live on the booking. */
+  /* The way out of the booking that was replaced, on the card that is it.
+     Amber because it is the only thing on this page with a cost to leaving it
+     alone, and a link rather than a button because it leaves for somebody
+     else's site — we can point at the door, we cannot open it. No countdown on
+     it: the deadline is a figure, and figures live on the booking. */
   .st-undo{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;
     font-size:13px;font-weight:700;color:var(--amber);
     text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(162,97,10,.35);}
@@ -421,6 +430,9 @@
     /* the tear turns horizontal: photo on top, stub below */
     .tk{flex-direction:column;}
     .tk-stub{width:auto;min-height:180px;order:-1;}
+    /* the photo is a banner across the top here rather than a stub down the
+       side, so the shorter card keeps a band you can still see a hotel in */
+    .tk.ext .tk-stub{min-height:150px;}
     .tk-perf{width:auto;height:30px;}
     .tk-perf::before{left:16px;right:16px;top:50%;bottom:auto;border-left:none;
       border-top:1.6px dashed var(--perf);}
@@ -572,13 +584,13 @@
      marks. The banner is tilted against the rings rather than with them —
      upright type on a tilted stamp looks printed, not stamped.
      The path ids have to be unique per card, so the row's id goes in them. */
-  function stamp(id, word, ring, cls){
+  function stamp(id, word, ring){
     var u = 'st-' + String(id).replace(/[^a-z0-9]/gi, '');
     /* Read down the middle: the ring sits above the banner, so the two texts
        make one phrase in that order. The dots are the stamp's ornament and are
        not part of it, so they come out before it is read aloud. */
     var label = (ring.replace(/·/g, '').replace(/\s+/g, ' ').trim() + ' ' + word).trim();
-    return '<svg class="stamp' + (cls ? ' ' + cls : '') + '" viewBox="0 0 120 120" ' +
+    return '<svg class="stamp" viewBox="0 0 120 120" ' +
              'role="img" aria-label="' + esc(label) + '">' +
       '<defs>' +
         '<path id="' + u + '-t" fill="none" d="M18.7,45 A44,44 0 0 1 101.3,45"/>' +
@@ -639,28 +651,40 @@
        with — the two facts this page is opened for on the morning of a stay.
        Managing the booking is still inside the ticket. */
     if(b.ownership === 'owned'){
-      /* ---- and, for one session, the old booking this one replaced ----
-         The stay is ours; what is left elsewhere is a live reservation only
-         the guest can release, and the card it belongs to is gone from the
-         list. So the way out rides here, beside the voucher rather than
-         instead of it: they are not alternatives, and a card that hid the
-         paperwork until the guest had finished cancelling would be holding
-         one thing hostage to the other.
+      /* Nothing outstanding on this one, including on a booking we made by
+         switching: what is still owed elsewhere is owed on the other booking,
+         and the other booking has a card. */
+      return { st: whenBlock(b), acts: voucher(b.id), stack: true };
+    }
 
-         Named, because "your old booking" is not something anyone can act on
-         until they know whose site to go and do it on. It is a link and not a
-         button: the booking to be pleased about is ours, and the jade belongs
-         to the voucher. */
-      var old = T.owedRelease(b);
-      var undo = old
-        ? '<a class="st-undo" href="' + esc(old.platform.manage) + '" target="_blank" ' +
-            'rel="noopener">Cancel your ' + esc(old.platform.label) + ' booking' +
-            ICON.ext + '</a>'
-        : '';
-      /* The loose end first and the paperwork last, because the row is read
-         left to right and the voucher is what the guest came for — it is the
-         end of the sentence, not an obstacle in the middle of it. */
-      return { st: whenBlock(b), acts: undo + voucher(b.id), stack: true };
+    /* ---- switched: their booking, with ours now beside it ----
+       Both records are on the list, so this row answers only for the original.
+       It has no voucher of ours to give and nothing of ours to manage; what it
+       has is one thing left to do, and that sits on the row it belongs to. */
+    if(b.counterpart){
+      var ev = b.switch_event;
+
+      if(b.status === 'cancel_pending'){
+        /* One thing left to do and one control to do it with. The platform is
+           named because that is the part nobody can act on without: this row
+           is the booking, but the site it is held on is where it ends. Nothing
+           opposite it: the link is the whole of what this card is for, and a
+           word restating what the link already implies is a second voice
+           saying the same thing more slowly. */
+        return { st: '',
+                 acts: '<a class="st-undo" href="' + esc(b.platform.manage) +
+                 '" target="_blank" rel="noopener">Cancel on ' +
+                 esc(b.platform.label) + ICON.ext + '</a>' };
+      }
+
+      /* Released, and the card says so and stays. A booking that existed and
+         was cancelled is part of what happened to this stay; the guest told us
+         they cancelled it, and a row that vanished on being dealt with would
+         leave them nothing to check that against. */
+      return { st: '<span class="st-ink">Cancelled' +
+               (ev.user_marked_cancelled_at
+                 ? ' on ' + esc(fmt.day(ev.user_marked_cancelled_at)) : '') +
+               '</span>', acts: '' };
     }
 
     /* ---- everything else is stage 03, and the model has already decided
@@ -741,9 +765,8 @@
 
   function rowHTML(b){
     var side = sideFor(b);
-    /* Every ticket opens its own booking, including the original of a switched
-       pair — that page is where the sequence and the cancel link live. The one
-       exception is a read nobody has stood behind yet: the booking page states
+    /* Every ticket opens its own booking. The one exception is a read nobody
+       has stood behind yet: the booking page states
        the stay as fact and offers our price against it, and on this row that
        reading is the very thing in question. The row says it is being checked
        and there is nothing behind it to open until a person has been through
@@ -753,20 +776,22 @@
     var name = pending
       ? esc(b.property_name_raw)
       : '<a ' + link + '>' + esc(b.property_name_raw) + '</a>';
-    /* Booked on someone else's platform and still theirs, switched or not: the
-       booking we made by switching is a separate row and carries no pill. */
+    /* Booked on someone else's platform and still theirs, replaced or not. The
+       booking we made by switching is our own and carries no pill. */
     var external = b.ownership === 'tracked'
       ? ' <span class="pill">External</span>' : '';
-    /* One finding earns a stamp now. OUTDATED went with the card it was on:
-       it marked a record the guest was meant to stop looking at, which is a
-       thing better done by not showing it than by showing it with a warning
-       printed across it. What is left is `switchable` — the model's own word
-       for a saving that is real and a stay that can actually be moved. */
+    /* One finding earns a stamp: `switchable`, the model's own word for a
+       saving that is real and a stay that can actually be moved. The replaced
+       half of a switched pair used to earn one too, and no longer does — a
+       stamp is a finding about a booking, and there is no finding here to
+       make. The card says what has happened to it in its foot, in words. */
     var mark = b.watch && b.watch.switchable
       ? stamp(b.id, 'DROP', '· PRICE ·') : '';
 
-    return '<article class="tk' + (pending ? ' quiet' : '') + '" data-row="' +
-        esc(b.id) + '">' +
+    /* Booked elsewhere, so the card runs shorter — every one of them, whether
+       we replaced it or are only watching it. */
+    return '<article class="tk' + (b.ownership === 'tracked' ? ' ext' : '') +
+        (pending ? ' quiet' : '') + '" data-row="' + esc(b.id) + '">' +
       '<div class="tk-body">' +
         '<h3 class="tk-name">' + name + external + '</h3>' +
         /* When, and for how many. The room, the meal plan and the reference are
@@ -826,7 +851,7 @@
   function yearRows(){
     var year = new Date().getFullYear();
     var stays = T.all().filter(function(b){
-      return !b.merged_into && new Date(b.check_in).getFullYear() === year;
+      return !b.same_stay_as && new Date(b.check_in).getFullYear() === year;
     });
     if(!stays.length) return [];
 

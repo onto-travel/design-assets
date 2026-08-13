@@ -951,69 +951,6 @@
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
-  /* ---------- how long the reminder lives ----------
-     The way out of the old booking sits on the live card for the session the
-     guest switched in, and is not there the next time they come back. It is a
-     nudge and not a task list: the moment it survives into a second visit it
-     has become a permanent accusation on a card the guest already dealt with,
-     and the one thing worse than forgetting to cancel is a page that will not
-     stop saying so.
-
-     It takes two stores to say this, because a session cannot be recognised by
-     anything that outlives it. sessionStorage holds the reminders live *now* —
-     it dies with the tab, so its very existence is the session. localStorage
-     holds the ones that have already had a session, which is what makes the
-     difference between "not yet shown" and "shown and done with".
-
-     Reading it that way round also handles a switch made mid-session: a
-     reminder nobody has seen before is new whether the page just loaded or the
-     guest just pressed the button, and either way this is its session. */
-  var LIVE_KEY = NS + ':reminders';
-
-  function readLive() {
-    try { return JSON.parse(sessionStorage.getItem(LIVE_KEY)) || {}; }
-    catch (e) { return {}; }
-  }
-  function writeLive(v) {
-    try { sessionStorage.setItem(LIVE_KEY, JSON.stringify(v)); } catch (e) {}
-  }
-
-  /* Is there still an original behind this booking that the guest has to go
-     and release themselves? Answers with the dead record, because the platform
-     it is on and the way into it are the two things the link needs. */
-  function pendingRelease(b) {
-    var old = b && b.superseded;
-    if (!old || !old.switch_event) return null;
-    if (old.status !== 'cancel_pending') return null;
-    if (old.switch_event.user_marked_cancelled_at) return null;
-    return old;
-  }
-
-  /* Claim this session's reminders, and leave the spent ones unclaimed. Run on
-     every read of the list, not once on load, so that a switch made while the
-     page is open gets its session too. */
-  function sweepReminders(list) {
-    var live = readLive(), s = null, spent = null, liveNew = false, spentNew = false;
-    list.forEach(function (b) {
-      var old = pendingRelease(b);
-      if (!old || live[old.id]) return;
-      if (s === null) { s = readState(); spent = s.reminder_spent || {}; }
-      /* it has had its session already, and does not get another */
-      if (spent[old.id]) return;
-      live[old.id] = true; liveNew = true;
-      spent[old.id] = true; spentNew = true;
-    });
-    if (spentNew) { s.reminder_spent = spent; writeState(s); }
-    if (liveNew) writeLive(live);
-  }
-
-  /* The release still owed *and* still worth saying. `pendingRelease` is the
-     fact; this is the fact inside the window the page will state it in. */
-  function owedRelease(b) {
-    var old = pendingRelease(b);
-    return old && readLive()[old.id] ? old : null;
-  }
-
   /* Seed + persisted overrides, with derived fields filled in. */
   function all() {
     var state = readState();
@@ -1049,29 +986,29 @@
     });
 
     /* A switch produces two records for one stay: the original booked elsewhere
-       and the one we made. Same hotel, same nights, same decision — so one card
-       stands for both, and it is ours. What is left of theirs is not a booking
-       to look at but a thing to go and undo, and that belongs on the live card
-       as a link rather than beside it as a second stay the guest has to work
-       out they do not have.
+       and the one we made. They stay two records and they stay two cards. Same
+       hotel and same nights, but they are held by two companies on two systems,
+       and only one of them can be cancelled — by the guest, on the other site.
+       Folding them into one card put a single row where the guest has two live
+       bookings, which is the one thing the list must not say. It goes on saying
+       two after the original is released, too: a cancellation is a thing that
+       happened to a booking, not a reason for the booking to stop existing.
 
-       Which way the links run is the whole of it. `superseded` hangs the dead
-       original off the live booking, so the surviving row can offer the way out
-       of it. `merged_into` marks the record that is no longer shown anywhere,
-       and `counterpart` is left pointing the way it always did, for the details
-       page that reads a tracked booking on its own terms. */
+       `counterpart` links them, for the details page and for the card that has
+       to know it is somebody's original. `same_stay_as` marks the one of the
+       pair that is not counted again where the account is totted up — one stay
+       was booked here, however many bookings it took. */
     var byId = {};
     list.forEach(function (b) { byId[b.id] = b; });
     list.forEach(function (b) {
       if (b.switched_from && byId[b.switched_from]) {
         var old = byId[b.switched_from];
-        b.superseded = old;
+        b.counterpart = old;
         old.counterpart = b;
-        old.merged_into = b.id;
+        old.same_stay_as = b.id;
       }
     });
 
-    sweepReminders(list);
     groups(list);
     return list;
   }
@@ -1098,25 +1035,33 @@
     var today = new Date(); today.setHours(0, 0, 0, 0);
     return all()
       .filter(function (b) { return new Date(b.check_out) >= today; })
-      /* One stay, one row. Two rows was an earlier answer to a real problem —
-         a switch leaves two live bookings on two systems, and a list showing
-         only one of them hid a cancellation nobody but the guest can make.
-         What has changed is that the surviving row now carries that
-         cancellation itself, so the second row is no longer the only place the
-         task could live, and it goes. */
-      .filter(function (b) { return !b.merged_into; })
-      .sort(function (a, b) { return new Date(a.check_in) - new Date(b.check_in); });
+      /* Both records stand, before the release and after it. A switch leaves
+         two bookings on two systems; the list is where the guest sees what is
+         held in their name, and one row for two bookings hides the one they
+         are still on the hook for. */
+      .sort(function (a, b) {
+        var d = new Date(a.check_in) - new Date(b.check_in);
+        if (d) return d;
+        /* The pair shares a check-in, so date order alone leaves which of them
+           comes first to the order they happen to be stored in. Ours leads and
+           the record it replaced follows: the stay is read downwards, and the
+           booking the guest is actually turning up on is the one to meet
+           first. */
+        if (a.same_stay_as === b.id) return 1;
+        if (b.same_stay_as === a.id) return -1;
+        return 0;
+      });
   }
 
   /* Open cancel tasks. Drives the amber banner(s) on /bookings. More than one
      can be outstanding — a user can switch two stays before cancelling either. */
   function openCancelTasks() {
     /* Derived from the visible list, never from all() — a task pointing at a
-       row the user cannot see is worse than no task. The rows are the live
-       bookings now, so what comes back is the original hanging off each one,
-       and `pendingRelease` rather than `owedRelease`: this is the standing
-       fact, not the version of it the card stops repeating after a session. */
-    return sorted().map(pendingRelease).filter(Boolean).sort(function (a, b) {
+       row the user cannot see is worse than no task. */
+    return sorted().filter(function (b) {
+      return b.status === 'cancel_pending' &&
+             b.switch_event && !b.switch_event.user_marked_cancelled_at;
+    }).sort(function (a, b) {
       return new Date(a.switch_event.cancel_deadline) - new Date(b.switch_event.cancel_deadline);
     });
   }
@@ -1303,7 +1248,7 @@
       if (!v || !v.parsed) return null;
       var name = String(v.property_name_raw || '').toLowerCase();
       return all().filter(function (b) {
-        if (b.merged_into) return false;
+        if (b.same_stay_as) return false;
         var same = (v.property_id && b.property_id)
           ? v.property_id === b.property_id
           : String(b.property_name_raw || '').toLowerCase() === name;
@@ -1451,13 +1396,8 @@
       writeState(s);
     },
 
-    owedRelease: owedRelease,
-    /* The reminders live in a second store, so a reset that only cleared the
-       first would put the seed back and then hide its one reminder — the
-       prototype would come back subtly less than it started with. */
     reset: function () {
       try { localStorage.removeItem(NS); } catch (e) {}
-      try { sessionStorage.removeItem(LIVE_KEY); } catch (e) {}
     }
   };
 
