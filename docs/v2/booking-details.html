@@ -4,31 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Taj Exotica · Your booking</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <style>
-  /* v2 neutral system, same tokens as results.html and bookings.html. */
+  /* Palette and type come from tokens.css. */
   :root{
-    --bg:#f7f7f5; --card:#ffffff; --ink:#111827; --muted:#737373;
-    --line:#e8e8e6; --chip-bg:#f3f4f6; --chip-ink:#393939;
-    --jade:#0f8a63; --jade-deep:#0b6d4e; --jade-soft:#eef6f1;
-    --hero:#2b9068; --hero-deep:#1d7754;
-    --amber:#a2610a; --red:#b23b32;
-    --perf:#dcdcd8;
-    --shadow-card:0 6px 11px rgba(0,0,0,.07), 0 1.809px 3.316px rgba(0,0,0,.05),
-                  0 .751px 1.377px rgba(0,0,0,.04), 0 .272px .498px rgba(0,0,0,.02);
+    /* the stay header's green wash — brand ramp, light end to dark end */
+    --hero:var(--green-500); --hero-deep:var(--green-900);
+    --perf:var(--border-default);   /* spent/past progress track */
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;}
-  body{min-height:100vh;background:var(--bg);color:var(--ink);
-    font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    line-height:1.5;-webkit-font-smoothing:antialiased;}
-  h1,h2,h3{font-family:inherit;font-weight:700;letter-spacing:-.015em;margin:0;}
-  button,input{font-family:inherit;}
+  body{min-height:100vh;line-height:1.5;}
   [hidden]{display:none !important;}
-  a{color:inherit;}
-  :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:4px;}
   /* The account panel's styles arrive inside topnav.js, so until that has run
      this div has none and a filled one would paint as a static white card in
      the bar. Hidden here, before the first paint; .menu.open still outranks it. */
@@ -95,7 +80,7 @@
     border:1px solid var(--on-hero-line);background:transparent;color:var(--on-hero);transition:background .15s;}
   .hbtn:hover{background:var(--on-hero-wash);}
   .hbtn.solid{background:var(--on-hero);color:var(--hero-solid-ink);border-color:var(--on-hero);}
-  .hbtn.solid:hover{background:#f2f2ef;}
+  .hbtn.solid:hover{background:#fafaf9;}
   .hbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
 
@@ -133,7 +118,7 @@
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect x='31' y='31' width='34' height='34' rx='10' transform='rotate(45 48 48)' fill='%2314321f'/%3E%3C/svg%3E");}
 
   /* cancelled: the hero loses its colour and the stamp turns */
-  body.is-cancelled .hero{background:#6b6f6d;}
+  body.is-cancelled .hero{background:#808080;}
   body.is-cancelled .rs-status{color:#ffd9d5;}
 
   /* ============================================================
@@ -155,11 +140,11 @@
   .main .sec-h,.rail .sec-h{padding-left:2px;}
   .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow-card);padding:18px;}
 
-  .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #dededa;background:#fff;
+  .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #efefef;background:#fff;
     color:var(--ink);border-radius:11px;padding:9px 15px;font-size:13.5px;font-weight:700;
     cursor:pointer;text-decoration:none;white-space:nowrap;
     transition:background .15s,border-color .15s,color .15s;}
-  .btn:hover{background:#f7f7f5;border-color:#cdcdc7;}
+  .btn:hover{background:#fafaf9;border-color:#e3e3df;}
   .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .btn.jade{background:var(--jade);border-color:var(--jade);color:#fff;}
@@ -177,10 +162,10 @@
   .tk-h{font-size:19px;font-weight:700;letter-spacing:-.015em;}
   .tk-sub{margin-top:5px;font-size:13.5px;font-weight:500;color:var(--muted);
     display:flex;flex-wrap:wrap;align-items:center;gap:2px 7px;}
-  .tk-sub .sep{color:#c8c8c3;}
+  .tk-sub .sep{color:#e3e3df;}
   .tk-ref{font-variant-numeric:tabular-nums;}
   .tk-ref b{color:var(--chip-ink);font-weight:700;letter-spacing:.03em;margin-left:5px;}
-  .ref-copy{border:none;background:none;padding:3px;margin-left:2px;cursor:pointer;color:#a8a8a2;
+  .ref-copy{border:none;background:none;padding:3px;margin-left:2px;cursor:pointer;color:#e3e3df;
     border-radius:6px;vertical-align:middle;transition:color .15s,background .15s;}
   .ref-copy:hover{color:var(--chip-ink);background:var(--chip-bg);}
   .ref-copy svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;
@@ -190,10 +175,10 @@
      dash carrying the distance between them */
   .tk-when{display:flex;align-items:flex-end;gap:16px;margin-top:20px;}
   .tk-when .k{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-    color:#9a9a94;}
+    color:#808080;}
   .tk-when .v{font-size:15px;font-weight:700;margin-top:2px;}
   .tk-when .v span{font-weight:500;color:var(--muted);}
-  .tk-dash{color:#c8c8c3;padding-bottom:2px;}
+  .tk-dash{color:#e3e3df;padding-bottom:2px;}
 
   .tk-perf{flex:none;width:34px;position:relative;align-self:stretch;}
   .tk-perf::before{content:"";position:absolute;left:50%;top:16px;bottom:16px;
@@ -203,14 +188,14 @@
   .notch.b{bottom:-8px;transform:translate(-50%,50%);}
 
   .tk-stub{flex:none;width:206px;align-self:stretch;min-height:148px;border-radius:14px;
-    overflow:hidden;background:#eceae5;}
+    overflow:hidden;background:#efefef;}
   .tk-stub img{width:100%;height:100%;object-fit:cover;display:block;}
 
   /* ============ ROOMS ============ */
   .room{padding:11px;background:var(--card);border-radius:16px;box-shadow:var(--shadow-card);}
   .room + .room{margin-top:12px;}
   .room-top{display:flex;align-items:center;gap:14px;}
-  .room-ph{flex:none;width:74px;height:64px;border-radius:12px;overflow:hidden;background:#eceae5;}
+  .room-ph{flex:none;width:74px;height:64px;border-radius:12px;overflow:hidden;background:#efefef;}
   .room-ph img{width:100%;height:100%;object-fit:cover;display:block;}
   .room-n{font-size:15.5px;font-weight:700;letter-spacing:-.01em;}
   .room-s{font-size:13px;font-weight:500;color:var(--muted);margin-top:1px;}
@@ -227,7 +212,7 @@
   /* ============ GUESTS ============ */
   .guest{display:flex;align-items:center;gap:11px;padding:9px 4px;}
   .guest + .guest{border-top:1px solid var(--line);}
-  .g-av{flex:none;width:28px;height:28px;border-radius:50%;background:#eaeef7;
+  .g-av{flex:none;width:28px;height:28px;border-radius:50%;background:#fafaf9;
     display:flex;align-items:center;justify-content:center;}
   .g-av svg{width:15px;height:15px;stroke:#5b7bb5;fill:none;stroke-width:1.9;
     stroke-linecap:round;stroke-linejoin:round;}
@@ -240,7 +225,7 @@
   .go-tx{flex:1;min-width:0;}
   .go-n{font-size:15.5px;font-weight:700;letter-spacing:-.01em;}
   .go-a{font-size:13.5px;font-weight:500;color:var(--muted);margin:5px 0 13px;line-height:1.5;}
-  .go-map{flex:none;width:172px;height:132px;border-radius:13px;overflow:hidden;background:#dfeaf2;}
+  .go-map{flex:none;width:172px;height:132px;border-radius:13px;overflow:hidden;background:#efefef;}
   .go-map svg{width:100%;height:100%;display:block;}
 
   /* ============ GUIDELINES ============ */
@@ -269,7 +254,7 @@
   .pay-how svg{width:15px;height:15px;flex:none;margin-top:2px;}
   .pay-who{font-size:13.5px;font-weight:600;color:var(--chip-ink);}
   .pay-c{font-size:13px;font-weight:500;color:var(--muted);margin:2px 0 13px;}
-  .pay-c .dot{margin:0 6px;color:#c8c8c3;}
+  .pay-c .dot{margin:0 6px;color:#e3e3df;}
   /* reserved but not paid — the deadline is the point, so it sits on the total */
   .paywarn{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0;padding:10px 12px;
     background:#fdf3e2;border-radius:11px;font-size:12.5px;font-weight:600;color:var(--amber);line-height:1.45;}
@@ -343,14 +328,14 @@
   .cart-val{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;
     line-height:1.5;color:#111827;}
   /* the nights, boxed beside the dates */
-  .cart-n{border:1px solid #e3e3e3;border-radius:5px;padding:4px;font-size:14px;
+  .cart-n{border:1px solid #efefef;border-radius:5px;padding:4px;font-size:14px;
     font-weight:700;line-height:1.5;text-align:center;}
   /* one chip per discrete thing off the voucher — each guest, each room.
      20 tall with the 21px line overhanging it half a pixel each side, which is
      what the design does and what keeps the row inside 68. */
   .cart-v{display:flex;flex-wrap:wrap;gap:4px 6px;}
   .cart-v span{display:inline-flex;align-items:center;height:20px;padding:0 6px;
-    background:#e7eaf1;color:#111827;border-radius:8px;
+    background:#efefef;color:#111827;border-radius:8px;
     font-size:14px;font-weight:700;line-height:1.5;text-align:center;}
   /* On the PDP every row opens its picker and every row wears a chevron. Here
      the stay is read off their voucher and none of it is ours to change, so the
@@ -367,7 +352,7 @@
      gone: two chips stacked is 44, which the row has room for */
   .cart-ph{flex:none;position:relative;width:44px;height:54px;}
   .cart-ph i{position:absolute;display:block;background-size:cover;background-position:center;
-    background-color:#eceae5;border:1.513px solid #fff;border-radius:6.809px;
+    background-color:#efefef;border:1.513px solid #fff;border-radius:6.809px;
     box-shadow:0 2.27px 6.809px rgba(17,24,39,.13);
     width:30.261px;height:37.827px;left:-.7px;top:6.35px;transform:rotate(-4deg);}
   .cart-ph i + i,
@@ -378,10 +363,10 @@
   .cart-ph.solo i{left:6.3px;}
 
   /* the foot: who it is under, what it comes to, and the one control */
-  .cart-foot{background:#fff;border:.8px solid #ededed;border-radius:20px;
+  .cart-foot{background:#fff;border:.8px solid #efefef;border-radius:20px;
     box-shadow:var(--shadow-card);padding:16.8px;display:flex;flex-direction:column;
     gap:12px;min-height:60px;}
-  .cart-name{border:.8px solid #e8e8e6;border-radius:16px;padding:12.8px;
+  .cart-name{border:.8px solid #e3e3df;border-radius:16px;padding:12.8px;
     display:flex;align-items:center;justify-content:space-between;gap:12px;}
   .cart-name .who{display:flex;flex-direction:column;gap:2px;min-width:0;}
   .cart-who{display:flex;gap:2px;font-size:14px;font-weight:700;line-height:1.5;
@@ -398,7 +383,7 @@
     padding:0 12px;border:none;border-radius:12px;background:#000;color:#fff;
     font-size:14px;font-weight:700;line-height:1.5;text-decoration:none;cursor:pointer;
     transition:background .15s;}
-  .cart-go:hover{background:#1f1f1f;}
+  .cart-go:hover{background:#2c2c2c;}
 
   /* what the same stay already cost them, in the column the booking they hold
      is described in. Their figure is plain black: it is a fact about their
@@ -437,7 +422,7 @@
   .dlg{width:100%;max-width:420px;background:var(--card);border-radius:20px;padding:24px;
     box-shadow:0 24px 60px rgba(0,0,0,.28);transform:translateY(10px);transition:transform .18s;}
   .scrim.open .dlg{transform:none;}
-  .dlg-ic{width:42px;height:42px;border-radius:12px;background:#fdeceb;
+  .dlg-ic{width:42px;height:42px;border-radius:12px;background:#fafaf9;
     display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
   .dlg-ic svg{width:21px;height:21px;stroke:var(--red);fill:none;stroke-width:1.9;
     stroke-linecap:round;stroke-linejoin:round;}
@@ -453,7 +438,6 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
   .toast svg{width:16px;height:16px;stroke:#8fd6b4;fill:none;stroke-width:2.6;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
-
 
   @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important;} }
 
@@ -622,13 +606,13 @@
             <!-- a drawn map, not a tile service: the prototype has no key and the
                  shape of the coast is the only thing this needs to convey -->
             <svg viewBox="0 0 172 132" preserveAspectRatio="xMidYMid slice">
-              <rect width="172" height="132" fill="#eef3ee"/>
+              <rect width="172" height="132" fill="#fafaf9"/>
               <path d="M0 0h58c-6 22-10 44-6 66 4 20 2 46-10 66H0z" fill="#bcd9ea"/>
               <path d="M58 0c-6 22-10 44-6 66 4 20 2 46-10 66" fill="none" stroke="#9dc4da" stroke-width="1.5"/>
-              <path d="M60 0c8 26 30 40 62 44l50 4" fill="none" stroke="#dcdcd6" stroke-width="7" stroke-linecap="round"/>
-              <path d="M74 132c4-30 20-52 46-60l52-14" fill="none" stroke="#dcdcd6" stroke-width="7" stroke-linecap="round"/>
-              <path d="M96 8c2 40 6 84 4 120" fill="none" stroke="#e8e8e2" stroke-width="4"/>
-              <path d="M124 30c18 8 32 26 40 48" fill="none" stroke="#e8e8e2" stroke-width="4"/>
+              <path d="M60 0c8 26 30 40 62 44l50 4" fill="none" stroke="#efefef" stroke-width="7" stroke-linecap="round"/>
+              <path d="M74 132c4-30 20-52 46-60l52-14" fill="none" stroke="#efefef" stroke-width="7" stroke-linecap="round"/>
+              <path d="M96 8c2 40 6 84 4 120" fill="none" stroke="#efefef" stroke-width="4"/>
+              <path d="M124 30c18 8 32 26 40 48" fill="none" stroke="#efefef" stroke-width="4"/>
               <path d="M86 52a11 11 0 1 1 22 0c0 8-11 22-11 22S86 60 86 52z" fill="#0f8a63"/>
               <circle cx="97" cy="52" r="4.2" fill="#fff"/>
             </svg>

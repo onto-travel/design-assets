@@ -4,28 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Taj Exotica · Booking confirmed</title>
+<link rel="stylesheet" href="tokens.css">
 <style>
-  :root{
-    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
-    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --green:#0f8a63;
-    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
-  }
   *{box-sizing:border-box;}
   body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:var(--font-body);
     line-height:1.5;-webkit-font-smoothing:antialiased;
     display:flex;align-items:center;justify-content:center;padding:40px 20px;}
-  h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+  h1{font-family:var(--font-display);letter-spacing:-.01em;margin:0;}
 
   .card{width:520px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
     overflow:hidden;position:relative;}
   .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
     color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
     transition:color .15s,background .15s;}
-  .backlink:hover{color:var(--jade);background:#faf8f3;}
+  .backlink:hover{color:var(--jade);background:#fafaf9;}
   .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
   .head{text-align:center;padding:40px 34px 26px;}
-  .check{width:66px;height:66px;border-radius:50%;background:#eaf5ef;border:1px solid #cfe8db;
+  .check{width:66px;height:66px;border-radius:50%;background:#eef6f1;border:1px solid #cfe8db;
     display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
   .check svg{width:32px;height:32px;stroke:var(--green);stroke-width:2.6;fill:none;
     stroke-linecap:round;stroke-linejoin:round;}
@@ -33,33 +29,33 @@
   @keyframes pop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
   .head h1{font-size:27px;margin-bottom:8px;}
   .head p{color:var(--muted);font-size:15px;margin:0 auto;max-width:360px;}
-  .ref{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:#faf8f3;
-    border:1px solid var(--line);border-radius:30px;padding:8px 16px;font-size:13.5px;color:#4a4641;}
+  .ref{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:#fafaf9;
+    border:1px solid var(--line);border-radius:30px;padding:8px 16px;font-size:13.5px;color:#2c2c2c;}
   .ref b{color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;}
 
   .stars{color:var(--gold);letter-spacing:3px;font-size:14px;}
   .sum{margin:4px 34px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
-  .sum-hd{padding:18px 18px 16px;background:#faf8f3;}
+  .sum-hd{padding:18px 18px 16px;background:#fafaf9;}
   .sum-hd .h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
-  .sum-hd .n{font-family:Georgia,serif;font-size:17px;font-weight:700;margin-top:3px;}
-  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#4a4641;margin-top:11px;}
+  .sum-hd .n{font-family:var(--font-display);font-size:17px;font-weight:700;margin-top:3px;}
+  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#2c2c2c;margin-top:11px;}
   .sum-hd .hd-dates span{font-weight:400;color:var(--muted);}
   .sum-hd .hd-dates span::before{content:" · ";}
   .sum-hd .loc{color:var(--jade);font-weight:600;font-size:11.5px;letter-spacing:.06em;margin-top:2px;}
   .row{display:flex;gap:14px;padding:12px 18px;}
-  .row+.row{border-top:1px solid #f1ede5;}
+  .row+.row{border-top:1px solid #efefef;}
   .k{flex:0 0 96px;font-size:12.5px;color:var(--muted);padding-top:1px;}
   .v{font-size:14.5px;color:var(--ink);font-weight:600;}
   .v span{font-weight:400;color:var(--muted);}
   .v span::before{content:" · ";}
   .paid{display:flex;align-items:center;justify-content:space-between;
-    padding:15px 18px;border-top:1px solid #e4ede4;background:#f2f8f5;}
+    padding:15px 18px;border-top:1px solid #efefef;background:#fafaf9;}
   .paid .pl{font-size:13px;color:#0f8a63;font-weight:600;}
   .paid .pl b{display:block;color:var(--green);font-size:11.5px;letter-spacing:.04em;margin-top:2px;font-weight:700;}
-  .paid .amt{font-family:Georgia,serif;font-size:26px;font-weight:600;letter-spacing:-.01em;}
+  .paid .amt{font-family:var(--font-display);font-size:26px;font-weight:900;letter-spacing:-.01em;}
   /* rewards nudge — shown only when the stay was booked as a guest (not logged in) */
   .rewards{display:none;margin:18px 34px 0;padding:12px 14px;border-radius:14px;gap:12px;
-    align-items:center;background:linear-gradient(120deg,#fcf6e9,#f8efdb);border:1px solid #eaddbe;}
+    align-items:center;background:linear-gradient(120deg,#fafaf9,#fafaf9);border:1px solid #efefef;}
   .rewards.show{display:flex;}
   .rw-ic{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(193,154,75,.15);
     display:flex;align-items:center;justify-content:center;color:#b8923f;}
@@ -82,9 +78,9 @@
   .btn:hover{background:var(--jade-deep);}
   .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
   .ghostbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
-    border:1px solid #e2dac9;border-radius:12px;padding:14px;font-family:inherit;font-size:14.5px;font-weight:600;
+    border:1px solid #e3e3df;border-radius:12px;padding:14px;font-family:inherit;font-size:14.5px;font-weight:600;
     color:var(--jade);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
-  .ghostbtn:hover{background:#faf8f3;border-color:#d3c9b4;}
+  .ghostbtn:hover{background:#fafaf9;border-color:#e3e3df;}
   .ghostbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
   .txtlinks{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:6px;}
   .txtlinks a{color:var(--jade);font-size:14px;font-weight:600;text-decoration:none;}

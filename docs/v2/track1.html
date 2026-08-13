@@ -4,28 +4,17 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>onto — Japan, slowly in autumn</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css">
 <style>
 /* ============================================================
    onto — tokens
    ============================================================ */
 :root{
-  --jade:#0f8a63;
-  --jade-deep:#063f2f;
-  --ink:#1b211e;
-  --muted:#6d726c;
-  --bg:#faf8f3;
-  --card:#ffffff;
-  --line:#e4dfd2;
-  --pill:#f1ede3;
-  --gold:#f2c14e;
   --clay:#c26b4a; /* dining marker only */
 
-  --serif:"Fraunces",Georgia,serif;
-  --sans:"Instrument Sans",system-ui,-apple-system,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --serif:var(--font-display);
+  --sans:var(--font-body);
+  --mono:var(--font-mono);
 
   --shadow-sm:0 1px 2px rgba(27,33,30,.04), 0 2px 8px rgba(27,33,30,.05);
   --shadow-md:0 4px 12px rgba(27,33,30,.06), 0 12px 34px rgba(27,33,30,.09);
@@ -109,7 +98,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   overflow:hidden;
   box-shadow:var(--shadow-lg);
   border:1px solid var(--line);
-  background:#cfe3dd;
+  background:#efefef;
   aspect-ratio:22/9;
   max-height:50vh;
 }
@@ -260,7 +249,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .btn svg{width:15px;height:15px}
 .btn:hover{transform:translateY(-1px)}
 .btn-quiet{background:rgba(255,255,255,.9);color:var(--ink);border:1px solid rgba(255,255,255,.5)}
-.btn-gold{background:var(--gold);color:#3a2c05}
+.btn-gold{background:var(--gold);color:#a2610a}
 
 .day-close{
   position:absolute;top:15px;right:15px;z-index:6;width:40px;height:40px;border-radius:50%;
@@ -304,7 +293,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .knob svg{width:17px;height:17px}
 .knob.transit{background:var(--ink)}
 .knob.stay{background:var(--jade)}
-.knob.experience{background:var(--gold);color:#3a2c05}
+.knob.experience{background:var(--gold);color:#a2610a}
 .knob.dining{background:var(--clay)}
 .ev-body{padding-top:1px}
 .ev-time{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink)}
@@ -350,7 +339,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .doc-ic svg{width:15px;height:15px}
 .doc-ic.transit{background:var(--ink)}
 .doc-ic.stay{background:var(--jade)}
-.doc-ic.experience{background:var(--gold);color:#3a2c05}
+.doc-ic.experience{background:var(--gold);color:#a2610a}
 .doc-ic.dining{background:var(--clay)}
 .doc-main{min-width:0;flex:1;display:flex;flex-direction:column}
 .doc-title{font-weight:600;font-size:14px;line-height:1.25}
@@ -651,7 +640,7 @@ function buildMap(){
         <stop offset="0" stop-color="#cfe6df"/><stop offset="1" stop-color="#bcdcd6"/>
       </linearGradient>
       <linearGradient id="land" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#eef1e4"/><stop offset="1" stop-color="#e6ecd9"/>
+        <stop offset="0" stop-color="#fafaf9"/><stop offset="1" stop-color="#efefef"/>
       </linearGradient>
       <radialGradient id="park" cx="50%" cy="45%" r="60%">
         <stop offset="0" stop-color="#bcd9b3"/><stop offset="1" stop-color="#bcd9b3" stop-opacity="0"/>
@@ -683,7 +672,7 @@ function buildMap(){
     </g>
 
     <g class="m-fuji">
-      <path d="M636 322 L690 236 L744 322 Z" fill="#c3cbbe" stroke="#a9b79c" stroke-width="1.5"/>
+      <path d="M636 322 L690 236 L744 322 Z" fill="#e3e3df" stroke="#a9b79c" stroke-width="1.5"/>
       <path d="M672 262 L690 236 L708 262 q-18 -10 -36 0 Z" fill="#fff"/>
     </g>
 
@@ -772,7 +761,7 @@ function buildCircles(){
   route.setAttribute("aria-label","The route — full itinerary on one page");
   route.innerHTML=`<span class="ring"><span class="inner">
     <svg viewBox="0 0 44 44" fill="none" stroke="#7fe3bd" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M8 30 C 16 22, 24 30, 36 14"/><circle cx="8" cy="30" r="3.2" fill="#7fe3bd" stroke="none"/><circle cx="36" cy="14" r="3.2" fill="#f2c14e" stroke="none"/>
+      <path d="M8 30 C 16 22, 24 30, 36 14"/><circle cx="8" cy="30" r="3.2" fill="#7fe3bd" stroke="none"/><circle cx="36" cy="14" r="3.2" fill="#ffb503" stroke="none"/>
     </svg></span></span>
     <span class="lbl">The route</span><span class="city">Full itinerary</span>`;
   route.addEventListener("click",()=>openItinerary());

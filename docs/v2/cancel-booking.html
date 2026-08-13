@@ -4,22 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Taj Exotica · Cancel booking</title>
+<link rel="stylesheet" href="tokens.css">
 <style>
-  :root{
-    --bg:#efeae1; --card:#ffffff; --ink:#1c1c1c; --muted:#7c7771; --line:#e7e1d6;
-    --jade:#2f4f74; --jade-deep:#284667; --gold:#c19a4b; --green:#2a7d5f; --danger:#b23b32; --danger-deep:#9c332b;
-    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
-  }
   *{box-sizing:border-box;}
   body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:var(--font-body);
     line-height:1.5;-webkit-font-smoothing:antialiased;
     display:flex;align-items:center;justify-content:center;padding:40px 20px;}
-  h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+  h1{font-family:var(--font-display);letter-spacing:-.01em;margin:0;}
 
   .card{width:540px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;}
   .head{text-align:center;padding:38px 34px 22px;}
-  .warn{width:64px;height:64px;border-radius:50%;background:#fbeeec;border:1px solid #f2d5d0;
+  .warn{width:64px;height:64px;border-radius:50%;background:#fafaf9;border:1px solid #f2d5d0;
     display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
   .warn svg{width:30px;height:30px;stroke:var(--danger);stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;}
   .head h1{font-size:26px;margin-bottom:8px;}
@@ -27,24 +23,24 @@
 
   .stars{color:var(--gold);letter-spacing:3px;font-size:14px;}
   .sum{margin:4px 34px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
-  .sum-hd{padding:18px 18px 16px;background:#faf7f1;}
+  .sum-hd{padding:18px 18px 16px;background:#fafaf9;}
   .sum-hd .h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
-  .sum-hd .n{font-family:Georgia,serif;font-size:17px;font-weight:700;margin-top:3px;}
-  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#4a4641;margin-top:11px;}
+  .sum-hd .n{font-family:var(--font-display);font-size:17px;font-weight:700;margin-top:3px;}
+  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#2c2c2c;margin-top:11px;}
   .sum-hd .hd-dates span{font-weight:400;color:var(--muted);}
   .sum-hd .hd-dates span::before{content:" · ";}
   .sum-hd .hd-ref{font-size:12.5px;color:var(--muted);margin-top:9px;}
-  .sum-hd .hd-ref b{color:#4a4641;font-weight:600;letter-spacing:.03em;font-variant-numeric:tabular-nums;}
+  .sum-hd .hd-ref b{color:#2c2c2c;font-weight:600;letter-spacing:.03em;font-variant-numeric:tabular-nums;}
   .sum-hd .hd-paid{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
     margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);font-weight:600;}
-  .sum-hd .hd-paid b{font-family:Georgia,serif;font-size:18px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .sum-hd .hd-paid b{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
 
   /* refund box */
-  .refund{margin:18px 34px 0;padding:16px 18px;border:1px solid #cfe8db;background:#f2f8f5;border-radius:14px;}
+  .refund{margin:18px 34px 0;padding:16px 18px;border:1px solid #cfe8db;background:#fafaf9;border-radius:14px;}
   .refund .rtop{display:flex;align-items:center;justify-content:space-between;gap:14px;}
   .refund .rl{font-size:13px;color:#3a6a55;font-weight:600;}
   .refund .rl b{display:block;color:var(--green);font-size:11.5px;letter-spacing:.04em;margin-top:2px;font-weight:700;}
-  .refund .ramt{font-family:Georgia,serif;font-size:26px;font-weight:600;letter-spacing:-.01em;color:var(--ink);}
+  .refund .ramt{font-family:var(--font-display);font-size:26px;font-weight:900;letter-spacing:-.01em;color:var(--ink);}
 
   .cta{display:flex;gap:12px;padding:24px 34px 30px;}
   .btn{flex:1;border:none;background:var(--jade);color:#fff;font-size:15.5px;font-weight:600;
@@ -53,8 +49,8 @@
   .btn:hover{background:var(--jade-deep);}
   .btn.danger{background:var(--danger);}
   .btn.danger:hover{background:var(--danger-deep);}
-  .btn.ghost{background:#fff;color:var(--jade);border:1px solid #d9d1c1;}
-  .btn.ghost:hover{background:#faf7f1;border-color:#c2b8a4;}
+  .btn.ghost{background:#fff;color:var(--jade);border:1px solid #e3e3df;}
+  .btn.ghost:hover{background:#fafaf9;border-color:#808080;}
   .fine{text-align:center;color:var(--muted);font-size:12.5px;padding:0 40px 30px;margin:0;}
   @media(max-width:480px){ .cta{flex-direction:column-reverse;} }
 

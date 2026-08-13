@@ -4,28 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Taj Exotica · Price updated</title>
+<link rel="stylesheet" href="tokens.css">
 <style>
   :root{
-    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
-    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --green:#0f8a63; --amber:#b8862f;
-    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
+        --amber:#b8862f;
+    --shadow:var(--shadow-l2);
   }
   *{box-sizing:border-box;}
   body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:var(--font-body);
     line-height:1.5;-webkit-font-smoothing:antialiased;
     display:flex;align-items:center;justify-content:center;padding:40px 20px;}
-  h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0;}
+  h1{font-family:var(--font-display);letter-spacing:-.01em;margin:0;}
 
   .card{width:520px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;position:relative;}
   .backlink{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:5px;
     color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 8px;border-radius:8px;
     transition:color .15s,background .15s;}
-  .backlink:hover{color:var(--jade);background:#faf8f3;}
+  .backlink:hover{color:var(--jade);background:#fafaf9;}
   .backlink svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
 
   .head{text-align:center;padding:40px 34px 22px;}
-  .mark{width:66px;height:66px;border-radius:50%;background:#fbf3e0;border:1px solid #eeddb6;
+  .mark{width:66px;height:66px;border-radius:50%;background:#fafaf9;border:1px solid #efefef;
     display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
   .mark svg{width:32px;height:32px;stroke:var(--amber);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
   .mark.pop{animation:pop .45s cubic-bezier(.22,1.2,.36,1) both;}
@@ -35,28 +35,28 @@
 
   .stars{color:var(--gold);letter-spacing:3px;font-size:14px;}
   .sum{margin:8px 34px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
-  .sum-hd{padding:18px 18px 16px;background:#faf8f3;}
+  .sum-hd{padding:18px 18px 16px;background:#fafaf9;}
   .sum-hd .h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
-  .sum-hd .n{font-family:Georgia,serif;font-size:17px;font-weight:700;margin-top:3px;}
-  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#4a4641;margin-top:11px;}
+  .sum-hd .n{font-family:var(--font-display);font-size:17px;font-weight:700;margin-top:3px;}
+  .sum-hd .hd-dates{font-size:14.5px;font-weight:600;color:#2c2c2c;margin-top:11px;}
   .sum-hd .hd-dates span{font-weight:400;color:var(--muted);}
   .sum-hd .hd-dates span::before{content:" · ";}
 
   .prow{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;}
-  .prow+.prow{border-top:1px solid #f1ede5;}
+  .prow+.prow{border-top:1px solid #efefef;}
   .prow .pk{font-size:13.5px;color:var(--muted);}
   .prow .pv{font-size:15px;font-weight:600;}
-  .prow.old .pv{color:var(--muted);text-decoration:line-through;text-decoration-color:#c9c1b2;}
-  .prow.new{background:#f6f2ea;}
-  .prow.new .pk{color:#4a4641;font-weight:600;}
-  .prow.new .pv{font-family:Georgia,serif;font-size:22px;letter-spacing:-.01em;}
+  .prow.old .pv{color:var(--muted);text-decoration:line-through;text-decoration-color:#e3e3df;}
+  .prow.new{background:#fafaf9;}
+  .prow.new .pk{color:#2c2c2c;font-weight:600;}
+  .prow.new .pv{font-family:var(--font-display);font-weight:900;font-size:22px;letter-spacing:-.01em;}
   .diff{display:inline-flex;align-items:center;gap:5px;margin-left:9px;font-size:12px;font-weight:700;
-    padding:2px 8px;border-radius:20px;vertical-align:middle;background:#fbeeea;color:#c0442f;}
-  .diff.down{background:#eaf5ef;color:var(--green);}
+    padding:2px 8px;border-radius:20px;vertical-align:middle;background:#fafaf9;color:#b23b32;}
+  .diff.down{background:#eef6f1;color:var(--green);}
   .diff svg{width:11px;height:11px;stroke:currentColor;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;}
 
   .note{margin:16px 34px 0;display:flex;gap:11px;align-items:flex-start;
-    padding:13px 15px;border-radius:12px;background:#faf8f3;border:1px solid var(--line);}
+    padding:13px 15px;border-radius:12px;background:#fafaf9;border:1px solid var(--line);}
   .note svg{flex:none;width:18px;height:18px;stroke:var(--muted);stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-top:1px;}
   .note p{margin:0;font-size:13px;color:var(--muted);line-height:1.45;}
 
@@ -67,9 +67,9 @@
   .btn:hover{background:var(--jade-deep);}
   .btn b{font-weight:700;}
   .ghostbtn{display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;
-    border:1px solid #e2dac9;border-radius:12px;padding:14px;font-family:inherit;font-size:14.5px;font-weight:600;
+    border:1px solid #e3e3df;border-radius:12px;padding:14px;font-family:inherit;font-size:14.5px;font-weight:600;
     color:var(--jade);cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;}
-  .ghostbtn:hover{background:#faf8f3;border-color:#d3c9b4;}
+  .ghostbtn:hover{background:#fafaf9;border-color:#e3e3df;}
 </style>
 </head>
 <body>

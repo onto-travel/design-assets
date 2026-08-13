@@ -4,32 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>onto · Bookings</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <style>
-  /* v2 neutral system, same tokens as results.html. Following the departure
-     established there: where the design uses black #111827 as an *interactive*
+  /* Palette and type come from tokens.css. Following the departure established
+     in results.html: where the design uses black #111827 as an *interactive*
      accent, this uses the brand green. Black stays for plain text. */
   :root{
-    --bg:#f7f7f5; --card:#ffffff; --ink:#111827; --muted:#737373;
-    --line:#e8e8e6; --card-line:#e3e3df; --chip-bg:#f3f4f6; --chip-ink:#393939;
-    --jade:#0f8a63; --jade-deep:#0b6d4e; --jade-soft:#eef6f1;
-    --amber:#a2610a; --amber-soft:#fdf3e2;
-    --perf:#dcdcd8;
-    --shadow-card:0 6px 11px rgba(0,0,0,.07), 0 1.809px 3.316px rgba(0,0,0,.05),
-                  0 .751px 1.377px rgba(0,0,0,.04), 0 .272px .498px rgba(0,0,0,.02);
+    --perf:var(--border-default);   /* spent/past progress track */
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;}
-  body{min-height:100vh;background:var(--bg);color:var(--ink);
-    font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    line-height:1.5;-webkit-font-smoothing:antialiased;}
-  h1,h2,h3{font-family:inherit;font-weight:700;letter-spacing:-.015em;margin:0;}
-  button,input,select{font-family:inherit;}
+  body{min-height:100vh;line-height:1.5;}
   [hidden]{display:none !important;}
-  a{color:inherit;}
-  :focus-visible{outline:2px solid var(--jade);outline-offset:2px;border-radius:4px;}
 
   /* ============ TOP NAV — breadcrumb left, account right ============ */
   .topnav{position:sticky;top:0;z-index:80;background:rgba(247,247,245,.88);
@@ -38,15 +22,15 @@
     display:flex;align-items:center;gap:10px;}
   .crumb{display:flex;align-items:center;gap:10px;min-width:0;}
   .tn-brand{font-size:17px;font-weight:800;letter-spacing:.01em;color:var(--ink);text-decoration:none;}
-  .crumb-sep{color:#c4c4bf;font-size:16px;}
-  .crumb-here{font-size:16px;font-weight:500;color:#6b6b66;}
+  .crumb-sep{color:#e3e3df;font-size:16px;}
+  .crumb-here{font-size:16px;font-weight:500;color:#808080;}
   .tn-right{margin-left:auto;display:flex;align-items:center;gap:8px;position:relative;}
   /* the account is a name, not an initial — the mock is a single real person */
   .tn-who{display:inline-flex;align-items:center;gap:7px;border:none;background:none;padding:7px 10px;
     border-radius:10px;font-size:14.5px;font-weight:600;color:var(--ink);cursor:pointer;
     transition:background .15s;}
   .tn-who:hover{background:rgba(0,0,0,.045);}
-  .tn-who .cv{width:9px;height:9px;stroke:#8a8a85;fill:none;stroke-width:2.2;
+  .tn-who .cv{width:9px;height:9px;stroke:#808080;fill:none;stroke-width:2.2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
   /* The panel's own styles live in topnav.js and arrive with it — which means
      that until the script has run, this div has none, and a filled one would
@@ -64,11 +48,11 @@
   /* A fixed 40 tall, hugging its label sideways. The vertical padding is 1px
      because the height sets the box and the flex centring places the text in
      it — padding here would only fight the height. */
-  .btn{border:1px solid #dededa;background:#fff;color:var(--ink);border-radius:12px;
+  .btn{border:1px solid #efefef;background:#fff;color:var(--ink);border-radius:12px;
     height:36px;padding:1px 12px;
     font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;
     align-items:center;gap:8px;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;}
-  .btn:hover{background:#f7f7f5;border-color:#cdcdc7;}
+  .btn:hover{background:#fafaf9;border-color:#e3e3df;}
   .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;
     stroke-linecap:round;stroke-linejoin:round;}
   .btn.jade{background:var(--jade);border-color:var(--jade);color:#fff;}
@@ -100,14 +84,14 @@
   /* Booked somewhere else. Sits against the name because it qualifies the
      booking, not the row: it is the one thing the name alone doesn't say. */
   .pill{display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:7px;
-    background:var(--chip-bg);color:#6f6f69;font-size:11.5px;font-weight:700;
+    background:var(--chip-bg);color:#808080;font-size:11.5px;font-weight:700;
     letter-spacing:.01em;vertical-align:2px;margin-left:2px;}
   .tk-name a:focus-visible{outline:none;}
   .tk-name a:focus-visible::after{outline:2px solid var(--jade);outline-offset:-3px;}
   /* one dotted line of facts, the way a ticket prints them */
   .tk-meta{margin-top:3px;font-size:13px;font-weight:500;color:var(--muted);
     display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;}
-  .tk-meta .sep{color:#c8c8c3;}
+  .tk-meta .sep{color:#e3e3df;}
   /* the case and its action, pinned to the foot of the stub */
   /* No wrapping here. When the foot could break, the same card laid out two
      different ways depending on how wide that month's name happened to be —
@@ -158,7 +142,7 @@
   .tk-when .k{font-size:12.5px;font-weight:500;color:var(--muted);}
   .tk-when .v{font-size:14.5px;font-weight:700;margin-top:2px;white-space:nowrap;}
   .tk-when .v span{font-weight:500;color:var(--muted);}
-  .tk-when .dash{color:#c8c8c3;padding-bottom:3px;}
+  .tk-when .dash{color:#e3e3df;padding-bottom:3px;}
 
   /* ============ THE STAMP ============
      A finding, not a control: there is nothing to press on this row, and the
@@ -186,7 +170,7 @@
 
   /* the stub */
   .tk-stub{flex:none;width:222px;align-self:stretch;min-height:152px;
-    border-radius:15px;overflow:hidden;background:#eceae5;}
+    border-radius:15px;overflow:hidden;background:#efefef;}
   .tk-stub img{width:100%;height:100%;object-fit:cover;display:block;}
 
   /* Someone else's booking runs shorter than one of ours, because there is
@@ -204,7 +188,6 @@
      number: at 80 on a card this height it stops being a mark on the paper and
      starts being the thing the card is. */
   .tk.ext .stamp{width:70px;height:70px;}
-
 
   /* ============ STATUS ============ */
   /* Every status is one line. A second line under it only ever restated the
@@ -250,7 +233,7 @@
   /* ---- getting a booking in ----
      Still here, and no longer dressed as the thing to do: most visits have no
      voucher to hand over, so it keeps its place and loses its weight. */
-  .up{position:relative;border:1px dashed #d8d8d3;border-radius:16px;padding:16px 18px;
+  .up{position:relative;border:1px dashed #e3e3df;border-radius:16px;padding:16px 18px;
     transition:background .15s,border-color .15s;}
   /* the whole card is the drop target, so a dragged file has somewhere obvious to land */
   .up.drag{background:var(--jade-soft);border-color:var(--jade);}
@@ -358,13 +341,13 @@
   /* Two readings of what may be one booking, stacked so that the lines of one
      fall directly under the lines of the other. */
   .dup{margin-top:13px;display:flex;flex-direction:column;gap:9px;}
-  .dup-b{padding:11px 12px;border-radius:12px;background:#f8f8f6;border:1px solid var(--line);}
+  .dup-b{padding:11px 12px;border-radius:12px;background:#fafaf9;border:1px solid var(--line);}
   .dup-k{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
-    color:#9c9c95;}
+    color:#808080;}
   .dup-n{margin-top:3px;font-size:13.5px;font-weight:700;line-height:1.3;}
   .dup-f{margin-top:5px;display:flex;flex-wrap:wrap;align-items:center;gap:1px 6px;
     font-size:12px;font-weight:600;color:var(--muted);}
-  .dup-f .sep{color:#c8c8c3;}
+  .dup-f .sep{color:#e3e3df;}
   /* what we can see is different. What we can't is why this is a question and
      not a decision. */
   .dup-f .x{color:var(--amber);}
@@ -393,7 +376,7 @@
   .empty{margin:0;padding:40px 0;font-size:15px;font-weight:500;color:var(--muted);}
 
   .foot{grid-column:1/-1;margin-top:8px;text-align:center;}
-  .foot button{background:none;border:none;font-size:12.5px;color:#b8b8b2;cursor:pointer;padding:6px 10px;}
+  .foot button{background:none;border:none;font-size:12.5px;color:#e3e3df;cursor:pointer;padding:6px 10px;}
   .foot button:hover{color:var(--muted);text-decoration:underline;}
 
   /* TEMPORARY — every state of the voucher card, stacked down the right edge.
@@ -408,13 +391,13 @@
     box-shadow:0 10px 26px rgba(0,0,0,.26);
     max-height:calc(100vh - 32px);overflow-y:auto;}
   .dev b{padding:4px 10px 7px;font-size:10px;font-weight:800;letter-spacing:.05em;
-    text-transform:uppercase;color:#8a8a82;}
+    text-transform:uppercase;color:#808080;}
   .dev button + b{padding-top:14px;}
   .dev button{flex:none;height:28px;padding:0 12px;border:none;background:none;
-    border-radius:9px;font-size:12px;font-weight:700;color:#c6c6be;cursor:pointer;
+    border-radius:9px;font-size:12px;font-weight:700;color:#e3e3df;cursor:pointer;
     white-space:nowrap;text-align:left;transition:background .12s,color .12s;}
   .dev button:hover{color:#fff;background:rgba(255,255,255,.1);}
-  .dev button.on{background:#fff;color:#1a1a18;}
+  .dev button.on{background:#fff;color:#2c2c2c;}
   .dev button.on:hover{background:#fff;}
 
   @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important;} }

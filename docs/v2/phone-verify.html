@@ -4,46 +4,42 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>onto · Verify your mobile</title>
+<link rel="stylesheet" href="tokens.css">
 <style>
-  :root{
-    --bg:#faf8f3; --card:#ffffff; --ink:#1b211e; --muted:#6d726c; --line:#e4dfd2;
-    --jade:#0f8a63; --jade-deep:#063f2f; --gold:#f2c14e; --green:#0f8a63; --danger:#b23b32;
-    --shadow:0 1px 2px rgba(0,0,0,.04), 0 18px 44px rgba(40,30,10,.10);
-  }
   *{box-sizing:border-box;}
   body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:var(--font-body);
     line-height:1.5;-webkit-font-smoothing:antialiased;
     display:flex;align-items:center;justify-content:center;padding:24px;}
 
   .card{width:440px;max-width:100%;background:var(--card);border-radius:20px;box-shadow:var(--shadow);
     padding:34px 34px 30px;text-align:center;}
-  .brand{display:inline-block;font-family:Georgia,serif;font-weight:700;font-size:20px;color:var(--jade);
+  .brand{display:inline-block;font-family:var(--font-display);font-weight:900;font-size:20px;color:var(--jade);
     text-decoration:none;margin-bottom:24px;letter-spacing:-.01em;}
   .brand span{color:var(--gold);}
-  .ic{width:60px;height:60px;border-radius:50%;background:#eaf5ef;border:1px solid #cfe8db;
+  .ic{width:60px;height:60px;border-radius:50%;background:#eef6f1;border:1px solid #cfe8db;
     display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
   .ic svg{width:27px;height:27px;stroke:var(--jade);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-  .ic.ok{background:#eaf5ef;border-color:#cfe8db;}
+  .ic.ok{background:#eef6f1;border-color:#cfe8db;}
   .ic.ok svg{stroke:var(--green);stroke-width:2.6;}
   .ic.pop{animation:pop .45s cubic-bezier(.22,1.2,.36,1) both;}
   @keyframes pop{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
-  h1{font-family:Georgia,serif;font-size:24px;color:var(--ink);margin:0 0 9px;letter-spacing:-.01em;}
+  h1{font-family:var(--font-display);font-weight:900;font-size:24px;color:var(--ink);margin:0 0 9px;letter-spacing:-.01em;}
   .lede{color:var(--muted);font-size:14.5px;margin:0 auto;max-width:344px;}
   .lede b{color:var(--ink);font-weight:600;}
 
   .phone-field{display:flex;gap:10px;margin-top:22px;}
-  .cc{flex:none;display:inline-flex;align-items:center;gap:7px;background:#faf7f1;border:1px solid #d9d1c1;
+  .cc{flex:none;display:inline-flex;align-items:center;gap:7px;background:#fafaf9;border:1px solid #e3e3df;
     border-radius:12px;padding:0 14px;font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);}
-  .phone-field input{flex:1;min-width:0;border:1px solid #d9d1c1;border-radius:12px;padding:14px 16px;
+  .phone-field input{flex:1;min-width:0;border:1px solid #e3e3df;border-radius:12px;padding:14px 16px;
     font-family:inherit;font-size:16px;color:var(--ink);background:#fff;letter-spacing:.03em;}
   .phone-field input:focus{outline:none;border-color:var(--jade);box-shadow:0 0 0 3px rgba(15,138,99,.15);}
 
   .otp{display:flex;gap:9px;justify-content:center;margin:24px 0 4px;}
-  .otp-in{width:46px;height:54px;text-align:center;border:1px solid #d9d1c1;border-radius:12px;
+  .otp-in{width:46px;height:54px;text-align:center;border:1px solid #e3e3df;border-radius:12px;
     font-family:inherit;font-size:22px;font-weight:600;color:var(--ink);background:#fff;transition:border-color .12s,box-shadow .12s;}
   .otp-in:focus{outline:none;border-color:var(--jade);box-shadow:0 0 0 3px rgba(15,138,99,.15);}
-  .otp-in.filled{border-color:#bcb3a1;background:#faf7f1;}
+  .otp-in.filled{border-color:#e3e3df;background:#fafaf9;}
   .card.err-shake .otp{animation:shake .35s;}
   @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
 

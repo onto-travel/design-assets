@@ -4,28 +4,17 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>onto — Japan, slowly in autumn</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css">
 <style>
 /* ============================================================
    onto — tokens
    ============================================================ */
 :root{
-  --jade:#0f8a63;
-  --jade-deep:#063f2f;
-  --ink:#1b211e;
-  --muted:#6d726c;
-  --bg:#faf8f3;
-  --card:#ffffff;
-  --line:#e4dfd2;
-  --pill:#f1ede3;
-  --gold:#f2c14e;
   --clay:#b5583c; /* dining marker only */
 
-  --serif:"Fraunces",Georgia,serif;
-  --sans:"Instrument Sans",system-ui,-apple-system,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --serif:var(--font-display);
+  --sans:var(--font-body);
+  --mono:var(--font-mono);
 
   --shadow-sm:0 1px 2px rgba(27,33,30,.04), 0 2px 8px rgba(27,33,30,.05);
   --shadow-md:0 4px 12px rgba(27,33,30,.06), 0 12px 34px rgba(27,33,30,.09);
@@ -33,7 +22,7 @@
 
   --r-sm:10px; --r-md:16px; --r-lg:24px; --r-xl:32px;
   --maxw:960px;
-  --ease:cubic-bezier(.2,.7,.2,1);
+  
 }
 
 *{box-sizing:border-box}
@@ -77,7 +66,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .chip{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.04em;color:var(--ink);background:var(--pill);border:1px solid var(--line);padding:6px 11px;border-radius:999px;white-space:nowrap}
 .chip b{color:var(--jade);font-weight:600}
 
-.map-shell{position:relative;border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-lg);border:1px solid var(--line);background:#cfe3dd;aspect-ratio:22/9;max-height:50vh}
+.map-shell{position:relative;border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-lg);border:1px solid var(--line);background:#efefef;aspect-ratio:22/9;max-height:50vh}
 @media(max-width:760px){.map-shell{aspect-ratio:4/5;max-height:none}}
 .map-shell svg{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation}
 
@@ -128,7 +117,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   overflow:hidden;box-shadow:var(--shadow-sm);scroll-margin-top:66px;
   transition:box-shadow .3s var(--ease),border-color .3s var(--ease);
 }
-.daycard.open{box-shadow:var(--shadow-lg);border-color:#d6cfbc}
+.daycard.open{box-shadow:var(--shadow-lg);border-color:#e3e3df}
 
 /* media / header */
 .dc-media{position:relative;height:222px;background:var(--jade-deep)}
@@ -175,7 +164,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .btn svg{width:15px;height:15px}
 .btn:hover{transform:translateY(-1px)}
 .btn-quiet{background:rgba(255,255,255,.92);color:var(--ink)}
-.btn-gold{background:var(--gold);color:#3a2c05}
+.btn-gold{background:var(--gold);color:#a2610a}
 
 /* body (accordion) */
 .dc-body{height:0;overflow:hidden;transition:height .38s var(--ease)}
@@ -196,7 +185,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .knob svg{width:17px;height:17px}
 .knob.transit{background:var(--ink)}
 .knob.stay{background:var(--jade)}
-.knob.experience{background:var(--gold);color:#3a2c05}
+.knob.experience{background:var(--gold);color:#a2610a}
 .knob.dining{background:var(--clay)}
 .ev-body{padding-top:1px;min-width:0}
 .ev-time{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink)}
@@ -254,7 +243,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .doc-ic svg{width:15px;height:15px}
 .doc-ic.transit{background:var(--ink)}
 .doc-ic.stay{background:var(--jade)}
-.doc-ic.experience{background:var(--gold);color:#3a2c05}
+.doc-ic.experience{background:var(--gold);color:#a2610a}
 .doc-ic.dining{background:var(--clay)}
 .doc-main{min-width:0;flex:1;display:flex;flex-direction:column}
 .doc-title{font-weight:600;font-size:14px;line-height:1.25}
@@ -518,7 +507,7 @@ function buildMap(){
   <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustrated route map, Tokyo to Kyoto">
     <defs>
       <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe6df"/><stop offset="1" stop-color="#bcdcd6"/></linearGradient>
-      <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1e4"/><stop offset="1" stop-color="#e6ecd9"/></linearGradient>
+      <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fafaf9"/><stop offset="1" stop-color="#efefef"/></linearGradient>
       <radialGradient id="park" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#bcd9b3"/><stop offset="1" stop-color="#bcd9b3" stop-opacity="0"/></radialGradient>
       <filter id="soft"><feGaussianBlur stdDeviation="7"/></filter>
     </defs>
@@ -537,7 +526,7 @@ function buildMap(){
       <path d="M840 400 l40 -34 30 24 40 -30"/>
     </g>
     <g class="m-fuji">
-      <path d="M636 322 L690 236 L744 322 Z" fill="#c3cbbe" stroke="#a9b79c" stroke-width="1.5"/>
+      <path d="M636 322 L690 236 L744 322 Z" fill="#e3e3df" stroke="#a9b79c" stroke-width="1.5"/>
       <path d="M672 262 L690 236 L708 262 q-18 -10 -36 0 Z" fill="#fff"/>
     </g>
     <path d="${routeD}" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
