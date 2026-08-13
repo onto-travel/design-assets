@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>onto — Flight results</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* The shell is results.html's: 1440 frame, 40px gutters, list left and a
+     332px rail right, everything sticky parking 8px under the header. Keeping
+     the two listing pages on one geometry is the point — a flight list and a
+     hotel list should differ in what a row says, not in where the page's
+     furniture sits.
+
+     Same departure from the Figma file as the stays list makes: where the
+     design uses black as an *interactive* accent, this uses the brand green. */
+  :root{ --stick:80px; }
+  body{min-height:100vh;background:var(--bg);}
+
+  /* ============ TOP NAV ============ */
+  /* results.html's header, verbatim: the vertical is carried by the breadcrumb
+     — "ONTO / Flights to Goa" — rather than by a links row, which that page
+     hides. A listing page has already been navigated to; it says where you are,
+     not where else you could go. */
+  .topnav{position:sticky;top:0;z-index:90;
+    background:rgba(250,250,249,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:.8px solid var(--line);}
+  .topnav-in{max-width:1440px;margin:0 auto;padding:0 40px;height:72px;
+    display:flex;align-items:center;justify-content:space-between;gap:26px;}
+  .tn-brand{display:flex;align-items:center;gap:9px;font-size:20px;color:var(--ink);
+    letter-spacing:normal;text-decoration:none;white-space:nowrap;font-weight:400;}
+  .tn-brand b{font-weight:700;}
+  .tn-brand .tn-sl{font-size:24px;font-weight:400;letter-spacing:-.12px;color:var(--ink);}
+  .tn-right{display:flex;align-items:center;gap:9px;position:relative;}
+
+  .wrap{max-width:1440px;margin:0 auto;padding:0 40px 140px;}
+
+  /* ============ THE SEARCH, RESTATED ============ */
+  /* Not an editable copy of the search card — a receipt of what was asked for,
+     with one way back to change it. Rebuilding five live fields here would be a
+     second implementation to keep in step with the first. */
+  .recap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:22px 0 18px;}
+  .recap-route{display:flex;align-items:center;gap:11px;font-family:var(--font-display);
+    font-size:26px;font-weight:900;letter-spacing:-.01em;color:var(--ink);}
+  .recap-route svg{width:19px;height:19px;stroke:var(--jade);fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .recap-meta{font-size:14.5px;color:var(--muted);}
+  .recap-meta b{color:var(--ink);font-weight:600;}
+  .recap-change{margin-left:auto;background:none;border:.8px solid var(--card-line);border-radius:999px;
+    padding:9px 18px;font-family:inherit;font-size:14px;font-weight:600;color:var(--ink);
+    text-decoration:none;cursor:pointer;box-shadow:var(--shadow-field);transition:border-color .15s,background .15s;}
+  .recap-change:hover{border-color:#808080;background:#fff;}
+
+  /* ============ LEG TABS ============ */
+  /* A round trip is two decisions, so it gets two tabs rather than one list of
+     pre-paired itineraries: pick the outbound you want, then the return. The
+     tab keeps the leg's own summary once it's answered. */
+  .legs{display:flex;gap:10px;margin:0 0 22px;}
+  .leg{flex:1;text-align:left;background:var(--card);border:.8px solid var(--card-line);border-radius:18px;
+    padding:14px 18px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow-field);
+    transition:border-color .16s,box-shadow .16s,background .16s;min-width:0;}
+  .leg:hover{border-color:#cfcfca;}
+  .leg[aria-selected="true"]{border-color:var(--jade);background:var(--jade-soft);box-shadow:none;}
+  .leg-k{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--muted);}
+  .leg[aria-selected="true"] .leg-k{color:var(--jade-deep);}
+  .leg-n{font-size:16px;font-weight:700;color:var(--ink);margin-top:5px;letter-spacing:-.01em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .leg-s{font-size:13px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .leg-s.done{color:var(--jade-deep);font-weight:600;}
+
+  /* ============ RESULTS HEADER ============ */
+  .res-head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 0 14px;flex-wrap:wrap;}
+  .res-head h1{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:0;}
+  .res-head h1 span{color:var(--muted);font-weight:500;}
+  .sortwrap{display:flex;align-items:center;gap:9px;}
+  .sort{appearance:none;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+    border:.8px solid var(--card-line);border-radius:999px;padding:10px 38px 10px 16px;
+    font-family:inherit;font-size:15px;font-weight:500;color:var(--ink);cursor:pointer;
+    box-shadow:var(--shadow-field);transition:border-color .15s;}
+  .sort:hover{border-color:#e3e3df;}
+
+  /* ============ TWO COLUMN ============ */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 332px;gap:clamp(24px,4vw,56px);align-items:start;}
+  .col-list{min-width:0;display:flex;flex-direction:column;gap:12px;}
+  .side{position:sticky;top:var(--stick);min-width:0;}
+
+  /* ============ FLIGHT CARD ============ */
+  .fc{display:grid;grid-template-columns:186px minmax(0,1fr) 178px;align-items:center;gap:20px;
+    background:var(--card);border:.8px solid var(--card-line);border-radius:20px;padding:18px 20px;
+    box-shadow:var(--shadow-card);transition:box-shadow .18s,border-color .18s;}
+  .fc:hover{box-shadow:0 10px 20px rgba(0,0,0,.09),0 3px 6px rgba(0,0,0,.05);}
+  .fc.is-sel{border-color:var(--jade);box-shadow:0 0 0 1px var(--jade) inset;}
+
+  /* --- airline --- */
+  .fc-air{display:flex;align-items:center;gap:12px;min-width:0;}
+  .fc-logo{width:38px;height:38px;border-radius:10px;flex:none;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:13px;font-weight:700;letter-spacing:.02em;}
+  .fc-airt{min-width:0;}
+  .fc-airn{font-size:14.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fc-airm{font-size:12.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* --- the leg itself --- */
+  /* Times are the thing being compared down the column, so they're the biggest
+     text on the row and they're tabular — the digits have to line up. */
+  .fc-leg{display:flex;align-items:center;gap:16px;min-width:0;}
+  .fc-t{text-align:center;flex:none;}
+  .fc-hh{font-family:var(--font-display);font-size:22px;font-weight:900;letter-spacing:-.02em;
+    color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1;}
+  .fc-hh sup{font-size:11px;font-weight:700;color:var(--jade);vertical-align:super;margin-left:2px;letter-spacing:0;}
+  .fc-cd{font-size:12.5px;color:var(--muted);margin-top:3px;font-weight:600;}
+  .fc-mid{flex:1;min-width:0;text-align:center;}
+  .fc-dur{font-size:12.5px;color:var(--muted);margin-bottom:5px;}
+  /* the hairline with a node at each end, and one more where it stops */
+  .fc-line{position:relative;height:2px;background:var(--line);border-radius:2px;}
+  .fc-line::before,.fc-line::after{content:"";position:absolute;top:50%;width:6px;height:6px;
+    border-radius:50%;background:#c9c9c4;transform:translateY(-50%);}
+  .fc-line::before{left:0;} .fc-line::after{right:0;}
+  .fc-stop{position:absolute;top:50%;width:7px;height:7px;border-radius:50%;background:#fff;
+    border:2px solid var(--gold);transform:translate(-50%,-50%);}
+  .fc-stops{font-size:12.5px;margin-top:6px;font-weight:600;color:var(--jade-deep);}
+  .fc-stops.via{color:var(--muted);font-weight:500;}
+
+  /* --- price --- */
+  .fc-buy{text-align:right;flex:none;}
+  .fc-pr{font-family:var(--font-display);font-size:23px;font-weight:900;letter-spacing:-.02em;color:var(--ink);}
+  .fc-pu{font-size:12px;color:var(--muted);margin-top:1px;}
+  .fc-go{margin-top:10px;width:100%;background:var(--jade);color:#fff;border:none;border-radius:12px;
+    padding:11px 16px;font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer;transition:background .15s;}
+  .fc-go:hover{background:var(--jade-deep);}
+  .fc.is-sel .fc-go{background:var(--jade-deep);}
+  .fc-seats{font-size:12px;font-weight:600;color:#b45309;margin-top:7px;}
+
+  /* ============ FILTER RAIL ============ */
+  .rail-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px;}
+  .side-h{font-size:20px;font-weight:700;color:var(--ink);margin:0;letter-spacing:-.01em;}
+  .clear-link{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;
+    cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:2px;}
+  .clear-link:hover{color:var(--ink);}
+  .clear-link:disabled{opacity:.4;cursor:default;text-decoration:none;}
+
+  .fsec{border-top:.8px solid var(--line);}
+  .fsec-h{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+    background:none;border:none;padding:14px 0;cursor:pointer;font-family:inherit;
+    font-size:14px;font-weight:700;color:var(--ink);text-align:left;}
+  .fsec-ar{width:16px;height:16px;flex:none;stroke:var(--muted);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
+  .fsec.is-open > .fsec-h .fsec-ar{transform:rotate(180deg);}
+  .fsec-b{padding-bottom:16px;}
+  .fsec:not(.is-open) .fsec-b{display:none;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{border:.8px solid #efefef;background:var(--card);color:var(--chip-ink);border-radius:999px;
+    height:36px;padding:0 14px;font-family:inherit;font-size:13.5px;font-weight:600;
+    cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:6px;}
+  .chip:hover{border-color:#e3e3df;background:#fafaf9;}
+  .chip[aria-pressed="true"]{background:var(--jade-soft);border-color:var(--jade);
+    color:var(--jade-deep);font-weight:700;}
+  .chip:disabled{opacity:.4;cursor:default;}
+
+  .checks{display:flex;flex-direction:column;gap:2px;}
+  .chk{display:flex;align-items:center;gap:10px;padding:7px 2px;border-radius:8px;cursor:pointer;
+    font-size:14px;transition:background .1s;}
+  .chk:hover{background:#fafaf9;}
+  .chk.off{opacity:.42;}
+  .chk input{position:absolute;opacity:0;width:0;height:0;}
+  .chk .box{width:16px;height:16px;border:1px solid #808080;border-radius:3px;flex:none;
+    display:flex;align-items:center;justify-content:center;background:#fff;transition:all .12s;}
+  .chk .box svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0;}
+  .chk input:checked + .box{background:var(--jade);border-color:var(--jade);}
+  .chk input:checked + .box svg{opacity:1;}
+  .chk input:focus-visible + .box{outline:2px solid var(--jade);outline-offset:2px;}
+  .chk-lb{font-size:14px;font-weight:600;color:var(--chip-ink);min-width:0;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chk-n{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--muted);flex:none;
+    font-variant-numeric:tabular-nums;}
+
+  /* price slider */
+  .rng-val{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:12px;}
+  .rng-val span{color:var(--muted);font-weight:500;}
+  input[type=range]{width:100%;appearance:none;background:none;height:20px;cursor:pointer;}
+  input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--line);}
+  input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--jade);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);margin-top:-7px;}
+  input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--line);}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--jade);
+    border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);}
+  .rng-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:2px;}
+
+  /* ============ EMPTY ============ */
+  .empty{background:var(--card);border:.8px solid var(--card-line);border-radius:20px;
+    padding:56px 32px;text-align:center;box-shadow:var(--shadow-field);}
+  .empty h3{font-size:19px;font-weight:700;margin:0 0 6px;letter-spacing:-.01em;}
+  .empty p{color:var(--muted);font-size:14.5px;margin:0 0 20px;}
+  .empty button{background:var(--jade);color:#fff;border:none;border-radius:12px;padding:11px 22px;
+    font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer;}
+
+  /* ============ THE RUNNING TOTAL ============ */
+  /* Docked rather than in the rail: the two legs are chosen at different
+     moments and the bar has to stay visible through both. */
+  .dock{position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(255,255,255,.97);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:.8px solid var(--line);
+    box-shadow:var(--shadow-up);transform:translateY(102%);transition:transform .28s var(--ease);}
+  .dock.up{transform:none;}
+  .dock-in{max-width:1440px;margin:0 auto;padding:14px 40px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;}
+  .dock-legs{display:flex;align-items:center;gap:26px;min-width:0;flex-wrap:wrap;}
+  .dock-leg{min-width:0;}
+  .dock-k{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .dock-v{font-size:14.5px;font-weight:600;color:var(--ink);margin-top:3px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;}
+  .dock-v em{font-style:normal;color:var(--muted);font-weight:500;}
+  .dock-sum{margin-left:auto;display:flex;align-items:center;gap:22px;}
+  .dock-tot{text-align:right;}
+  .dock-tp{font-family:var(--font-display);font-size:24px;font-weight:900;letter-spacing:-.02em;color:var(--ink);}
+  .dock-ts{font-size:12px;color:var(--muted);margin-top:1px;}
+  .dock-go{background:var(--jade);color:#fff;border:none;border-radius:14px;padding:14px 30px;
+    font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;}
+  .dock-go:hover:not(:disabled){background:var(--jade-deep);}
+  .dock-go:disabled{background:#c8ccc9;cursor:default;}
+
+  @media(max-width:1080px){
+    .grid{grid-template-columns:1fr;}
+    .side{position:static;}
+    .fc{grid-template-columns:1fr;gap:16px;}
+    .fc-buy{text-align:left;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+    .fc-go{width:auto;margin-top:0;}
+  }
+  @media(max-width:760px){
+    .wrap,.topnav-in,.dock-in{padding-left:20px;padding-right:20px;}
+    .legs{flex-direction:column;}
+    .recap-route{font-size:21px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-in">
+    <a class="tn-brand" href="home2.html"><b>ONTO</b><span class="tn-sl">/</span><span id="crumb">Flights</span></a>
+    <div class="tn-right">
+      <button type="button" class="tn-who" id="profileBtn" aria-haspopup="true" aria-expanded="false">Saanvi</button>
+      <div class="menu" id="profileMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="recap">
+    <div class="recap-route" id="recapRoute"></div>
+    <div class="recap-meta" id="recapMeta"></div>
+    <a class="recap-change" href="flights.html">Change search</a>
+  </div>
+
+  <div class="legs" role="tablist" id="legTabs">
+    <button type="button" class="leg" role="tab" data-leg="out" aria-selected="true">
+      <span class="leg-k">Departure</span>
+      <span class="leg-n" data-n>—</span>
+      <span class="leg-s" data-s>—</span>
+    </button>
+    <button type="button" class="leg" role="tab" data-leg="ret" aria-selected="false">
+      <span class="leg-k">Return</span>
+      <span class="leg-n" data-n>—</span>
+      <span class="leg-s" data-s>—</span>
+    </button>
+  </div>
+
+  <div class="res-head">
+    <h1 id="resCount">—</h1>
+    <div class="sortwrap">
+      <select class="sort" id="sortSel" aria-label="Sort flights by">
+        <option value="best">Best</option>
+        <option value="cheap">Cheapest</option>
+        <option value="fast">Fastest</option>
+        <option value="early">Earliest departure</option>
+        <option value="late">Latest departure</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="col-list" id="list"></div>
+    <aside class="side">
+      <div class="rail-top">
+        <h2 class="side-h">Filters</h2>
+        <button type="button" class="clear-link" id="clearAll">Clear all</button>
+      </div>
+      <div id="rail"></div>
+    </aside>
+  </div>
+</div>
+
+<div class="dock" id="dock">
+  <div class="dock-in">
+    <div class="dock-legs">
+      <div class="dock-leg"><div class="dock-k">Departure</div><div class="dock-v" id="dockOut">—</div></div>
+      <div class="dock-leg" id="dockRetBlock"><div class="dock-k">Return</div><div class="dock-v" id="dockRet"><em>Not chosen</em></div></div>
+    </div>
+    <div class="dock-sum">
+      <div class="dock-tot">
+        <div class="dock-tp" id="dockTotal">—</div>
+        <div class="dock-ts" id="dockNote"></div>
+      </div>
+      <button type="button" class="dock-go" id="dockGo" disabled>Continue</button>
+    </div>
+  </div>
+</div>
+
+<script src="flights-data.js"></script>
+<script>
+/* =============================================================
+   WHAT WAS ASKED FOR
+   -------------------------------------------------------------
+   The query string is the source of truth, because a results URL should be
+   something you can paste. sessionStorage is the fallback for a reload that
+   lost its parameters, and there is a final hard default so that opening this
+   file directly still renders a page rather than an error.
+   ============================================================= */
+var SKEY = 'onto:flightSearch:v1';
+var $ = function(id){ return document.getElementById(id); };
+var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+
+var Q = (function(){
+  var o = {};
+  (location.search||'').replace(/^\?/,'').split('&').forEach(function(p){
+    if(!p) return; var i = p.indexOf('='); if(i<0) return;
+    o[decodeURIComponent(p.slice(0,i))] = decodeURIComponent(p.slice(i+1));
+  });
+  return o;
+})();
+
+/* "2026-6-11" → a Date. The middle number is a month index, matching what the
+   search page writes, so July is 6 here and stays 6 all the way through.
+
+   The range checks are not decoration: `new Date(2026, 99, 99)` is not NaN, it
+   is a real date in 2034, so a URL carrying "2026-99-99" would sail past an
+   isNaN guard and land the page on a return that precedes its departure. The
+   round-trip comparison catches the subtler version of the same thing — Feb 31
+   rolling quietly forward into March. */
+function parseYmd(s){
+  var m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(String(s||''));
+  if(!m) return null;
+  var y = +m[1], mo = +m[2], da = +m[3];
+  if(mo < 0 || mo > 11 || da < 1 || da > 31) return null;
+  var d = new Date(y, mo, da);
+  if(d.getFullYear() !== y || d.getMonth() !== mo || d.getDate() !== da) return null;
+  return d;
+}
+
+var REQ = (function(){
+  var stored = {};
+  try{ stored = JSON.parse(sessionStorage.getItem(SKEY)) || {}; }catch(e){}
+
+  var from = Q.from || stored.from || 'BOM';
+  var to   = Q.to   || stored.to   || 'GOX';
+  if(!Flights.byCode(from)) from = 'BOM';
+  if(!Flights.byCode(to) || to === from) to = from === 'GOX' ? 'BOM' : 'GOX';
+
+  /* Same floor as the search card: nothing before today. A cold open with no
+     query and nothing stored lands five days out — far enough that the return
+     leg below still sits in the future. */
+  var TODAY = new Date(); TODAY.setHours(0,0,0,0);
+  var SOON  = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate()+5);
+
+  var dep = parseYmd(Q.dep) || (Array.isArray(stored.dep) ? new Date(stored.dep[0],stored.dep[1],stored.dep[2]) : null) || SOON;
+  var ret = parseYmd(Q.ret) || (Array.isArray(stored.ret) ? new Date(stored.ret[0],stored.ret[1],stored.ret[2]) : null);
+  /* A hand-typed ?dep= or a date left in storage by an older session can be in
+     the past; pricing a flight that has already left is worse than defaulting. */
+  if(dep < TODAY) dep = SOON;
+  if(ret && ret < TODAY) ret = null;
+
+  /* A missing return means a one-way, and the only reliable way to know that is
+     to be told: `trip` is explicit for exactly this reason. The fallbacks
+     matter because a return can go missing for two different reasons — the user
+     didn't want one, or the URL was hand-trimmed — and inventing a return date
+     for someone who asked for a one-way is worse than the reverse. Opened with
+     no query and nothing stored, the page defaults to a round trip so the
+     two-leg flow is what a cold open demonstrates. */
+  var hasQuery = !!(location.search || '').replace(/^\?/, '');
+  var oneWay;
+  if(Q.trip === 'oneway')      oneWay = true;
+  else if(Q.trip === 'round')  oneWay = false;
+  else if(hasQuery)            oneWay = !parseYmd(Q.ret);
+  else if(stored && stored.from) oneWay = !Array.isArray(stored.ret);
+  else                         oneWay = false;
+
+  if(oneWay){
+    ret = null;
+  } else {
+    if(!ret) ret = new Date(dep.getFullYear(), dep.getMonth(), dep.getDate()+3);
+    if(ret <= dep) ret = new Date(dep.getFullYear(), dep.getMonth(), dep.getDate()+3);
+  }
+
+  var n = function(v, d, lo, hi){ var x = parseInt(v,10); return isNaN(x) ? d : Math.min(hi, Math.max(lo, x)); };
+  var adults   = n(Q.adults,   stored.adults   || 1, 1, 9);
+  var children = n(Q.children, stored.children || 0, 0, 8);
+  var infants  = n(Q.infants,  stored.infants  || 0, 0, adults);
+  var cabin    = Q.cabin || stored.cabin || 'economy';
+  if(['economy','premium','business','first'].indexOf(cabin) < 0) cabin = 'economy';
+
+  return { from:from, to:to, dep:dep, ret:ret, oneWay:oneWay,
+           adults:adults, children:children, infants:infants, cabin:cabin };
+})();
+
+/* Keep the store in step, so "Change search" reopens the card as it was left. */
+try{
+  sessionStorage.setItem(SKEY, JSON.stringify({
+    from:REQ.from, to:REQ.to,
+    dep:[REQ.dep.getFullYear(),REQ.dep.getMonth(),REQ.dep.getDate()],
+    ret:REQ.ret ? [REQ.ret.getFullYear(),REQ.ret.getMonth(),REQ.ret.getDate()] : null,
+    adults:REQ.adults, children:REQ.children, infants:REQ.infants, cabin:REQ.cabin
+  }));
+}catch(e){}
+
+var MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function dateKey(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function fmtDay(d){ return DAYS[d.getDay()] + ', ' + MONS[d.getMonth()] + ' ' + d.getDate(); }
+function fmtShort(d){ return MONS[d.getMonth()] + ' ' + d.getDate(); }
+
+var CABIN_LABEL = { economy:'Economy', premium:'Premium economy', business:'Business', first:'First' };
+/* Infants travel on a lap, so they don't multiply the fare. */
+var PAYING = REQ.adults + REQ.children;
+
+/* =============================================================
+   THE TWO LEGS
+   ============================================================= */
+/* On a one-way there is no return leg at all — not an empty one. Everything
+   downstream tests for its presence rather than for a `oneWay` flag, so there
+   is one thing to get right instead of two that can disagree. */
+var LEGS = {
+  out: { from:REQ.from, to:REQ.to, date:REQ.dep,
+         flights: Flights.leg(REQ.from, REQ.to, dateKey(REQ.dep), REQ.cabin) },
+  ret: REQ.oneWay ? null
+     : { from:REQ.to, to:REQ.from, date:REQ.ret,
+         flights: Flights.leg(REQ.to, REQ.from, dateKey(REQ.ret), REQ.cabin) }
+};
+
+var UI = {
+  leg: 'out',
+  sort: 'best',
+  chosen: { out:null, ret:null },
+  /* Filters are shared across both legs deliberately: someone who has ruled out
+     connections on the way there has ruled them out on the way back too. */
+  stops: {},            // '0' | '1' | '2' → true
+  airlines: {},         // carrier code → true
+  windows: {},          // 'n' | 'm' | 'a' | 'e' → true
+  maxPrice: null
+};
+
+/* The slider's ends are taken from both legs together, so the handle means the
+   same thing on either tab. The floor is the cheapest fare rather than zero:
+   on a business-class search the cheapest seat is ₹6,830 and a track that
+   started at ₹1,000 would be mostly dead travel. */
+var PRICE_FLOOR, PRICE_CAP;
+(function(){
+  var all = LEGS.out.flights.concat(LEGS.ret ? LEGS.ret.flights : [])
+              .map(function(f){ return f.price; });
+  if(!all.length){ PRICE_FLOOR = 1000; PRICE_CAP = 20000; return; }
+  /* Exactly the cheapest fare, not rounded down past it, so the left end of the
+     track is a price something is actually sold at. It's the cheapest across
+     *both* legs, which means the far-left stop can still empty the dearer of
+     the two — the alternative, a scale per leg, would move the handle under
+     the user's hand every time they switched tabs. The empty state covers it. */
+  PRICE_FLOOR = Math.min.apply(null, all);
+  PRICE_CAP   = Math.ceil(Math.max.apply(null, all) / 100) * 100;
+  if(PRICE_CAP <= PRICE_FLOOR) PRICE_CAP = PRICE_FLOOR + 500;
+})();
+
+var WINDOWS = [
+  { k:'n', label:'Before 6 AM', lo:0,    hi:359  },
+  { k:'m', label:'6 AM – noon', lo:360,  hi:719  },
+  { k:'a', label:'Noon – 6 PM', lo:720,  hi:1079 },
+  { k:'e', label:'After 6 PM',  lo:1080, hi:1439 }
+];
+
+function stopKey(f){ return f.stops >= 2 ? '2' : String(f.stops); }
+function windowKey(f){
+  for(var i=0;i<WINDOWS.length;i++){ if(f.depMin >= WINDOWS[i].lo && f.depMin <= WINDOWS[i].hi) return WINDOWS[i].k; }
+  return 'e';
+}
+function anyOn(o){ return Object.keys(o).some(function(k){ return o[k]; }); }
+
+/* A flight passes when it satisfies every *active* facet. Passing `skip` lets a
+   facet count its own options against the others' filtering, which is what
+   makes the counts in the rail change as you tick things elsewhere. */
+function passes(f, skip){
+  if(skip!=='stops'    && anyOn(UI.stops)    && !UI.stops[stopKey(f)])          return false;
+  if(skip!=='airlines' && anyOn(UI.airlines) && !UI.airlines[f.carrier.code])   return false;
+  if(skip!=='windows'  && anyOn(UI.windows)  && !UI.windows[windowKey(f)])      return false;
+  if(skip!=='price'    && UI.maxPrice != null && f.price > UI.maxPrice)         return false;
+  return true;
+}
+
+/* Everything reads the active leg through here, so a stale UI.leg of 'ret' on a
+   one-way falls back to the outbound instead of dereferencing null. */
+function activeLeg(){ return LEGS[UI.leg] || LEGS.out; }
+function current(){ return activeLeg().flights; }
+function visible(){ return current().filter(function(f){ return passes(f, null); }); }
+
+/* "Best" is not cheapest — it's the flight you'd actually pick: price and time
+   normalised against this leg's own spread, with a connection carrying a flat
+   penalty because a stop costs more than the minutes it adds. */
+function sorted(list){
+  var arr = list.slice();
+  if(UI.sort === 'cheap')  return arr.sort(function(a,b){ return a.price - b.price || a.durMin - b.durMin; });
+  if(UI.sort === 'fast')   return arr.sort(function(a,b){ return a.durMin - b.durMin || a.price - b.price; });
+  if(UI.sort === 'early')  return arr.sort(function(a,b){ return a.depMin - b.depMin; });
+  if(UI.sort === 'late')   return arr.sort(function(a,b){ return b.depMin - a.depMin; });
+
+  var pr = arr.map(function(f){ return f.price; });
+  var dr = arr.map(function(f){ return f.durMin; });
+  var pLo = Math.min.apply(null, pr), pHi = Math.max.apply(null, pr);
+  var dLo = Math.min.apply(null, dr), dHi = Math.max.apply(null, dr);
+  var norm = function(v, lo, hi){ return hi === lo ? 0 : (v - lo) / (hi - lo); };
+  return arr.sort(function(a,b){
+    var sa = norm(a.price,pLo,pHi) * 0.62 + norm(a.durMin,dLo,dHi) * 0.38 + a.stops * 0.12;
+    var sb = norm(b.price,pLo,pHi) * 0.62 + norm(b.durMin,dLo,dHi) * 0.38 + b.stops * 0.12;
+    return sa - sb || a.price - b.price;
+  });
+}
+
+/* =============================================================
+   RENDER — the recap and the leg tabs
+   ============================================================= */
+function paintRecap(){
+  var A = Flights.byCode(REQ.from), B = Flights.byCode(REQ.to);
+  /* The breadcrumb names the destination the way the stays list names the
+     place — "Stays in Goa" there, "Flights to Goa" here. */
+  $('crumb').textContent = 'Flights to ' + B.city;
+  $('recapRoute').innerHTML =
+    esc(A.city) + ' <svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg> ' + esc(B.city);
+
+  var pax = REQ.adults + ' adult' + (REQ.adults>1?'s':'');
+  if(REQ.children) pax += ', ' + REQ.children + (REQ.children>1?' children':' child');
+  if(REQ.infants)  pax += ', ' + REQ.infants + ' infant' + (REQ.infants>1?'s':'');
+  var when = REQ.ret
+    ? fmtShort(REQ.dep) + ' – ' + fmtShort(REQ.ret)
+    : fmtShort(REQ.dep) + ' · One way';
+  $('recapMeta').innerHTML =
+    '<b>' + esc(REQ.from) + ' – ' + esc(REQ.to) + '</b> · ' +
+    esc(when) + ' · ' + esc(pax) + ' · ' + esc(CABIN_LABEL[REQ.cabin]);
+}
+
+function paintTabs(){
+  /* One leg is not a choice between legs, so the tab strip goes entirely
+     rather than sitting there as a single dead tab. */
+  var strip = $('legTabs');
+  if(!LEGS.ret){ strip.hidden = true; return; }
+  strip.hidden = false;
+  document.querySelectorAll('.leg').forEach(function(tab){
+    var k = tab.dataset.leg, L = LEGS[k], pick = UI.chosen[k];
+    if(!L) return;
+    tab.setAttribute('aria-selected', k === UI.leg ? 'true' : 'false');
+    tab.querySelector('[data-n]').textContent = L.from + ' → ' + L.to + ' · ' + fmtDay(L.date);
+    var s = tab.querySelector('[data-s]');
+    if(pick){
+      s.className = 'leg-s done';
+      s.textContent = '✓ ' + pick.number + ' · ' + Flights.hhmm(pick.depMin) + ' – ' + Flights.hhmm(pick.arrMin) + ' · ' + Flights.inr(pick.price);
+    } else {
+      s.className = 'leg-s';
+      s.textContent = L.flights.length + ' flights';
+    }
+  });
+}
+
+/* =============================================================
+   RENDER — the list
+   ============================================================= */
+function cardHTML(f){
+  var sel = UI.chosen[UI.leg] && UI.chosen[UI.leg].id === f.id;
+  var plus = Flights.dayOffset(f.arrMin);
+
+  /* The connection node sits where the stop actually falls in the journey, so a
+     flight that connects late in the day's flying looks like one. Clamped away
+     from the ends so it never collides with the terminus dots. */
+  var stopNode = '';
+  if(f.stops && f.via){
+    var at = f.legAMin && f.durMin ? f.legAMin / f.durMin : 0.5;
+    at = Math.min(0.82, Math.max(0.18, at));
+    stopNode = '<i class="fc-stop" style="left:' + Math.round(at*100) + '%" title="' + esc(f.via) + '"></i>';
+  }
+
+  return '<article class="fc' + (sel ? ' is-sel' : '') + '" data-id="' + esc(f.id) + '">' +
+    '<div class="fc-air">' +
+      '<span class="fc-logo" style="background:' + esc(f.carrier.color) + '">' + esc(f.carrier.code) + '</span>' +
+      '<div class="fc-airt">' +
+        '<div class="fc-airn">' + esc(f.carrier.name) + '</div>' +
+        '<div class="fc-airm">' + esc(f.number) + ' · ' + esc(f.aircraft) + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fc-leg">' +
+      '<div class="fc-t"><div class="fc-hh">' + Flights.hhmm(f.depMin) + '</div><div class="fc-cd">' + esc(f.from) + '</div></div>' +
+      '<div class="fc-mid">' +
+        '<div class="fc-dur">' + Flights.dur(f.durMin) + '</div>' +
+        '<div class="fc-line">' + stopNode + '</div>' +
+        '<div class="fc-stops' + (f.stops ? ' via' : '') + '">' + esc(Flights.stopsLabel(f)) +
+          (f.stops && f.layoverMin ? ' · ' + Flights.dur(f.layoverMin) + ' layover' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="fc-t"><div class="fc-hh">' + Flights.hhmm(f.arrMin) +
+        (plus ? '<sup>+' + plus + '</sup>' : '') + '</div><div class="fc-cd">' + esc(f.to) + '</div></div>' +
+    '</div>' +
+    '<div class="fc-buy">' +
+      '<div>' +
+        '<div class="fc-pr">' + Flights.inr(f.price) + '</div>' +
+        '<div class="fc-pu">per traveller</div>' +
+      '</div>' +
+      '<button type="button" class="fc-go">' + (sel ? 'Selected' : 'Select') + '</button>' +
+      (f.seatsLeft ? '<div class="fc-seats">' + f.seatsLeft + ' seats left at this fare</div>' : '') +
+    '</div>' +
+  '</article>';
+}
+
+function paintList(){
+  var list = sorted(visible());
+  var box = $('list');
+
+  var L = activeLeg();
+  $('resCount').innerHTML = list.length + ' flight' + (list.length===1?'':'s') +
+    ' <span>· ' + esc(L.from) + ' → ' + esc(L.to) + ', ' + esc(fmtDay(L.date)) + '</span>';
+
+  if(!list.length){
+    box.innerHTML = '<div class="empty"><h3>No flights match these filters</h3>' +
+      '<p>' + current().length + ' flights fly this route on the day.</p>' +
+      '<button type="button" id="emptyClear">Clear filters</button></div>';
+    $('emptyClear').addEventListener('click', clearFilters);
+    return;
+  }
+
+  box.innerHTML = list.map(cardHTML).join('');
+  box.querySelectorAll('.fc').forEach(function(el){
+    el.querySelector('.fc-go').addEventListener('click', function(){ choose(el.dataset.id); });
+  });
+}
+
+function choose(id){
+  var f = current().filter(function(x){ return x.id === id; })[0];
+  if(!f) return;
+  UI.chosen[UI.leg] = f;
+
+  /* Choosing the outbound moves you on to the return, because that is the next
+     thing to do — but only the first time, so re-picking an outbound later
+     doesn't yank you off the list you're reading. On a one-way there is
+     nowhere to advance to. */
+  var advance = (!!LEGS.ret && UI.leg === 'out' && !UI.chosen.ret);
+  if(advance) UI.leg = 'ret';
+
+  paintTabs(); paintList(); paintDock();
+  if(advance) window.scrollTo({ top: 0, behavior:'smooth' });
+}
+
+/* =============================================================
+   RENDER — the rail
+   ============================================================= */
+/* Counted over the leg on screen, with this facet's own filter lifted — so the
+   number beside "Nonstop" is what you'd get by ticking it, not what you have
+   now. Options that would land on zero are greyed rather than hidden, so the
+   rail doesn't reflow under the cursor. */
+function countBy(fn, skip){
+  var out = {};
+  current().forEach(function(f){
+    if(!passes(f, skip)) return;
+    var k = fn(f);
+    out[k] = (out[k] || 0) + 1;
+  });
+  return out;
+}
+
+function sectionHTML(id, title, body, open){
+  return '<section class="fsec' + (open ? ' is-open' : '') + '" data-sec="' + id + '">' +
+    '<button type="button" class="fsec-h">' + esc(title) +
+      '<svg class="fsec-ar" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>' +
+    '<div class="fsec-b">' + body + '</div></section>';
+}
+
+function checkRow(name, key, label, n){
+  var on = (name==='stops' ? UI.stops : name==='airlines' ? UI.airlines : UI.windows)[key];
+  return '<label class="chk' + (n ? '' : ' off') + '">' +
+    '<input type="checkbox" data-f="' + name + '" value="' + esc(key) + '"' +
+      (on ? ' checked' : '') + (n ? '' : ' disabled') + '>' +
+    '<span class="box"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>' +
+    '<span class="chk-lb">' + esc(label) + '</span>' +
+    '<span class="chk-n">' + n + '</span></label>';
+}
+
+function paintRail(){
+  var sc = countBy(stopKey, 'stops');
+  var stopsBody = '<div class="checks">' +
+    checkRow('stops','0','Nonstop',    sc['0']||0) +
+    checkRow('stops','1','1 stop',     sc['1']||0) +
+    checkRow('stops','2','2+ stops',   sc['2']||0) +
+    '</div>';
+
+  var wc = countBy(windowKey, 'windows');
+  var timeBody = '<div class="checks">' + WINDOWS.map(function(w){
+    return checkRow('windows', w.k, w.label, wc[w.k]||0);
+  }).join('') + '</div>';
+
+  var ac = countBy(function(f){ return f.carrier.code; }, 'airlines');
+  /* Airlines are listed by how much of this leg they actually fly — an
+     alphabetical list buries the carrier with nine departures under one with
+     a single connection. */
+  var names = {};
+  current().forEach(function(f){ names[f.carrier.code] = f.carrier.name; });
+  var airBody = '<div class="checks">' + Object.keys(names)
+    .sort(function(a,b){ return (ac[b]||0) - (ac[a]||0) || names[a].localeCompare(names[b]); })
+    .map(function(code){ return checkRow('airlines', code, names[code], ac[code]||0); })
+    .join('') + '</div>';
+
+  var cap = UI.maxPrice == null ? PRICE_CAP : UI.maxPrice;
+  var priceBody =
+    '<div class="rng-val">Up to ' + Flights.inr(cap) + ' <span>per traveller</span></div>' +
+    '<input type="range" id="priceRng" min="' + PRICE_FLOOR + '" max="' + PRICE_CAP + '" step="100" value="' + cap + '">' +
+    '<div class="rng-ends"><span>' + Flights.inr(PRICE_FLOOR) + '</span><span>' + Flights.inr(PRICE_CAP) + '</span></div>';
+
+  /* Which sections are open survives a repaint — collapsing "Airlines" and
+     then having it spring back open on the next tick would be maddening. */
+  var openState = {};
+  document.querySelectorAll('.fsec').forEach(function(s){ openState[s.dataset.sec] = s.classList.contains('is-open'); });
+  var first = !Object.keys(openState).length;
+  var isOpen = function(k, dflt){ return first ? dflt : !!openState[k]; };
+
+  $('rail').innerHTML =
+    sectionHTML('stops',    'Stops',          stopsBody, isOpen('stops', true)) +
+    sectionHTML('time',     'Departure time', timeBody,  isOpen('time', true)) +
+    sectionHTML('airlines', 'Airlines',       airBody,   isOpen('airlines', true)) +
+    sectionHTML('price',    'Price',          priceBody, isOpen('price', false));
+
+  $('rail').querySelectorAll('.fsec-h').forEach(function(h){
+    h.addEventListener('click', function(){ h.parentNode.classList.toggle('is-open'); });
+  });
+  $('rail').querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      var bag = cb.dataset.f === 'stops' ? UI.stops : cb.dataset.f === 'airlines' ? UI.airlines : UI.windows;
+      if(cb.checked) bag[cb.value] = true; else delete bag[cb.value];
+      paintAll();
+    });
+  });
+  var rng = $('priceRng');
+  if(rng){
+    rng.addEventListener('input', function(){
+      UI.maxPrice = +rng.value;
+      /* Live label while dragging, full repaint on release — repainting the
+         whole rail on every pixel would fight the drag. */
+      var lab = rng.parentNode.querySelector('.rng-val');
+      if(lab) lab.innerHTML = 'Up to ' + Flights.inr(UI.maxPrice) + ' <span>per traveller</span>';
+      paintList();
+    });
+    /* Read the value here too rather than trusting that `input` already ran —
+       it does in a browser drag, but a programmatic set or an assistive
+       control can land straight on `change`. */
+    rng.addEventListener('change', function(){ UI.maxPrice = +rng.value; paintAll(); });
+  }
+
+  $('clearAll').disabled = !(anyOn(UI.stops) || anyOn(UI.airlines) || anyOn(UI.windows) || UI.maxPrice != null);
+}
+
+function clearFilters(){
+  UI.stops = {}; UI.airlines = {}; UI.windows = {}; UI.maxPrice = null;
+  paintAll();
+}
+$('clearAll').addEventListener('click', clearFilters);
+
+/* =============================================================
+   RENDER — the running total
+   ============================================================= */
+function paintDock(){
+  var o = UI.chosen.out, r = UI.chosen.ret;
+  var twoLeg = !!LEGS.ret;
+  var dock = $('dock');
+  dock.classList.toggle('up', !!(o || r));
+
+  $('dockOut').innerHTML = o
+    ? esc(o.number) + ' · ' + Flights.hhmm(o.depMin) + ' – ' + Flights.hhmm(o.arrMin) + ' · ' + Flights.inr(o.price)
+    : '<em>Not chosen</em>';
+
+  /* The return block is removed on a one-way rather than left saying "Not
+     chosen" — nothing is missing, so nothing should look outstanding. */
+  var retBlock = $('dockRetBlock');
+  retBlock.hidden = !twoLeg;
+  if(twoLeg){
+    $('dockRet').innerHTML = r
+      ? esc(r.number) + ' · ' + Flights.hhmm(r.depMin) + ' – ' + Flights.hhmm(r.arrMin) + ' · ' + Flights.inr(r.price)
+      : '<em>Not chosen</em>';
+  }
+
+  var per = (o ? o.price : 0) + (r ? r.price : 0);
+  $('dockTotal').textContent = Flights.inr(per * PAYING);
+
+  var pax = PAYING + ' traveller' + (PAYING>1?'s':'') +
+            (REQ.infants ? ' + ' + REQ.infants + ' infant' + (REQ.infants>1?'s':'') : '');
+  var done = twoLeg ? (o && r) : !!o;
+  $('dockNote').textContent = done
+    ? (twoLeg ? 'Round trip · ' : 'One way · ') + pax
+    : 'Pick your ' + (o ? 'return' : 'departure') + ' to see the total';
+  $('dockGo').disabled = !done;
+}
+
+/* =============================================================
+   WIRING
+   ============================================================= */
+if(!LEGS.ret) UI.leg = 'out';
+document.querySelectorAll('.leg').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    if(!LEGS[tab.dataset.leg]) return;
+    UI.leg = tab.dataset.leg;
+    paintAll();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  });
+});
+$('sortSel').addEventListener('change', function(){ UI.sort = $('sortSel').value; paintList(); });
+
+(function(){
+  var btn = $('profileBtn'), menu = $('profileMenu');
+  if(!btn || !menu) return;
+  btn.addEventListener('click', function(e){ e.stopPropagation(); var o=menu.classList.toggle('open'); btn.setAttribute('aria-expanded', o?'true':'false'); });
+  document.addEventListener('click', function(e){ if(!menu.contains(e.target) && !btn.contains(e.target)){ menu.classList.remove('open'); btn.setAttribute('aria-expanded','false'); } });
+})();
+
+function paintAll(){ paintTabs(); paintList(); paintRail(); paintDock(); }
+
+paintRecap();
+paintAll();
+</script>
+
+<script src="topnav.js"></script>
+</body>
+</html>

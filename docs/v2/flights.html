@@ -1,0 +1,840 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>onto — Flights</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* The flights twin of home2.html, on that page's design rather than the older
+     home.html one: the painted sky, the search built from separate rounded
+     pills instead of one joined card, and the dark verb button. Switching
+     vertical in the nav should not feel like switching product.
+
+     What's different is the count: five fields and a swap, where stays needs
+     three. The pills absorb that better than a joined card would — each field
+     stays its own object no matter how many sit in the row. */
+  :root{
+    /* the sky's own gradient stop — decorative, not a system colour */
+    --sky-top:#cbe4d7;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  /* an open popover may reach past the fold; it must never widen the page */
+  html{overflow-x:clip;}
+  body{
+    background:var(--bg-surface);color:var(--text-primary);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;flex-direction:column;
+  }
+  /* margin only — the heading face, weight and tracking come from tokens.css,
+     which is where the type scale is defined. A local font-family:inherit here
+     would quietly drop the display face and land the hero on body weight. */
+  h1,h2{margin:0;}
+  button{font-family:inherit;}
+
+  /* the account is a name, not an initial — Nav Icon Text: Satoshi Medium 16 */
+  .tn-who{display:inline-flex;align-items:center;gap:var(--sp-8);border:none;background:none;
+    padding:var(--sp-8) var(--sp-12);border-radius:var(--r-md);font-family:inherit;
+    font-size:var(--fs-xl);font-weight:var(--fw-medium);color:var(--text-primary);
+    cursor:pointer;transition:background .15s;}
+  .tn-who:hover{background:var(--green-soft);}
+  .tn-who .cv{width:10px;height:10px;stroke:var(--icon-secondary);fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* ================= SKY ================= */
+  /* Identical to home2.html's sky: same gradient stops, same cloud banks, same
+     nav geometry. Switching vertical must not move the furniture. */
+  .sky{position:relative;isolation:isolate;
+    min-height:100vh;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,var(--sky-top) 0%,var(--gray-50) 20%,var(--bg-default) 44%,
+      var(--bg-default) 66%,var(--bg-default) 86%,var(--white) 100%);}
+  .sky-bg{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
+  .sky-bg::before,.sky-bg::after{content:"";position:absolute;pointer-events:none;}
+  /* the green-lit bank across the upper third */
+  .sky-bg::before{inset:0;
+    background:
+      radial-gradient(38% 26% at 12% 22%, rgba(15,138,99,.22), rgba(15,138,99,0) 70%),
+      radial-gradient(34% 22% at 88% 20%, rgba(15,138,99,.19), rgba(15,138,99,0) 70%),
+      radial-gradient(32% 22% at 52% 10%, rgba(255,255,255,.75), rgba(255,255,255,0) 70%);
+    filter:blur(22px);}
+  /* the white bank the search bar sits on */
+  .sky-bg::after{left:-10%;right:-10%;top:34%;height:62%;
+    background:
+      radial-gradient(46% 46% at 22% 58%, rgba(255,255,255,.92), rgba(255,255,255,0) 72%),
+      radial-gradient(52% 42% at 72% 46%, rgba(255,255,255,.86), rgba(255,255,255,0) 72%),
+      radial-gradient(40% 38% at 48% 74%, rgba(255,255,255,.9), rgba(255,255,255,0) 72%);
+    filter:blur(26px);}
+  .sky > *{position:relative;z-index:1;}
+
+  /* nav on the sky — the mark, where you can go, and who you are */
+  .skynav{position:absolute;top:0;left:0;right:0;z-index:6;
+    width:100%;max-width:1380px;margin:0 auto;padding:var(--sp-24) var(--sp-32) 0;
+    display:flex;align-items:center;gap:var(--sp-24);}
+  /* the wordmark is a logo, so it keeps its own size rather than taking a
+     step off the text scale */
+  .brand{font-family:var(--font-display);font-weight:var(--fw-display);font-size:22px;
+    letter-spacing:var(--ls-heading);color:var(--text-primary);text-decoration:none;}
+  .skynav .tn-right{margin-left:auto;position:relative;display:flex;align-items:center;}
+  /* The vertical switch. Plain links rather than a segmented control: these go
+     to pages, and a control that looks like a toggle should behave like one.
+     Nav Icon Text: Satoshi Medium 16. */
+  .sky-links{display:flex;align-items:center;gap:var(--sp-4);}
+  .sky-links a{font-size:var(--fs-xl);font-weight:var(--fw-medium);color:var(--text-body);
+    text-decoration:none;padding:var(--sp-8) var(--sp-16);border-radius:var(--r-md);
+    transition:background .15s,color .15s;}
+  .sky-links a:hover{background:rgba(255,255,255,.55);color:var(--text-primary);}
+  .sky-links a.active{color:var(--accent-brand-primary);font-weight:var(--fw-bold);
+    background:rgba(255,255,255,.62);}
+
+  /* centred in the sky, then lifted: the extra floor under the block sits it
+     a little above the true middle, which reads better than dead centre */
+  .sky-mid{flex:1;display:flex;flex-direction:column;justify-content:center;
+    padding:var(--sp-96) 0 var(--sp-160);}
+  .hero2{text-align:center;padding:0 var(--sp-24);}
+  /* Hero Heading — Sharp Sans Extrabold 64 / 110% / -2%. Same rule as the stays
+     hero, so the two verticals open at the same weight. */
+  .hero2 h1{font-family:var(--font-display);font-size:var(--fs-display);
+    line-height:var(--lh-heading);letter-spacing:var(--ls-display);
+    font-weight:var(--fw-display);color:var(--text-primary);}
+
+  /* ================= SEARCH BAR ================= */
+  /* Five fields and a swap, where stays needs three. The pills absorb that
+     better than a joined card would — each field stays its own object no
+     matter how many sit in the row. The pill itself is the stays pill: same
+     height, radius, padding, shadow and type. */
+  .sbar{display:flex;justify-content:center;align-items:center;gap:var(--sp-8);flex-wrap:wrap;
+    width:fit-content;max-width:100%;margin:var(--sp-48) auto 0;padding:0 var(--sp-24);}
+  .sseg{position:relative;flex:none;display:flex;align-items:center;gap:var(--sp-12);
+    background:var(--bg-surface);border:1.5px solid transparent;border-radius:var(--r-xl);
+    padding:0 var(--sp-20);height:60px;min-width:0;
+    cursor:pointer;text-align:left;box-shadow:var(--shadow-l2);
+    transition:border-color .15s,box-shadow .15s;}
+  .sseg:hover{box-shadow:0 8px 22px rgba(0,0,0,.10);}
+  .sseg.open{border-color:var(--accent-brand-primary);}
+  .sseg > svg{width:20px;height:20px;stroke:var(--icon-primary);fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .sseg .cv{width:14px;height:14px;stroke:var(--icon-secondary);stroke-width:2;margin-left:var(--sp-4);}
+  .sseg-tx{display:flex;flex-direction:column;min-width:0;}
+  /* Tiny Label above, Input Value / Label below */
+  .sseg-tx em{font-style:normal;font-size:var(--fs-xs);font-weight:var(--fw-medium);
+    color:var(--text-secondary);line-height:1.2;}
+  .sseg-tx b{font-size:var(--fs-xl);font-weight:var(--fw-bold);color:var(--text-primary);
+    line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* an empty field drops to the placeholder role rather than to a lighter grey */
+  .sseg-tx b.ph{font-weight:var(--fw-medium);color:var(--text-secondary);}
+  /* widths carry the 16px value line without clipping "Mumbai (BOM)" */
+  .sseg.port{width:232px;}
+  .sseg.when{width:168px;}
+  .sseg.who{width:260px;}
+  /* the airport field is typed into, so its value line is an input */
+  .sseg.port input{border:none;outline:none;background:none;font-family:inherit;
+    font-size:var(--fs-xl);font-weight:var(--fw-bold);color:var(--text-primary);
+    width:100%;min-width:0;padding:0;line-height:1.3;}
+  .sseg.port input::placeholder{color:var(--text-secondary);font-weight:var(--fw-medium);}
+
+  /* Between the two airport pills rather than inside one — with separate pills
+     there is a real gap to put it in, and it belongs to neither field. */
+  .swap{flex:none;width:34px;height:34px;border-radius:var(--r-round);border:1.5px solid transparent;
+    background:var(--bg-surface);color:var(--accent-brand-primary);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-l2);
+    transition:transform .22s var(--ease),box-shadow .15s,border-color .15s;}
+  .swap:hover{border-color:var(--accent-brand-primary);box-shadow:0 6px 16px rgba(0,0,0,.12);}
+  .swap.spin{transform:rotate(180deg);}
+  .swap svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* the party already on the search — Caption Label */
+  .who-chips{display:flex;align-items:center;gap:var(--sp-4);min-width:0;}
+  .who-chips i{font-style:normal;background:var(--bg-default);border-radius:var(--r-sm);
+    padding:var(--sp-4) var(--sp-8);font-size:var(--fs-xs);font-weight:var(--fw-bold);
+    color:var(--text-body);white-space:nowrap;}
+
+  /* bg/button is black in the design system */
+  .sgo{flex:none;align-self:center;width:56px;height:56px;border:none;border-radius:var(--r-lg);
+    background:var(--bg-button);color:var(--text-inverse);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:var(--shadow-l2);transition:opacity .15s,transform .12s;}
+  .sgo:hover{opacity:.86;}
+  .sgo:active{transform:scale(.97);}
+  .sgo svg{width:21px;height:21px;stroke:var(--icon-inverse);fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;}
+
+  /* An unanswered field says so by shaking once, rather than by growing an
+     error message under a bar that has no room for one. */
+  @keyframes nudge{0%,100%{transform:translateX(0);}20%{transform:translateX(-5px);}60%{transform:translateX(5px);}}
+  .sseg.nudge{animation:nudge .28s var(--ease);}
+
+  /* ================= POPOVERS ================= */
+  .pop{position:absolute;top:calc(100% + var(--sp-12));background:var(--bg-surface);
+    border:1px solid var(--border-default);border-radius:var(--r-lg);
+    box-shadow:var(--shadow-l2);z-index:40;padding:var(--sp-16);
+    opacity:0;transform:translateY(-6px);pointer-events:none;visibility:hidden;
+    transition:opacity .15s,transform .15s,visibility .15s;}
+  .pop.open{opacity:1;transform:none;pointer-events:auto;visibility:visible;}
+  .pop-port{left:0;width:376px;padding:var(--sp-8);}
+  .pop-cal{left:0;width:328px;}
+  .pop-ret{left:auto;right:0;}
+  .pop-trav{right:0;width:322px;}
+
+  .sug{display:flex;align-items:center;gap:var(--sp-12);padding:var(--sp-8) var(--sp-12);
+    border-radius:var(--r-md);cursor:pointer;transition:background .12s;}
+  .sug:hover,.sug.on{background:var(--bg-muted);}
+  /* the code badge stands in for the stays suggestion icon, same green ground */
+  .sug-code{width:44px;height:38px;border-radius:var(--r-md);background:var(--green-soft);
+    color:var(--accent-brand-primary);flex:none;display:flex;align-items:center;justify-content:center;
+    font-size:var(--fs-l);font-weight:var(--fw-bold);letter-spacing:.02em;}
+  .sug-t{min-width:0;flex:1;}
+  .sug-n{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sug-s{font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--text-secondary);
+    margin-top:var(--sp-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pop-empty{padding:var(--sp-16) var(--sp-12);color:var(--text-secondary);
+    font-size:var(--fs-l);text-align:center;}
+
+  /* calendar */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-12);}
+  .cal-head b{font-size:var(--fs-xl);font-weight:var(--fw-bold);}
+  .cal-nav{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid var(--border-default);
+    background:var(--bg-surface);cursor:pointer;color:var(--text-primary);font-size:var(--fs-xl);
+    display:flex;align-items:center;justify-content:center;transition:all .13s;}
+  .cal-nav:hover:not(:disabled){border-color:var(--border-dark);background:var(--bg-default);}
+  .cal-nav:disabled{opacity:.3;cursor:default;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+  /* Caption Label */
+  .cal-dow{font-size:var(--fs-xs);font-weight:var(--fw-bold);color:var(--text-secondary);
+    text-align:center;padding:var(--sp-4) 0;text-transform:uppercase;}
+  .cal-d{aspect-ratio:1;border:none;background:none;cursor:pointer;font-size:var(--fs-s);
+    font-weight:var(--fw-medium);color:var(--text-primary);border-radius:var(--r-md);position:relative;
+    transition:background .1s;font-family:inherit;}
+  .cal-d:hover:not(:disabled){background:var(--bg-default);}
+  .cal-d:disabled{color:var(--gray-200);cursor:default;}
+  .cal-d.in-range{background:var(--green-soft);border-radius:0;}
+  .cal-d.edge{background:var(--accent-brand-primary);color:var(--text-inverse);}
+  .cal-d.edge.s{border-radius:var(--r-md) 0 0 var(--r-md);}
+  .cal-d.edge.e{border-radius:0 var(--r-md) var(--r-md) 0;}
+  .cal-d.edge.only{border-radius:var(--r-md);}
+  .cal-hint{margin-top:var(--sp-12);font-size:var(--fs-xs);font-weight:var(--fw-medium);
+    color:var(--text-secondary);text-align:center;}
+  /* The way back out of a return date. A trip with no return is a one-way, so
+     clearing the field is a real choice and needs somewhere to be made — not
+     just the absence of a click. */
+  .cal-alt{width:100%;margin-top:var(--sp-8);padding-top:var(--sp-12);
+    border-top:1px solid var(--border-default);display:flex;justify-content:center;}
+  .cal-alt button{background:none;border:none;font-family:inherit;font-size:var(--fs-l);
+    font-weight:var(--fw-bold);color:var(--accent-brand-primary);cursor:pointer;
+    padding:var(--sp-4) var(--sp-12);border-radius:var(--r-sm);transition:background .13s;}
+  .cal-alt button:hover{background:var(--green-soft);}
+
+  /* travellers + cabin */
+  .gst{display:flex;align-items:center;justify-content:space-between;padding:var(--sp-12) var(--sp-4);}
+  .gst + .gst{border-top:1px solid var(--border-default);}
+  .gst .gl{font-size:var(--fs-l);font-weight:var(--fw-bold);}
+  .gst .gl small{display:block;font-weight:var(--fw-medium);color:var(--text-secondary);
+    font-size:var(--fs-xs);margin-top:var(--sp-2);}
+  .stp{display:flex;align-items:center;gap:var(--sp-12);}
+  .stp button{width:32px;height:32px;border-radius:50%;border:1px solid var(--border-default);
+    background:var(--bg-surface);color:var(--accent-brand-primary);font-size:var(--fs-xxxl);line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .13s;}
+  .stp button:hover:not(:disabled){border-color:var(--accent-brand-primary);background:var(--green-soft);}
+  .stp button:disabled{opacity:.35;cursor:default;}
+  .stp b{min-width:16px;text-align:center;font-size:var(--fs-xl);font-weight:var(--fw-bold);
+    font-variant-numeric:tabular-nums;}
+  .cab-lab{font-size:var(--fs-xs);font-weight:var(--fw-bold);letter-spacing:.07em;text-transform:uppercase;
+    color:var(--text-secondary);margin:var(--sp-16) var(--sp-4) var(--sp-8);
+    padding-top:var(--sp-12);border-top:1px solid var(--border-default);}
+  .cabs{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-8);}
+  .cab{border:1px solid var(--border-default);background:var(--bg-surface);border-radius:var(--r-md);
+    padding:var(--sp-8) var(--sp-12);font-family:inherit;font-size:var(--fs-l);
+    font-weight:var(--fw-bold);color:var(--text-primary);cursor:pointer;text-align:left;transition:all .14s;}
+  .cab:hover{border-color:var(--accent-brand-primary);background:var(--bg-default);}
+  .cab[aria-pressed="true"]{background:var(--green-soft);border-color:var(--accent-brand-primary);
+    color:var(--green-deep);}
+  .pop-done{width:100%;margin-top:var(--sp-8);background:var(--accent-brand-primary);
+    color:var(--text-inverse);border:none;border-radius:var(--r-md);
+    padding:var(--sp-12);font-size:var(--fs-l);font-weight:var(--fw-bold);cursor:pointer;transition:background .14s;}
+  .pop-done:hover{background:var(--green-deep);}
+
+  .footer{position:absolute;bottom:0;left:0;right:0;
+    width:100%;max-width:1180px;margin:0 auto;padding:var(--sp-24) var(--sp-32) var(--sp-32);
+    color:var(--text-secondary);font-size:var(--fs-s);font-weight:var(--fw-medium);
+    border-top:1px solid var(--border-default);display:flex;justify-content:space-between;
+    flex-wrap:wrap;gap:var(--sp-8);}
+
+  @media(max-width:1180px){
+    .sseg.port{width:200px;}
+    .sseg.who{width:228px;}
+  }
+  @media(max-width:1040px){
+    .sbar{width:100%;max-width:720px;}
+    .sseg{flex:1 1 200px;width:auto;}
+    .sseg.port,.sseg.when,.sseg.who{width:auto;}
+  }
+  @media(max-width:900px){
+    .skynav{gap:var(--sp-12);padding:var(--sp-16) var(--sp-20) 0;}
+    .sky-links a{padding:var(--sp-8) var(--sp-12);font-size:var(--fs-l);}
+    .hero2{padding-top:var(--sp-40);}
+    /* the hero steps to H2 rather than to an off-scale size */
+    .hero2 h1{font-size:var(--fs-h2);letter-spacing:var(--ls-heading);}
+    .sbar{flex-direction:column;align-items:stretch;width:100%;max-width:460px;gap:var(--sp-8);}
+    .sseg{flex:auto;}
+    .sseg,.sseg.port,.sseg.when,.sseg.who{width:auto;}
+    .swap{align-self:center;}
+    .swap.spin{transform:rotate(180deg);}
+    .sgo{width:100%;height:54px;border-radius:var(--r-lg);}
+    .pop{left:0;right:0;width:auto;}
+    .pop-port,.pop-cal,.pop-trav,.pop-ret{left:0;right:0;width:auto;}
+    .sky-mid{padding:var(--sp-80) 0 var(--sp-128);}
+  }
+</style>
+
+<!-- ================= SKY ================= -->
+<section class="sky">
+  <div class="sky-bg" aria-hidden="true"></div>
+  <nav class="skynav">
+    <a class="brand" href="home2.html">onto</a>
+    <div class="sky-links">
+      <a href="home2.html">Stays</a>
+      <a href="flights.html" class="active">Flights</a>
+    </div>
+    <div class="tn-right">
+      <button type="button" class="tn-who" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+        <span id="whoName">Saanvi</span>
+        <svg class="cv" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
+      </button>
+      <div class="menu" id="profileMenu" role="menu"></div>
+    </div>
+  </nav>
+
+  <div class="sky-mid">
+    <div class="hero2">
+      <h1>Find your flight</h1>
+    </div>
+
+    <div class="sbar">
+      <div class="sseg port" id="segFrom">
+        <svg viewBox="0 0 24 24"><path d="M3 20h18M4.5 14.5l2.8.8 3.2-3.4-6.2-3.6 1.7-1.2 7.4 2.3 3-3.2a1.8 1.8 0 0 1 2.6 2.5l-3.1 3.2 2.3 7.3-1.2 1.7-3.6-6.2-3.4 3.2.8 2.8-1.3.9-2-2.9-2.9-2 .9-1.3z"/></svg>
+        <span class="sseg-tx">
+          <em>From</em>
+          <input type="text" id="fromInput" placeholder="City or airport" autocomplete="off" spellcheck="false" aria-label="Leaving from">
+        </span>
+        <div class="pop pop-port" id="popFrom" role="listbox" aria-label="Departure airports"></div>
+      </div>
+
+      <button type="button" class="swap" id="swapBtn" aria-label="Swap origin and destination">
+        <svg viewBox="0 0 24 24"><path d="M7 4v13M7 17l-3-3M7 17l3-3M17 20V7M17 7l-3 3M17 7l3 3"/></svg>
+      </button>
+
+      <div class="sseg port" id="segTo">
+        <svg viewBox="0 0 24 24"><path d="M3 20h18M5.5 16.2l2.9-.3 2.2-4.1-6.8-2.2 1.4-1.6 7.7.6 2.3-3.7a1.8 1.8 0 0 1 3 1.9l-2.3 3.8 4 6.6-1.5 1.5-4.6-5.5-2.4 4 1.4 2.5-1.1 1.1-2.6-2.5-3.2-1.8z"/></svg>
+        <span class="sseg-tx">
+          <em>To</em>
+          <input type="text" id="toInput" placeholder="City or airport" autocomplete="off" spellcheck="false" aria-label="Going to">
+        </span>
+        <div class="pop pop-port" id="popTo" role="listbox" aria-label="Arrival airports"></div>
+      </div>
+
+      <div class="sseg when" id="segDep" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v4M16 3v4"/></svg>
+        <span class="sseg-tx"><em>Depart</em><b class="ph" id="depVal">Add date</b></span>
+        <svg class="cv" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
+        <div class="pop pop-cal" id="popDep">
+          <div class="cal-head">
+            <button type="button" class="cal-nav" data-nav="prev" data-cal="dep">‹</button>
+            <b data-title="dep">Month</b>
+            <button type="button" class="cal-nav" data-nav="next" data-cal="dep">›</button>
+          </div>
+          <div class="cal-grid" data-grid="dep"></div>
+          <div class="cal-hint" data-hint="dep">Select your departure date</div>
+        </div>
+      </div>
+
+      <div class="sseg when" id="segRet" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v4M16 3v4"/></svg>
+        <span class="sseg-tx"><em>Return</em><b class="ph" id="retVal">One way</b></span>
+        <svg class="cv" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
+        <div class="pop pop-cal pop-ret" id="popRet">
+          <div class="cal-head">
+            <button type="button" class="cal-nav" data-nav="prev" data-cal="ret">‹</button>
+            <b data-title="ret">Month</b>
+            <button type="button" class="cal-nav" data-nav="next" data-cal="ret">›</button>
+          </div>
+          <div class="cal-grid" data-grid="ret"></div>
+          <div class="cal-hint" data-hint="ret">Select your return date</div>
+          <div class="cal-alt"><button type="button" id="oneWayBtn">Skip — one way</button></div>
+        </div>
+      </div>
+
+      <div class="sseg who" id="segTrav" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/></svg>
+        <span class="sseg-tx"><em>Who all</em><span class="who-chips" id="travVal"></span></span>
+        <svg class="cv" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
+        <div class="pop pop-trav" id="popTrav">
+          <div class="gst">
+            <div class="gl">Adults<small>Age 12+</small></div>
+            <div class="stp">
+              <button type="button" data-cat="adults" data-d="-1" aria-label="Fewer adults">&minus;</button>
+              <b id="cAdults">1</b>
+              <button type="button" data-cat="adults" data-d="1" aria-label="More adults">+</button>
+            </div>
+          </div>
+          <div class="gst">
+            <div class="gl">Children<small>Age 2&ndash;11</small></div>
+            <div class="stp">
+              <button type="button" data-cat="children" data-d="-1" aria-label="Fewer children">&minus;</button>
+              <b id="cChildren">0</b>
+              <button type="button" data-cat="children" data-d="1" aria-label="More children">+</button>
+            </div>
+          </div>
+          <div class="gst">
+            <div class="gl">Infants<small>Under 2 &middot; on lap</small></div>
+            <div class="stp">
+              <button type="button" data-cat="infants" data-d="-1" aria-label="Fewer infants">&minus;</button>
+              <b id="cInfants">0</b>
+              <button type="button" data-cat="infants" data-d="1" aria-label="More infants">+</button>
+            </div>
+          </div>
+          <div class="cab-lab">Cabin</div>
+          <div class="cabs" id="cabs">
+            <button type="button" class="cab" data-cabin="economy" aria-pressed="true">Economy</button>
+            <button type="button" class="cab" data-cabin="premium" aria-pressed="false">Premium economy</button>
+            <button type="button" class="cab" data-cabin="business" aria-pressed="false">Business</button>
+            <button type="button" class="cab" data-cabin="first" aria-pressed="false">First</button>
+          </div>
+          <button type="button" class="pop-done" id="travDone">Done</button>
+        </div>
+      </div>
+
+      <button type="button" class="sgo" id="searchGo" aria-label="Search flights">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>© 2026 onto.travel — a prototype</span>
+    <span>Benaulim · Goa · India</span>
+  </div>
+</section>
+
+<script src="flights-data.js"></script>
+<script>
+/* =============================================================
+   PROFILE MENU — the panel itself is built by topnav.js
+   ============================================================= */
+(function(){
+  var btn = document.getElementById('profileBtn');
+  var menu = document.getElementById('profileMenu');
+  if(!btn || !menu) return;
+  btn.addEventListener('click', function(e){ e.stopPropagation(); var o=menu.classList.toggle('open'); btn.setAttribute('aria-expanded', o?'true':'false'); });
+  document.addEventListener('click', function(e){ if(!menu.contains(e.target) && !btn.contains(e.target)){ menu.classList.remove('open'); btn.setAttribute('aria-expanded','false'); } });
+})();
+
+/* =============================================================
+   THE SEARCH
+   -------------------------------------------------------------
+   One state object for the whole bar, persisted under its own sessionStorage
+   key. Deliberately NOT `searchGuests` / `searchDates`: those belong to the
+   stays flow, they carry a different shape (rooms, named companions, hotel age
+   bands), and a flights page writing into them is how the two verticals would
+   start corrupting each other's pickers.
+   ============================================================= */
+var SKEY = 'onto:flightSearch:v1';
+
+/* The floor for every date in this flow: real today, at midnight so a date
+   picked today compares equal rather than "earlier than now". Read once at load
+   so a long-open tab keeps one consistent floor instead of shifting at
+   midnight while a calendar is open. */
+var TODAY = new Date(); TODAY.setHours(0,0,0,0);
+
+var S = { from:null, to:null, dep:null, ret:null,
+          adults:1, children:0, infants:0, cabin:'economy' };
+
+(function restore(){
+  try{
+    var p = JSON.parse(sessionStorage.getItem(SKEY));
+    if(!p) return;
+    if(p.from && Flights.byCode(p.from)) S.from = p.from;
+    if(p.to   && Flights.byCode(p.to))   S.to   = p.to;
+    /* A stored date can be older than the floor — the session was opened
+       before midnight, or carries a date the anchor used to allow. Drop it
+       rather than restore a departure into the past. */
+    var pd = Array.isArray(p.dep) ? new Date(p.dep[0],p.dep[1],p.dep[2]) : null;
+    var pr = Array.isArray(p.ret) ? new Date(p.ret[0],p.ret[1],p.ret[2]) : null;
+    if(pd && pd >= TODAY) S.dep = pd;
+    /* A return only survives if it still has a departure to follow. */
+    if(pr && pr >= TODAY && (!S.dep || pr >= S.dep)) S.ret = pr;
+    S.adults   = Math.min(9, Math.max(1, p.adults|0 || 1));
+    S.children = Math.min(8, Math.max(0, p.children|0));
+    S.infants  = Math.min(S.adults, Math.max(0, p.infants|0));
+    if(['economy','premium','business','first'].indexOf(p.cabin) >= 0) S.cabin = p.cabin;
+  }catch(e){}
+})();
+
+function ymd(d){ return [d.getFullYear(), d.getMonth(), d.getDate()]; }
+function save(){
+  try{ sessionStorage.setItem(SKEY, JSON.stringify({
+    from:S.from, to:S.to,
+    dep:S.dep?ymd(S.dep):null, ret:S.ret?ymd(S.ret):null,
+    adults:S.adults, children:S.children, infants:S.infants, cabin:S.cabin
+  })); }catch(e){}
+}
+
+var $ = function(id){ return document.getElementById(id); };
+var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+
+/* Which pill is lit is a property of which popover is open, so the two are
+   moved together and never drift apart. */
+var POPS = ['popFrom','popTo','popDep','popRet','popTrav'];
+function setOpen(pop, on){
+  if(!pop) return;
+  pop.classList.toggle('open', !!on);
+  var seg = pop.closest('.sseg');
+  if(seg) seg.classList.toggle('open', !!on);
+}
+function closeAll(except){
+  POPS.forEach(function(id){
+    var el = $(id);
+    if(el && el !== except) setOpen(el, false);
+  });
+}
+document.addEventListener('click', function(e){
+  POPS.forEach(function(id){
+    var pop = $(id); if(!pop) return;
+    var seg = pop.closest('.sseg');
+    if(seg && !seg.contains(e.target)) setOpen(pop, false);
+  });
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeAll(null); });
+
+/* =============================================================
+   AIRPORT FIELDS — type-ahead, arrow keys, and the code in the value
+   ============================================================= */
+function makePort(which){
+  var seg   = $(which==='from' ? 'segFrom'   : 'segTo');
+  var input = $(which==='from' ? 'fromInput' : 'toInput');
+  var pop   = $(which==='from' ? 'popFrom'   : 'popTo');
+  var cursor = -1, list = [];
+
+  /* The pill is one line high, so the airport's own name can't sit under the
+     city — the code carries that job instead. "Goa (GOX)" and "Goa (GOI)" are
+     different airports and the field has to say which. */
+  function paint(){
+    var a = S[which] ? Flights.byCode(S[which]) : null;
+    input.value = a ? a.city + ' (' + a.code + ')' : '';
+  }
+
+  function render(q){
+    /* The other end of the route is filtered out — offering Goa → Goa is a
+       result nobody can use. */
+    var other = which==='from' ? S.to : S.from;
+    list = Flights.search(q, 7).filter(function(a){ return a.code !== other; });
+    cursor = list.length ? 0 : -1;
+    if(!list.length){ pop.innerHTML = '<div class="pop-empty">No airport matches that</div>'; return; }
+    pop.innerHTML = list.map(function(a,i){
+      return '<div class="sug'+(i===cursor?' on':'')+'" role="option" data-code="'+a.code+'">'
+        + '<span class="sug-code">'+esc(a.code)+'</span>'
+        + '<div class="sug-t"><div class="sug-n">'+esc(a.city)+'</div>'
+        + '<div class="sug-s">'+esc(a.name)+' · '+esc(a.country)+'</div></div></div>';
+    }).join('');
+    pop.querySelectorAll('.sug').forEach(function(el){
+      el.addEventListener('mousedown', function(e){ e.preventDefault(); choose(el.dataset.code); });
+    });
+  }
+
+  function choose(code){
+    S[which] = code; save(); paint(); setOpen(pop, false);
+    /* Filling From with nothing after it is a dead end, so hand the user to
+       the next empty field rather than making them find it. */
+    if(which==='from' && !S.to) setTimeout(function(){ $('toInput').focus(); }, 0);
+    else if(!S.dep) setTimeout(function(){ openCal('dep'); }, 0);
+  }
+
+  /* A field that already holds an airport opens on the full list rather than
+     on the one match its own text spells — you opened it to change it. */
+  function open(){ closeAll(pop); render(S[which] ? '' : input.value); setOpen(pop, true); }
+
+  input.addEventListener('focus', function(){ input.select(); open(); });
+  input.addEventListener('click', function(e){ e.stopPropagation(); open(); });
+  input.addEventListener('input', function(){ render(input.value); setOpen(pop, true); });
+  input.addEventListener('keydown', function(e){
+    if(e.key==='ArrowDown' || e.key==='ArrowUp'){
+      e.preventDefault();
+      if(!list.length) return;
+      cursor = (cursor + (e.key==='ArrowDown'?1:-1) + list.length) % list.length;
+      pop.querySelectorAll('.sug').forEach(function(el,i){ el.classList.toggle('on', i===cursor); });
+    } else if(e.key==='Enter'){
+      e.preventDefault(); e.stopPropagation();
+      if(cursor>=0 && list[cursor]) choose(list[cursor].code);
+    } else if(e.key==='Tab'){
+      /* Tabbing out of a field showing one obvious match should keep it. */
+      if(cursor>=0 && list[cursor] && input.value.trim()) choose(list[cursor].code);
+    }
+  });
+  input.addEventListener('blur', function(){ paint(); });
+  seg.addEventListener('click', function(e){
+    if(pop.contains(e.target)) return;
+    input.focus();
+  });
+  pop.addEventListener('click', function(e){ e.stopPropagation(); });
+
+  return { paint: paint };
+}
+var portFrom = makePort('from'), portTo = makePort('to');
+
+/* swap — the button turns over so the exchange is legible, not just implied */
+$('swapBtn').addEventListener('click', function(e){
+  e.stopPropagation();
+  var t = S.from; S.from = S.to; S.to = t; save();
+  portFrom.paint(); portTo.paint();
+  var b = this; b.classList.add('spin');
+  setTimeout(function(){ b.classList.remove('spin'); }, 240);
+});
+
+/* =============================================================
+   DATES — one range across two popovers
+   -------------------------------------------------------------
+   Depart and Return are separate fields but a single range, so both calendars
+   read the same two dates and either can be the one you edit. Which field you
+   opened decides what your next click sets.
+   ============================================================= */
+var MON  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DOW  = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+/* TODAY — the floor no date in this flow may fall below — is defined with the
+   search state above, because restoring a stored date already needs it. */
+
+var views = { dep: null, ret: null };
+(function(){
+  var base = S.dep || TODAY;
+  views.dep = new Date(base.getFullYear(), base.getMonth(), 1);
+  var rbase = S.ret || S.dep || TODAY;
+  views.ret = new Date(rbase.getFullYear(), rbase.getMonth(), 1);
+})();
+
+function key(d){ return d.getFullYear()*10000 + d.getMonth()*100 + d.getDate(); }
+function fmtDate(d){ return MONS[d.getMonth()] + ' ' + d.getDate(); }
+
+function drawCal(which){
+  var view  = views[which];
+  var grid  = document.querySelector('[data-grid="'+which+'"]');
+  var title = document.querySelector('[data-title="'+which+'"]');
+  if(!grid || !title) return;
+
+  title.textContent = MON[view.getMonth()] + ' ' + view.getFullYear();
+  var prev = document.querySelector('.cal-nav[data-nav="prev"][data-cal="'+which+'"]');
+  /* Never page back past the anchor; on the return calendar, never back past
+     the departure month either. */
+  var floor = (which==='ret' && S.dep) ? S.dep : TODAY;
+  if(prev) prev.disabled = (view.getFullYear()===floor.getFullYear() && view.getMonth()===floor.getMonth());
+
+  var html = DOW.map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
+  var first = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
+  var days  = new Date(view.getFullYear(), view.getMonth()+1, 0).getDate();
+  for(var i=0;i<first;i++) html += '<div></div>';
+
+  for(var day=1; day<=days; day++){
+    var d = new Date(view.getFullYear(), view.getMonth(), day);
+    var k = key(d), cls = 'cal-d';
+    /* A return before the departure isn't a trip, so the return calendar
+       closes off everything before it. */
+    var min = (which==='ret' && S.dep) ? S.dep : TODAY;
+    var dis = d < min;
+    if(S.dep && S.ret){
+      if(k > key(S.dep) && k < key(S.ret)) cls += ' in-range';
+      if(k === key(S.dep)) cls += ' edge s';
+      if(k === key(S.ret)) cls += ' edge e';
+    } else if(S.dep && k === key(S.dep)){
+      cls += ' edge only';
+    }
+    html += '<button type="button" class="'+cls+'" data-k="'+k+'" data-day="'+day+'"'+(dis?' disabled':'')+'>'+day+'</button>';
+  }
+  grid.innerHTML = html;
+}
+
+function paintDates(){
+  var dv = $('depVal'), rv = $('retVal');
+  if(S.dep){ dv.textContent = fmtDate(S.dep); dv.classList.remove('ph'); }
+  else { dv.textContent = 'Add date'; dv.classList.add('ph'); }
+  /* No return date is not an unanswered field — it is a one-way trip, and the
+     pill should say the trip you'll get rather than nag for a date you may not
+     want. */
+  if(S.ret){ rv.textContent = fmtDate(S.ret); rv.classList.remove('ph'); }
+  else { rv.textContent = 'One way'; rv.classList.add('ph'); }
+}
+
+function openCal(which){
+  var pop = $(which==='dep' ? 'popDep' : 'popRet');
+  closeAll(pop);
+  /* Open on a month that contains what you're about to pick. */
+  var anchor = which==='dep' ? (S.dep || TODAY) : (S.ret || S.dep || TODAY);
+  views[which] = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
+  drawCal(which);
+  setOpen(pop, true);
+}
+
+document.querySelectorAll('.cal-nav').forEach(function(b){
+  b.addEventListener('click', function(e){
+    e.stopPropagation();
+    var which = b.dataset.cal;
+    views[which].setMonth(views[which].getMonth() + (b.dataset.nav==='next' ? 1 : -1));
+    drawCal(which);
+  });
+});
+
+document.querySelectorAll('.cal-grid').forEach(function(grid){
+  grid.addEventListener('click', function(e){
+    var b = e.target.closest('.cal-d'); if(!b || b.disabled) return;
+    e.stopPropagation();
+    var which = grid.dataset.grid;
+    var view  = views[which];
+    var d = new Date(view.getFullYear(), view.getMonth(), +b.dataset.day);
+
+    if(which === 'dep'){
+      S.dep = d;
+      /* A departure that has overtaken the return invalidates it — better to
+         clear it and ask again than to quietly ship an impossible trip. */
+      if(S.ret && S.ret <= d) S.ret = null;
+      save(); paintDates(); drawCal('dep'); drawCal('ret');
+      setOpen($('popDep'), false);
+      if(!S.ret) setTimeout(function(){ openCal('ret'); }, 60);
+    } else {
+      if(!S.dep){ S.dep = d; save(); paintDates(); drawCal('dep'); drawCal('ret'); return; }
+      S.ret = d; save(); paintDates(); drawCal('dep'); drawCal('ret');
+      setOpen($('popRet'), false);
+    }
+  });
+});
+
+$('segDep').addEventListener('click', function(e){
+  if($('popDep').contains(e.target)) return;
+  if($('popDep').classList.contains('open')) setOpen($('popDep'), false); else openCal('dep');
+});
+$('segRet').addEventListener('click', function(e){
+  if($('popRet').contains(e.target)) return;
+  if($('popRet').classList.contains('open')) setOpen($('popRet'), false); else openCal('ret');
+});
+$('popDep').addEventListener('click', function(e){ e.stopPropagation(); });
+$('popRet').addEventListener('click', function(e){ e.stopPropagation(); });
+
+/* Drop the return and the trip becomes a one-way. Also the escape hatch from
+   the calendar that opens itself after a departure is picked. */
+$('oneWayBtn').addEventListener('click', function(e){
+  e.stopPropagation();
+  S.ret = null; save(); paintDates(); drawCal('dep'); drawCal('ret');
+  setOpen($('popRet'), false);
+});
+
+/* =============================================================
+   TRAVELLERS + CABIN
+   ============================================================= */
+(function(){
+  var seg = $('segTrav'), pop = $('popTrav');
+  var CABIN_LABEL = { economy:'Economy', premium:'Premium economy', business:'Business', first:'First' };
+  var MAXP = 9;
+
+  function heads(){ return S.adults + S.children; }   // infants sit on a lap, not a seat
+
+  function paint(){
+    $('cAdults').textContent   = S.adults;
+    $('cChildren').textContent = S.children;
+    $('cInfants').textContent  = S.infants;
+
+    pop.querySelectorAll('.stp button').forEach(function(b){
+      var cat = b.dataset.cat, d = +b.dataset.d;
+      if(d < 0){
+        /* One adult always stays, and losing an adult can't strand an infant. */
+        b.disabled = cat==='adults'   ? S.adults <= 1
+                   : cat==='children' ? S.children <= 0
+                   : S.infants <= 0;
+        if(cat==='adults' && S.adults <= S.infants) b.disabled = true;
+      } else {
+        b.disabled = cat==='infants' ? S.infants >= S.adults : heads() >= MAXP;
+      }
+    });
+
+    pop.querySelectorAll('.cab').forEach(function(b){
+      b.setAttribute('aria-pressed', b.dataset.cabin===S.cabin ? 'true' : 'false');
+    });
+
+    /* The pill states the party the way the stays bar does — small chips, one
+       per thing worth knowing at a glance. */
+    var chips = ['<i>' + S.adults + ' Adult' + (S.adults>1?'s':'') + '</i>'];
+    if(S.children) chips.push('<i>' + S.children + (S.children>1?' Children':' Child') + '</i>');
+    if(S.infants)  chips.push('<i>' + S.infants + ' Infant' + (S.infants>1?'s':'') + '</i>');
+    chips.push('<i>' + CABIN_LABEL[S.cabin] + '</i>');
+    $('travVal').innerHTML = chips.join('');
+  }
+
+  pop.querySelectorAll('.stp button').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var cat = b.dataset.cat, d = +b.dataset.d;
+      if(d > 0){
+        if(cat==='infants'){ if(S.infants >= S.adults) return; }
+        else if(heads() >= MAXP) return;
+      }
+      S[cat] = Math.max(0, S[cat] + d);
+      if(S.adults < 1) S.adults = 1;
+      if(S.infants > S.adults) S.infants = S.adults;
+      save(); paint();
+    });
+  });
+
+  pop.querySelectorAll('.cab').forEach(function(b){
+    b.addEventListener('click', function(e){ e.stopPropagation(); S.cabin = b.dataset.cabin; save(); paint(); });
+  });
+  $('travDone').addEventListener('click', function(e){ e.stopPropagation(); setOpen(pop, false); });
+
+  seg.addEventListener('click', function(e){
+    if(pop.contains(e.target)) return;
+    var on = pop.classList.contains('open');
+    closeAll(pop); setOpen(pop, !on);
+  });
+  pop.addEventListener('click', function(e){ e.stopPropagation(); });
+
+  paint();
+})();
+
+/* =============================================================
+   GO
+   ============================================================= */
+function nudge(segId){
+  var seg = $(segId);
+  seg.classList.remove('nudge');
+  void seg.offsetWidth;              // restart the animation
+  seg.classList.add('nudge');
+}
+
+function goSearch(){
+  /* Walk the bar left to right and stop at the first thing that isn't
+     answered, opening it — the order the fields are read in is the order it is
+     reasonable to be asked about them. */
+  /* Return is deliberately not in this list: an empty return is a one-way, not
+     a gap. Only origin, destination and a departure are actually required. */
+  if(!S.from){ nudge('segFrom'); $('fromInput').focus(); return; }
+  if(!S.to)  { nudge('segTo');   $('toInput').focus();   return; }
+  if(!S.dep) { nudge('segDep');  openCal('dep');         return; }
+
+  save();
+  var q = 'from='+S.from + '&to='+S.to
+        + '&dep='+ymd(S.dep).join('-')
+        + (S.ret ? '&ret='+ymd(S.ret).join('-') : '')
+        + '&trip=' + (S.ret ? 'round' : 'oneway')
+        + '&adults='+S.adults + '&children='+S.children + '&infants='+S.infants
+        + '&cabin='+S.cabin;
+  window.location.href = 'flight-results.html?' + q;
+}
+$('searchGo').addEventListener('click', goSearch);
+/* Enter runs the search — but not the Enter that just picked an airport out of
+   a suggestion list, and not one typed into a field. */
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Enter') return;
+  if(e.target && e.target.tagName === 'INPUT') return;
+  if(document.querySelector('.pop.open')) return;
+  goSearch();
+});
+
+/* first paint */
+portFrom.paint(); portTo.paint(); paintDates();
+</script>
+
+<script src="topnav.js"></script>

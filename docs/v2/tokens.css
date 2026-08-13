@@ -1,8 +1,16 @@
 /* ============================================================================
    ONTO Design System — token layer
    Source: Figma "ONTO Design System" (file 8sDqBWwj4D8sguuOUH1IFE)
-           · Style Swatch frame 10:89
-           · bound variables read off frames 29:104254 (pdp) and 28:21906 (list)
+           · Colours   — frames 7:4615 (primitives) and 7:4752 (semantics)
+           · Typography— frame 7:4981
+           · Spacing   — frame 28:10609
+           · Components— frame 7:4982
+
+   Values below are read off those frames rather than sampled by eye: the swatch
+   captions are text layers, so the hex codes here are the file's own strings.
+   Where a value is NOT in the Figma file it is marked "no Figma token" and kept
+   only because pages already depend on it — those are the candidates to design
+   properly rather than to keep inventing per-page.
 
    Every v2 page links this file and then declares only its own page-specific
    variables. The LEGACY ALIASES block at the bottom keeps the older hand-written
@@ -10,86 +18,132 @@
    wholesale — new work should use the semantic names directly.
    ========================================================================== */
 
-/* Satoshi stands in for the pair the Figma specifies. Sharp Sans Extrabold is a
-   commercial Sharp Type licence and isn't in this repo, so Satoshi Black (900)
-   carries the display role; Satoshi itself is the real body face from the file. */
-/* Satoshi ships 400/500/700/900 — there is no 600 or 800 cut. Page CSS that asks
+/* The file specifies Sharp Sans Extrabold for display/headings and Satoshi for
+   interface, navigation and body. Sharp Sans is a commercial Sharp Type licence
+   and isn't in this repo, so Satoshi Black (900) carries the display role;
+   Satoshi itself is the real body face from the file.
+   Satoshi ships 400/500/700/900 — there is no 600 or 800 cut. Page CSS that asks
    for 600 resolves to 700, and 800 (the file's Extrabold) resolves to 900. */
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
 
 :root{
-  /* ---------- primitives ---------- */
-  --green-900:#003f2b;
-  --green-500:#0f8a63;
-  --neutral-950:#000000;
-  --neutral-900:#111827;
-  --neutral-800:#2c2c2c;
-  --neutral-500:#808080;
-  --neutral-200:#e3e3df;
-  --neutral-100:#efefef;
+  /* ---------- primitives — Figma "Color — Primitives" (7:4615) ---------- */
+  /* Names match the file exactly so a swatch can be traced back to its token. */
   --white:#ffffff;
-  --yellow-2:#ffb503;      /* accent/yellow 2 — star glyphs */
-  --brand-tertiary:#a4e081;
-  --highlight-blue:#e7eaf1;
+  --gray-50:#efefef;
+  --gray-200:#e3e3e3;
+  --gray-400:#808080;
+  --gray-600:#2c2c2c;
+  --gray-900:#111827;
+  --black:#000000;
 
-  /* ---------- semantic: background & surface ---------- */
-  --bg-default:#fafaf9;    /* page body */
+  --green:#0f8a63;         /* core brand */
+  --green-2:#99ebd1;       /* lighter companion, secondary emphasis and soft fills */
+
+  --teal-100:#a8e6e5;
+  --teal-500:#009795;
+
+  --purple-100:#f8d7ff;
+  --purple-500:#b457bd;
+
+  --amber-100:#ffecbe;
+  --amber-500:#e2983d;
+
+  --red-800:#c9553d;
+  --red-900:#b4462f;
+
+  --indigo-200:#e7eaf1;
+  --indigo-400:#a8a7c0;
+
+  --blue:#417bff;
+
+  /* alpha utilities — these are genuinely transparent, not flattened greys */
+  --black-alpha-15:rgba(0,0,0,.15);
+  --white-alpha-12:rgba(255,255,255,.12);
+
+  /* ---------- semantic: background ---------- */
   --bg-surface:var(--white);
-  --bg-muted:var(--neutral-100);
-  --bg-primary:var(--green-500);
-  --bg-highlight:var(--highlight-blue);
+  --bg-highlight:var(--indigo-200);
+  --bg-muted-accent:var(--indigo-400);
+  --bg-button:var(--black);        /* the file's primary button is black, not green */
 
-  /* ---------- semantic: text & icon ---------- */
-  --text-primary:var(--neutral-900);    /* headings */
-  --text-body:var(--neutral-800);       /* body copy */
-  --text-secondary:var(--neutral-500);  /* hints, meta */
+  /* ---------- semantic: text ---------- */
+  --text-primary:var(--gray-900);
+  --text-body:var(--gray-600);
+  --text-secondary:var(--gray-400);
   --text-inverse:var(--white);
-  --icon-primary:var(--neutral-900);
-  --icon-body:var(--neutral-800);
-  --icon-secondary:var(--neutral-500);
+
+  /* ---------- semantic: icon ---------- */
+  --icon-primary:var(--gray-900);
+  --icon-body:var(--gray-600);
+  --icon-secondary:var(--gray-400);
   --icon-inverse:var(--white);
 
   /* ---------- semantic: border ---------- */
-  --border-default:var(--neutral-200);
-  --border-dark:var(--neutral-900);
-  --border-accent:var(--green-900);
+  /* border/default is black at 12%, not an opaque grey — it darkens whatever it
+     sits on instead of stamping one fixed colour over it. */
+  --border-default:rgba(0,0,0,.12);
+  --border-dark:var(--gray-900);
 
-  /* ---------- type ---------- */
+  /* ---------- semantic: accent ---------- */
+  --accent-brand-primary:var(--green);
+  --accent-brand-secondary:var(--green-2);
+  --accent-negative-border:var(--red-800);
+  --accent-negative-text:var(--red-900);
+  --accent-teal-bg:var(--teal-100);
+  --accent-teal-icon:var(--teal-500);
+  --accent-purple-bg:var(--purple-100);
+  --accent-purple-icon:var(--purple-500);
+  --accent-amber-bg:var(--amber-100);
+  --accent-amber-icon:var(--amber-500);
+
+  /* ---------- semantic: badge ---------- */
+  --badge-bg:var(--black-alpha-15);
+  --badge-border:var(--white-alpha-12);
+  --badge-text:var(--white);
+
+  /* ---------- type — Figma "Typography" (7:4981) ---------- */
   --font-display:Satoshi,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --font-body:Satoshi,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
 
-  /* Sharp Sans Extrabold in the file → 900 here. Headline sizes 64/28/24 come
-     from the Style Swatch; H2/H3 carry the file's -1px tracking and 1.1 leading. */
-  --fs-display:64px;
-  --fs-h2:32px;
-  --fs-h3:24px;
-  --fs-h4:20px;
+  /* Headings — Sharp Sans Extrabold. The file gives tracking as a percentage,
+     so these are em-based: a single -1px would be a different optical amount at
+     64px than at 20px, which is the whole reason the spec is proportional. */
+  --fs-display:64px;   /* H1 · 110% · -2%  — hero */
+  --fs-h2:32px;        /* H2 · 110% · -1% */
+  --fs-h3:24px;        /* H3 · 110% · -1%  — section heading */
+  --fs-h4:20px;        /* H4 · auto  ·  0  — panel title */
   --lh-heading:1.1;
-  --ls-heading:-1px;
+  --ls-display:-.02em;
+  --ls-heading:-.01em;
   --fw-display:900;
 
-  /* Satoshi Bold 16/13/12 — subheadings & labels. Medium 16/14 — body & UI. */
-  --fs-xxxl:20px;
+  /* Body — Satoshi Medium and Bold, five sizes XXL(18) down to XS(12).
+     20px exists as a Satoshi Bold subtitle / card title. */
+  --fs-xxxl:20px;      /* subtitle / card title — Bold */
   --fs-xxl:18px;
-  --fs-xl:16px;
-  --fs-l:14px;
+  --fs-xl:16px;        /* input value & label — Bold · nav icon text — Medium */
+  --fs-l:14px;         /* body bold / action link · body regular / secondary */
   --fs-s:13px;
-  --fs-xs:12px;
+  --fs-xs:12px;        /* caption label — Bold · tiny label — Medium */
   --fw-bold:700;
   --fw-medium:500;
 
   /* ---------- radius ---------- */
   --r-sm:8px;
-  --r-md:12px;    /* sds-size-radius-200 */
+  --r-md:12px;
   --r-lg:16px;
-  --r-xl:20px;    /* sds-size-radius-400 */
+  --r-xl:20px;
   --r-round:999px;
 
-  /* ---------- spacing ---------- */
-  --sp-2:2px;   --sp-4:4px;   --sp-6:6px;   --sp-8:8px;
-  --sp-12:12px; --sp-16:16px; --sp-20:20px; --sp-24:24px;
-  --sp-32:32px; --sp-40:40px; --sp-80:80px; --sp-200:200px;
+  /* ---------- spacing — Figma "Spacing" (28:10609) ---------- */
+  /* A 4px-based scale: micro adjustments through component spacing (8–24) to
+     section-level layout (40–160). */
+  --sp-4:4px;     --sp-8:8px;     --sp-12:12px;   --sp-16:16px;
+  --sp-20:20px;   --sp-24:24px;   --sp-32:32px;   --sp-40:40px;
+  --sp-48:48px;   --sp-64:64px;   --sp-80:80px;   --sp-96:96px;
+  --sp-128:128px; --sp-160:160px;
 
   /* ---------- elevation ---------- */
   /* Shadow/L2, the file's four-stop ramp, verbatim */
@@ -106,15 +160,15 @@
   /* ---------- motion ---------- */
   --ease:cubic-bezier(.2,.7,.2,1);
 
-  /* ---------- status ---------- */
-  /* Not in the Figma file — the design system has no error/warning ramp yet.
-     Held here as one definition each so the lane stops inventing new ones. */
-  --danger:#b23b32;
-  --danger-deep:#9c332b;
-  --amber:#a2610a;
-  --amber-soft:#fdf3e2;
-  --amber-line:#e8cf9f;
-  --success-soft:#eef6f1;
+  /* ============ NO FIGMA TOKEN ============
+     Roles the pages need that the design file doesn't define. Kept in one place
+     so the lane stops inventing a new value per page — but each is a gap in the
+     system rather than a decision, and should be taken back to the file. */
+  --bg-default:#fafaf9;            /* page wash. The file only defines bg/surface (white). */
+  --bg-muted:var(--gray-50);       /* filled chip / inert pill ground */
+  --green-deep:#003f2b;            /* pressed & hover state under --green; no dark green in the file */
+  --green-soft:#eef6f1;            /* soft green ground. accent/Brand Secondary (#99ebd1) is far
+                                      more saturated and does not substitute. */
 
   /* ============ LEGACY ALIASES ============
      Older names still referenced by page CSS, remapped onto the tokens above. */
@@ -125,16 +179,23 @@
   --line:var(--border-default);
   --card-line:var(--border-default);
   --label:var(--text-secondary);
-  --jade:var(--green-500);
-  --jade-deep:var(--green-900);
-  --jade-soft:var(--success-soft);
-  --green:var(--green-500);
-  --gold:var(--yellow-2);
+  --jade:var(--accent-brand-primary);
+  --jade-deep:var(--green-deep);
+  --jade-soft:var(--green-soft);
+  --gold:var(--accent-amber-icon);      /* was #ffb503; the file's warm accent is amber-500 */
   --pill:var(--bg-muted);
   --info:var(--bg-muted);
   --chip-bg:var(--bg-muted);
   --chip-ink:var(--text-body);
-  --red:var(--danger);
+  --red:var(--accent-negative-border);
+  --danger:var(--accent-negative-border);
+  --danger-deep:var(--accent-negative-text);
+  --amber:var(--accent-amber-icon);
+  --amber-soft:var(--accent-amber-bg);
+  --amber-line:var(--amber-100);
+  --success-soft:var(--green-soft);
+  --highlight-blue:var(--indigo-200);
+  --brand-tertiary:var(--green-2);
   --serif:var(--font-display);
   --sans:var(--font-body);
   --mono:var(--font-mono);
@@ -143,6 +204,21 @@
   --shadow-md:var(--shadow-l2);
   --shadow-lg:var(--shadow-l2);
   --shadow-card:var(--shadow-l2);
+  /* primitive names from the previous revision */
+  --green-500:var(--green);
+  --green-900:var(--green-deep);
+  --neutral-950:var(--black);
+  --neutral-900:var(--gray-900);
+  --neutral-800:var(--gray-600);
+  --neutral-500:var(--gray-400);
+  --neutral-200:var(--gray-200);
+  --neutral-100:var(--gray-50);
+  --yellow-2:var(--amber-500);
+  --bg-primary:var(--accent-brand-primary);
+  --border-accent:var(--green-deep);
+  --sp-2:2px;
+  --sp-6:6px;
+  --sp-200:200px;
 }
 
 /* ---------------------------------------------------------------------------
@@ -158,8 +234,11 @@ body{
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
 }
-/* The design system has no serif. Headings are Satoshi Black with the file's
-   tight tracking; pages that want a lighter heading override font-weight. */
+/* The design system has no serif. Headings are Satoshi Black standing in for
+   Sharp Sans Extrabold, with the file's tracking per level.
+
+   Note the offset: the file's H1 (64px) is the hero display, reached through
+   --fs-display rather than through a page <h1>. A page <h1> is the file's H2. */
 h1,h2,h3,h4{
   font-family:var(--font-display);
   font-weight:var(--fw-display);
@@ -167,10 +246,10 @@ h1,h2,h3,h4{
   letter-spacing:var(--ls-heading);
   margin:0;
 }
-h1{font-size:var(--fs-h2);}
-h2{font-size:var(--fs-h3);}
-h3{font-size:var(--fs-h4);}
-h4{font-size:var(--fs-xxxl);letter-spacing:0;}
+h1{font-size:var(--fs-h2);}                          /* 32 · -1% */
+h2{font-size:var(--fs-h3);}                          /* 24 · -1% */
+h3{font-size:var(--fs-h4);letter-spacing:0;}         /* 20 ·  0  */
+h4{font-size:var(--fs-xxxl);letter-spacing:0;}       /* 20 ·  0  */
 button,input,select,textarea{font-family:inherit;}
 a{color:inherit;}
-:focus-visible{outline:2px solid var(--green-500);outline-offset:2px;border-radius:4px;}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px;}

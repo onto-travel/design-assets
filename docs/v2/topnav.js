@@ -49,6 +49,8 @@
     '  padding:0;overflow:hidden;text-align:left;color:var(--ink,#111827);',
     '  opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .15s,transform .15s;}',
     '.menu.open{opacity:1;transform:none;pointer-events:auto;}',
+    /* Held only across the recalc that first hides the panel — see init(). */
+    '.menu.tn-boot{transition:none;}',
     '.menu .pm-top{padding-bottom:16px;text-align:center;}',
     '.menu .pm-band{height:78px;position:relative;overflow:hidden;background:#2b9068;}',
     /* flowing ribbons with a dotted spine, not a diamond field */
@@ -197,6 +199,21 @@
   }
 
   function init() {
+    var menu = doc.getElementById('profileMenu');
+
+    /* Pages that declare .menu in their own stylesheet — home.html, help.html,
+       trips.html, results.html — are hidden from first parse. Pages that leave
+       the panel entirely to this file — home2.html, flights.html — have a
+       plain, fully opaque div until the stylesheet below lands. At that moment
+       opacity goes 1 → 0, and because a transition is declared on it, the
+       browser animates the change: the panel it has just been given fades out
+       in front of the reader, once per navigation.
+
+       Pinning transition:none across that first recalc removes the animation
+       without removing it from real opens. It has to go on before the sheet
+       does, so the hidden state and the suppression arrive together. */
+    if (menu) menu.classList.add('tn-boot');
+
     /* The stylesheet goes down wherever this is included, panel or no panel:
        results.html renders its menu through React and has to own its own
        markup, but it should not also own its own copy of the design. */
@@ -206,10 +223,20 @@
 
     normaliseBar();
 
-    var menu = doc.getElementById('profileMenu');
     if (!menu) return;
     menu.setAttribute('role', 'menu');
     build(menu);
+
+    /* Two frames: the first commits the hidden state, the second releases the
+       transition so the next open still animates. Releasing in one frame can
+       land in the same recalc and start the fade after all. */
+    if (root.requestAnimationFrame) {
+      root.requestAnimationFrame(function () {
+        root.requestAnimationFrame(function () { menu.classList.remove('tn-boot'); });
+      });
+    } else {
+      menu.classList.remove('tn-boot');
+    }
   }
 
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', init);
