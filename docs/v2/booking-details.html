@@ -352,7 +352,10 @@
   .cart-v span{display:inline-flex;align-items:center;height:20px;padding:0 6px;
     background:#e7eaf1;color:#111827;border-radius:8px;
     font-size:14px;font-weight:700;line-height:1.5;text-align:center;}
-  /* the chevrons are the design's own: on the PDP each row opens its picker */
+  /* On the PDP every row opens its picker and every row wears a chevron. Here
+     the stay is read off their voucher and none of it is ours to change, so the
+     chevron is only left where something can actually be edited — the name and
+     number the booking is held under, down in the foot. */
   .cart-cv{flex:none;width:20px;height:20px;}
 
   /* the rooms row is taller and leads with the rooms themselves, two prints
@@ -738,9 +741,6 @@
               <span class="cart-k">When</span>
               <span class="cart-val" id="cartWhen"></span>
             </span>
-            <span class="cart-cv">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 7.50004C15 7.50004 11.3176 12.5 10 12.5C8.68233 12.5 5 7.5 5 7.5" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
           </div>
           <div class="cart-row">
             <span class="cart-ic">
@@ -750,18 +750,12 @@
               <span class="cart-k">Who all</span>
               <span class="cart-v" id="cartWho"></span>
             </span>
-            <span class="cart-cv">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 7.50004C15 7.50004 11.3176 12.5 10 12.5C8.68233 12.5 5 7.5 5 7.5" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
           </div>
           <div class="cart-row rooms">
             <span class="cart-ph" id="cartPhoto"></span>
             <span class="cart-t">
               <span class="cart-k">Room you&rsquo;ll be staying in</span>
               <span class="cart-v" id="cartRoom"></span>
-            </span>
-            <span class="cart-cv">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 7.50004C15 7.50004 11.3176 12.5 10 12.5C8.68233 12.5 5 7.5 5 7.5" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
           </div>
           <div class="cart-row terms">
