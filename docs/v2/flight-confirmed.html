@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto · Flight booked</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* Same voucher architecture as the stay's booking-details.html — green
+     hero carrying the status and the one download, a ticket per thing
+     confirmed, a payment rail. What's different is what there is to
+     confirm: a flight is a schedule and an airline PNR, not a room and a
+     check-in time, so the ticket's body is an itinerary row instead of a
+     date range, and there's one ticket per leg rather than one per stay. */
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  [hidden]{display:none !important;}
+  .menu{opacity:0;pointer-events:none;}
+  :root{ --hero:var(--green-500); --hero-deep:var(--green-900); --perf:var(--border-default); }
+
+  /* ============ HERO ============ */
+  .hero{position:relative;background:var(--hero);padding:0 0 24px;
+    --on-hero:#fff;
+    --on-hero-soft:rgba(255,255,255,.85);
+    --on-hero-dim:rgba(255,255,255,.5);
+    --on-hero-line:rgba(255,255,255,.55);
+    --on-hero-wash:rgba(255,255,255,.16);
+    --on-hero-fill:rgba(255,255,255,.18);
+    --on-hero-edge:rgba(255,255,255,.28);
+    --hero-solid-ink:var(--hero-deep);
+    color:var(--on-hero);}
+  .hero-bg{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
+  .hero-thread{position:absolute;top:-22px;width:260px;height:320px;overflow:visible;}
+  .hero-thread path{fill:none;stroke:var(--on-hero);stroke-width:13;
+    stroke-linecap:round;stroke-dasharray:3 15;opacity:.3;}
+  .hero-thread-l{left:-40px;}
+  .hero-thread-r{right:-40px;transform:scaleX(-1);}
+  .hero-in{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:0 32px;}
+
+  .hero-nav{display:flex;align-items:center;gap:10px;height:54px;}
+  .tn-brand{font-size:17px;font-weight:800;letter-spacing:.01em;color:var(--on-hero);text-decoration:none;}
+  .crumb-sep{color:var(--on-hero-dim);font-size:16px;}
+  .crumb-here{font-size:16px;font-weight:500;color:var(--on-hero-soft);}
+  .tn-right{margin-left:auto;display:flex;align-items:center;position:relative;}
+  .tn-who{display:inline-flex;align-items:center;gap:7px;border:none;background:none;padding:7px 10px;
+    border-radius:10px;font-size:14.5px;font-weight:600;color:var(--on-hero);cursor:pointer;transition:background .15s;}
+  .tn-who:hover{background:var(--on-hero-wash);}
+  .tn-who .cv{width:9px;height:9px;stroke:var(--on-hero-soft);fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  .hero-mid{text-align:center;padding:2px 0 0;}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;background:var(--on-hero-fill);
+    border:1px solid var(--on-hero-edge);border-radius:999px;padding:4px 12px 4px 9px;
+    font-size:12.5px;font-weight:700;}
+  .status-pill svg{width:14px;height:14px;stroke:var(--on-hero);fill:none;stroke-width:2.6;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .hero-h1{font-size:30px;line-height:1.2;margin:8px 0 3px;letter-spacing:-.025em;}
+  .hero-place{font-size:14px;font-weight:500;color:var(--on-hero-soft);margin:0;}
+  .hero-ref{display:inline-flex;align-items:center;gap:5px;margin-top:9px;font-size:12.5px;
+    font-weight:600;color:var(--on-hero-soft);}
+  .hero-ref b{color:var(--on-hero);letter-spacing:.03em;font-variant-numeric:tabular-nums;font-weight:700;}
+  .hero-acts{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:16px;}
+  .hbtn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 17px;
+    font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;
+    border:1px solid var(--on-hero-line);background:transparent;color:var(--on-hero);transition:background .15s;
+    font-family:inherit;}
+  .hbtn:hover{background:var(--on-hero-wash);}
+  .hbtn.solid{background:var(--on-hero);color:var(--hero-solid-ink);border-color:var(--on-hero);}
+  .hbtn.solid:hover{background:#fafaf9;}
+  .hbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* ============ RUBBER STAMP ============ */
+  .rstamp{position:relative;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;border:2.5px solid currentColor;text-align:center;
+    font-size:12px;font-weight:800;letter-spacing:.14em;line-height:1.15;text-transform:uppercase;
+    pointer-events:none;user-select:none;}
+  .rstamp::before{content:"";position:absolute;inset:5px;border:1.4px solid currentColor;border-radius:50%;}
+  .rs-tx{max-width:68px;}
+
+  /* ============ BODY ============ */
+  .page{max-width:1240px;margin:0 auto;padding:24px 32px 48px;position:relative;z-index:1;
+    display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;}
+  .main{display:flex;flex-direction:column;gap:18px;}
+  .sec-h{font-size:17px;font-weight:700;margin:0 0 9px;letter-spacing:-.015em;}
+  .main .sec-h,.rail .sec-h{padding-left:2px;}
+  .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow-card);padding:18px;}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #efefef;background:#fff;
+    color:var(--ink);border-radius:11px;padding:9px 15px;font-size:13.5px;font-weight:700;
+    cursor:pointer;text-decoration:none;white-space:nowrap;font-family:inherit;
+    transition:background .15s,border-color .15s,color .15s;}
+  .btn:hover{background:#fafaf9;border-color:#e3e3df;}
+  .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .btn.wide{width:100%;justify-content:center;}
+  .btn.danger{background:var(--red);border-color:var(--red);color:#fff;}
+  .btn.danger:hover{background:#9c322a;border-color:#9c322a;}
+  /* the destructive action, stated rather than defaulted to — red ink on a
+     white ground, not the solid fill that's reserved for the modal's actual
+     confirm step */
+  .btn.outline-danger{background:#fff;border-color:#f0d4ce;color:var(--red);}
+  .btn.outline-danger:hover{background:#fdf2f0;border-color:#e3b7ac;}
+
+  /* ============ CANCEL CONFIRMATION ============
+     The one destructive decision on the page, so it stops the page rather
+     than living in it — and it shows the two numbers that decide it. */
+  .scrim{position:fixed;inset:0;z-index:95;background:rgba(17,24,39,.42);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    opacity:0;pointer-events:none;transition:opacity .18s;}
+  .scrim.open{opacity:1;pointer-events:auto;}
+  .dlg{width:100%;max-width:420px;background:var(--card);border-radius:20px;padding:24px;
+    box-shadow:0 24px 60px rgba(0,0,0,.28);transform:translateY(10px);transition:transform .18s;}
+  .scrim.open .dlg{transform:none;}
+  .dlg-ic{width:42px;height:42px;border-radius:12px;background:#fafaf9;
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+  .dlg-ic svg{width:21px;height:21px;stroke:var(--red);fill:none;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .dlg h2{font-size:20px;margin-bottom:16px;}
+  .cancel-note{font-size:12.5px;font-weight:500;color:var(--muted);line-height:1.5;margin:10px 0 0;}
+  .dlg-acts{display:flex;gap:9px;margin-top:20px;}
+  .dlg-acts .btn{flex:1;justify-content:center;}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
+    background:var(--ink);color:#fff;font-size:13.5px;font-weight:600;padding:11px 18px;
+    border-radius:13px;box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;
+    transition:opacity .2s,transform .2s;z-index:99;display:flex;align-items:center;gap:9px;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .toast svg{width:16px;height:16px;stroke:#8fd6b4;fill:none;stroke-width:2.6;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* cancelled: the hero loses its colour and every ticket's stamp turns with it */
+  body.is-cancelled .hero{background:#808080;}
+  body.is-cancelled .tk-stamp .rstamp{color:var(--red);}
+
+  /* ============ THE TICKET ============
+     One per leg — a round trip is two boarding passes, not a shared row,
+     which is also why each carries its own stamp: each leg is its own
+     confirmation with the airline, not a line item of one. */
+  .legs-wrap{display:flex;flex-direction:column;gap:14px;}
+  .tk{position:relative;display:flex;align-items:stretch;background:var(--card);
+    border-radius:20px;padding:8px;box-shadow:var(--shadow-card);}
+  .tk-body{flex:1;min-width:0;padding:16px 14px 16px 16px;}
+  .tk-k{display:block;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;margin-bottom:4px;}
+  .tk-h{font-size:19px;font-weight:700;letter-spacing:-.015em;}
+  .tk-sub{margin-top:5px;font-size:13.5px;font-weight:500;color:var(--muted);
+    display:flex;flex-wrap:wrap;align-items:center;gap:2px 7px;}
+  .tk-sub .sep{color:#e3e3df;}
+  .tk-ref{font-variant-numeric:tabular-nums;}
+  .tk-ref b{color:var(--chip-ink);font-weight:700;letter-spacing:.03em;margin-left:5px;}
+  .ref-copy{border:none;background:none;padding:3px;margin-left:2px;cursor:pointer;color:#e3e3df;
+    border-radius:6px;vertical-align:middle;transition:color .15s,background .15s;}
+  .ref-copy:hover{color:var(--chip-ink);background:var(--chip-bg);}
+  .ref-copy svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;display:block;}
+  .ref-copy.done{color:var(--jade);}
+
+  .tk-air{display:flex;align-items:center;gap:10px;margin-top:16px;margin-bottom:12px;}
+  .tk-logo{width:28px;height:28px;border-radius:8px;flex:none;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:10.5px;font-weight:700;}
+  .tk-airn{font-size:13.5px;font-weight:600;}
+  .tk-airn span{color:var(--muted);font-weight:400;}
+
+  .tk-run{display:flex;align-items:center;gap:14px;}
+  .tk-t{flex:none;}
+  .tk-hh{font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums;line-height:1.1;}
+  .tk-hh sup{font-size:10px;font-weight:700;color:var(--jade);vertical-align:super;margin-left:2px;letter-spacing:0;}
+  .tk-cd{font-size:12px;color:var(--muted);margin-top:2px;font-weight:600;}
+  .tk-mid{flex:1;min-width:0;text-align:center;}
+  .tk-dur{font-size:12px;color:var(--muted);margin-bottom:4px;}
+  .tk-line{position:relative;height:2px;background:var(--line);border-radius:2px;}
+  .tk-line::before,.tk-line::after{content:"";position:absolute;top:50%;width:6px;height:6px;
+    border-radius:50%;background:#c9c9c4;transform:translateY(-50%);}
+  .tk-line::before{left:0;} .tk-line::after{right:0;}
+  .tk-stop{position:absolute;top:50%;width:7px;height:7px;border-radius:50%;background:#fff;
+    border:2px solid var(--gold);transform:translate(-50%,-50%);}
+  .tk-stops{font-size:12px;margin-top:5px;color:var(--muted);}
+  .tk-t.right{text-align:right;}
+
+  .tk-perf{flex:none;width:34px;position:relative;align-self:stretch;}
+  .tk-perf::before{content:"";position:absolute;left:50%;top:16px;bottom:16px;
+    border-left:1.6px dashed var(--perf);}
+  .notch{position:absolute;left:50%;width:20px;height:20px;border-radius:50%;background:var(--bg);}
+  .notch.t{top:-8px;transform:translate(-50%,-50%);}
+  .notch.b{bottom:-8px;transform:translate(-50%,50%);}
+
+  .tk-stamp{flex:none;width:96px;display:flex;align-items:center;justify-content:center;}
+  .tk-stamp .rstamp{width:82px;height:82px;color:var(--jade-deep);font-size:10px;
+    transform:rotate(-9deg);
+    background-image:repeating-linear-gradient(135deg,var(--jade-soft) 0 2px,transparent 2px 7px);}
+
+  /* ============ TRAVELLERS ============ */
+  .guest{display:flex;align-items:center;gap:11px;padding:9px 4px;}
+  .guest + .guest{border-top:1px solid var(--line);}
+  .g-av{flex:none;width:28px;height:28px;border-radius:50%;background:#fafaf9;
+    display:flex;align-items:center;justify-content:center;}
+  .g-av svg{width:15px;height:15px;stroke:#5b7bb5;fill:none;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .g-n{font-size:14.5px;font-weight:600;}
+  .g-n em{font-style:normal;font-weight:500;color:var(--muted);margin-left:4px;}
+  .g-you{margin-left:auto;background:var(--chip-bg);color:var(--chip-ink);border-radius:7px;
+    padding:3px 9px;font-size:12px;font-weight:700;}
+
+  /* ============ PAYMENT ============ */
+  .rail{display:flex;flex-direction:column;gap:14px;}
+  .pay-l{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+    font-size:13.5px;font-weight:500;color:var(--chip-ink);padding:5px 0;}
+  .pay-l em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px;}
+  .pay-l b{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .pay-l.free b{color:var(--jade-deep);}
+  .pay-rule{border:none;border-top:1px solid var(--line);margin:12px 0;}
+  .pay-total{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .pay-total .t{font-size:17px;font-weight:700;}
+  .pay-total .a{font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+  .pay-how{display:flex;align-items:flex-start;gap:6px;margin-top:3px;font-size:13px;
+    font-weight:500;color:var(--muted);}
+  .pay-how b{color:var(--jade-deep);font-weight:700;}
+  .pay-how svg{width:15px;height:15px;flex:none;margin-top:2px;stroke:var(--jade-deep);fill:none;
+    stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  .pay-who{font-size:13.5px;font-weight:600;color:var(--chip-ink);}
+  .pay-c{font-size:13px;font-weight:500;color:var(--muted);margin:2px 0 13px;}
+  .pay-c .dot{margin:0 6px;color:#e3e3df;}
+
+  .help-h{font-size:15.5px;font-weight:700;letter-spacing:-.01em;}
+  .help-p{font-size:13.5px;font-weight:500;color:var(--muted);margin:5px 0 14px;line-height:1.5;}
+  .help-acts{display:flex;flex-direction:column;gap:9px;align-items:stretch;}
+
+  @media(max-width:1080px){
+    .page{grid-template-columns:minmax(0,1fr);}
+  }
+  @media(max-width:640px){
+    .hero-in,.page{padding-left:18px;padding-right:18px;}
+    .hero-h1{font-size:25px;}
+    .tk{flex-direction:column;}
+    .tk-perf{width:auto;height:30px;}
+    .tk-perf::before{left:16px;right:16px;top:50%;bottom:auto;border-left:none;
+      border-top:1.6px dashed var(--perf);}
+    .notch{left:auto;top:50%;}
+    .notch.t{left:-8px;transform:translate(-50%,-50%);}
+    .notch.b{right:-8px;bottom:auto;transform:translate(50%,-50%);}
+    .tk-stamp{width:auto;padding:10px 0;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <svg class="hero-thread hero-thread-l" viewBox="0 0 260 320" aria-hidden="true">
+        <path d="M8 312C-10 230 24 178 78 152S172 96 190 40 210 -8 234 6"/>
+      </svg>
+      <svg class="hero-thread hero-thread-r" viewBox="0 0 260 320" aria-hidden="true">
+        <path d="M8 312C-10 230 24 178 78 152S172 96 190 40 210 -8 234 6"/>
+      </svg>
+    </div>
+    <div class="hero-in">
+      <nav class="hero-nav">
+        <a class="tn-brand" href="home2.html">ONTO</a>
+        <span class="crumb-sep">/</span>
+        <span class="crumb-here">Your booking</span>
+        <div class="tn-right">
+          <button type="button" class="tn-who" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+            <span id="whoName">Saanvi</span>
+            <svg class="cv" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
+          </button>
+          <div class="menu" id="profileMenu" role="menu"></div>
+        </div>
+      </nav>
+
+      <div class="hero-mid">
+        <span class="status-pill">
+          <svg id="statusIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/></svg>
+          <span id="statusTitle">Booking confirmed</span>
+        </span>
+        <h1 class="hero-h1" id="csRoute">—</h1>
+        <p class="hero-place" id="csWhen">—</p>
+        <p class="hero-ref">Booking reference <b id="ref">ONTO-000000</b></p>
+        <div class="hero-acts">
+          <button type="button" class="hbtn solid" id="dlTicket">
+            <svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1.5a2 2 0 0 0 0 4V15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1.5a2 2 0 0 0 0-4z"/><path d="M9 6.3v1.4M9 10.3v1.4M9 14.3v1.4" stroke-dasharray="1.5 2"/></svg>
+            Download e-ticket
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= BODY ================= -->
+  <div class="page">
+    <div class="main">
+      <section>
+        <h2 class="sec-h" id="flightsH">Your flights</h2>
+        <div class="legs-wrap" id="legs"></div>
+      </section>
+
+      <section>
+        <h2 class="sec-h">Travellers</h2>
+        <div class="card" id="travList" style="padding:6px 14px;"></div>
+      </section>
+    </div>
+
+    <aside class="rail">
+      <section>
+        <h2 class="sec-h">Payment</h2>
+        <div class="card">
+          <div id="payLines"></div>
+          <hr class="pay-rule">
+          <div class="pay-total">
+            <div class="t" id="totalLabel">Total</div>
+            <div class="a" id="amount">—</div>
+          </div>
+          <span class="pay-how">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/></svg>
+            <span id="payHowTx"><b>Fully paid</b> using UPI</span>
+          </span>
+          <hr class="pay-rule">
+          <div class="pay-who">Booking under <span id="payWho"></span></div>
+          <div class="pay-c"><span id="payMail"></span><span class="dot">&bull;</span><span id="payPhone"></span></div>
+          <button type="button" class="btn wide" id="dlInvoice">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
+            Download Invoice
+          </button>
+        </div>
+      </section>
+
+      <div class="card" id="helpCard">
+        <div class="help-h">Need help with your booking?</div>
+        <p class="help-p">Our support team can help with changes, cancellations, or questions about your flight.</p>
+        <div class="help-acts">
+          <a class="btn" href="help.html">
+            <svg viewBox="0 0 24 24"><path d="M12 3v0M12 8v8"/><circle cx="12" cy="12" r="9"/></svg>
+            Contact Support
+          </a>
+        </div>
+        <hr class="pay-rule">
+        <div class="help-h">Change of plans?</div>
+        <div class="help-acts" style="margin-top:10px">
+          <button type="button" class="btn outline-danger" id="cancelLink">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+            Cancel Booking
+          </button>
+          <a class="btn" id="browseBtn" href="flights.html" hidden>Book another flight</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ================= CANCEL CONFIRMATION ================= -->
+  <div class="scrim" id="cancelScrim" role="dialog" aria-modal="true" aria-labelledby="cancelH">
+    <div class="dlg">
+      <div class="dlg-ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z"/><path d="M12 9.5v4"/><path d="M12 17.2v.01"/></svg>
+      </div>
+      <h2 id="cancelH">Cancel this booking?</h2>
+      <div class="pay-l"><span>Amount paid</span><b id="cancelPaidAmt">—</b></div>
+      <div class="pay-l"><span>Refund amount</span><b id="cancelRefundAmt">—</b></div>
+      <p class="cancel-note" id="cancelNote"></p>
+      <div class="dlg-acts">
+        <button type="button" class="btn" id="keepBooking">Keep the booking</button>
+        <button type="button" class="btn danger" id="confirmCancel">Cancel booking</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="flights-data.js"></script>
+<script>
+/* =============================================================
+   THE BOOKING
+   -------------------------------------------------------------
+   Written by flight-checkout.html / flight-seats.html under its own key —
+   the stay's 'booking' record is a different shape and this page must
+   never be handed one.
+   ============================================================= */
+var PAY_KEY = 'flightBooking';
+var $ = function(id){ return document.getElementById(id); };
+var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+
+var B = {};
+try{ B = JSON.parse(sessionStorage.getItem(PAY_KEY)) || {}; }catch(e){}
+var LEGS = Array.isArray(B.legs) ? B.legs : [];
+
+/* Nothing to confirm — either this file was opened cold or the session was
+   cleared. Checkout can rebuild a trip from the last search; this page
+   can't invent one, so it hands over rather than rendering a blank ticket. */
+if(!LEGS.length){ location.replace('flight-checkout.html'); }
+
+var MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function fromYmd(a){ return Array.isArray(a) ? new Date(a[0],a[1],a[2]) : null; }
+function fmtDay(d){ return d ? DAYS[d.getDay()] + ', ' + MONS[d.getMonth()] + ' ' + d.getDate() : ''; }
+function fmtShort(d){ return d ? MONS[d.getMonth()] + ' ' + d.getDate() : ''; }
+var CABIN_LABEL = { economy:'Economy', premium:'Premium economy', business:'Business', first:'First' };
+
+/* =============================================================
+   REFERENCES
+   -------------------------------------------------------------
+   Two different things: ours identifies the booking, the airline's
+   identifies the seats on its own system. Generated once and written
+   back, so a reload doesn't reissue the ticket under a new number.
+   ============================================================= */
+function code(n){
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s = '';
+  for(var i=0;i<n;i++) s += chars.charAt(Math.floor(Math.random()*chars.length));
+  return s;
+}
+var dirty = false;
+if(!B.ref){ B.ref = 'ONTO-' + code(6); dirty = true; }
+LEGS.forEach(function(L){ if(!L.pnr){ L.pnr = code(6); dirty = true; } });
+if(dirty){ try{ sessionStorage.setItem(PAY_KEY, JSON.stringify(B)); }catch(e){} }
+
+$('ref').textContent = B.ref;
+
+/* =============================================================
+   THE HERO
+   ============================================================= */
+(function(){
+  var A = Flights.byCode(B.from), Z = Flights.byCode(B.to);
+  $('csRoute').textContent = (A ? A.city : B.from) + (LEGS.length > 1 ? ' ⇄ ' : ' → ') + (Z ? Z.city : B.to);
+  var when = LEGS.length > 1
+    ? fmtShort(fromYmd(LEGS[0].date)) + ' – ' + fmtShort(fromYmd(LEGS[1].date))
+    : fmtDay(fromYmd(LEGS[0].date));
+  var pax = (B.travellers || []).length || B.paying || 1;
+  $('csWhen').textContent = when + ' · ' + CABIN_LABEL[B.cabin || 'economy'] + ' · ' +
+    pax + ' traveller' + (pax > 1 ? 's' : '');
+})();
+
+/* =============================================================
+   THE TICKETS — one per leg, each with its own airline PNR and stamp
+   ============================================================= */
+$('flightsH').textContent = LEGS.length > 1 ? 'Your flights' : 'Your flight';
+$('legs').innerHTML = LEGS.map(function(L, i){
+  var f = L.flight, d = fromYmd(L.date), A = Flights.byCode(f.from), Z = Flights.byCode(f.to);
+  var plus = Flights.dayOffset(f.arrMin);
+  var stopNode = '';
+  if(f.stops && f.via){
+    var at = f.legAMin && f.durMin ? f.legAMin / f.durMin : 0.5;
+    at = Math.min(0.82, Math.max(0.18, at));
+    stopNode = '<i class="tk-stop" style="left:' + Math.round(at*100) + '%"></i>';
+  }
+  return '<article class="tk">' +
+    '<div class="tk-body">' +
+      '<span class="tk-k">' + esc(L.label) + '</span>' +
+      '<div class="tk-h">' + esc(A ? A.city : f.from) + ' → ' + esc(Z ? Z.city : f.to) + '</div>' +
+      '<div class="tk-sub">' +
+        '<span>' + esc(fmtDay(d)) + '</span>' +
+        '<span class="sep">&middot;</span>' +
+        '<span class="tk-ref">Airline PNR<b>' + esc(L.pnr) + '</b></span>' +
+        '<button type="button" class="ref-copy" data-pnr="' + esc(L.pnr) + '" aria-label="Copy airline PNR">' +
+          '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<div class="tk-air">' +
+        '<span class="tk-logo" style="background:' + esc(f.carrier.color) + '">' + esc(f.carrier.code) + '</span>' +
+        '<div class="tk-airn">' + esc(f.carrier.name) + ' <span>&middot; ' + esc(f.number) + ' &middot; ' + esc(f.aircraft) + '</span></div>' +
+      '</div>' +
+      '<div class="tk-run">' +
+        '<div class="tk-t"><div class="tk-hh">' + Flights.hhmm(f.depMin) + '</div>' +
+          '<div class="tk-cd">' + esc(f.from) + '</div></div>' +
+        '<div class="tk-mid"><div class="tk-dur">' + Flights.dur(f.durMin) + '</div>' +
+          '<div class="tk-line">' + stopNode + '</div>' +
+          '<div class="tk-stops">' + esc(Flights.stopsLabel(f)) + '</div></div>' +
+        '<div class="tk-t right"><div class="tk-hh">' + Flights.hhmm(f.arrMin) +
+          (plus ? '<sup>+' + plus + '</sup>' : '') + '</div>' +
+          '<div class="tk-cd">' + esc(f.to) + '</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="tk-perf"><span class="notch t"></span><span class="notch b"></span></div>' +
+    '<div class="tk-stamp" aria-hidden="true"><span class="rstamp"><span class="rs-tx">Confirmed</span></span></div>' +
+  '</article>';
+}).join('');
+
+$('legs').querySelectorAll('.ref-copy').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var pnr = btn.dataset.pnr;
+    try{ navigator.clipboard.writeText(pnr); }catch(e){}
+    btn.classList.add('done');
+    setTimeout(function(){ btn.classList.remove('done'); }, 1400);
+  });
+});
+
+/* =============================================================
+   TRAVELLERS
+   ============================================================= */
+var TYPE_NOTE = { adult:'', child:'Child', infant:'Infant · on lap' };
+$('travList').innerHTML = (B.travellers || []).map(function(t, i){
+  var note = TYPE_NOTE[t.type];
+  return '<div class="guest">' +
+    '<span class="g-av"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20c.7-3.7 3.3-5.6 6.5-5.6s5.8 1.9 6.5 5.6"/></svg></span>' +
+    '<span class="g-n">' + esc(t.name) + (note ? '<em>&middot; ' + esc(note) + '</em>' : '') + '</span>' +
+    (i === 0 ? '<span class="g-you">You</span>' : '') +
+  '</div>';
+}).join('');
+
+/* =============================================================
+   PAYMENT — the same fare + extras (baggage, meals, cancellation cover,
+   seats) checkout and the seat map already priced; this just states it back.
+   ============================================================= */
+function baseOf(f){ return Flights.fareSplit(f.price).base; }
+function taxOf(f){ return Flights.fareSplit(f.price).tax; }
+var PAYING = B.paying || (B.travellers || []).length || 1;
+
+var lines = LEGS.map(function(L){
+  var f = L.flight, A = Flights.byCode(f.from), Z = Flights.byCode(f.to);
+  return '<div class="pay-l"><span>' + esc(A ? A.city : f.from) + ' → ' + esc(Z ? Z.city : f.to) +
+    '<em>' + esc(f.number) + ' &middot; fare + taxes</em></span>' +
+    '<b>' + Flights.inr((L.base != null ? L.base : baseOf(f) * PAYING) + (L.tax != null ? L.tax : taxOf(f) * PAYING)) + '</b></div>';
+});
+(B.extras || []).forEach(function(x){
+  lines.push('<div class="pay-l"><span>' + esc(x.name) + '</span><b>' + Flights.inr(x.amount) + '</b></div>');
+});
+if(B.infants){
+  lines.push('<div class="pay-l free"><span>' + B.infants + ' infant' + (B.infants>1?'s':'') +
+    '<em>Travelling on a lap</em></span><b>Free</b></div>');
+}
+$('payLines').innerHTML = lines.join('');
+
+/* =============================================================
+   CONTACT
+   ============================================================= */
+var who = (B.travellers && B.travellers[0] && B.travellers[0].name) || 'Saanvi';
+$('payWho').textContent = who;
+$('payMail').textContent = B.email || '';
+$('payPhone').textContent = B.phone || '';
+
+/* =============================================================
+   CANCEL — full refund, unless the cancellation-cover add-on wasn't
+   bought, in which case the per-traveller-per-flight fee stated in Fare
+   conditions at checkout applies (taxes are still refunded in full — the
+   fee only ever comes out of the fare). Persisted into the same booking
+   record so a reload doesn't re-offer a booking that's already gone.
+   ============================================================= */
+function hasCancelCover(){ return (B.extras || []).some(function(x){ return x.k === 'cancel'; }); }
+function cancelFee(){ return hasCancelCover() ? 0 : (Flights.RULES.cancelFee || 0) * PAYING * LEGS.length; }
+function refundAmount(){ return Math.max(0, (B.total || 0) - cancelFee()); }
+
+function paintTotal(){
+  if(B.status === 'cancelled'){
+    $('totalLabel').textContent = 'Refund';
+    $('amount').textContent = B.refund || Flights.inr(0);
+    $('payHowTx').innerHTML = '<b>Refund on its way</b> to your original payment method';
+  } else {
+    $('amount').textContent = B.amount || '';
+  }
+}
+
+function markCancelledUI(){
+  document.body.classList.add('is-cancelled');
+  $('statusTitle').textContent = 'Booking cancelled';
+  $('statusIcon').innerHTML = '<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>';
+  $('cancelLink').hidden = true;
+  $('browseBtn').hidden = false;
+  paintTotal();
+}
+
+paintTotal();
+if(B.status === 'cancelled'){ markCancelledUI(); }
+
+var scrim = $('cancelScrim');
+function closeDlg(){ scrim.classList.remove('open'); }
+$('cancelLink').addEventListener('click', function(){
+  $('cancelPaidAmt').textContent = B.amount || '';
+  $('cancelRefundAmt').textContent = Flights.inr(refundAmount());
+  $('cancelNote').textContent = hasCancelCover()
+    ? 'Cancellation cover was purchased for this trip, so this is a full refund.'
+    : 'A change/cancellation fee of ' + Flights.inr(cancelFee()) + ' applies — taxes are refunded in full.';
+  scrim.classList.add('open');
+});
+$('keepBooking').addEventListener('click', closeDlg);
+scrim.addEventListener('click', function(e){ if(e.target === scrim) closeDlg(); });
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && scrim.classList.contains('open')) closeDlg();
+});
+$('confirmCancel').addEventListener('click', function(){
+  B.status = 'cancelled';
+  B.refund = Flights.inr(refundAmount());
+  try{ sessionStorage.setItem(PAY_KEY, JSON.stringify(B)); }catch(e){}
+  closeDlg();
+  markCancelledUI();
+  toast('Booking cancelled — refund on its way');
+});
+
+function toast(msg){
+  var t = $('toast');
+  t.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' + esc(msg);
+  t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+/* =============================================================
+   THE E-TICKET AND THE INVOICE — two different documents, the way the
+   stay's voucher (what you carry) and its invoice (what you were charged)
+   are two different downloads rather than one file trying to be both.
+   ============================================================= */
+function download(name, lines){
+  var blob = new Blob([lines.join('\n')], {type:'text/plain'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 0);
+}
+
+$('dlTicket').addEventListener('click', function(){
+  var A = Flights.byCode(B.from), Z = Flights.byCode(B.to);
+  var out = [
+    'ONTO — ELECTRONIC TICKET',
+    '========================',
+    '',
+    'Booking reference : ' + B.ref,
+    'Route             : ' + ((A?A.city:B.from) + ' → ' + (Z?Z.city:B.to)),
+    'Cabin             : ' + (CABIN_LABEL[B.cabin] || B.cabin || ''),
+    ''
+  ];
+  LEGS.forEach(function(L){
+    var f = L.flight, d = fromYmd(L.date);
+    out.push(L.label.toUpperCase() + ' — ' + fmtDay(d) + '   (airline PNR ' + L.pnr + ')');
+    out.push('  ' + f.carrier.name + ' ' + f.number + ' · ' + f.aircraft);
+    out.push('  ' + f.from + ' ' + Flights.hhmm(f.depMin) + '  →  ' + f.to + ' ' + Flights.hhmm(f.arrMin) +
+               (Flights.dayOffset(f.arrMin) ? ' (+' + Flights.dayOffset(f.arrMin) + ' day)' : ''));
+    out.push('  ' + Flights.dur(f.durMin) + ' · ' + Flights.stopsLabel(f));
+    out.push('');
+  });
+  out.push('TRAVELLERS');
+  (B.travellers || []).forEach(function(t){
+    out.push('  ' + t.name + (TYPE_NOTE[t.type] ? '  (' + TYPE_NOTE[t.type] + ')' : '') +
+               (t.dob ? '  DOB ' + t.dob : ''));
+  });
+  if(B.extras && B.extras.length){
+    out.push('');
+    out.push('ADDED');
+    B.extras.forEach(function(x){ out.push('  ' + x.name + ' — ' + Flights.inr(x.amount)); });
+  }
+  out.push('');
+  out.push('Contact     : ' + (B.email || '') + (B.phone ? ' · ' + B.phone : ''));
+  out.push('Amount paid : ' + (B.amount || '') + '  · paid via Razorpay');
+  out.push('');
+  out.push('Carry the ID each name is booked under. Prototype — not a real ticket.');
+  download('onto-eticket-' + B.ref + '.txt', out);
+});
+
+$('dlInvoice').addEventListener('click', function(){
+  var out = [
+    'ONTO — TAX INVOICE',
+    '========================================',
+    '',
+    'Booking reference : ' + B.ref,
+    ''
+  ];
+  LEGS.forEach(function(L){
+    var f = L.flight;
+    out.push(f.from + ' → ' + f.to + ' (' + f.number + ')  base + taxes : ' +
+      Flights.inr((L.base != null ? L.base : baseOf(f) * PAYING) + (L.tax != null ? L.tax : taxOf(f) * PAYING)));
+  });
+  (B.extras || []).forEach(function(x){ out.push(x.name + ' : ' + Flights.inr(x.amount)); });
+  out.push('');
+  out.push('Total : ' + (B.amount || ''));
+  out.push('');
+  out.push('Prototype — not a real invoice.');
+  download('onto-invoice-' + B.ref + '.txt', out);
+});
+
+/* =============================================================
+   ACCOUNT MENU — the panel itself is built by topnav.js
+   ============================================================= */
+(function(){
+  var btn = $('profileBtn'), menu = $('profileMenu');
+  if(!btn || !menu) return;
+  btn.addEventListener('click', function(e){ e.stopPropagation(); var o=menu.classList.toggle('open'); btn.setAttribute('aria-expanded', o?'true':'false'); });
+  document.addEventListener('click', function(e){ if(!menu.contains(e.target) && !btn.contains(e.target)){ menu.classList.remove('open'); btn.setAttribute('aria-expanded','false'); } });
+})();
+(function(){
+  var first = (B.travellers && B.travellers[0] && B.travellers[0].first) || '';
+  if(first){ $('whoName').textContent = first; }
+})();
+</script>
+
+<script src="topnav.js"></script>
+</body>
+</html>

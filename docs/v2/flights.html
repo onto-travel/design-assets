@@ -96,6 +96,20 @@
     line-height:var(--lh-heading);letter-spacing:var(--ls-display);
     font-weight:var(--fw-display);color:var(--text-primary);}
 
+  /* ================= TRIP TYPE ================= */
+  /* An explicit decision, not something inferred from whether the return
+     field happens to hold a date — the field states a date, this states
+     the trip. Same pill-group shape the account switcher elsewhere uses. */
+  .trip-tabs{display:inline-flex;gap:2px;background:rgba(255,255,255,.5);
+    border:1px solid var(--border-default);border-radius:999px;padding:3px;
+    margin-top:var(--sp-20);}
+  .trip-tab{background:none;border:none;font-family:inherit;font-size:var(--fs-l);
+    font-weight:var(--fw-bold);color:var(--text-secondary);padding:var(--sp-8) var(--sp-16);
+    border-radius:999px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s;}
+  .trip-tab:hover{color:var(--text-primary);}
+  .trip-tab[aria-selected="true"]{background:var(--bg-surface);color:var(--accent-brand-primary);
+    box-shadow:var(--shadow-l2);}
+
   /* ================= SEARCH BAR ================= */
   /* Five fields and a swap, where stays needs three. The pills absorb that
      better than a joined card would — each field stays its own object no
@@ -110,6 +124,7 @@
     transition:border-color .15s,box-shadow .15s;}
   .sseg:hover{box-shadow:0 8px 22px rgba(0,0,0,.10);}
   .sseg.open{border-color:var(--accent-brand-primary);}
+  .sseg.disabled{opacity:.5;cursor:default;pointer-events:none;}
   .sseg > svg{width:20px;height:20px;stroke:var(--icon-primary);fill:none;stroke-width:1.7;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
   .sseg .cv{width:14px;height:14px;stroke:var(--icon-secondary);stroke-width:2;margin-left:var(--sp-4);}
@@ -165,7 +180,7 @@
   /* ================= POPOVERS ================= */
   .pop{position:absolute;top:calc(100% + var(--sp-12));background:var(--bg-surface);
     border:1px solid var(--border-default);border-radius:var(--r-lg);
-    box-shadow:var(--shadow-l2);z-index:40;padding:var(--sp-16);
+    box-shadow:0 16px 40px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06);z-index:40;padding:var(--sp-16);
     opacity:0;transform:translateY(-6px);pointer-events:none;visibility:hidden;
     transition:opacity .15s,transform .15s,visibility .15s;}
   .pop.open{opacity:1;transform:none;pointer-events:auto;visibility:visible;}
@@ -211,19 +226,12 @@
   .cal-d.edge.s{border-radius:var(--r-md) 0 0 var(--r-md);}
   .cal-d.edge.e{border-radius:0 var(--r-md) var(--r-md) 0;}
   .cal-d.edge.only{border-radius:var(--r-md);}
-  .cal-hint{margin-top:var(--sp-12);font-size:var(--fs-xs);font-weight:var(--fw-medium);
-    color:var(--text-secondary);text-align:center;}
   /* The way back out of a return date. A trip with no return is a one-way, so
-     clearing the field is a real choice and needs somewhere to be made — not
-     just the absence of a click. */
-  .cal-alt{width:100%;margin-top:var(--sp-8);padding-top:var(--sp-12);
-    border-top:1px solid var(--border-default);display:flex;justify-content:center;}
-  .cal-alt button{background:none;border:none;font-family:inherit;font-size:var(--fs-l);
-    font-weight:var(--fw-bold);color:var(--accent-brand-primary);cursor:pointer;
-    padding:var(--sp-4) var(--sp-12);border-radius:var(--r-sm);transition:background .13s;}
-  .cal-alt button:hover{background:var(--green-soft);}
+     clearing the field is a real choice — but the One way tab is that
+     choice now, made explicitly and in one place, so the calendar itself
+     doesn't also need an escape hatch for it. */
 
-  /* travellers + cabin */
+  /* travellers */
   .gst{display:flex;align-items:center;justify-content:space-between;padding:var(--sp-12) var(--sp-4);}
   .gst + .gst{border-top:1px solid var(--border-default);}
   .gst .gl{font-size:var(--fs-l);font-weight:var(--fw-bold);}
@@ -240,19 +248,19 @@
   .cab-lab{font-size:var(--fs-xs);font-weight:var(--fw-bold);letter-spacing:.07em;text-transform:uppercase;
     color:var(--text-secondary);margin:var(--sp-16) var(--sp-4) var(--sp-8);
     padding-top:var(--sp-12);border-top:1px solid var(--border-default);}
-  .cabs{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-8);}
-  .cab{border:1px solid var(--border-default);background:var(--bg-surface);border-radius:var(--r-md);
-    padding:var(--sp-8) var(--sp-12);font-family:inherit;font-size:var(--fs-l);
-    font-weight:var(--fw-bold);color:var(--text-primary);cursor:pointer;text-align:left;transition:all .14s;}
-  .cab:hover{border-color:var(--accent-brand-primary);background:var(--bg-default);}
-  .cab[aria-pressed="true"]{background:var(--green-soft);border-color:var(--accent-brand-primary);
-    color:var(--green-deep);}
-  .pop-done{width:100%;margin-top:var(--sp-8);background:var(--accent-brand-primary);
-    color:var(--text-inverse);border:none;border-radius:var(--r-md);
-    padding:var(--sp-12);font-size:var(--fs-l);font-weight:var(--fw-bold);cursor:pointer;transition:background .14s;}
-  .pop-done:hover{background:var(--green-deep);}
+  .cabs{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-12) var(--sp-8);margin-bottom:var(--sp-4);}
+  .cabr{display:flex;align-items:center;gap:var(--sp-8);cursor:pointer;}
+  .cabr input{position:absolute;opacity:0;width:0;height:0;}
+  .cabr-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border-default);
+    display:flex;align-items:center;justify-content:center;transition:border-color .13s;}
+  .cabr-dot::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent-brand-primary);
+    transform:scale(0);transition:transform .13s;}
+  .cabr input:checked + .cabr-dot{border-color:var(--accent-brand-primary);}
+  .cabr input:checked + .cabr-dot::after{transform:scale(1);}
+  .cabr-tx{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+  .cabr input:checked ~ .cabr-tx{color:var(--accent-brand-primary);}
 
-  .footer{position:absolute;bottom:0;left:0;right:0;
+  .footer{position:absolute;bottom:0;left:0;right:0;z-index:0;
     width:100%;max-width:1180px;margin:0 auto;padding:var(--sp-24) var(--sp-32) var(--sp-32);
     color:var(--text-secondary);font-size:var(--fs-s);font-weight:var(--fw-medium);
     border-top:1px solid var(--border-default);display:flex;justify-content:space-between;
@@ -306,9 +314,13 @@
   <div class="sky-mid">
     <div class="hero2">
       <h1>Find your flight</h1>
+      <div class="trip-tabs" role="tablist" aria-label="Trip type">
+        <button type="button" class="trip-tab" role="tab" data-trip="oneway">One way</button>
+        <button type="button" class="trip-tab" role="tab" data-trip="roundtrip" aria-selected="true">Round trip</button>
+      </div>
     </div>
 
-    <div class="sbar">
+    <div class="sbar" id="sbar">
       <div class="sseg port" id="segFrom">
         <svg viewBox="0 0 24 24"><path d="M3 20h18M4.5 14.5l2.8.8 3.2-3.4-6.2-3.6 1.7-1.2 7.4 2.3 3-3.2a1.8 1.8 0 0 1 2.6 2.5l-3.1 3.2 2.3 7.3-1.2 1.7-3.6-6.2-3.4 3.2.8 2.8-1.3.9-2-2.9-2.9-2 .9-1.3z"/></svg>
         <span class="sseg-tx">
@@ -342,7 +354,6 @@
             <button type="button" class="cal-nav" data-nav="next" data-cal="dep">›</button>
           </div>
           <div class="cal-grid" data-grid="dep"></div>
-          <div class="cal-hint" data-hint="dep">Select your departure date</div>
         </div>
       </div>
 
@@ -357,8 +368,6 @@
             <button type="button" class="cal-nav" data-nav="next" data-cal="ret">›</button>
           </div>
           <div class="cal-grid" data-grid="ret"></div>
-          <div class="cal-hint" data-hint="ret">Select your return date</div>
-          <div class="cal-alt"><button type="button" id="oneWayBtn">Skip — one way</button></div>
         </div>
       </div>
 
@@ -391,14 +400,29 @@
               <button type="button" data-cat="infants" data-d="1" aria-label="More infants">+</button>
             </div>
           </div>
-          <div class="cab-lab">Cabin</div>
+          <div class="cab-lab">Choose Travel Class</div>
           <div class="cabs" id="cabs">
-            <button type="button" class="cab" data-cabin="economy" aria-pressed="true">Economy</button>
-            <button type="button" class="cab" data-cabin="premium" aria-pressed="false">Premium economy</button>
-            <button type="button" class="cab" data-cabin="business" aria-pressed="false">Business</button>
-            <button type="button" class="cab" data-cabin="first" aria-pressed="false">First</button>
+            <label class="cabr">
+              <input type="radio" name="cabin" data-cabin="economy" checked>
+              <span class="cabr-dot"></span>
+              <span class="cabr-tx">Economy</span>
+            </label>
+            <label class="cabr">
+              <input type="radio" name="cabin" data-cabin="premium">
+              <span class="cabr-dot"></span>
+              <span class="cabr-tx">Premium economy</span>
+            </label>
+            <label class="cabr">
+              <input type="radio" name="cabin" data-cabin="business">
+              <span class="cabr-dot"></span>
+              <span class="cabr-tx">Business</span>
+            </label>
+            <label class="cabr">
+              <input type="radio" name="cabin" data-cabin="first">
+              <span class="cabr-dot"></span>
+              <span class="cabr-tx">First</span>
+            </label>
           </div>
-          <button type="button" class="pop-done" id="travDone">Done</button>
         </div>
       </div>
 
@@ -444,7 +468,7 @@ var SKEY = 'onto:flightSearch:v1';
    midnight while a calendar is open. */
 var TODAY = new Date(); TODAY.setHours(0,0,0,0);
 
-var S = { from:null, to:null, dep:null, ret:null,
+var S = { from:null, to:null, dep:null, ret:null, tripType:'roundtrip',
           adults:1, children:0, infants:0, cabin:'economy' };
 
 (function restore(){
@@ -465,6 +489,8 @@ var S = { from:null, to:null, dep:null, ret:null,
     S.children = Math.min(8, Math.max(0, p.children|0));
     S.infants  = Math.min(S.adults, Math.max(0, p.infants|0));
     if(['economy','premium','business','first'].indexOf(p.cabin) >= 0) S.cabin = p.cabin;
+    if(['oneway','roundtrip'].indexOf(p.tripType) >= 0) S.tripType = p.tripType;
+    if(S.tripType === 'oneway') S.ret = null;
   }catch(e){}
 })();
 
@@ -473,7 +499,8 @@ function save(){
   try{ sessionStorage.setItem(SKEY, JSON.stringify({
     from:S.from, to:S.to,
     dep:S.dep?ymd(S.dep):null, ret:S.ret?ymd(S.ret):null,
-    adults:S.adults, children:S.children, infants:S.infants, cabin:S.cabin
+    adults:S.adults, children:S.children, infants:S.infants, cabin:S.cabin,
+    tripType:S.tripType
   })); }catch(e){}
 }
 
@@ -651,14 +678,24 @@ function drawCal(which){
 }
 
 function paintDates(){
-  var dv = $('depVal'), rv = $('retVal');
+  var dv = $('depVal'), rv = $('retVal'), segRet = $('segRet');
   if(S.dep){ dv.textContent = fmtDate(S.dep); dv.classList.remove('ph'); }
   else { dv.textContent = 'Add date'; dv.classList.add('ph'); }
-  /* No return date is not an unanswered field — it is a one-way trip, and the
-     pill should say the trip you'll get rather than nag for a date you may not
-     want. */
-  if(S.ret){ rv.textContent = fmtDate(S.ret); rv.classList.remove('ph'); }
-  else { rv.textContent = 'One way'; rv.classList.add('ph'); }
+
+  /* Whether a return date is even wanted is the trip-type tabs' call now,
+     not something read off whether this field happens to hold a date. */
+  var oneway = S.tripType === 'oneway';
+  segRet.classList.toggle('disabled', oneway);
+  segRet.setAttribute('aria-disabled', oneway ? 'true' : 'false');
+  if(oneway){ rv.textContent = 'Not needed'; rv.classList.add('ph'); }
+  else if(S.ret){ rv.textContent = fmtDate(S.ret); rv.classList.remove('ph'); }
+  else { rv.textContent = 'Add date'; rv.classList.add('ph'); }
+}
+
+function paintTripTabs(){
+  document.querySelectorAll('.trip-tab').forEach(function(b){
+    b.setAttribute('aria-selected', b.dataset.trip === S.tripType ? 'true' : 'false');
+  });
 }
 
 function openCal(which){
@@ -695,7 +732,9 @@ document.querySelectorAll('.cal-grid').forEach(function(grid){
       if(S.ret && S.ret <= d) S.ret = null;
       save(); paintDates(); drawCal('dep'); drawCal('ret');
       setOpen($('popDep'), false);
-      if(!S.ret) setTimeout(function(){ openCal('ret'); }, 60);
+      /* No forced hop into the return calendar — the field already reads
+         "One way" until it's told otherwise, so picking a return date is
+         something you go do, not a second step this puts in your way. */
     } else {
       if(!S.dep){ S.dep = d; save(); paintDates(); drawCal('dep'); drawCal('ret'); return; }
       S.ret = d; save(); paintDates(); drawCal('dep'); drawCal('ret');
@@ -715,16 +754,19 @@ $('segRet').addEventListener('click', function(e){
 $('popDep').addEventListener('click', function(e){ e.stopPropagation(); });
 $('popRet').addEventListener('click', function(e){ e.stopPropagation(); });
 
-/* Drop the return and the trip becomes a one-way. Also the escape hatch from
-   the calendar that opens itself after a departure is picked. */
-$('oneWayBtn').addEventListener('click', function(e){
-  e.stopPropagation();
-  S.ret = null; save(); paintDates(); drawCal('dep'); drawCal('ret');
-  setOpen($('popRet'), false);
+/* =============================================================
+   TRIP TYPE
+   ============================================================= */
+document.querySelectorAll('.trip-tab').forEach(function(b){
+  b.addEventListener('click', function(){
+    S.tripType = b.dataset.trip;
+    if(S.tripType === 'oneway') S.ret = null;
+    save(); paintTripTabs(); paintDates(); drawCal('ret');
+  });
 });
 
 /* =============================================================
-   TRAVELLERS + CABIN
+   TRAVELLERS
    ============================================================= */
 (function(){
   var seg = $('segTrav'), pop = $('popTrav');
@@ -751,8 +793,8 @@ $('oneWayBtn').addEventListener('click', function(e){
       }
     });
 
-    pop.querySelectorAll('.cab').forEach(function(b){
-      b.setAttribute('aria-pressed', b.dataset.cabin===S.cabin ? 'true' : 'false');
+    pop.querySelectorAll('.cabr input').forEach(function(r){
+      r.checked = r.dataset.cabin === S.cabin;
     });
 
     /* The pill states the party the way the stays bar does — small chips, one
@@ -779,10 +821,9 @@ $('oneWayBtn').addEventListener('click', function(e){
     });
   });
 
-  pop.querySelectorAll('.cab').forEach(function(b){
-    b.addEventListener('click', function(e){ e.stopPropagation(); S.cabin = b.dataset.cabin; save(); paint(); });
+  pop.querySelectorAll('.cabr input').forEach(function(r){
+    r.addEventListener('change', function(e){ e.stopPropagation(); S.cabin = r.dataset.cabin; save(); paint(); });
   });
-  $('travDone').addEventListener('click', function(e){ e.stopPropagation(); setOpen(pop, false); });
 
   seg.addEventListener('click', function(e){
     if(pop.contains(e.target)) return;
@@ -834,7 +875,19 @@ document.addEventListener('keydown', function(e){
 });
 
 /* first paint */
-portFrom.paint(); portTo.paint(); paintDates();
+portFrom.paint(); portTo.paint(); paintTripTabs(); paintDates();
+
+/* Arriving from a card on the results rail that names one field — open that
+   field. The click that sent us here was a click on it, and landing on the
+   whole search bar with nothing open makes the user ask for it twice. */
+(function(){
+  var which = (location.hash || '').replace('#','');
+  if(!which) return;
+  if(which === 'from')       $('fromInput').focus();
+  else if(which === 'to')    $('toInput').focus();
+  else if(which === 'dates') openCal('dep');
+  else if(which === 'who')   { closeAll($('popTrav')); setOpen($('popTrav'), true); }
+})();
 </script>
 
 <script src="topnav.js"></script>

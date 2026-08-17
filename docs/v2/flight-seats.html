@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>onto — Choose your seat</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* The fourth screen of the flights flow, and the last one before money
+     changes hands — checkout hands off a booking draft in sessionStorage,
+     this screen turns "which seat" into a real map instead of a checkbox,
+     and the one Pay button here is the one that actually charges. Same
+     1440 frame / 40px gutter / 332px sticky rail as every other screen in
+     this flow, for the same reason: the furniture shouldn't move under
+     the user mid-booking. */
+  :root{ --stick:80px; }
+  body{min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:var(--font-body);-webkit-font-smoothing:antialiased;margin:0;}
+  *{box-sizing:border-box;}
+  h1,h2,h3{margin:0;}
+  button{font-family:inherit;}
+
+  /* ============ TOP NAV ============ */
+  .topnav{position:sticky;top:0;z-index:90;
+    background:rgba(250,250,249,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:.8px solid var(--line);}
+  .topnav-in{max-width:1440px;margin:0 auto;padding:0 40px;height:72px;
+    display:flex;align-items:center;justify-content:space-between;gap:26px;}
+  .tn-brand{display:flex;align-items:center;gap:9px;font-size:20px;color:var(--ink);
+    letter-spacing:normal;text-decoration:none;white-space:nowrap;font-weight:400;}
+  .tn-brand b{font-weight:700;}
+  .tn-brand .tn-sl{font-size:24px;font-weight:400;letter-spacing:-.12px;color:var(--ink);}
+  .tn-right{display:flex;align-items:center;gap:9px;position:relative;}
+
+  .wrap{max-width:1440px;margin:0 auto;padding:0 40px 120px;}
+
+  /* ============ PAGE HEAD ============ */
+  .crumbrow{display:flex;align-items:center;gap:14px;padding:22px 0 14px;flex-wrap:wrap;}
+  .backlink{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:14px;
+    font-weight:600;text-decoration:none;padding:7px 12px 7px 8px;border-radius:999px;
+    transition:color .15s,background .15s;}
+  .backlink:hover{color:var(--ink);background:#fff;}
+  .backlink svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .pdp-title{padding:0 0 22px;}
+  .page-h{font-size:32px;font-weight:700;line-height:1.3;letter-spacing:-.01em;}
+
+  /* A charge that was refused has to be said on the page the user is sent back
+     to, or they land on a seat map they already filled with no idea why. */
+  .alert{display:none;align-items:flex-start;gap:12px;background:#fff;
+    border:1px solid var(--accent-negative-border);border-left-width:4px;border-radius:14px;
+    padding:14px 18px;margin:0 0 20px;}
+  .alert.show{display:flex;}
+  .alert svg{width:19px;height:19px;flex:none;margin-top:1px;stroke:var(--accent-negative-text);
+    fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .alert-t{font-size:14.5px;font-weight:700;color:var(--accent-negative-text);}
+  .alert-s{font-size:13.5px;color:var(--muted);margin-top:2px;}
+
+  /* ============ TWO COLUMN ============ */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 332px;gap:clamp(24px,4vw,56px);align-items:start;}
+  .col-main{min-width:0;}
+  .side{position:sticky;top:var(--stick);min-width:0;}
+
+  .card{background:var(--card);border:.8px solid var(--card-line);border-radius:20px;
+    box-shadow:var(--shadow-card);padding:20px 22px;}
+
+  /* ============ LEG TABS ============
+     Same component the results list switches an outbound/return search on —
+     a round trip is two seat maps, not one, and picking is answered per leg. */
+  .legs{display:flex;gap:10px;margin:0 0 18px;}
+  .legs[hidden]{display:none;}
+  .leg{flex:1;text-align:left;background:var(--card);border:.8px solid var(--card-line);border-radius:18px;
+    padding:14px 18px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow-field);
+    transition:border-color .16s,box-shadow .16s,background .16s;min-width:0;}
+  .leg:hover{border-color:#cfcfca;}
+  .leg[aria-selected="true"]{border-color:var(--jade);background:var(--jade-soft);box-shadow:none;}
+  .leg-k{display:block;font-size:11.5px;font-weight:600;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--muted);}
+  .leg[aria-selected="true"] .leg-k{color:var(--jade-deep);}
+  .leg-n{display:block;font-size:16px;font-weight:600;color:var(--ink);margin-top:5px;letter-spacing:-.01em;}
+  .leg-s{display:block;font-size:13px;color:var(--muted);margin-top:3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .leg-s.done{color:var(--jade-deep);font-weight:600;}
+
+  /* ============ SEAT MAP ============ */
+  .map-h{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:2px;}
+  .map-t{font-size:17px;font-weight:700;letter-spacing:-.01em;}
+  .map-hint{font-size:13.5px;font-weight:600;color:var(--jade-deep);}
+  .map-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:16px;padding:12px 14px;background:#fafaf9;
+    border:.8px solid var(--line);border-radius:14px;margin-bottom:18px;}
+  .lg-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--chip-ink);}
+  .lg-sw{width:16px;height:16px;border-radius:5px;flex:none;border:1px solid var(--card-line);background:#fff;}
+  .lg-sw.xl{border-color:var(--amber-line);background:var(--amber-soft);}
+  .lg-sw.sel{border-color:var(--jade);background:var(--jade);}
+  .lg-sw.occ{border-color:#efefef;background:#f2f2f0;}
+
+  .seatscroll{max-height:520px;overflow-y:auto;overscroll-behavior:contain;
+    scrollbar-width:thin;scrollbar-color:#e3e3df transparent;padding:4px 2px 4px 0;}
+  .seatscroll::-webkit-scrollbar{width:6px;}
+  .seatscroll::-webkit-scrollbar-thumb{background:#e3e3df;border-radius:3px;}
+  .front-tag{text-align:center;font-size:11px;font-weight:600;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+  .srow{display:flex;align-items:center;gap:8px;padding:3px 0;}
+  .srow.xl{background:var(--amber-soft);border-radius:10px;}
+  .srow-n{width:22px;text-align:right;font-size:11px;color:var(--muted);flex:none;font-variant-numeric:tabular-nums;}
+  .sgrp{display:flex;gap:6px;}
+  .saisle{width:20px;flex:none;}
+  .seat{width:32px;height:32px;border-radius:8px;border:1px solid var(--card-line);background:#fff;
+    font-size:10.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-family:inherit;transition:all .12s;}
+  .seat:hover:not(:disabled){border-color:var(--jade);color:var(--jade-deep);}
+  .seat.xl{border-color:var(--amber-line);background:#fff;color:#7c5e22;}
+  .seat.sel{background:var(--jade);border-color:var(--jade);color:#fff;}
+  .seat.occ{background:#f2f2f0;border-color:#efefef;color:#c9c9c4;cursor:default;}
+  .seat:disabled{cursor:default;}
+
+  /* ============ THE RAIL ============ */
+  .book-lbl{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.01em;margin-bottom:16px;}
+  .stay-cards{display:flex;flex-direction:column;gap:10px;}
+  .tripchip{width:100%;text-align:left;background:#fff;border:.8px solid var(--card-line);
+    border-radius:20px;padding:12px 16px;min-height:68px;cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-field);
+    transition:box-shadow .15s,border-color .15s;}
+  .tripchip:hover{border-color:#e3e3df;box-shadow:0 8px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);}
+  .sc-ic{width:40px;height:40px;flex:none;color:var(--ink);
+    display:flex;align-items:center;justify-content:center;overflow:visible;}
+  .sc-ic svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .sc-ic.sc-ic-air{width:40px;height:40px;border-radius:10px;color:#fff;font-size:12px;
+    font-weight:700;letter-spacing:.02em;}
+  .sc-body{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
+  .sc-ar{flex:none;color:#e3e3df;display:flex;align-items:center;}
+  .sc-ar svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .tc-k{font-size:14px;color:var(--label);font-weight:600;}
+  .tc-cnt{font-weight:700;font-size:14px;color:var(--ink);border:1px solid #efefef;
+    border-radius:5px;padding:2px 4px;margin-left:4px;}
+  .tc-v{font-size:14px;font-weight:700;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tc-s{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .totalcard{background:#fff;border:.8px solid #efefef;border-radius:20px;padding:16.8px;
+    margin-top:12px;box-shadow:var(--shadow-field);display:flex;flex-direction:column;gap:2px;}
+  .tc-h{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.005em;margin:0 0 4px;}
+
+  .ln{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:7px 0;font-size:14px;}
+  .ln-k{color:var(--chip-ink);min-width:0;}
+  .ln-k em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px;}
+  .ln-v{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .ln.free .ln-v{color:var(--jade-deep);font-weight:700;}
+  .ln-rule{height:.8px;background:var(--line);margin:11px 0 6px;}
+  .tot{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:8px 0 2px;}
+  .tot-k{font-size:14.5px;font-weight:700;}
+  .tot-k em{display:block;font-style:normal;font-size:12px;color:var(--muted);font-weight:500;margin-top:2px;}
+  .tot-v{font-size:24px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;line-height:1.3;}
+  .pay{width:100%;margin-top:10px;background:var(--jade);color:#fff;border:none;border-radius:12px;
+    min-height:40px;padding:10px 12px;font-size:14px;font-weight:700;cursor:pointer;
+    font-family:inherit;transition:background .15s;}
+  .pay:hover:not(:disabled){background:var(--jade-deep);}
+  .pay:active:not(:disabled){transform:scale(.995);}
+  .pay:disabled{background:#c8ccc9;cursor:default;}
+  .paynote{font-size:12px;color:var(--muted);text-align:center;line-height:1.45;margin-top:10px;}
+
+  @media(max-width:1080px){
+    .grid{grid-template-columns:1fr;}
+    .side{position:static;}
+  }
+  @media(max-width:760px){
+    .wrap,.topnav-in{padding-left:20px;padding-right:20px;}
+    .page-h{font-size:25px;}
+    .legs{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-in">
+    <a class="tn-brand" href="home2.html"><b>ONTO</b><span class="tn-sl">/</span><span id="crumb">Choose your seat</span></a>
+    <div class="tn-right">
+      <button type="button" class="tn-who" id="profileBtn" aria-haspopup="true" aria-expanded="false">Saanvi</button>
+      <div class="menu" id="profileMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="crumbrow">
+    <a class="backlink" href="flight-checkout.html">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to details
+    </a>
+  </div>
+
+  <div class="pdp-title">
+    <h1 class="page-h">Choose your seat</h1>
+  </div>
+
+  <div class="alert" id="payAlert">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16.2v.2"/></svg>
+    <div>
+      <div class="alert-t">Payment declined</div>
+      <div class="alert-s">Your bank reversed the charge and nothing was taken. Your seats are still held on this page.</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="col-main">
+      <div class="legs" id="legs" role="tablist" hidden></div>
+
+      <section class="card">
+        <div class="map-h">
+          <h2 class="map-t" id="mapTitle">—</h2>
+          <span class="map-hint" id="mapHint"></span>
+        </div>
+        <div class="map-sub" id="mapSub"></div>
+
+        <div class="legend">
+          <span class="lg-item"><i class="lg-sw"></i>Available</span>
+          <span class="lg-item"><i class="lg-sw xl"></i>Extra legroom · +₹450</span>
+          <span class="lg-item"><i class="lg-sw sel"></i>Selected</span>
+          <span class="lg-item"><i class="lg-sw occ"></i>Occupied</span>
+        </div>
+
+        <div class="seatscroll">
+          <div class="front-tag">✈ Front of aircraft</div>
+          <div id="seatRows"></div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="side">
+      <h2 class="book-lbl">Your trip</h2>
+      <div class="stay-cards" id="tripCards"></div>
+      <div class="totalcard">
+        <h3 class="tc-h">Fare breakdown</h3>
+        <div id="sumLines"></div>
+        <div class="ln-rule"></div>
+        <div class="tot">
+          <div class="tot-k">Total <em id="totSub"></em></div>
+          <div class="tot-v" id="totVal">—</div>
+        </div>
+        <button type="button" class="pay" id="payBtn" disabled>Choose your seat to continue</button>
+        <div class="paynote">Prototype — no real payment is processed.</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="flights-data.js"></script>
+<script>
+/* =============================================================
+   THE BOOKING DRAFT
+   -------------------------------------------------------------
+   Checkout hands the whole draft over in sessionStorage — travellers,
+   contact, fare extras, the lot — the same way the results page hands
+   its cart to checkout. Nothing here is invented; a cold open with no
+   draft has nothing to seat, so it goes back to the screen that builds one.
+   ============================================================= */
+var PAY_KEY = 'flightBooking';
+var $ = function(id){ return document.getElementById(id); };
+var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+
+var MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function fmtDay(d){ return DAYS[d.getDay()] + ', ' + MONS[d.getMonth()] + ' ' + d.getDate(); }
+function fromYmd(a){ return Array.isArray(a) ? new Date(a[0],a[1],a[2]) : null; }
+var CABIN_LABEL = { economy:'Economy', premium:'Premium economy', business:'Business', first:'First' };
+
+var B = {};
+try{ B = JSON.parse(sessionStorage.getItem(PAY_KEY)) || {}; }catch(e){}
+var LEGS = Array.isArray(B.legs) ? B.legs : [];
+
+/* Nothing to seat — either this file was opened cold or the session was
+   cleared. Checkout can rebuild a trip from the last search; this page
+   can't, so it hands over rather than rendering an empty map. */
+if(!LEGS.length){ location.replace('flight-checkout.html'); }
+
+var PAYING = B.paying || 1;
+
+/* =============================================================
+   THE MAP
+   -------------------------------------------------------------
+   26 rows, 3-3, one aisle — a generic narrowbody rather than a per-aircraft
+   layout, which this prototype doesn't have data for. Row 1 and the
+   over-wing exit rows (13–14) are the legroom that's actually worth paying
+   for; everything else is free to pick. Which seats are already taken is
+   derived from the flight number rather than Math.random(), so reloading
+   this page — or bouncing back from a declined charge — doesn't reshuffle
+   the cabin under the seats already chosen.
+   ============================================================= */
+var ROWS = 26, XL_ROWS = [1, 13, 14], XL_PRICE = 450, OCC_RATE = .32;
+var COLS = ['A','B','C','D','E','F'];
+
+function seatRand(key){
+  var h = 0;
+  for(var i=0;i<key.length;i++){ h = (h*31 + key.charCodeAt(i)) >>> 0; }
+  h = (h ^ (h >>> 16)) >>> 0;
+  return (h % 1000) / 1000;
+}
+function isOccupied(flightNo, seatId){ return seatRand(flightNo + ':' + seatId) < OCC_RATE; }
+function seatPrice(row){ return XL_ROWS.indexOf(row) >= 0 ? XL_PRICE : 0; }
+function seatTotalFor(ids){ return ids.reduce(function(n,id){ return n + seatPrice(parseInt(id,10)); }, 0); }
+
+/* Restored from the booking draft, so a bounced charge — or just switching
+   leg tabs — doesn't clear a seat that was already picked. */
+var chosen = {};
+LEGS.forEach(function(L){ chosen[L.k] = (B.seats && B.seats[L.k]) || []; });
+var activeLeg = LEGS[0].k;
+
+function legDone(L){ return (chosen[L.k] || []).length === PAYING; }
+function legOf(k){ return LEGS.filter(function(L){ return L.k === k; })[0] || LEGS[0]; }
+
+function seatBtn(L, r, c, xl){
+  var id = r + c;
+  var occ = isOccupied(L.flight.number, id);
+  var sel = (chosen[L.k] || []).indexOf(id) >= 0;
+  var cls = 'seat' + (xl ? ' xl' : '') + (occ ? ' occ' : '') + (sel ? ' sel' : '');
+  var label = 'Seat ' + id + (xl ? ', extra legroom, +' + Flights.inr(XL_PRICE) : '') + (occ ? ', occupied' : sel ? ', selected' : '');
+  return '<button type="button" class="' + cls + '" data-leg="' + L.k + '" data-seat="' + id + '"' +
+    (occ ? ' disabled' : '') + ' aria-label="' + esc(label) + '">' + c + '</button>';
+}
+
+function seatMapHTML(L){
+  var rows = '';
+  for(var r = 1; r <= ROWS; r++){
+    var xl = XL_ROWS.indexOf(r) >= 0;
+    var left  = COLS.slice(0,3).map(function(c){ return seatBtn(L, r, c, xl); }).join('');
+    var right = COLS.slice(3).map(function(c){ return seatBtn(L, r, c, xl); }).join('');
+    rows += '<div class="srow' + (xl ? ' xl' : '') + '">' +
+      '<span class="srow-n">' + r + '</span>' +
+      '<span class="sgrp">' + left + '</span><span class="saisle"></span><span class="sgrp">' + right + '</span>' +
+    '</div>';
+  }
+  return rows;
+}
+
+function paintSeatMap(){
+  var L = legOf(activeLeg);
+  $('mapTitle').textContent = (LEGS.length > 1 ? L.label + ' · ' : '') + L.flight.from + ' → ' + L.flight.to;
+  $('mapSub').textContent = L.flight.carrier.name + ' ' + L.flight.number + ' · ' + (L.flight.aircraft || '') +
+    ' · ' + CABIN_LABEL[B.cabin || 'economy'];
+
+  var need = PAYING - (chosen[L.k] || []).length;
+  $('mapHint').textContent = need > 0
+    ? 'Choose ' + need + ' more seat' + (need > 1 ? 's' : '')
+    : chosen[L.k].slice().sort().join(', ') + ' selected';
+
+  $('seatRows').innerHTML = seatMapHTML(L);
+  $('seatRows').querySelectorAll('.seat:not(.occ)').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var leg = btn.dataset.leg, id = btn.dataset.seat;
+      var list = chosen[leg] || (chosen[leg] = []);
+      var idx = list.indexOf(id);
+      if(idx >= 0) list.splice(idx, 1);
+      else{
+        /* Full for this leg — the fix is to release a seat first, not to
+           silently bump whichever one was picked earliest. */
+        if(list.length >= PAYING) return;
+        list.push(id);
+      }
+      paintSeatMap();
+      paintLegTabs();
+      paintSummary();
+    });
+  });
+}
+
+function paintLegTabs(){
+  $('legs').hidden = LEGS.length < 2;
+  if(LEGS.length < 2) return;
+  $('legs').innerHTML = LEGS.map(function(L){
+    var done = legDone(L);
+    return '<button type="button" class="leg" role="tab" data-leg="' + L.k + '" aria-selected="' + (L.k === activeLeg) + '">' +
+      '<span class="leg-k">' + esc(L.label) + '</span>' +
+      '<span class="leg-n">' + esc(L.flight.from) + ' → ' + esc(L.flight.to) + '</span>' +
+      '<span class="leg-s' + (done ? ' done' : '') + '">' +
+        (done ? esc(chosen[L.k].slice().sort().join(', ')) + ' chosen'
+              : 'Choose ' + PAYING + (PAYING > 1 ? ' seats' : ' seat')) +
+      '</span>' +
+    '</button>';
+  }).join('');
+  $('legs').querySelectorAll('.leg').forEach(function(b){
+    b.addEventListener('click', function(){ activeLeg = b.dataset.leg; paintLegTabs(); paintSeatMap(); });
+  });
+}
+
+/* =============================================================
+   THE RAIL — same tripchip component checkout uses, reading the resolved
+   booking draft rather than re-deriving a cart, since every field it
+   needs (route, dates, flights) already came through in full.
+   ============================================================= */
+var ICON = {
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v4M16 3v4"/>',
+  who:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/>',
+  chev:'<path d="M6 9l6 6 6-6"/>'
+};
+
+function chipHTML(o){
+  return '<button type="button" class="tripchip" data-go="' + esc(o.go) + '">' +
+    (o.tile
+      ? '<span class="sc-ic sc-ic-air" style="background:' + esc(o.tile.color) + '">' + esc(o.tile.code) + '</span>'
+      : '<span class="sc-ic"><svg viewBox="0 0 24 24">' + o.icon + '</svg></span>') +
+    '<span class="sc-body">' +
+      '<span class="tc-k">' + esc(o.k) + (o.cnt ? '<span class="tc-cnt">' + esc(o.cnt) + '</span>' : '') + '</span>' +
+      '<span class="tc-v">' + esc(o.v) + '</span>' +
+      (o.s ? '<span class="tc-s">' + esc(o.s) + '</span>' : '') +
+    '</span>' +
+    '<span class="sc-ar"><svg viewBox="0 0 24 24">' + ICON.chev + '</svg></span>' +
+  '</button>';
+}
+
+function paintTrip(){
+  var cards = [
+    chipHTML({ k:'Dates', cnt: LEGS.length > 1 ? 'Round trip' : 'One way',
+      v: LEGS.length > 1
+        ? fmtDay(fromYmd(LEGS[0].date)) + ' — ' + fmtDay(fromYmd(LEGS[1].date))
+        : fmtDay(fromYmd(LEGS[0].date)),
+      icon:ICON.cal, go:'flight-checkout.html' }),
+    chipHTML({ k:'Travellers', cnt: PAYING + (PAYING > 1 ? ' travellers' : ' traveller'),
+      v: (B.travellers || []).map(function(t){ return t.first; }).filter(Boolean).join(', ') ||
+         (PAYING + ' traveller' + (PAYING > 1 ? 's' : '')),
+      icon:ICON.who, go:'flight-checkout.html' })
+  ];
+
+  LEGS.forEach(function(L){
+    var f = L.flight;
+    cards.push(chipHTML({
+      k: L.label,
+      v: f.carrier.name + ' ' + f.number,
+      s: Flights.hhmm(f.depMin) + ' → ' + Flights.hhmm(f.arrMin) + ' · ' + Flights.stopsLabel(f),
+      tile: { code:f.carrier.code, color:f.carrier.color },
+      go: 'flight-results.html'
+    }));
+  });
+
+  $('tripCards').innerHTML = cards.join('');
+  $('tripCards').querySelectorAll('.tripchip').forEach(function(b){
+    b.addEventListener('click', function(){ location.href = b.dataset.go; });
+  });
+}
+
+/* =============================================================
+   THE BREAKDOWN — the fare checkout already priced, plus whatever seats add
+   ============================================================= */
+function paintSummary(){
+  var lines = LEGS.map(function(L){
+    return '<div class="ln"><div class="ln-k">' + esc(L.flight.from) + ' → ' + esc(L.flight.to) +
+      '<em>' + esc(L.flight.number) + ' · fare + taxes</em></div>' +
+      '<div class="ln-v">' + Flights.inr(L.base + L.tax) + '</div></div>';
+  });
+
+  (B.extras || []).forEach(function(x){
+    lines.push('<div class="ln"><div class="ln-k">' + esc(x.name) + '</div>' +
+      '<div class="ln-v">' + Flights.inr(x.amount) + '</div></div>');
+  });
+
+  var seatTotal = 0;
+  LEGS.forEach(function(L){
+    var ids = (chosen[L.k] || []).slice().sort();
+    if(!ids.length) return;
+    var amt = seatTotalFor(ids);
+    seatTotal += amt;
+    lines.push('<div class="ln' + (amt ? '' : ' free') + '"><div class="ln-k">' +
+      (LEGS.length > 1 ? esc(L.label) + ' seats' : 'Seats') +
+      '<em>' + esc(ids.join(', ')) + '</em></div>' +
+      '<div class="ln-v">' + (amt ? Flights.inr(amt) : 'Free') + '</div></div>');
+  });
+
+  $('sumLines').innerHTML = lines.join('');
+
+  var total = (B.total || 0) + seatTotal;
+  $('totVal').textContent = Flights.inr(total);
+  $('totSub').textContent = PAYING + ' traveller' + (PAYING > 1 ? 's' : '') + ' · ' +
+    (LEGS.length > 1 ? 'round trip' : 'one way');
+
+  var allDone = LEGS.every(legDone);
+  $('payBtn').disabled = !allDone;
+  $('payBtn').textContent = allDone
+    ? 'Pay · ' + Flights.inr(total)
+    : 'Choose your seat' + (PAYING > 1 || LEGS.length > 1 ? 's' : '') + ' to continue';
+
+  return total;
+}
+
+/* =============================================================
+   PAY — the seat map's picks fold into the same booking draft and the same
+   gateway every other onto checkout uses.
+   ============================================================= */
+$('payBtn').addEventListener('click', function(){
+  if($('payBtn').disabled) return;
+
+  var seatExtras = [];
+  LEGS.forEach(function(L){
+    var ids = (chosen[L.k] || []).slice().sort();
+    var amt = seatTotalFor(ids);
+    if(amt){
+      seatExtras.push({
+        k: 'seat-' + L.k,
+        name: (LEGS.length > 1 ? L.label + ' s' : 'S') + 'eats ' + ids.join(', '),
+        amount: amt
+      });
+    }
+  });
+
+  B.seats = {};
+  LEGS.forEach(function(L){ B.seats[L.k] = (chosen[L.k] || []).slice().sort(); });
+  B.extras = (B.extras || []).filter(function(x){ return x.k.indexOf('seat-') !== 0; }).concat(seatExtras);
+
+  var total = paintSummary();
+  B.total = total;
+  B.amount = Flights.inr(total);
+
+  try{
+    sessionStorage.setItem(PAY_KEY, JSON.stringify(B));
+    /* The gateway is shared with the stay, so it is told which record it is
+       charging and where to send both outcomes. */
+    sessionStorage.setItem('payKey', PAY_KEY);
+    sessionStorage.setItem('payReturn', 'flight-confirmed.html');
+    sessionStorage.setItem('payFailReturn', 'flight-seats.html');
+    sessionStorage.removeItem('payFailed');
+  }catch(e){}
+  location.href = 'razorpay.html';
+});
+
+/* Sent back here by a declined charge: say so, once, and clear the flag so a
+   later reload isn't still apologising for it. */
+(function(){
+  var failed = false;
+  try{ failed = sessionStorage.getItem('payFailed') === '1'; }catch(e){}
+  if(!failed) return;
+  $('payAlert').classList.add('show');
+  try{ sessionStorage.removeItem('payFailed'); }catch(e){}
+})();
+
+/* =============================================================
+   ACCOUNT MENU — the panel itself is built by topnav.js
+   ============================================================= */
+var PROFILE = {};
+try{ PROFILE = JSON.parse(localStorage.getItem('onto:profile:v1')) || {}; }catch(e){}
+(function(){
+  var btn = $('profileBtn'), menu = $('profileMenu');
+  if(!btn || !menu) return;
+  btn.addEventListener('click', function(e){ e.stopPropagation(); var o=menu.classList.toggle('open'); btn.setAttribute('aria-expanded', o?'true':'false'); });
+  document.addEventListener('click', function(e){ if(!menu.contains(e.target) && !btn.contains(e.target)){ menu.classList.remove('open'); btn.setAttribute('aria-expanded','false'); } });
+})();
+(function(){
+  var who = PROFILE.first || (B.travellers && B.travellers[0] && B.travellers[0].first) || '';
+  if(who) $('profileBtn').textContent = who;
+})();
+
+paintTrip();
+paintLegTabs();
+paintSeatMap();
+paintSummary();
+</script>
+
+<script src="topnav.js"></script>
+</body>
+</html>

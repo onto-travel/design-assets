@@ -268,9 +268,7 @@
       layoverMin: layoverMin,
       legAMin: legAMin,                 // first sector, so a card can place the stop
 
-      price: Math.round(price / 10) * 10,
-      /* A scarcity line, but only sometimes: on every card it's wallpaper. */
-      seatsLeft: r() < 0.18 ? 2 + Math.floor(r() * 5) : 0
+      price: Math.round(price / 10) * 10
     };
   }
 
@@ -307,6 +305,30 @@
     return f.stops === 0 ? 'Nonstop' : f.stops + ' stop' + (f.stops > 1 ? 's' : '') + (f.via ? ' · ' + f.via : '');
   }
 
+  /* A one-stop is two flown sectors with ground time in the middle, and the
+     itinerary carries enough to say so exactly: the first sector's block time,
+     the layover, and the total. The second sector is whatever is left. Every
+     screen that draws a timeline needs this, so it is derived here once rather
+     than re-derived per page — the arithmetic has to agree everywhere or the
+     same flight arrives at two different times on two screens. */
+  function sectors(f) {
+    if (!f.stops || !f.via) return [{ from: f.from, to: f.to, dep: f.depMin, arr: f.arrMin }];
+    var a = { from: f.from, to: f.via, dep: f.depMin, arr: f.depMin + f.legAMin };
+    var b = { from: f.via, to: f.to, dep: a.arr + f.layoverMin, arr: f.arrMin };
+    return [a, b];
+  }
+
+  /* What a fare is made of. The list quotes one number per traveller and every
+     screen downstream has to total to exactly that — a checkout that discovers
+     taxes the results page never mentioned is the oldest bad trick in travel.
+     So the split is presentational: the fare is carved into base and tax, never
+     topped up with one, and base + tax === price by construction. */
+  var TAX_SHARE = 0.17;
+  function fareSplit(price) {
+    var tax = Math.round(price * TAX_SHARE / 10) * 10;
+    return { base: price - tax, tax: tax };
+  }
+
   root.Flights = {
     AIRPORTS: AIRPORTS,
     byCode: function (c) { return BY_CODE[c] || null; },
@@ -339,6 +361,18 @@
     dayOffset: dayOffset,
     dur: dur,
     inr: inr,
-    stopsLabel: stopsLabel
+    stopsLabel: stopsLabel,
+    sectors: sectors,
+    fareSplit: fareSplit,
+
+    /* What every screen says about what the fare includes and what changing
+       your mind costs. One list, because the results card, the checkout and
+       the ticket all quote it and they cannot disagree. */
+    RULES: {
+      cabinKg: 7,
+      checkinKg: 15,
+      changeFee: 3000,
+      cancelFee: 3500
+    }
   };
 })(window);

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>onto — Traveller details</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* The third screen of the flights flow: what you picked, who is flying, and
+     what to add to the fare. Payment isn't decided here — that's the seat
+     screen right after this one — so the rail's job is to state the running
+     total, not to spend it. The shell is flight-results.html's — 1440 frame,
+     40px gutters, main column left, a 332px rail right that sticks — because
+     this is the same journey and the furniture should not move under the
+     user.
+
+     What the rail holds changes, though. On the results page it filters;
+     here it is the fare breakdown and the one button that carries it
+     forward, which is why it stays on screen while the forms below scroll. */
+  :root{ --stick:80px; }
+  body{min-height:100vh;background:var(--bg);color:var(--ink);
+    font-family:var(--font-body);-webkit-font-smoothing:antialiased;margin:0;}
+  *{box-sizing:border-box;}
+  h1,h2,h3{margin:0;}
+  button{font-family:inherit;}
+
+  /* ============ TOP NAV ============ */
+  /* results.html's header. The breadcrumb says where in the flow you are
+     rather than where else you could go — the same reason the links row is
+     absent from every page past the search. */
+  .topnav{position:sticky;top:0;z-index:90;
+    background:rgba(250,250,249,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:.8px solid var(--line);}
+  .topnav-in{max-width:1440px;margin:0 auto;padding:0 40px;height:72px;
+    display:flex;align-items:center;justify-content:space-between;gap:26px;}
+  .tn-brand{display:flex;align-items:center;gap:9px;font-size:20px;color:var(--ink);
+    letter-spacing:normal;text-decoration:none;white-space:nowrap;font-weight:400;}
+  .tn-brand b{font-weight:700;}
+  .tn-brand .tn-sl{font-size:24px;font-weight:400;letter-spacing:-.12px;color:var(--ink);}
+  .tn-right{display:flex;align-items:center;gap:9px;position:relative;}
+
+  .wrap{max-width:1440px;margin:0 auto;padding:0 40px 120px;}
+
+  /* ============ PAGE HEAD ============ */
+  .crumbrow{display:flex;align-items:center;gap:14px;padding:22px 0 14px;flex-wrap:wrap;}
+  .backlink{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:14px;
+    font-weight:600;text-decoration:none;padding:7px 12px 7px 8px;border-radius:999px;
+    transition:color .15s,background .15s;}
+  .backlink:hover{color:var(--ink);background:#fff;}
+  .backlink svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  /* the PDP's title block: the name of the thing, then one quiet line of what
+     it is — no display face, no 900 weight */
+  .pdp-title{padding:0 0 22px;}
+  .page-h{font-size:32px;font-weight:700;line-height:1.3;letter-spacing:-.01em;}
+
+  /* ============ TWO COLUMN ============ */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 332px;gap:clamp(24px,4vw,56px);align-items:start;}
+  .col-main{min-width:0;display:flex;flex-direction:column;gap:14px;}
+  .side{position:sticky;top:var(--stick);min-width:0;}
+
+  .card{background:var(--card);border:.8px solid var(--card-line);border-radius:20px;
+    box-shadow:var(--shadow-card);padding:20px 22px;}
+  .card-h{font-size:17px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px;}
+  .card-h .n{color:var(--muted);font-weight:500;}
+
+  /* ============ ITINERARY ============ */
+  /* One block per leg, and inside it one row per sector — a connection is two
+     flights and reads like two flights, with the ground time between them
+     called out as its own line rather than folded into a duration. */
+  .leg + .leg{margin-top:18px;padding-top:18px;border-top:.8px solid var(--line);}
+  .leg-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .leg-d{font-size:13.5px;color:var(--muted);font-weight:600;}
+
+  .air{display:flex;align-items:center;gap:11px;margin-bottom:14px;}
+  .air-logo{width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:12px;font-weight:700;letter-spacing:.02em;}
+  .air-n{font-size:14px;font-weight:700;}
+
+  /* the sector timeline — a hairline rail with a node per airport */
+  /* The whole sector as one line: time and code anchor each end, the route
+     itself — duration above, stop count below — is what runs between them. */
+  .tl{display:flex;align-items:center;gap:16px;}
+  .tl-end{flex:none;}
+  .tl-end.r{text-align:right;}
+  .tl-hh{font-size:22px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .tl-hh sup{font-size:11px;font-weight:700;color:var(--jade);vertical-align:super;margin-left:2px;}
+  .tl-cd{font-size:13px;color:var(--muted);margin-top:2px;}
+  .tl-mid{flex:1;min-width:0;text-align:center;}
+  .tl-dur{font-size:13px;color:var(--muted);}
+  .tl-line{position:relative;height:9px;margin:6px 0;display:flex;align-items:center;justify-content:space-between;}
+  .tl-line::before{content:"";position:absolute;left:5px;right:5px;top:50%;height:1.5px;
+    background:var(--line);transform:translateY(-50%);}
+  .tl-dot{position:relative;width:9px;height:9px;border-radius:50%;
+    background:#fff;border:2px solid var(--jade);flex:none;}
+  .tl-stops{font-size:13.5px;font-weight:700;color:var(--jade-deep);}
+
+  /* ============ TRAVELLERS ============ */
+  .tv + .tv{margin-top:16px;padding-top:16px;border-top:.8px solid var(--line);}
+  .tv-h{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .tv-k{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .tv-lap{font-size:12.5px;color:var(--muted);}
+  /* saved travellers, if there are any — one tap fills the name rather than
+     retyping a companion who is already on the account */
+  .tv-saved{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+  .tv-chip{border:.8px solid var(--card-line);background:var(--card);color:var(--chip-ink);
+    border-radius:999px;height:32px;padding:0 13px;font-family:inherit;font-size:13px;font-weight:600;
+    cursor:pointer;transition:all .13s;}
+  .tv-chip:hover{border-color:var(--jade);color:var(--jade-deep);background:var(--jade-soft);}
+
+  .flds{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;}
+  .fld{display:block;min-width:0;}
+  .fld.wide{grid-column:1 / -1;}
+  .fld > span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;margin-bottom:6px;}
+  .fld input,.fld select{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;
+    font-size:15px;font-family:inherit;background:#fff;color:var(--ink);transition:border-color .15s;}
+  .fld select{appearance:none;cursor:pointer;
+    background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 13px center;
+    padding-right:34px;}
+  .fld input:hover,.fld select:hover{border-color:#e3e3df;}
+  .fld input:focus,.fld select:focus{outline:none;border-color:var(--jade);}
+  .fld-err{display:none;margin-top:6px;font-size:12.5px;color:var(--accent-negative-text);}
+  .fld.invalid input,.fld.invalid select,.fld.invalid input:focus{border-color:var(--accent-negative-border);}
+  .fld.invalid .fld-err{display:block;}
+
+  /* ============ EXTRAS ============ */
+  .xt{display:flex;align-items:center;gap:13px;padding:13px 2px;cursor:pointer;}
+  .xt + .xt{border-top:.8px solid var(--line);}
+  .xt input{position:absolute;opacity:0;width:0;height:0;}
+  .xt .box{width:18px;height:18px;border:1px solid var(--gray-400);border-radius:5px;flex:none;
+    display:flex;align-items:center;justify-content:center;background:#fff;transition:all .12s;}
+  .xt .box svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0;}
+  .xt input:checked + .box{background:var(--jade);border-color:var(--jade);}
+  .xt input:checked + .box svg{opacity:1;}
+  .xt input:focus-visible + .box{outline:2px solid var(--jade);outline-offset:2px;}
+  .xt-t{min-width:0;flex:1;}
+  .xt-n{font-size:14.5px;font-weight:600;}
+  .xt-s{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .xt-p{font-size:14.5px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;}
+
+  /* ============ CONDITIONS ============ */
+  .cond{display:flex;gap:12px;padding:11px 2px;font-size:13.5px;color:var(--chip-ink);}
+  .cond + .cond{border-top:.8px solid var(--line);}
+  .cond-k{flex:0 0 118px;color:var(--muted);font-size:12.5px;padding-top:1px;}
+  .cond-v b{font-weight:600;color:var(--ink);}
+
+  /* ============ THE RAIL ============ */
+  /* The PDP's "Your stay" block, carrying a trip: an unboxed heading with a
+     stack of white field cards under it, then the price and the one button.
+     Same 68px card, 20px radius, hairline border, icon–label–value–chevron.
+     What each card does when clicked is different, though. On the PDP the
+     dates re-price the same room; here they would be a different flight
+     altogether, so a card sends you back to the screen where that decision is
+     actually made rather than pretending to hold it. */
+  .book-lbl{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.01em;margin-bottom:16px;}
+  .stay-cards{display:flex;flex-direction:column;gap:10px;}
+  .tripchip{width:100%;text-align:left;background:#fff;border:.8px solid var(--card-line);
+    border-radius:20px;padding:12px 16px;min-height:68px;cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-field);
+    transition:box-shadow .15s,border-color .15s;}
+  .tripchip:hover{border-color:#e3e3df;box-shadow:0 8px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);}
+  .sc-ic{width:40px;height:40px;flex:none;color:var(--ink);
+    display:flex;align-items:center;justify-content:center;overflow:visible;}
+  .sc-ic svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;}
+  /* the flight card's icon is the carrier's own tile, the way the room card's
+     is a photograph of the room — the same 40px column either way */
+  .sc-ic.sc-ic-air{width:40px;height:40px;border-radius:10px;color:#fff;font-size:12px;
+    font-weight:700;letter-spacing:.02em;}
+  .sc-body{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
+  .sc-ar{flex:none;color:#e3e3df;display:flex;align-items:center;}
+  .sc-ar svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .tc-k{font-size:14px;color:var(--label);font-weight:600;}
+  .tc-cnt{font-weight:700;font-size:14px;color:var(--ink);border:1px solid #efefef;
+    border-radius:5px;padding:2px 4px;margin-left:4px;}
+  .tc-v{font-size:14px;font-weight:700;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tc-s{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* --- price: same boxed card as the PDP's totalcard — 20px radius,
+     hairline border, --shadow-field — so it reads as a card the way the
+     Dates/Travellers/Departure chips above it do, rather than floating on
+     the page background. The itemised breakdown lives in here now, not as
+     its own card in the main column — the rail is the one place that has
+     to state what the button is about to spend. */
+  .totalcard{background:#fff;border:.8px solid #efefef;border-radius:20px;padding:16.8px;
+    margin-top:12px;box-shadow:var(--shadow-field);display:flex;flex-direction:column;gap:2px;}
+  .tc-h{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.005em;margin:0 0 4px;}
+
+  /* ============ THE BREAKDOWN ============ */
+  .ln{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:7px 0;font-size:14px;}
+  .ln-k{color:var(--chip-ink);min-width:0;}
+  .ln-k em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px;}
+  .ln-v{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .ln.free .ln-v{color:var(--jade-deep);font-weight:700;}
+  .ln-rule{height:.8px;background:var(--line);margin:11px 0 6px;}
+  .tot{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:8px 0 2px;}
+  .tot-k{font-size:14.5px;font-weight:700;}
+  .tot-k em{display:block;font-style:normal;font-size:12px;color:var(--muted);font-weight:500;margin-top:2px;}
+  .tot-v{font-size:24px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;line-height:1.3;}
+  .pay{width:100%;margin-top:10px;background:var(--jade);color:#fff;border:none;border-radius:12px;
+    min-height:40px;padding:10px 12px;font-size:14px;font-weight:700;cursor:pointer;
+    font-family:inherit;transition:background .15s;}
+  .pay:hover{background:var(--jade-deep);}
+  .pay:active{transform:scale(.995);}
+
+  /* ============ CONDITIONS ACCORDION ============ */
+  .acc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+    background:none;border:none;padding:0;margin:0;cursor:pointer;font-family:inherit;text-align:left;}
+  .acc-ar{width:18px;height:18px;flex:none;stroke:var(--muted);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
+  .acc-h[aria-expanded="true"] .acc-ar{transform:rotate(180deg);}
+  .acc-b{margin-top:8px;}
+  .acc-b[hidden]{display:none;}
+
+  @media(max-width:1080px){
+    .grid{grid-template-columns:1fr;}
+    /* Below the fold on a narrow screen the rail stops being a rail — it goes
+       under the forms and the button travels with it. */
+    .side{position:static;}
+  }
+  @media(max-width:760px){
+    .wrap,.topnav-in{padding-left:20px;padding-right:20px;}
+    .flds{grid-template-columns:1fr;}
+    .page-h{font-size:25px;}
+    .tl{gap:8px;}
+    .tl-hh{font-size:19px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-in">
+    <a class="tn-brand" href="home2.html"><b>ONTO</b><span class="tn-sl">/</span><span id="crumb">Review and pay</span></a>
+    <div class="tn-right">
+      <button type="button" class="tn-who" id="profileBtn" aria-haspopup="true" aria-expanded="false">Saanvi</button>
+      <div class="menu" id="profileMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="crumbrow">
+    <a class="backlink" id="backLink" href="flight-results.html">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back to flights
+    </a>
+  </div>
+
+  <div class="pdp-title">
+    <h1 class="page-h" id="pageH">Review and pay</h1>
+  </div>
+
+  <div class="grid">
+    <div class="col-main">
+      <section class="card">
+        <h2 class="card-h" id="itinHead">Your flight</h2>
+        <div id="itin" style="margin-top:12px"></div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-h">Travellers <span class="n" id="travCount"></span></h2>
+        <div id="travs"></div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-h">Contact details</h2>
+        <div class="flds" style="margin-top:12px">
+          <label class="fld"><span>Email</span>
+            <input type="email" id="fEmail" autocomplete="email" inputmode="email">
+            <small class="fld-err">Enter a valid email address (must include @).</small></label>
+          <label class="fld"><span>Phone</span>
+            <input type="tel" id="fPhone" autocomplete="tel" inputmode="numeric" maxlength="17">
+            <small class="fld-err">Enter a 10-digit phone number — digits only.</small></label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-h">Add to your fare</h2>
+        <div id="extras" style="margin-top:6px"></div>
+      </section>
+
+      <!-- Reference detail, not a decision — closed by default the way the PDP
+           keeps secondary detail out of the way until it's asked for. The
+           price it's about (change/cancel fees) is one tap away, not absent. -->
+      <section class="card acc" id="condCard">
+        <button type="button" class="card-h acc-h" id="condToggle" aria-expanded="false">
+          Fare conditions
+          <svg class="acc-ar" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div id="conds" class="acc-b" hidden></div>
+      </section>
+    </div>
+
+    <aside class="side">
+      <h2 class="book-lbl">Your trip</h2>
+      <div class="stay-cards" id="tripCards"></div>
+      <div class="totalcard">
+        <h3 class="tc-h">Fare breakdown</h3>
+        <div id="sumLines"></div>
+        <div class="ln-rule"></div>
+        <div class="tot">
+          <div class="tot-k">Total <em id="totSub"></em></div>
+          <div class="tot-v" id="totVal">—</div>
+        </div>
+        <button type="button" class="pay" id="nextBtn">Continue</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="flights-data.js"></script>
+<script>
+/* =============================================================
+   WHAT IS BEING BOUGHT
+   -------------------------------------------------------------
+   The results page hands the whole cart over in sessionStorage rather than in a
+   query string: two full itineraries plus the party is more than a URL should
+   carry, and this screen is not a link anyone should be pasting.
+
+   It still has to render when opened cold, though — a direct visit to this file
+   is how the screen gets reviewed. So a missing cart is rebuilt from the last
+   search, and a missing search falls back to the same Mumbai–Goa default the
+   results page uses. Both paths pick the leg's own top flight, which is what
+   the results list would have shown first.
+   ============================================================= */
+var CART_KEY   = 'onto:flightCart:v1';
+var SEARCH_KEY = 'onto:flightSearch:v1';
+var PAY_KEY    = 'flightBooking';       // NOT 'booking' — that one belongs to the stay
+
+var $ = function(id){ return document.getElementById(id); };
+var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+
+var MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function fmtDay(d){ return DAYS[d.getDay()] + ', ' + MONS[d.getMonth()] + ' ' + d.getDate(); }
+function fmtShort(d){ return MONS[d.getMonth()] + ' ' + d.getDate(); }
+function dateKey(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function ymd(d){ return [d.getFullYear(), d.getMonth(), d.getDate()]; }
+function fromYmd(a){ return Array.isArray(a) ? new Date(a[0],a[1],a[2]) : null; }
+/* An <input type="date"> speaks ISO and nothing else. */
+function iso(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+
+var CABIN_LABEL = { economy:'Economy', premium:'Premium economy', business:'Business', first:'First' };
+
+/* The same ranking the results list opens on, so a cold open shows the flight
+   that would have been at the top rather than whichever one sorts first by
+   accident. */
+function topFlight(list){
+  if(!list.length) return null;
+  var pr = list.map(function(f){ return f.price; });
+  var dr = list.map(function(f){ return f.durMin; });
+  var pLo = Math.min.apply(null,pr), pHi = Math.max.apply(null,pr);
+  var dLo = Math.min.apply(null,dr), dHi = Math.max.apply(null,dr);
+  var norm = function(v,lo,hi){ return hi===lo ? 0 : (v-lo)/(hi-lo); };
+  return list.slice().sort(function(a,b){
+    var sa = norm(a.price,pLo,pHi)*0.62 + norm(a.durMin,dLo,dHi)*0.38 + a.stops*0.12;
+    var sb = norm(b.price,pLo,pHi)*0.62 + norm(b.durMin,dLo,dHi)*0.38 + b.stops*0.12;
+    return sa - sb || a.price - b.price;
+  })[0];
+}
+
+var CART = (function(){
+  var c = null;
+  try{ c = JSON.parse(sessionStorage.getItem(CART_KEY)); }catch(e){}
+  if(c && c.outFlight && Flights.byCode(c.from) && Flights.byCode(c.to) && Array.isArray(c.dep)){
+    c.depDate = fromYmd(c.dep);
+    c.retDate = fromYmd(c.ret);
+    /* A cart carrying a return date but no return flight is half a round trip;
+       the only honest thing to do with it is treat the trip as what was
+       actually chosen. */
+    if(!c.retFlight) c.retDate = null;
+    return c;
+  }
+
+  var s = {};
+  try{ s = JSON.parse(sessionStorage.getItem(SEARCH_KEY)) || {}; }catch(e){}
+  var TODAY = new Date(); TODAY.setHours(0,0,0,0);
+  var SOON  = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate()+5);
+
+  var from = Flights.byCode(s.from) ? s.from : 'BOM';
+  var to   = Flights.byCode(s.to) && s.to !== from ? s.to : (from === 'GOX' ? 'BOM' : 'GOX');
+  var dep  = fromYmd(s.dep); if(!dep || dep < TODAY) dep = SOON;
+  /* No stored return date, no return leg — same rule the results page follows.
+     A date nobody picked would put a flight on this page that nobody chose. */
+  var ret  = fromYmd(s.ret); if(ret && ret <= dep) ret = null;
+
+  var cabin = ['economy','premium','business','first'].indexOf(s.cabin) >= 0 ? s.cabin : 'economy';
+  var adults = Math.min(9, Math.max(1, s.adults|0 || 1));
+  var children = Math.min(8, Math.max(0, s.children|0));
+
+  return {
+    from:from, to:to, dep:ymd(dep), ret:ret?ymd(ret):null, depDate:dep, retDate:ret,
+    adults:adults, children:children, infants:Math.min(adults, Math.max(0, s.infants|0)), cabin:cabin,
+    outFlight: topFlight(Flights.leg(from, to, dateKey(dep), cabin)),
+    retFlight: ret ? topFlight(Flights.leg(to, from, dateKey(ret), cabin)) : null
+  };
+})();
+
+var LEGS = [];
+if(CART.outFlight) LEGS.push({ k:'out', label:'Departure', date:CART.depDate, f:CART.outFlight });
+if(CART.retFlight) LEGS.push({ k:'ret', label:'Return',    date:CART.retDate, f:CART.retFlight });
+
+var PAYING = CART.adults + CART.children;   // an infant travels on a lap, not a seat
+
+/* =============================================================
+   MONEY
+   -------------------------------------------------------------
+   The base/tax split lives in flights-data.js because the results card quotes
+   it too, and the two screens saying different things about the same fare is
+   exactly the bug that split is there to prevent.
+   ============================================================= */
+function taxOf(f){ return Flights.fareSplit(f.price).tax; }
+function baseOf(f){ return Flights.fareSplit(f.price).base; }
+
+/* Priced per traveller per flight, the way an airline sells them. Seats
+   aren't in this list — they get their own screen after this one, where a
+   map is the honest way to sell "which seat", not a checkbox. */
+var BAG_KG = 15;
+var EXTRAS = [
+  { k:'bag',    name:'Extra check-in baggage',
+    sub:'+' + BAG_KG + ' kg on top of the fare’s ' + Flights.RULES.checkinKg + ' kg', price:1600 },
+  { k:'meal',   name:'In-flight meal',
+    sub:'Chef-curated tray, served onboard',                                          price:450  },
+  { k:'cancel', name:'Free cancellation',
+    sub:'Cancel up to 24h before departure for a full refund',                        price:399  }
+];
+var chosenExtras = {};
+function extraTotal(x){ return x.price * PAYING * LEGS.length; }
+
+function fareBase(){ return LEGS.reduce(function(n,L){ return n + baseOf(L.f); }, 0) * PAYING; }
+function fareTax(){  return LEGS.reduce(function(n,L){ return n + taxOf(L.f);  }, 0) * PAYING; }
+function grandTotal(){
+  return fareBase() + fareTax() + EXTRAS.reduce(function(n,x){
+    return n + (chosenExtras[x.k] ? extraTotal(x) : 0);
+  }, 0);
+}
+
+/* =============================================================
+   RENDER — the itinerary
+   ============================================================= */
+function tlEnd(min, code, isRight){
+  var plus = Flights.dayOffset(min);
+  return '<div class="tl-end' + (isRight ? ' r' : '') + '">' +
+    '<div class="tl-hh">' + Flights.hhmm(min) + (plus ? '<sup>+' + plus + '</sup>' : '') + '</div>' +
+    '<div class="tl-cd">' + esc(code) + '</div></div>';
+}
+
+function legHTML(L){
+  var f = L.f, secs = Flights.sectors(f);
+  var timeline =
+    tlEnd(secs[0].dep, f.from, false) +
+    '<div class="tl-mid">' +
+      '<div class="tl-dur">' + Flights.dur(f.durMin) + '</div>' +
+      '<div class="tl-line"><i class="tl-dot"></i><i class="tl-dot"></i></div>' +
+      '<div class="tl-stops">' + esc(Flights.stopsLabel(f)) + '</div>' +
+    '</div>' +
+    tlEnd(secs[secs.length-1].arr, f.to, true);
+
+  return '<div class="leg">' +
+    (LEGS.length > 1 ? '<div class="leg-hd"><span class="leg-d">' + esc(fmtDay(L.date)) + '</span></div>' : '') +
+    '<div class="air">' +
+      '<span class="air-logo" style="background:' + esc(f.carrier.color) + '">' + esc(f.carrier.code) + '</span>' +
+      '<div class="air-n">' + esc(f.carrier.name) + '</div>' +
+    '</div>' +
+    '<div class="tl">' + timeline + '</div>' +
+  '</div>';
+}
+
+function paxLine(sep){
+  var pax = CART.adults + ' adult' + (CART.adults>1?'s':'');
+  if(CART.children) pax += sep + CART.children + (CART.children>1?' children':' child');
+  if(CART.infants)  pax += sep + CART.infants + ' infant' + (CART.infants>1?'s':'');
+  return pax;
+}
+
+function paintItinerary(){
+  var A = Flights.byCode(CART.from), B = Flights.byCode(CART.to);
+  $('crumb').textContent = 'Flights to ' + B.city;
+  document.title = 'onto — ' + A.city + ' to ' + B.city;
+
+  $('pageH').textContent = A.city + ' → ' + B.city;
+
+  $('itinHead').textContent = 'Your flight' + (LEGS.length > 1 ? 's' : '');
+  $('itin').innerHTML = LEGS.map(legHTML).join('');
+}
+
+/* =============================================================
+   RENDER — the trip, as the PDP states a stay
+   -------------------------------------------------------------
+   One field card per decision already made, and each one goes back to the
+   screen that owns that decision: dates and party to the search, a flight to
+   the list it was picked from. A picker in here would be a second copy of one
+   that already exists.
+   ============================================================= */
+var ICON = {
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v4M16 3v4"/>',
+  who:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/>',
+  chev:'<path d="M6 9l6 6 6-6"/>'
+};
+
+function chipHTML(o){
+  return '<button type="button" class="tripchip" data-go="' + esc(o.go) + '">' +
+    (o.tile
+      ? '<span class="sc-ic sc-ic-air" style="background:' + esc(o.tile.color) + '">' + esc(o.tile.code) + '</span>'
+      : '<span class="sc-ic"><svg viewBox="0 0 24 24">' + o.icon + '</svg></span>') +
+    '<span class="sc-body">' +
+      '<span class="tc-k">' + esc(o.k) + (o.cnt ? '<span class="tc-cnt">' + esc(o.cnt) + '</span>' : '') + '</span>' +
+      '<span class="tc-v">' + esc(o.v) + '</span>' +
+      (o.s ? '<span class="tc-s">' + esc(o.s) + '</span>' : '') +
+    '</span>' +
+    '<span class="sc-ar"><svg viewBox="0 0 24 24">' + ICON.chev + '</svg></span>' +
+  '</button>';
+}
+
+function paintTrip(){
+  var heads = PAYING;
+  var cards = [
+    chipHTML({ k:'Dates', cnt: CART.retDate ? 'Round trip' : 'One way',
+               v: CART.retDate ? fmtDay(CART.depDate) + ' — ' + fmtDay(CART.retDate) : fmtDay(CART.depDate),
+               icon:ICON.cal, go:'flights.html#dates' }),
+    chipHTML({ k:'Travellers', cnt: heads + (heads>1 ? ' travellers' : ' traveller'),
+               v: paxLine(' · ') + ' · ' + CABIN_LABEL[CART.cabin],
+               icon:ICON.who, go:'flights.html#who' })
+  ];
+
+  LEGS.forEach(function(L){
+    var f = L.f;
+    cards.push(chipHTML({
+      k: L.label,
+      v: f.carrier.name + ' ' + f.number,
+      s: Flights.hhmm(f.depMin) + ' → ' + Flights.hhmm(f.arrMin) + ' · ' + Flights.stopsLabel(f),
+      tile: { code:f.carrier.code, color:f.carrier.color },
+      go: 'flight-results.html'
+    }));
+  });
+
+  $('tripCards').innerHTML = cards.join('');
+  $('tripCards').querySelectorAll('.tripchip').forEach(function(b){
+    b.addEventListener('click', function(){ location.href = b.dataset.go; });
+  });
+}
+
+/* =============================================================
+   RENDER — the travellers
+   -------------------------------------------------------------
+   One block per seat, in the order an airline asks for them. Both names are
+   required because the ticket has to match the ID it is checked against, and a
+   child or an infant is only one of those on the day they fly — so their date
+   of birth is bounded by the departure date rather than by today.
+   ============================================================= */
+var PROFILE = {};
+try{ PROFILE = JSON.parse(localStorage.getItem('onto:profile:v1')) || {}; }catch(e){}
+
+var SAVED = (function(){
+  try{
+    return (JSON.parse(localStorage.getItem('onto:travellers:v3')) || [])
+      .filter(function(t){ return t && t.name && t.relation !== 'Myself' && t.id !== 't-you'; });
+  }catch(e){ return []; }
+})();
+
+var SLOTS = [];
+(function(){
+  var i;
+  for(i=0;i<CART.adults;i++)   SLOTS.push({ type:'adult',  n:i+1 });
+  for(i=0;i<CART.children;i++) SLOTS.push({ type:'child',  n:i+1 });
+  for(i=0;i<CART.infants;i++)  SLOTS.push({ type:'infant', n:i+1 });
+})();
+
+var TYPE_LABEL = { adult:'Adult', child:'Child', infant:'Infant' };
+var GENDERS = ['Female','Male','Prefer not to say'];
+
+/* The age bands are read against the days actually flown, and the two ends of
+   the trip answer different halves of the question. Old enough is asked on the
+   way out; young enough is asked on the way back, because an infant who turns
+   two before the return needs a seat on it and a child who turns twelve pays an
+   adult fare for the flight home. */
+var LAST_DATE = LEGS.length ? LEGS[LEGS.length-1].date : CART.depDate;
+function dobBounds(type){
+  var back = function(d, y, plusDay){ return new Date(d.getFullYear()-y, d.getMonth(), d.getDate() + (plusDay||0)); };
+  if(type === 'infant') return { min: back(LAST_DATE, 2, 1),  max: CART.depDate };
+  if(type === 'child')  return { min: back(LAST_DATE, 12, 1), max: back(CART.depDate, 2) };
+  return { min: back(CART.depDate, 120), max: back(CART.depDate, 12) };
+}
+
+function travHTML(slot, i){
+  var b = dobBounds(slot.type);
+  var isAdult = slot.type === 'adult';
+  var first = '', last = '', gender = '';
+  /* The account holder is the first adult until told otherwise — they are the
+     one who is signed in and the one whose details we already hold. */
+  if(i === 0){ first = PROFILE.first || 'Saanvi'; last = PROFILE.last || ''; gender = PROFILE.gender || ''; }
+
+  var saved = (i > 0 && SAVED.length)
+    ? '<div class="tv-saved">' + SAVED.map(function(t, si){
+        return '<button type="button" class="tv-chip" data-fill="' + i + '" data-sv="' + si + '">' + esc(t.name) + '</button>';
+      }).join('') + '</div>'
+    : '';
+
+  return '<div class="tv" data-slot="' + i + '">' +
+    '<div class="tv-h"><span class="tv-k">' + TYPE_LABEL[slot.type] + ' ' + slot.n + '</span>' +
+      (slot.type === 'infant' ? '<span class="tv-lap">On an adult’s lap</span>' : '') +
+      (slot.type === 'child'  ? '<span class="tv-lap">2–11 on the day of travel</span>' : '') +
+    '</div>' + saved +
+    '<div class="flds">' +
+      '<label class="fld"><span>Given name</span>' +
+        '<input type="text" data-f="first" data-slot="' + i + '" value="' + esc(first) + '" autocomplete="off" placeholder="As printed on ID">' +
+        '<small class="fld-err">Enter the given name exactly as it appears on the ID.</small></label>' +
+      '<label class="fld"><span>Surname</span>' +
+        '<input type="text" data-f="last" data-slot="' + i + '" value="' + esc(last) + '" autocomplete="off" placeholder="As printed on ID">' +
+        '<small class="fld-err">Enter the surname exactly as it appears on the ID.</small></label>' +
+      '<label class="fld"><span>Gender</span>' +
+        '<select data-f="gender" data-slot="' + i + '">' +
+          GENDERS.map(function(g){ return '<option' + (g===gender?' selected':'') + '>' + g + '</option>'; }).join('') +
+        '</select></label>' +
+      (isAdult ? '' :
+      '<label class="fld"><span>Date of birth</span>' +
+        '<input type="date" data-f="dob" data-slot="' + i + '" min="' + iso(b.min) + '" max="' + iso(b.max) + '">' +
+        '<small class="fld-err">' + (slot.type === 'infant'
+            ? 'An infant must be under 2 on the day of travel.'
+            : 'A child must be 2–11 on the day of travel.') + '</small></label>') +
+    '</div></div>';
+}
+
+function paintTravellers(){
+  $('travCount').textContent = '· ' + SLOTS.length + ' travelling';
+  $('travs').innerHTML = SLOTS.map(travHTML).join('');
+
+  /* Filling a companion in from the account: one name, split the way a form
+     with two boxes needs it. A single-word name is a real name, so it all goes
+     in the given-name box rather than being halved. */
+  $('travs').querySelectorAll('.tv-chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var t = SAVED[+chip.dataset.sv]; if(!t) return;
+      var whole = String(t.name).trim(), sp = whole.indexOf(' ');
+      var slot = chip.dataset.fill;
+      var f = $('travs').querySelector('input[data-f="first"][data-slot="'+slot+'"]');
+      var l = $('travs').querySelector('input[data-f="last"][data-slot="'+slot+'"]');
+      if(f) f.value = sp === -1 ? whole : whole.slice(0, sp);
+      if(l) l.value = sp === -1 ? ''    : whole.slice(sp+1).trim();
+      [f,l].forEach(function(el){ if(el) el.closest('.fld').classList.remove('invalid'); });
+      var g = $('travs').querySelector('select[data-f="gender"][data-slot="'+slot+'"]');
+      if(g && t.gender && GENDERS.indexOf(t.gender) >= 0) g.value = t.gender;
+    });
+  });
+
+  /* Typing is the user answering the complaint, so the complaint goes away. */
+  $('travs').querySelectorAll('input,select').forEach(function(el){
+    el.addEventListener('input', function(){ el.closest('.fld').classList.remove('invalid'); });
+  });
+}
+
+/* =============================================================
+   RENDER — extras, conditions, and the money
+   ============================================================= */
+function paintExtras(){
+  $('extras').innerHTML = EXTRAS.map(function(x){
+    return '<label class="xt">' +
+      '<input type="checkbox" data-x="' + x.k + '"' + (chosenExtras[x.k] ? ' checked' : '') + '>' +
+      '<span class="box"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>' +
+      '<span class="xt-t"><span class="xt-n">' + esc(x.name) + '</span>' +
+        '<span class="xt-s">' + esc(x.sub) + ' · ' + Flights.inr(x.price) + ' per traveller per flight</span></span>' +
+      '<span class="xt-p">' + Flights.inr(extraTotal(x)) + '</span></label>';
+  }).join('');
+
+  $('extras').querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      if(cb.checked) chosenExtras[cb.dataset.x] = true; else delete chosenExtras[cb.dataset.x];
+      /* The allowance line in Fare conditions states the bag you'll actually
+         have, so buying more has to move it. */
+      paintConditions();
+      paintSummary();
+    });
+  });
+}
+
+function paintConditions(){
+  /* Real numbers rather than a reassurance line: what it costs to change your
+     mind is part of what you are buying. */
+  var carriers = {};
+  LEGS.forEach(function(L){ carriers[L.f.carrier.name] = 1; });
+  var R = Flights.RULES;
+  var rows = [
+    ['Cabin baggage', R.cabinKg + ' kg, one piece per traveller'],
+    ['Check-in baggage', R.checkinKg + ' kg per traveller' + (chosenExtras.bag ? ' + ' + BAG_KG + ' kg added' : '')],
+    ['Changes', '<b>' + Flights.inr(R.changeFee) + '</b> per traveller per flight, plus any fare difference'],
+    ['Cancellation', chosenExtras.cancel
+      ? '<b>Free</b> up to 24h before departure, then ' + Flights.inr(R.cancelFee) + ' per traveller per flight'
+      : '<b>' + Flights.inr(R.cancelFee) + '</b> per traveller per flight; taxes are refunded in full'],
+    ['Operated by', Object.keys(carriers).join(' · ')]
+  ];
+  $('conds').innerHTML = rows.map(function(r){
+    return '<div class="cond"><div class="cond-k">' + esc(r[0]) + '</div><div class="cond-v">' + r[1] + '</div></div>';
+  }).join('');
+}
+
+$('condToggle').addEventListener('click', function(){
+  var open = $('condToggle').getAttribute('aria-expanded') === 'true';
+  $('condToggle').setAttribute('aria-expanded', open ? 'false' : 'true');
+  $('conds').hidden = open;
+});
+
+function paintSummary(){
+  var lines = LEGS.map(function(L){
+    return '<div class="ln"><div class="ln-k">' + esc(L.f.from) + ' → ' + esc(L.f.to) +
+      '<em>' + esc(L.f.number) + ' · ' + esc(fmtShort(L.date)) + ' · base fare × ' + PAYING + '</em></div>' +
+      '<div class="ln-v">' + Flights.inr(baseOf(L.f) * PAYING) + '</div></div>';
+  });
+
+  lines.push('<div class="ln"><div class="ln-k">Taxes and airport fees</div>' +
+    '<div class="ln-v">' + Flights.inr(fareTax()) + '</div></div>');
+
+  EXTRAS.forEach(function(x){
+    if(!chosenExtras[x.k]) return;
+    lines.push('<div class="ln"><div class="ln-k">' + esc(x.name) +
+      '<em>' + PAYING + ' × ' + LEGS.length + ' flight' + (LEGS.length>1?'s':'') + '</em></div>' +
+      '<div class="ln-v">' + Flights.inr(extraTotal(x)) + '</div></div>');
+  });
+
+  /* Said out loud, because a party of three that is charged for two looks like
+     a mistake until the line explains itself. */
+  if(CART.infants){
+    lines.push('<div class="ln free"><div class="ln-k">' + CART.infants + ' infant' +
+      (CART.infants>1?'s':'') + '<em>Travelling on a lap</em></div><div class="ln-v">Free</div></div>');
+  }
+
+  $('sumLines').innerHTML = lines.join('');
+
+  var total = grandTotal();
+  var party = PAYING + ' traveller' + (PAYING>1?'s':'') +
+    (CART.infants ? ' + ' + CART.infants + ' infant' + (CART.infants>1?'s':'') : '');
+
+  $('totVal').textContent = Flights.inr(total);
+  $('totSub').textContent = party + ' · ' + (LEGS.length > 1 ? 'round trip' : 'one way');
+}
+
+/* =============================================================
+   CONTACT — prefilled from the account, still the user's to change
+   ============================================================= */
+$('fEmail').value = PROFILE.email || 'xyz@email.com';
+$('fPhone').value = PROFILE.phone || '+91 98765 43210';
+
+var emailOK = function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||'').trim()); };
+var phoneDigits = function(v){
+  var d = String(v||'').replace(/\D/g,'');
+  if(d.length === 12 && d.indexOf('91') === 0) return d.slice(2);
+  if(d.length === 11 && d.charAt(0) === '0')   return d.slice(1);
+  return d;
+};
+var phoneOK = function(v){ return /^\d{10}$/.test(phoneDigits(v)); };
+
+$('fPhone').addEventListener('input', function(){
+  var cleaned = $('fPhone').value.replace(/[^\d+\s()\-]/g,'');
+  if(cleaned !== $('fPhone').value) $('fPhone').value = cleaned;
+  $('fPhone').closest('.fld').classList.remove('invalid');
+});
+$('fEmail').addEventListener('input', function(){ $('fEmail').closest('.fld').classList.remove('invalid'); });
+
+/* =============================================================
+   PAY
+   ============================================================= */
+function markBad(el){
+  var f = el.closest('.fld');
+  if(f) f.classList.add('invalid');
+  return el;
+}
+
+/* Every complaint is collected before any is shown, so the form is wrong once
+   rather than once per field, and the page scrolls to the first one. */
+function collect(){
+  var bad = [], travellers = [];
+
+  SLOTS.forEach(function(slot, i){
+    var q = function(sel){ return $('travs').querySelector(sel + '[data-slot="'+i+'"]'); };
+    var first = q('input[data-f="first"]'), last = q('input[data-f="last"]');
+    var gender = q('select[data-f="gender"]'), dob = q('input[data-f="dob"]');
+
+    var fv = (first.value||'').trim(), lv = (last.value||'').trim();
+    /* One character is a real name in enough of the world; what is refused is
+       an empty box and digits where a name should be. */
+    if(!fv || !/^[\p{L}][\p{L} .'\-]*$/u.test(fv)) bad.push(markBad(first));
+    if(!lv || !/^[\p{L}][\p{L} .'\-]*$/u.test(lv)) bad.push(markBad(last));
+
+    var dv = null;
+    if(dob){
+      var b = dobBounds(slot.type);
+      dv = dob.value ? new Date(dob.value + 'T00:00:00') : null;
+      if(!dv || isNaN(dv) || dv < b.min || dv > b.max) bad.push(markBad(dob));
+    }
+
+    travellers.push({
+      type: slot.type, n: slot.n,
+      first: fv, last: lv,
+      name: [fv, lv].filter(Boolean).join(' '),
+      gender: gender ? gender.value : '',
+      dob: dob && dob.value ? dob.value : null
+    });
+  });
+
+  if(!emailOK($('fEmail').value)) bad.push(markBad($('fEmail')));
+  if(!phoneOK($('fPhone').value)) bad.push(markBad($('fPhone')));
+
+  return { bad: bad, travellers: travellers };
+}
+
+/* Nothing is charged here — this screen hands off to the seat map, which is
+   where the total becomes final and the one Pay button lives. */
+$('nextBtn').addEventListener('click', function(){
+  var r = collect();
+  if(r.bad.length){
+    var first = r.bad[0];
+    first.scrollIntoView({ behavior:'smooth', block:'center' });
+    setTimeout(function(){ first.focus({ preventScroll:true }); }, 260);
+    return;
+  }
+
+  var total = grandTotal();
+  var booking = {
+    kind:     'flight',
+    merchant: 'onto Travel',
+    amount:   Flights.inr(total),
+    total:    total,
+    from:CART.from, to:CART.to, cabin:CART.cabin,
+    adults:CART.adults, children:CART.children, infants:CART.infants, paying:PAYING,
+    legs: LEGS.map(function(L){
+      return { k:L.k, label:L.label, date:ymd(L.date), flight:L.f,
+               base:baseOf(L.f)*PAYING, tax:taxOf(L.f)*PAYING };
+    }),
+    extras: EXTRAS.filter(function(x){ return chosenExtras[x.k]; })
+                  .map(function(x){ return { k:x.k, name:x.name, amount:extraTotal(x) }; }),
+    travellers: r.travellers,
+    email: $('fEmail').value.trim(),
+    phone: $('fPhone').value.trim()
+  };
+
+  try{ sessionStorage.setItem(PAY_KEY, JSON.stringify(booking)); }catch(e){}
+  location.href = 'flight-seats.html';
+});
+
+/* =============================================================
+   ACCOUNT MENU — the panel itself is built by topnav.js
+   ============================================================= */
+(function(){
+  var btn = $('profileBtn'), menu = $('profileMenu');
+  if(!btn || !menu) return;
+  btn.addEventListener('click', function(e){ e.stopPropagation(); var o=menu.classList.toggle('open'); btn.setAttribute('aria-expanded', o?'true':'false'); });
+  document.addEventListener('click', function(e){ if(!menu.contains(e.target) && !btn.contains(e.target)){ menu.classList.remove('open'); btn.setAttribute('aria-expanded','false'); } });
+})();
+(function(){
+  var who = PROFILE.first || (PROFILE.name || '').split(' ')[0];
+  if(who) $('profileBtn').textContent = who;
+})();
+
+paintItinerary();
+paintTrip();
+paintTravellers();
+paintExtras();
+paintConditions();
+paintSummary();
+
+/* A cart with nothing in it can only have come from a route with no schedule
+   at all — there is nothing here to charge for, so the button stops being one.
+   Last, so that the painters above don't put the live state back. */
+if(!LEGS.length){
+  $('itin').innerHTML = '<div class="tl-cd">No flights are held for this trip.</div>';
+  $('nextBtn').disabled = true;
+  $('nextBtn').style.background = '#c8ccc9';
+  $('nextBtn').style.cursor = 'default';
+  $('nextBtn').textContent = 'Nothing to continue with';
+}
+</script>
+
+<script src="topnav.js"></script>
+</body>
+</html>

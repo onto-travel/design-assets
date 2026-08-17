@@ -36,43 +36,133 @@
   .wrap{max-width:1440px;margin:0 auto;padding:0 40px 140px;}
 
   /* ============ THE SEARCH, RESTATED ============ */
-  /* Not an editable copy of the search card — a receipt of what was asked for,
-     with one way back to change it. Rebuilding five live fields here would be a
-     second implementation to keep in step with the first. */
-  .recap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:22px 0 18px;}
-  .recap-route{display:flex;align-items:center;gap:11px;font-family:var(--font-display);
-    font-size:26px;font-weight:900;letter-spacing:-.01em;color:var(--ink);}
-  .recap-route svg{width:19px;height:19px;stroke:var(--jade);fill:none;stroke-width:2.2;
-    stroke-linecap:round;stroke-linejoin:round;flex:none;}
-  .recap-meta{font-size:14.5px;color:var(--muted);}
-  .recap-meta b{color:var(--ink);font-weight:600;}
-  .recap-change{margin-left:auto;background:none;border:.8px solid var(--card-line);border-radius:999px;
-    padding:9px 18px;font-family:inherit;font-size:14px;font-weight:600;color:var(--ink);
-    text-decoration:none;cursor:pointer;box-shadow:var(--shadow-field);transition:border-color .15s,background .15s;}
-  .recap-change:hover{border-color:#808080;background:#fff;}
+  /* The stays list keeps the search in the rail as a stack of field cards, and
+     this is that stack: same 60px white card, same 20px radius, same hairline,
+     same icon-label-value-chevron anatomy. What it is not is a second
+     implementation of the pickers — five live fields would be a copy of
+     flights.html to keep in step with. Each card goes back to the field it
+     names, and the search page opens on it. */
+  .search-card{display:flex;flex-direction:column;gap:10px;}
+  .seg{position:relative;width:100%;text-align:left;min-width:0;
+    background:#fff;border:.8px solid var(--card-line);border-radius:20px;padding:10.8px 14.8px;
+    min-height:60px;box-shadow:var(--shadow-field);cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;gap:12px;transition:box-shadow .15s,border-color .15s;}
+  .seg:hover{border-color:#e3e3df;box-shadow:0 8px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);}
+  .seg-ic{flex:none;width:20px;height:20px;color:var(--muted);
+    display:flex;align-items:center;justify-content:center;overflow:visible;}
+  .seg-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .seg-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .seg-ar{flex:none;color:var(--muted);display:flex;align-items:center;}
+  .seg-ar svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .seg .lb{display:block;font-size:14px;font-weight:600;color:var(--label);}
+  /* the count is the design's small bordered chip, not a suffix on the label */
+  .seg-cnt{font-weight:600;font-size:14px;color:var(--ink);border:1px solid #efefef;
+    border-radius:5px;padding:2px 4px;margin-left:4px;}
+  .seg .vl{display:block;font-size:16px;font-weight:600;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* ============ RAIL POPOVERS ============ */
+  /* Each trip card edits itself, in place — same field cards, but the click
+     opens a picker anchored to the card instead of leaving the page. */
+  .rf{position:relative;}
+  .rpop{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;
+    border:.8px solid var(--card-line);border-radius:16px;
+    box-shadow:0 16px 40px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06);
+    z-index:30;padding:14px;opacity:0;transform:translateY(-6px);
+    pointer-events:none;visibility:hidden;transition:opacity .15s,transform .15s,visibility .15s;}
+  .rpop.open{opacity:1;transform:none;pointer-events:auto;visibility:visible;}
+  .rpop-search{width:100%;border:.8px solid var(--card-line);border-radius:10px;
+    padding:9px 12px;font-size:14px;font-family:inherit;margin-bottom:8px;box-sizing:border-box;}
+  .rpop-search:focus{outline:none;border-color:var(--jade);}
+  .rpop-list{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+  .rpop-opt{display:flex;flex-direction:column;text-align:left;background:none;border:none;
+    border-radius:10px;padding:8px 10px;cursor:pointer;font-family:inherit;width:100%;}
+  .rpop-opt:hover{background:var(--jade-soft);}
+  .rpop-opt b{font-size:14px;font-weight:600;color:var(--ink);}
+  .rpop-opt span{font-size:12.5px;color:var(--muted);}
+  .rpop-empty{padding:10px;font-size:13px;color:var(--muted);}
+
+  .rpop-tabs{display:inline-flex;gap:2px;background:var(--chip-bg);border-radius:999px;
+    padding:3px;margin-bottom:14px;}
+  .rpop-tab{background:none;border:none;font-family:inherit;font-size:13px;font-weight:700;
+    color:var(--muted);padding:7px 14px;border-radius:999px;cursor:pointer;}
+  .rpop-tab[aria-selected="true"]{background:#fff;color:var(--jade-deep);box-shadow:var(--shadow-field);}
+
+  .rpop-cal + .rpop-cal{margin-top:16px;padding-top:16px;border-top:.8px solid var(--line);}
+  .rpop-cal-lb{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:8px;}
+  .rpop-cal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .rpop-cal-tt{font-size:13px;font-weight:600;color:var(--ink);}
+  .cal-nav{width:26px;height:26px;border-radius:8px;border:.8px solid var(--card-line);
+    background:#fff;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .cal-nav:hover:not(:disabled){border-color:#cfcfca;}
+  .cal-nav:disabled{opacity:.3;cursor:default;}
+  .cal-nav svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+  .cal-dow{font-size:11px;font-weight:700;color:var(--muted);text-align:center;padding:4px 0;}
+  .cal-d{aspect-ratio:1;border:none;background:none;cursor:pointer;font-size:13px;
+    font-family:inherit;color:var(--ink);border-radius:8px;}
+  .cal-d:hover:not(:disabled){background:var(--jade-soft);}
+  .cal-d:disabled{color:#d7d7d2;cursor:default;}
+  .cal-d.in-range{background:var(--jade-soft);border-radius:0;}
+  .cal-d.edge{background:var(--jade);color:#fff;}
+  .cal-d.edge.s{border-radius:8px 0 0 8px;}
+  .cal-d.edge.e{border-radius:0 8px 8px 0;}
+  .cal-d.edge.only{border-radius:8px;}
+
+  .rpop-stp{display:flex;align-items:center;justify-content:space-between;padding:10px 0;}
+  .rpop-stp + .rpop-stp{border-top:.8px solid var(--line);}
+  .rpop-stp-l{font-size:14px;font-weight:600;color:var(--ink);}
+  .rpop-stp-l small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:1px;}
+  .rpop-ctr{display:flex;align-items:center;gap:12px;}
+  .rpop-ctr button{width:28px;height:28px;border-radius:50%;border:1px solid var(--card-line);
+    background:#fff;color:var(--jade);font-size:18px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-family:inherit;}
+  .rpop-ctr button:disabled{opacity:.35;cursor:default;}
+  .rpop-ctr b{min-width:16px;text-align:center;font-size:14px;font-variant-numeric:tabular-nums;}
+  .rpop-cab-lb{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);margin:14px 0 8px;padding-top:14px;border-top:.8px solid var(--line);}
+  .rpop-cabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .rpop-cab{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink);}
+  .rpop-cab input{accent-color:var(--jade);width:15px;height:15px;margin:0;}
+
+  .rpop-apply{width:100%;margin-top:14px;background:var(--jade-deep);color:#fff;border:none;
+    border-radius:12px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .rpop-apply:disabled{background:#c8ccc9;cursor:default;}
 
   /* ============ LEG TABS ============ */
   /* A round trip is two decisions, so it gets two tabs rather than one list of
      pre-paired itineraries: pick the outbound you want, then the return. The
      tab keeps the leg's own summary once it's answered. */
   .legs{display:flex;gap:10px;margin:0 0 22px;}
+  /* `display:flex` above outranks the browser's own [hidden] rule, so a one-way
+     needs this or the strip stays on screen with nothing in it. */
+  .legs[hidden]{display:none;}
   .leg{flex:1;text-align:left;background:var(--card);border:.8px solid var(--card-line);border-radius:18px;
     padding:14px 18px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow-field);
     transition:border-color .16s,box-shadow .16s,background .16s;min-width:0;}
   .leg:hover{border-color:#cfcfca;}
   .leg[aria-selected="true"]{border-color:var(--jade);background:var(--jade-soft);box-shadow:none;}
-  .leg-k{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  .leg-k{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;letter-spacing:.05em;
     text-transform:uppercase;color:var(--muted);}
   .leg[aria-selected="true"] .leg-k{color:var(--jade-deep);}
-  .leg-n{font-size:16px;font-weight:700;color:var(--ink);margin-top:5px;letter-spacing:-.01em;
+  .leg-n{font-size:16px;font-weight:600;color:var(--ink);margin-top:5px;letter-spacing:-.01em;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .leg-s{font-size:13px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .leg-s.done{color:var(--jade-deep);font-weight:600;}
 
   /* ============ RESULTS HEADER ============ */
-  .res-head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 0 14px;flex-wrap:wrap;}
-  .res-head h1{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:0;}
-  .res-head h1 span{color:var(--muted);font-weight:500;}
+  /* "Stays in Goa" and its sort control, one row, and the same here — the page
+     is named for where it is taking you, and the count is the quiet line under
+     it rather than the headline. */
+  .res-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+    padding:24px 0 16px;flex-wrap:wrap;}
+  .res-head h1{font-size:28px;line-height:1.35;font-weight:600;letter-spacing:-.01em;margin:0;}
+  .res-sub{font-size:14px;color:var(--muted);margin-top:2px;}
+  .res-sub b{color:var(--ink);font-weight:600;}
   .sortwrap{display:flex;align-items:center;gap:9px;}
   .sort{appearance:none;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
     border:.8px solid var(--card-line);border-radius:999px;padding:10px 38px 10px 16px;
@@ -82,33 +172,46 @@
 
   /* ============ TWO COLUMN ============ */
   .grid{display:grid;grid-template-columns:minmax(0,1fr) 332px;gap:clamp(24px,4vw,56px);align-items:start;}
-  .col-list{min-width:0;display:flex;flex-direction:column;gap:12px;}
-  .side{position:sticky;top:var(--stick);min-width:0;}
+  .col-list{min-width:0;}
+  #list{display:flex;flex-direction:column;gap:12px;}
+  /* two blocks, the trip then the filters, the way the stays rail stacks them */
+  .side{position:sticky;top:var(--stick);min-width:0;display:flex;flex-direction:column;gap:32px;}
 
   /* ============ FLIGHT CARD ============ */
-  .fc{display:grid;grid-template-columns:186px minmax(0,1fr) 178px;align-items:center;gap:20px;
-    background:var(--card);border:.8px solid var(--card-line);border-radius:20px;padding:18px 20px;
-    box-shadow:var(--shadow-card);transition:box-shadow .18s,border-color .18s;}
+  /* The whole row is the link, the way a stay card is — there is no separate
+     verb to hit, and nothing on the card that isn't part of the same decision.
+     Clicking it opens that flight's page. */
+  .fc{position:relative;display:grid;grid-template-columns:186px minmax(0,1fr) 178px;align-items:center;gap:20px;
+    background:var(--card);border:.8px solid var(--card-line);border-radius:20px;padding:26px 20px;
+    box-shadow:var(--shadow-card);transition:box-shadow .18s,border-color .18s;cursor:pointer;}
   .fc:hover{box-shadow:0 10px 20px rgba(0,0,0,.09),0 3px 6px rgba(0,0,0,.05);}
+  .fc:focus-visible{outline:2px solid var(--jade);outline-offset:3px;}
   .fc.is-sel{border-color:var(--jade);box-shadow:0 0 0 1px var(--jade) inset;}
+  /* The one card the page vouches for — everything else on the list steps
+     back in weight (below) so this is the row that actually reads as
+     heavier, not just another row with a label stuck on it. */
+  .fc.is-best{border-color:var(--jade);}
+  .fc-best-badge{position:absolute;top:-11px;left:20px;background:var(--jade);color:#fff;
+    font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    padding:4px 11px;border-radius:999px;box-shadow:0 2px 5px rgba(0,0,0,.15);}
 
   /* --- airline --- */
   .fc-air{display:flex;align-items:center;gap:12px;min-width:0;}
   .fc-logo{width:38px;height:38px;border-radius:10px;flex:none;display:flex;align-items:center;
     justify-content:center;color:#fff;font-size:13px;font-weight:700;letter-spacing:.02em;}
   .fc-airt{min-width:0;}
-  .fc-airn{font-size:14.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .fc-airm{font-size:12.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fc-airn{font-size:14.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
   /* --- the leg itself --- */
   /* Times are the thing being compared down the column, so they're the biggest
      text on the row and they're tabular — the digits have to line up. */
   .fc-leg{display:flex;align-items:center;gap:16px;min-width:0;}
   .fc-t{text-align:center;flex:none;}
-  .fc-hh{font-family:var(--font-display);font-size:22px;font-weight:900;letter-spacing:-.02em;
+  .fc-hh{font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-.02em;
     color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1;}
-  .fc-hh sup{font-size:11px;font-weight:700;color:var(--jade);vertical-align:super;margin-left:2px;letter-spacing:0;}
-  .fc-cd{font-size:12.5px;color:var(--muted);margin-top:3px;font-weight:600;}
+  .fc.is-best .fc-hh{font-weight:700;}
+  .fc-hh sup{font-size:11px;font-weight:600;color:var(--jade);vertical-align:super;margin-left:2px;letter-spacing:0;}
+  .fc-cd{font-size:12.5px;color:var(--muted);margin-top:3px;font-weight:500;}
   .fc-mid{flex:1;min-width:0;text-align:center;}
   .fc-dur{font-size:12.5px;color:var(--muted);margin-bottom:5px;}
   /* the hairline with a node at each end, and one more where it stops */
@@ -118,22 +221,23 @@
   .fc-line::before{left:0;} .fc-line::after{right:0;}
   .fc-stop{position:absolute;top:50%;width:7px;height:7px;border-radius:50%;background:#fff;
     border:2px solid var(--gold);transform:translate(-50%,-50%);}
-  .fc-stops{font-size:12.5px;margin-top:6px;font-weight:600;color:var(--jade-deep);}
+  .fc-stops{font-size:12.5px;margin-top:6px;font-weight:500;color:var(--jade-deep);}
   .fc-stops.via{color:var(--muted);font-weight:500;}
 
   /* --- price --- */
   .fc-buy{text-align:right;flex:none;}
-  .fc-pr{font-family:var(--font-display);font-size:23px;font-weight:900;letter-spacing:-.02em;color:var(--ink);}
+  .fc-pr{font-family:var(--font-display);font-size:23px;font-weight:600;letter-spacing:-.02em;color:var(--ink);}
+  .fc.is-best .fc-pr{font-weight:700;}
   .fc-pu{font-size:12px;color:var(--muted);margin-top:1px;}
-  .fc-go{margin-top:10px;width:100%;background:var(--jade);color:#fff;border:none;border-radius:12px;
-    padding:11px 16px;font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer;transition:background .15s;}
-  .fc-go:hover{background:var(--jade-deep);}
-  .fc.is-sel .fc-go{background:var(--jade-deep);}
-  .fc-seats{font-size:12px;font-weight:600;color:#b45309;margin-top:7px;}
+  /* With no button on the card, this is what says a leg has been answered —
+     it matters on a round trip, where you come back to a list you have already
+     chosen from. */
+  .fc-chosen{display:inline-flex;align-items:center;gap:5px;margin-top:8px;
+    font-size:12.5px;font-weight:600;color:var(--jade-deep);}
 
   /* ============ FILTER RAIL ============ */
-  .rail-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px;}
-  .side-h{font-size:20px;font-weight:700;color:var(--ink);margin:0;letter-spacing:-.01em;}
+  .rail-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+  .side-h{font-size:20px;font-weight:600;color:var(--ink);margin:0 0 16px;letter-spacing:-.01em;}
   .clear-link{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;
     cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:2px;}
   .clear-link:hover{color:var(--ink);}
@@ -142,21 +246,12 @@
   .fsec{border-top:.8px solid var(--line);}
   .fsec-h{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
     background:none;border:none;padding:14px 0;cursor:pointer;font-family:inherit;
-    font-size:14px;font-weight:700;color:var(--ink);text-align:left;}
+    font-size:14px;font-weight:600;color:var(--ink);text-align:left;}
   .fsec-ar{width:16px;height:16px;flex:none;stroke:var(--muted);fill:none;stroke-width:2;
     stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
   .fsec.is-open > .fsec-h .fsec-ar{transform:rotate(180deg);}
   .fsec-b{padding-bottom:16px;}
   .fsec:not(.is-open) .fsec-b{display:none;}
-
-  .chips{display:flex;flex-wrap:wrap;gap:8px;}
-  .chip{border:.8px solid #efefef;background:var(--card);color:var(--chip-ink);border-radius:999px;
-    height:36px;padding:0 14px;font-family:inherit;font-size:13.5px;font-weight:600;
-    cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:6px;}
-  .chip:hover{border-color:#e3e3df;background:#fafaf9;}
-  .chip[aria-pressed="true"]{background:var(--jade-soft);border-color:var(--jade);
-    color:var(--jade-deep);font-weight:700;}
-  .chip:disabled{opacity:.4;cursor:default;}
 
   .checks{display:flex;flex-direction:column;gap:2px;}
   .chk{display:flex;align-items:center;gap:10px;padding:7px 2px;border-radius:8px;cursor:pointer;
@@ -175,22 +270,10 @@
   .chk-n{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--muted);flex:none;
     font-variant-numeric:tabular-nums;}
 
-  /* price slider */
-  .rng-val{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:12px;}
-  .rng-val span{color:var(--muted);font-weight:500;}
-  input[type=range]{width:100%;appearance:none;background:none;height:20px;cursor:pointer;}
-  input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--line);}
-  input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;
-    background:var(--jade);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);margin-top:-7px;}
-  input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--line);}
-  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--jade);
-    border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);}
-  .rng-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:2px;}
-
   /* ============ EMPTY ============ */
   .empty{background:var(--card);border:.8px solid var(--card-line);border-radius:20px;
     padding:56px 32px;text-align:center;box-shadow:var(--shadow-field);}
-  .empty h3{font-size:19px;font-weight:700;margin:0 0 6px;letter-spacing:-.01em;}
+  .empty h3{font-size:19px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em;}
   .empty p{color:var(--muted);font-size:14.5px;margin:0 0 20px;}
   .empty button{background:var(--jade);color:#fff;border:none;border-radius:12px;padding:11px 22px;
     font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer;}
@@ -205,13 +288,13 @@
   .dock-in{max-width:1440px;margin:0 auto;padding:14px 40px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;}
   .dock-legs{display:flex;align-items:center;gap:26px;min-width:0;flex-wrap:wrap;}
   .dock-leg{min-width:0;}
-  .dock-k{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .dock-k{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
   .dock-v{font-size:14.5px;font-weight:600;color:var(--ink);margin-top:3px;white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis;}
   .dock-v em{font-style:normal;color:var(--muted);font-weight:500;}
   .dock-sum{margin-left:auto;display:flex;align-items:center;gap:22px;}
   .dock-tot{text-align:right;}
-  .dock-tp{font-family:var(--font-display);font-size:24px;font-weight:900;letter-spacing:-.02em;color:var(--ink);}
+  .dock-tp{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink);}
   .dock-ts{font-size:12px;color:var(--muted);margin-top:1px;}
   .dock-go{background:var(--jade);color:#fff;border:none;border-radius:14px;padding:14px 30px;
     font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;}
@@ -223,7 +306,7 @@
     .side{position:static;}
     .fc{grid-template-columns:1fr;gap:16px;}
     .fc-buy{text-align:left;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-    .fc-go{width:auto;margin-top:0;}
+    .fc-chosen{margin-top:0;}
   }
   @media(max-width:760px){
     .wrap,.topnav-in,.dock-in{padding-left:20px;padding-right:20px;}
@@ -245,27 +328,11 @@
 </nav>
 
 <div class="wrap">
-  <div class="recap">
-    <div class="recap-route" id="recapRoute"></div>
-    <div class="recap-meta" id="recapMeta"></div>
-    <a class="recap-change" href="flights.html">Change search</a>
-  </div>
-
-  <div class="legs" role="tablist" id="legTabs">
-    <button type="button" class="leg" role="tab" data-leg="out" aria-selected="true">
-      <span class="leg-k">Departure</span>
-      <span class="leg-n" data-n>—</span>
-      <span class="leg-s" data-s>—</span>
-    </button>
-    <button type="button" class="leg" role="tab" data-leg="ret" aria-selected="false">
-      <span class="leg-k">Return</span>
-      <span class="leg-n" data-n>—</span>
-      <span class="leg-s" data-s>—</span>
-    </button>
-  </div>
-
   <div class="res-head">
-    <h1 id="resCount">—</h1>
+    <div>
+      <h1 id="pageH">Flights</h1>
+      <div class="res-sub" id="resCount">—</div>
+    </div>
     <div class="sortwrap">
       <select class="sort" id="sortSel" aria-label="Sort flights by">
         <option value="best">Best</option>
@@ -278,13 +345,34 @@
   </div>
 
   <div class="grid">
-    <div class="col-list" id="list"></div>
-    <aside class="side">
-      <div class="rail-top">
-        <h2 class="side-h">Filters</h2>
-        <button type="button" class="clear-link" id="clearAll">Clear all</button>
+    <div class="col-list">
+      <div class="legs" role="tablist" id="legTabs">
+        <button type="button" class="leg" role="tab" data-leg="out" aria-selected="true">
+          <span class="leg-k">Departure</span>
+          <span class="leg-n" data-n>—</span>
+          <span class="leg-s" data-s>—</span>
+        </button>
+        <button type="button" class="leg" role="tab" data-leg="ret" aria-selected="false">
+          <span class="leg-k">Return</span>
+          <span class="leg-n" data-n>—</span>
+          <span class="leg-s" data-s>—</span>
+        </button>
       </div>
-      <div id="rail"></div>
+      <div id="list"></div>
+    </div>
+
+    <aside class="side">
+      <div>
+        <h2 class="side-h">Your trip</h2>
+        <div class="search-card" id="tripCards"></div>
+      </div>
+      <div>
+        <div class="rail-top">
+          <h2 class="side-h">Filters</h2>
+          <button type="button" class="clear-link" id="clearAll">Clear all</button>
+        </div>
+        <div id="rail"></div>
+      </div>
     </aside>
   </div>
 </div>
@@ -368,27 +456,15 @@ var REQ = (function(){
   if(dep < TODAY) dep = SOON;
   if(ret && ret < TODAY) ret = null;
 
-  /* A missing return means a one-way, and the only reliable way to know that is
-     to be told: `trip` is explicit for exactly this reason. The fallbacks
-     matter because a return can go missing for two different reasons — the user
-     didn't want one, or the URL was hand-trimmed — and inventing a return date
-     for someone who asked for a one-way is worse than the reverse. Opened with
-     no query and nothing stored, the page defaults to a round trip so the
-     two-leg flow is what a cold open demonstrates. */
-  var hasQuery = !!(location.search || '').replace(/^\?/, '');
-  var oneWay;
-  if(Q.trip === 'oneway')      oneWay = true;
-  else if(Q.trip === 'round')  oneWay = false;
-  else if(hasQuery)            oneWay = !parseYmd(Q.ret);
-  else if(stored && stored.from) oneWay = !Array.isArray(stored.ret);
-  else                         oneWay = false;
-
-  if(oneWay){
-    ret = null;
-  } else {
-    if(!ret) ret = new Date(dep.getFullYear(), dep.getMonth(), dep.getDate()+3);
-    if(ret <= dep) ret = new Date(dep.getFullYear(), dep.getMonth(), dep.getDate()+3);
-  }
+  /* A return leg needs a return date. Without one there is nothing to price and
+     no options to list, so a missing date is a one-way — however it went
+     missing: the search said one-way, the URL was hand-trimmed, or the page was
+     opened cold. Never invent a date to fill the gap; a leg the user didn't ask
+     for is worse than no leg. `trip=oneway` is still honoured explicitly so a
+     stale ?ret= can't resurrect a return that was dropped. */
+  if(ret && ret <= dep) ret = null;
+  var oneWay = Q.trip === 'oneway' || !ret;
+  if(oneWay) ret = null;
 
   var n = function(v, d, lo, hi){ var x = parseInt(v,10); return isNaN(x) ? d : Math.min(hi, Math.max(lo, x)); };
   var adults   = n(Q.adults,   stored.adults   || 1, 1, 9);
@@ -412,7 +488,10 @@ try{
 }catch(e){}
 
 var MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var MON  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var DOW  = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+var TODAY = new Date(); TODAY.setHours(0,0,0,0);
 function dateKey(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
 function fmtDay(d){ return DAYS[d.getDay()] + ', ' + MONS[d.getMonth()] + ' ' + d.getDate(); }
 function fmtShort(d){ return MONS[d.getMonth()] + ' ' + d.getDate(); }
@@ -442,42 +521,10 @@ var UI = {
   /* Filters are shared across both legs deliberately: someone who has ruled out
      connections on the way there has ruled them out on the way back too. */
   stops: {},            // '0' | '1' | '2' → true
-  airlines: {},         // carrier code → true
-  windows: {},          // 'n' | 'm' | 'a' | 'e' → true
-  maxPrice: null
+  airlines: {}          // carrier code → true
 };
 
-/* The slider's ends are taken from both legs together, so the handle means the
-   same thing on either tab. The floor is the cheapest fare rather than zero:
-   on a business-class search the cheapest seat is ₹6,830 and a track that
-   started at ₹1,000 would be mostly dead travel. */
-var PRICE_FLOOR, PRICE_CAP;
-(function(){
-  var all = LEGS.out.flights.concat(LEGS.ret ? LEGS.ret.flights : [])
-              .map(function(f){ return f.price; });
-  if(!all.length){ PRICE_FLOOR = 1000; PRICE_CAP = 20000; return; }
-  /* Exactly the cheapest fare, not rounded down past it, so the left end of the
-     track is a price something is actually sold at. It's the cheapest across
-     *both* legs, which means the far-left stop can still empty the dearer of
-     the two — the alternative, a scale per leg, would move the handle under
-     the user's hand every time they switched tabs. The empty state covers it. */
-  PRICE_FLOOR = Math.min.apply(null, all);
-  PRICE_CAP   = Math.ceil(Math.max.apply(null, all) / 100) * 100;
-  if(PRICE_CAP <= PRICE_FLOOR) PRICE_CAP = PRICE_FLOOR + 500;
-})();
-
-var WINDOWS = [
-  { k:'n', label:'Before 6 AM', lo:0,    hi:359  },
-  { k:'m', label:'6 AM – noon', lo:360,  hi:719  },
-  { k:'a', label:'Noon – 6 PM', lo:720,  hi:1079 },
-  { k:'e', label:'After 6 PM',  lo:1080, hi:1439 }
-];
-
 function stopKey(f){ return f.stops >= 2 ? '2' : String(f.stops); }
-function windowKey(f){
-  for(var i=0;i<WINDOWS.length;i++){ if(f.depMin >= WINDOWS[i].lo && f.depMin <= WINDOWS[i].hi) return WINDOWS[i].k; }
-  return 'e';
-}
 function anyOn(o){ return Object.keys(o).some(function(k){ return o[k]; }); }
 
 /* A flight passes when it satisfies every *active* facet. Passing `skip` lets a
@@ -486,8 +533,6 @@ function anyOn(o){ return Object.keys(o).some(function(k){ return o[k]; }); }
 function passes(f, skip){
   if(skip!=='stops'    && anyOn(UI.stops)    && !UI.stops[stopKey(f)])          return false;
   if(skip!=='airlines' && anyOn(UI.airlines) && !UI.airlines[f.carrier.code])   return false;
-  if(skip!=='windows'  && anyOn(UI.windows)  && !UI.windows[windowKey(f)])      return false;
-  if(skip!=='price'    && UI.maxPrice != null && f.price > UI.maxPrice)         return false;
   return true;
 }
 
@@ -500,6 +545,15 @@ function visible(){ return current().filter(function(f){ return passes(f, null);
 /* "Best" is not cheapest — it's the flight you'd actually pick: price and time
    normalised against this leg's own spread, with a connection carrying a flat
    penalty because a stop costs more than the minutes it adds. */
+function bestScorer(list){
+  var pr = list.map(function(f){ return f.price; });
+  var dr = list.map(function(f){ return f.durMin; });
+  var pLo = Math.min.apply(null, pr), pHi = Math.max.apply(null, pr);
+  var dLo = Math.min.apply(null, dr), dHi = Math.max.apply(null, dr);
+  var norm = function(v, lo, hi){ return hi === lo ? 0 : (v - lo) / (hi - lo); };
+  return function(f){ return norm(f.price,pLo,pHi) * 0.62 + norm(f.durMin,dLo,dHi) * 0.38 + f.stops * 0.12; };
+}
+
 function sorted(list){
   var arr = list.slice();
   if(UI.sort === 'cheap')  return arr.sort(function(a,b){ return a.price - b.price || a.durMin - b.durMin; });
@@ -507,38 +561,379 @@ function sorted(list){
   if(UI.sort === 'early')  return arr.sort(function(a,b){ return a.depMin - b.depMin; });
   if(UI.sort === 'late')   return arr.sort(function(a,b){ return b.depMin - a.depMin; });
 
-  var pr = arr.map(function(f){ return f.price; });
-  var dr = arr.map(function(f){ return f.durMin; });
-  var pLo = Math.min.apply(null, pr), pHi = Math.max.apply(null, pr);
-  var dLo = Math.min.apply(null, dr), dHi = Math.max.apply(null, dr);
-  var norm = function(v, lo, hi){ return hi === lo ? 0 : (v - lo) / (hi - lo); };
-  return arr.sort(function(a,b){
-    var sa = norm(a.price,pLo,pHi) * 0.62 + norm(a.durMin,dLo,dHi) * 0.38 + a.stops * 0.12;
-    var sb = norm(b.price,pLo,pHi) * 0.62 + norm(b.durMin,dLo,dHi) * 0.38 + b.stops * 0.12;
-    return sa - sb || a.price - b.price;
+  var score = bestScorer(arr);
+  return arr.sort(function(a,b){ return score(a) - score(b) || a.price - b.price; });
+}
+
+/* The badge is a claim about the flight, not about its position on screen —
+   so it's computed off the full filtered list and stays put on whichever
+   card earned it even if the sort control is set to "Cheapest" or "Fastest". */
+function bestIdOf(list){
+  if(!list.length) return null;
+  var score = bestScorer(list);
+  var top = list[0], topScore = score(top);
+  list.forEach(function(f){
+    var s = score(f);
+    if(s < topScore || (s === topScore && f.price < top.price)){ top = f; topScore = s; }
   });
+  return top.id;
 }
 
 /* =============================================================
    RENDER — the recap and the leg tabs
    ============================================================= */
-function paintRecap(){
-  var A = Flights.byCode(REQ.from), B = Flights.byCode(REQ.to);
-  /* The breadcrumb names the destination the way the stays list names the
-     place — "Stays in Goa" there, "Flights to Goa" here. */
-  $('crumb').textContent = 'Flights to ' + B.city;
-  $('recapRoute').innerHTML =
-    esc(A.city) + ' <svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg> ' + esc(B.city);
+var ICON = {
+  takeoff:'<path d="M3 20h18M4.5 14.5l2.8.8 3.2-3.4-6.2-3.6 1.7-1.2 7.4 2.3 3-3.2a1.8 1.8 0 0 1 2.6 2.5l-3.1 3.2 2.3 7.3-1.2 1.7-3.6-6.2-3.4 3.2.8 2.8-1.3.9-2-2.9-2.9-2 .9-1.3z"/>',
+  landing:'<path d="M3 20h18M5.5 16.2l2.9-.3 2.2-4.1-6.8-2.2 1.4-1.6 7.7.6 2.3-3.7a1.8 1.8 0 0 1 3 1.9l-2.3 3.8 4 6.6-1.5 1.5-4.6-5.5-2.4 4 1.4 2.5-1.1 1.1-2.6-2.5-3.2-1.8z"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v4M16 3v4"/>',
+  who:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 6.5a3 3 0 0 1 0 5.4M17 14.4c1.9.6 3.2 2 3.7 4.1"/>',
+  chev:'<path d="M6 9l6 6 6-6"/>'
+};
 
+function segHTML(o){
+  return '<button type="button" class="seg" data-field="' + esc(o.field) + '">' +
+    '<span class="seg-ic"><svg viewBox="0 0 24 24">' + o.icon + '</svg></span>' +
+    '<span class="seg-body">' +
+      '<span class="lb">' + esc(o.k) + (o.cnt ? '<span class="seg-cnt">' + esc(o.cnt) + '</span>' : '') + '</span>' +
+      '<span class="vl">' + esc(o.v) + '</span>' +
+    '</span>' +
+    '<span class="seg-ar"><svg viewBox="0 0 24 24">' + ICON.chev + '</svg></span>' +
+  '</button>';
+}
+
+function portPopHTML(field){
+  return '<div class="rpop" data-pop="' + field + '">' +
+    '<input type="text" class="rpop-search" data-role="search" autocomplete="off" placeholder="Search city or airport">' +
+    '<div class="rpop-list" data-role="list"></div>' +
+  '</div>';
+}
+
+function calNavHTML(which){
+  return '<div class="rpop-cal-h">' +
+    '<button type="button" class="cal-nav" data-nav="prev" data-cal="' + which + '"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>' +
+    '<span class="rpop-cal-tt" data-title="' + which + '"></span>' +
+    '<button type="button" class="cal-nav" data-nav="next" data-cal="' + which + '"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>' +
+  '</div>';
+}
+
+function whenPopHTML(){
+  return '<div class="rpop" data-pop="when">' +
+    '<div class="rpop-tabs" role="tablist">' +
+      '<button type="button" class="rpop-tab" data-trip="oneway">One way</button>' +
+      '<button type="button" class="rpop-tab" data-trip="roundtrip">Round trip</button>' +
+    '</div>' +
+    '<div class="rpop-cal">' +
+      '<div class="rpop-cal-lb">Departure</div>' + calNavHTML('dep') +
+      '<div class="cal-grid" data-grid="dep"></div>' +
+    '</div>' +
+    '<div class="rpop-cal" data-ret-cal>' +
+      '<div class="rpop-cal-lb">Return</div>' + calNavHTML('ret') +
+      '<div class="cal-grid" data-grid="ret"></div>' +
+    '</div>' +
+    '<button type="button" class="rpop-apply" data-apply="when">Update dates</button>' +
+  '</div>';
+}
+
+function stpHTML(key, label, sub){
+  return '<div class="rpop-stp" data-stp="' + key + '">' +
+    '<div class="rpop-stp-l">' + esc(label) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</div>' +
+    '<div class="rpop-ctr">' +
+      '<button type="button" data-ctr="dec">−</button>' +
+      '<b data-ctr="val">0</b>' +
+      '<button type="button" data-ctr="inc">+</button>' +
+    '</div></div>';
+}
+
+function whoPopHTML(){
+  return '<div class="rpop" data-pop="who">' +
+    stpHTML('adults', 'Adults', '') +
+    stpHTML('children', 'Children', 'Ages 2–11') +
+    stpHTML('infants', 'Infants', 'Under 2, on a lap') +
+    '<div class="rpop-cab-lb">Cabin class</div>' +
+    '<div class="rpop-cabs">' + Object.keys(CABIN_LABEL).map(function(k){
+      return '<label class="rpop-cab"><input type="radio" name="rpopCabin" value="' + k + '">' + esc(CABIN_LABEL[k]) + '</label>';
+    }).join('') + '</div>' +
+    '<button type="button" class="rpop-apply" data-apply="who">Update travellers</button>' +
+  '</div>';
+}
+
+/* The trip, as the stays rail states a stay: one field card per thing that was
+   asked for — but editable right here, the way it's asked for. A popover per
+   card, not a second copy of the search page: they read and write the same
+   REQ this page already runs on, so there's nothing to drift. */
+function paintTrip(){
+  var A = Flights.byCode(REQ.from), B = Flights.byCode(REQ.to);
+
+  var heads = REQ.adults + REQ.children;
   var pax = REQ.adults + ' adult' + (REQ.adults>1?'s':'');
-  if(REQ.children) pax += ', ' + REQ.children + (REQ.children>1?' children':' child');
-  if(REQ.infants)  pax += ', ' + REQ.infants + ' infant' + (REQ.infants>1?'s':'');
-  var when = REQ.ret
-    ? fmtShort(REQ.dep) + ' – ' + fmtShort(REQ.ret)
-    : fmtShort(REQ.dep) + ' · One way';
-  $('recapMeta').innerHTML =
-    '<b>' + esc(REQ.from) + ' – ' + esc(REQ.to) + '</b> · ' +
-    esc(when) + ' · ' + esc(pax) + ' · ' + esc(CABIN_LABEL[REQ.cabin]);
+  if(REQ.children) pax += ' · ' + REQ.children + (REQ.children>1?' children':' child');
+  if(REQ.infants)  pax += ' · ' + REQ.infants + ' infant' + (REQ.infants>1?'s':'');
+
+  $('tripCards').innerHTML =
+    '<div class="rf">' + segHTML({ k:'From', v:A.city + ' (' + A.code + ')', icon:ICON.takeoff, field:'from' }) + portPopHTML('from') + '</div>' +
+    '<div class="rf">' + segHTML({ k:'To',   v:B.city + ' (' + B.code + ')', icon:ICON.landing, field:'to' })   + portPopHTML('to')   + '</div>' +
+    '<div class="rf">' + segHTML({ k:'When', cnt: REQ.ret ? 'Round trip' : 'One way',
+              v: REQ.ret ? fmtShort(REQ.dep) + ' → ' + fmtShort(REQ.ret) : fmtDay(REQ.dep),
+              icon:ICON.cal, field:'when' }) + whenPopHTML() + '</div>' +
+    '<div class="rf">' + segHTML({ k:'Who all', cnt: heads + (heads>1 ? ' travellers' : ' traveller'),
+              v: pax + ' · ' + CABIN_LABEL[REQ.cabin], icon:ICON.who, field:'who' }) + whoPopHTML() + '</div>';
+
+  bindTripPop();
+}
+
+/* =============================================================
+   RAIL POPOVERS — edit REQ in place, then re-run the search this
+   page already knows how to run.
+   ============================================================= */
+var EDIT = {
+  q: { from:'', to:'' },
+  calView: { dep:null, ret:null },
+  cal: { tripType:'roundtrip', dep:null, ret:null },
+  who: { adults:1, children:0, infants:0, cabin:'economy' }
+};
+
+function closeAllPops(){
+  document.querySelectorAll('.rpop.open').forEach(function(p){ p.classList.remove('open'); });
+}
+
+function openPop(field){
+  var pop = document.querySelector('.rpop[data-pop="' + field + '"]');
+  var wasOpen = pop.classList.contains('open');
+  closeAllPops();
+  if(wasOpen) return;
+
+  if(field === 'from' || field === 'to'){
+    EDIT.q[field] = '';
+    pop.querySelector('[data-role="search"]').value = '';
+    renderPortList(field);
+    pop.classList.add('open');
+    setTimeout(function(){ pop.querySelector('[data-role="search"]').focus(); }, 0);
+  } else if(field === 'when'){
+    EDIT.cal.tripType = REQ.ret ? 'roundtrip' : 'oneway';
+    EDIT.cal.dep = REQ.dep;
+    EDIT.cal.ret = REQ.ret;
+    EDIT.calView.dep = new Date(REQ.dep.getFullYear(), REQ.dep.getMonth(), 1);
+    var retAnchor = REQ.ret || REQ.dep;
+    EDIT.calView.ret = new Date(retAnchor.getFullYear(), retAnchor.getMonth(), 1);
+    paintWhenPop();
+    pop.classList.add('open');
+  } else if(field === 'who'){
+    EDIT.who.adults = REQ.adults; EDIT.who.children = REQ.children;
+    EDIT.who.infants = REQ.infants; EDIT.who.cabin = REQ.cabin;
+    paintWhoPop();
+    pop.classList.add('open');
+  }
+}
+
+function renderPortList(field){
+  var pop = document.querySelector('.rpop[data-pop="' + field + '"]');
+  var list = pop.querySelector('[data-role="list"]');
+  var results = Flights.search(EDIT.q[field], 8);
+  if(!results.length){ list.innerHTML = '<div class="rpop-empty">No airport matches that</div>'; return; }
+  list.innerHTML = results.map(function(a){
+    return '<button type="button" class="rpop-opt" data-code="' + esc(a.code) + '">' +
+      '<b>' + esc(a.city) + ' (' + esc(a.code) + ')</b><span>' + esc(a.name) + '</span></button>';
+  }).join('');
+  list.querySelectorAll('.rpop-opt').forEach(function(b){
+    b.addEventListener('click', function(){ applyAirport(field, b.dataset.code); });
+  });
+}
+
+/* Picking the city already on the other side swaps rather than collides —
+   there is no such thing as flying somewhere from itself. */
+function applyAirport(field, code){
+  var other = field === 'from' ? 'to' : 'from';
+  if(code === REQ[other]) REQ[other] = REQ[field];
+  REQ[field] = code;
+  closeAllPops();
+  commitSearch();
+}
+
+function calKey(d){ return d.getFullYear()*10000 + d.getMonth()*100 + d.getDate(); }
+
+function drawCal(which){
+  var pop = document.querySelector('.rpop[data-pop="when"]');
+  var view = EDIT.calView[which];
+  var grid = pop.querySelector('[data-grid="' + which + '"]');
+  var title = pop.querySelector('[data-title="' + which + '"]');
+
+  title.textContent = MON[view.getMonth()] + ' ' + view.getFullYear();
+  var floor = (which === 'ret' && EDIT.cal.dep) ? EDIT.cal.dep : TODAY;
+  var prev = pop.querySelector('.cal-nav[data-nav="prev"][data-cal="' + which + '"]');
+  prev.disabled = (view.getFullYear()===floor.getFullYear() && view.getMonth()===floor.getMonth());
+
+  var html = DOW.map(function(d){ return '<div class="cal-dow">' + d + '</div>'; }).join('');
+  var first = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
+  var days = new Date(view.getFullYear(), view.getMonth()+1, 0).getDate();
+  for(var i=0;i<first;i++) html += '<div></div>';
+
+  for(var day=1; day<=days; day++){
+    var d = new Date(view.getFullYear(), view.getMonth(), day);
+    var k = calKey(d), cls = 'cal-d';
+    var min = (which === 'ret' && EDIT.cal.dep) ? EDIT.cal.dep : TODAY;
+    var dis = d < min;
+    if(EDIT.cal.dep && EDIT.cal.ret){
+      if(k > calKey(EDIT.cal.dep) && k < calKey(EDIT.cal.ret)) cls += ' in-range';
+      if(k === calKey(EDIT.cal.dep)) cls += ' edge s';
+      if(k === calKey(EDIT.cal.ret)) cls += ' edge e';
+    } else if(EDIT.cal.dep && k === calKey(EDIT.cal.dep)){
+      cls += ' edge only';
+    }
+    html += '<button type="button" class="' + cls + '" data-day="' + day + '"' + (dis ? ' disabled' : '') + '>' + day + '</button>';
+  }
+  grid.innerHTML = html;
+}
+
+function paintWhenPop(){
+  var pop = document.querySelector('.rpop[data-pop="when"]');
+  pop.querySelectorAll('.rpop-tab').forEach(function(b){
+    b.setAttribute('aria-selected', b.dataset.trip === EDIT.cal.tripType ? 'true' : 'false');
+  });
+  pop.querySelector('[data-ret-cal]').hidden = EDIT.cal.tripType !== 'roundtrip';
+  drawCal('dep');
+  if(EDIT.cal.tripType === 'roundtrip') drawCal('ret');
+  var valid = !!EDIT.cal.dep && (EDIT.cal.tripType !== 'roundtrip' || !!EDIT.cal.ret);
+  pop.querySelector('[data-apply="when"]').disabled = !valid;
+}
+
+function paintWhoPop(){
+  var pop = document.querySelector('.rpop[data-pop="who"]');
+  var lims = { adults:[1,9], children:[0,8], infants:[0, EDIT.who.adults] };
+  ['adults','children','infants'].forEach(function(key){
+    var row = pop.querySelector('[data-stp="' + key + '"]');
+    row.querySelector('[data-ctr="val"]').textContent = EDIT.who[key];
+    row.querySelector('[data-ctr="dec"]').disabled = EDIT.who[key] <= lims[key][0];
+    row.querySelector('[data-ctr="inc"]').disabled = EDIT.who[key] >= lims[key][1];
+  });
+  pop.querySelectorAll('input[name="rpopCabin"]').forEach(function(r){ r.checked = r.value === EDIT.who.cabin; });
+}
+
+function stepWho(key, delta){
+  var lims = { adults:[1,9], children:[0,8], infants:[0, EDIT.who.adults] };
+  EDIT.who[key] = Math.min(lims[key][1], Math.max(lims[key][0], EDIT.who[key] + delta));
+  if(key === 'adults' && EDIT.who.infants > EDIT.who.adults) EDIT.who.infants = EDIT.who.adults;
+  paintWhoPop();
+}
+
+/* REQ has already been updated by the caller — rebuild everything that was
+   derived from it once, the same way a fresh page load would. */
+function commitSearch(){
+  PAYING = REQ.adults + REQ.children;
+  LEGS.out = { from:REQ.from, to:REQ.to, date:REQ.dep,
+               flights: Flights.leg(REQ.from, REQ.to, dateKey(REQ.dep), REQ.cabin) };
+  LEGS.ret = REQ.ret ? { from:REQ.to, to:REQ.from, date:REQ.ret,
+               flights: Flights.leg(REQ.to, REQ.from, dateKey(REQ.ret), REQ.cabin) } : null;
+  UI.leg = 'out'; UI.chosen = { out:null, ret:null }; UI.stops = {}; UI.airlines = {};
+
+  try{
+    sessionStorage.setItem(SKEY, JSON.stringify({
+      from:REQ.from, to:REQ.to,
+      dep:[REQ.dep.getFullYear(),REQ.dep.getMonth(),REQ.dep.getDate()],
+      ret:REQ.ret ? [REQ.ret.getFullYear(),REQ.ret.getMonth(),REQ.ret.getDate()] : null,
+      adults:REQ.adults, children:REQ.children, infants:REQ.infants, cabin:REQ.cabin
+    }));
+  }catch(e){}
+
+  var q = 'from=' + REQ.from + '&to=' + REQ.to + '&dep=' + dateKey(REQ.dep)
+        + (REQ.ret ? '&ret=' + dateKey(REQ.ret) : '')
+        + '&trip=' + (REQ.ret ? 'round' : 'oneway')
+        + '&adults=' + REQ.adults + '&children=' + REQ.children + '&infants=' + REQ.infants
+        + '&cabin=' + REQ.cabin;
+  history.replaceState(null, '', 'flight-results.html?' + q);
+
+  paintHead();
+  paintTrip();
+  paintAll();
+}
+
+function bindTripPop(){
+  document.querySelectorAll('.seg[data-field]').forEach(function(b){
+    b.addEventListener('click', function(){ openPop(b.dataset.field); });
+  });
+  document.querySelectorAll('.rpop').forEach(function(p){
+    p.addEventListener('click', function(e){ e.stopPropagation(); });
+  });
+
+  ['from','to'].forEach(function(field){
+    var pop = document.querySelector('.rpop[data-pop="' + field + '"]');
+    pop.querySelector('[data-role="search"]').addEventListener('input', function(){
+      EDIT.q[field] = this.value;
+      renderPortList(field);
+    });
+  });
+
+  var whenPop = document.querySelector('.rpop[data-pop="when"]');
+  whenPop.querySelectorAll('.rpop-tab').forEach(function(b){
+    b.addEventListener('click', function(){
+      EDIT.cal.tripType = b.dataset.trip;
+      if(EDIT.cal.tripType === 'oneway') EDIT.cal.ret = null;
+      paintWhenPop();
+    });
+  });
+  whenPop.querySelectorAll('.cal-nav').forEach(function(b){
+    b.addEventListener('click', function(){
+      var which = b.dataset.cal;
+      EDIT.calView[which].setMonth(EDIT.calView[which].getMonth() + (b.dataset.nav === 'next' ? 1 : -1));
+      drawCal(which);
+    });
+  });
+  whenPop.querySelectorAll('.cal-grid').forEach(function(grid){
+    grid.addEventListener('click', function(e){
+      var b = e.target.closest('.cal-d'); if(!b || b.disabled) return;
+      var which = grid.dataset.grid;
+      var view = EDIT.calView[which];
+      var d = new Date(view.getFullYear(), view.getMonth(), +b.dataset.day);
+      if(which === 'dep'){
+        EDIT.cal.dep = d;
+        if(EDIT.cal.ret && EDIT.cal.ret <= d) EDIT.cal.ret = null;
+      } else if(!EDIT.cal.dep){
+        EDIT.cal.dep = d;
+      } else {
+        EDIT.cal.ret = d;
+      }
+      paintWhenPop();
+    });
+  });
+  whenPop.querySelector('[data-apply="when"]').addEventListener('click', function(){
+    REQ.dep = EDIT.cal.dep;
+    REQ.ret = EDIT.cal.tripType === 'roundtrip' ? EDIT.cal.ret : null;
+    REQ.oneWay = EDIT.cal.tripType !== 'roundtrip';
+    closeAllPops();
+    commitSearch();
+  });
+
+  var whoPop = document.querySelector('.rpop[data-pop="who"]');
+  ['adults','children','infants'].forEach(function(key){
+    var row = whoPop.querySelector('[data-stp="' + key + '"]');
+    row.querySelector('[data-ctr="dec"]').addEventListener('click', function(){ stepWho(key, -1); });
+    row.querySelector('[data-ctr="inc"]').addEventListener('click', function(){ stepWho(key, 1); });
+  });
+  whoPop.querySelectorAll('input[name="rpopCabin"]').forEach(function(r){
+    r.addEventListener('change', function(){ if(this.checked) EDIT.who.cabin = this.value; });
+  });
+  whoPop.querySelector('[data-apply="who"]').addEventListener('click', function(){
+    REQ.adults = EDIT.who.adults; REQ.children = EDIT.who.children;
+    REQ.infants = EDIT.who.infants; REQ.cabin = EDIT.who.cabin;
+    closeAllPops();
+    commitSearch();
+  });
+}
+
+document.addEventListener('click', function(e){
+  if(e.target.closest('.rf')) return;
+  closeAllPops();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeAllPops();
+});
+
+function paintHead(){
+  var B = Flights.byCode(REQ.to);
+  /* The page is named for where it is taking you, the way the stays list is
+     named for where you are staying. */
+  $('crumb').textContent = 'Flights to ' + B.city;
+  $('pageH').textContent = 'Flights to ' + B.city;
+  document.title = 'onto — Flights to ' + B.city;
 }
 
 function paintTabs(){
@@ -566,7 +961,7 @@ function paintTabs(){
 /* =============================================================
    RENDER — the list
    ============================================================= */
-function cardHTML(f){
+function cardHTML(f, isBest){
   var sel = UI.chosen[UI.leg] && UI.chosen[UI.leg].id === f.id;
   var plus = Flights.dayOffset(f.arrMin);
 
@@ -580,12 +975,13 @@ function cardHTML(f){
     stopNode = '<i class="fc-stop" style="left:' + Math.round(at*100) + '%" title="' + esc(f.via) + '"></i>';
   }
 
-  return '<article class="fc' + (sel ? ' is-sel' : '') + '" data-id="' + esc(f.id) + '">' +
+  return '<article class="fc' + (sel ? ' is-sel' : '') + (isBest ? ' is-best' : '') + '" data-id="' + esc(f.id) + '"' +
+      ' tabindex="0" role="button">' +
+    (isBest ? '<span class="fc-best-badge">Best</span>' : '') +
     '<div class="fc-air">' +
       '<span class="fc-logo" style="background:' + esc(f.carrier.color) + '">' + esc(f.carrier.code) + '</span>' +
       '<div class="fc-airt">' +
         '<div class="fc-airn">' + esc(f.carrier.name) + '</div>' +
-        '<div class="fc-airm">' + esc(f.number) + ' · ' + esc(f.aircraft) + '</div>' +
       '</div>' +
     '</div>' +
     '<div class="fc-leg">' +
@@ -605,8 +1001,7 @@ function cardHTML(f){
         '<div class="fc-pr">' + Flights.inr(f.price) + '</div>' +
         '<div class="fc-pu">per traveller</div>' +
       '</div>' +
-      '<button type="button" class="fc-go">' + (sel ? 'Selected' : 'Select') + '</button>' +
-      (f.seatsLeft ? '<div class="fc-seats">' + f.seatsLeft + ' seats left at this fare</div>' : '') +
+      (sel ? '<div class="fc-chosen">✓ Chosen</div>' : '') +
     '</div>' +
   '</article>';
 }
@@ -616,8 +1011,8 @@ function paintList(){
   var box = $('list');
 
   var L = activeLeg();
-  $('resCount').innerHTML = list.length + ' flight' + (list.length===1?'':'s') +
-    ' <span>· ' + esc(L.from) + ' → ' + esc(L.to) + ', ' + esc(fmtDay(L.date)) + '</span>';
+  $('resCount').innerHTML = '<b>' + list.length + ' flight' + (list.length===1?'':'s') + '</b> · ' +
+    esc(L.from) + ' → ' + esc(L.to) + ' · ' + esc(fmtDay(L.date));
 
   if(!list.length){
     box.innerHTML = '<div class="empty"><h3>No flights match these filters</h3>' +
@@ -627,26 +1022,36 @@ function paintList(){
     return;
   }
 
-  box.innerHTML = list.map(cardHTML).join('');
+  var bestId = bestIdOf(list);
+  box.innerHTML = list.map(function(f){ return cardHTML(f, f.id === bestId); }).join('');
   box.querySelectorAll('.fc').forEach(function(el){
-    el.querySelector('.fc-go').addEventListener('click', function(){ choose(el.dataset.id); });
+    el.addEventListener('click', function(){ choose(el.dataset.id); });
+    el.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); choose(el.dataset.id); }
+    });
   });
 }
 
 function choose(id){
+  /* A click that ended a text selection was a read, not a press. */
+  if(String(window.getSelection() || '')) return;
+
   var f = current().filter(function(x){ return x.id === id; })[0];
   if(!f) return;
   UI.chosen[UI.leg] = f;
 
-  /* Choosing the outbound moves you on to the return, because that is the next
-     thing to do — but only the first time, so re-picking an outbound later
-     doesn't yank you off the list you're reading. On a one-way there is
-     nowhere to advance to. */
-  var advance = (!!LEGS.ret && UI.leg === 'out' && !UI.chosen.ret);
-  if(advance) UI.leg = 'ret';
+  /* Picking a flight takes you onward, even on a round trip with no return
+     chosen — a one-way trip is a real answer, and the return tab is still there
+     to add one. The single exception is the reverse: a return without an
+     outbound can't be checked out, so that pick moves to the departure tab. */
+  if(LEGS.ret && UI.leg === 'ret' && !UI.chosen.out){
+    UI.leg = 'out';
+    paintTabs(); paintList(); paintDock();
+    window.scrollTo({ top: 0, behavior:'smooth' });
+    return;
+  }
 
-  paintTabs(); paintList(); paintDock();
-  if(advance) window.scrollTo({ top: 0, behavior:'smooth' });
+  goCheckout();
 }
 
 /* =============================================================
@@ -666,15 +1071,15 @@ function countBy(fn, skip){
   return out;
 }
 
-function sectionHTML(id, title, body, open){
-  return '<section class="fsec' + (open ? ' is-open' : '') + '" data-sec="' + id + '">' +
+function sectionHTML(id, title, body, open, card){
+  return '<section class="fsec' + (open ? ' is-open' : '') + (card ? ' is-card' : '') + '" data-sec="' + id + '">' +
     '<button type="button" class="fsec-h">' + esc(title) +
       '<svg class="fsec-ar" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>' +
     '<div class="fsec-b">' + body + '</div></section>';
 }
 
 function checkRow(name, key, label, n){
-  var on = (name==='stops' ? UI.stops : name==='airlines' ? UI.airlines : UI.windows)[key];
+  var on = (name==='stops' ? UI.stops : UI.airlines)[key];
   return '<label class="chk' + (n ? '' : ' off') + '">' +
     '<input type="checkbox" data-f="' + name + '" value="' + esc(key) + '"' +
       (on ? ' checked' : '') + (n ? '' : ' disabled') + '>' +
@@ -691,11 +1096,6 @@ function paintRail(){
     checkRow('stops','2','2+ stops',   sc['2']||0) +
     '</div>';
 
-  var wc = countBy(windowKey, 'windows');
-  var timeBody = '<div class="checks">' + WINDOWS.map(function(w){
-    return checkRow('windows', w.k, w.label, wc[w.k]||0);
-  }).join('') + '</div>';
-
   var ac = countBy(function(f){ return f.carrier.code; }, 'airlines');
   /* Airlines are listed by how much of this leg they actually fly — an
      alphabetical list buries the carrier with nine departures under one with
@@ -707,12 +1107,6 @@ function paintRail(){
     .map(function(code){ return checkRow('airlines', code, names[code], ac[code]||0); })
     .join('') + '</div>';
 
-  var cap = UI.maxPrice == null ? PRICE_CAP : UI.maxPrice;
-  var priceBody =
-    '<div class="rng-val">Up to ' + Flights.inr(cap) + ' <span>per traveller</span></div>' +
-    '<input type="range" id="priceRng" min="' + PRICE_FLOOR + '" max="' + PRICE_CAP + '" step="100" value="' + cap + '">' +
-    '<div class="rng-ends"><span>' + Flights.inr(PRICE_FLOOR) + '</span><span>' + Flights.inr(PRICE_CAP) + '</span></div>';
-
   /* Which sections are open survives a repaint — collapsing "Airlines" and
      then having it spring back open on the next tick would be maddening. */
   var openState = {};
@@ -721,42 +1115,25 @@ function paintRail(){
   var isOpen = function(k, dflt){ return first ? dflt : !!openState[k]; };
 
   $('rail').innerHTML =
-    sectionHTML('stops',    'Stops',          stopsBody, isOpen('stops', true)) +
-    sectionHTML('time',     'Departure time', timeBody,  isOpen('time', true)) +
-    sectionHTML('airlines', 'Airlines',       airBody,   isOpen('airlines', true)) +
-    sectionHTML('price',    'Price',          priceBody, isOpen('price', false));
+    sectionHTML('stops',    'Stops',    stopsBody, isOpen('stops', true)) +
+    sectionHTML('airlines', 'Airlines', airBody,   isOpen('airlines', true));
 
   $('rail').querySelectorAll('.fsec-h').forEach(function(h){
     h.addEventListener('click', function(){ h.parentNode.classList.toggle('is-open'); });
   });
   $('rail').querySelectorAll('input[type=checkbox]').forEach(function(cb){
     cb.addEventListener('change', function(){
-      var bag = cb.dataset.f === 'stops' ? UI.stops : cb.dataset.f === 'airlines' ? UI.airlines : UI.windows;
+      var bag = cb.dataset.f === 'stops' ? UI.stops : UI.airlines;
       if(cb.checked) bag[cb.value] = true; else delete bag[cb.value];
       paintAll();
     });
   });
-  var rng = $('priceRng');
-  if(rng){
-    rng.addEventListener('input', function(){
-      UI.maxPrice = +rng.value;
-      /* Live label while dragging, full repaint on release — repainting the
-         whole rail on every pixel would fight the drag. */
-      var lab = rng.parentNode.querySelector('.rng-val');
-      if(lab) lab.innerHTML = 'Up to ' + Flights.inr(UI.maxPrice) + ' <span>per traveller</span>';
-      paintList();
-    });
-    /* Read the value here too rather than trusting that `input` already ran —
-       it does in a browser drag, but a programmatic set or an assistive
-       control can land straight on `change`. */
-    rng.addEventListener('change', function(){ UI.maxPrice = +rng.value; paintAll(); });
-  }
 
-  $('clearAll').disabled = !(anyOn(UI.stops) || anyOn(UI.airlines) || anyOn(UI.windows) || UI.maxPrice != null);
+  $('clearAll').disabled = !(anyOn(UI.stops) || anyOn(UI.airlines));
 }
 
 function clearFilters(){
-  UI.stops = {}; UI.airlines = {}; UI.windows = {}; UI.maxPrice = null;
+  UI.stops = {}; UI.airlines = {};
   paintAll();
 }
 $('clearAll').addEventListener('click', clearFilters);
@@ -789,11 +1166,17 @@ function paintDock(){
 
   var pax = PAYING + ' traveller' + (PAYING>1?'s':'') +
             (REQ.infants ? ' + ' + REQ.infants + ' infant' + (REQ.infants>1?'s':'') : '');
-  var done = twoLeg ? (o && r) : !!o;
-  $('dockNote').textContent = done
-    ? (twoLeg ? 'Round trip · ' : 'One way · ') + pax
-    : 'Pick your ' + (o ? 'return' : 'departure') + ' to see the total';
-  $('dockGo').disabled = !done;
+  /* A departure is enough to go on with. Someone who searched a round trip may
+     still only want to book the way there — or want to think about the way
+     back — and holding the button hostage to a leg they haven't decided on
+     makes the page argue with them. The total says what it is totalling, so
+     nobody continues thinking they have bought a return they haven't. */
+  $('dockNote').textContent = !o
+    ? 'Pick your departure to see the total'
+    : (twoLeg
+        ? (r ? 'Round trip · ' + pax : 'Departure only · ' + pax + ' · add a return, or continue')
+        : 'One way · ' + pax);
+  $('dockGo').disabled = !o;
 }
 
 /* =============================================================
@@ -810,6 +1193,31 @@ document.querySelectorAll('.leg').forEach(function(tab){
 });
 $('sortSel').addEventListener('change', function(){ UI.sort = $('sortSel').value; paintList(); });
 
+/* On to the trip page — hand the whole cart over in sessionStorage rather than
+   in the URL. Two itineraries and a party don't belong in a query string, and
+   unlike this page the next one is not something anyone should be pasting: it
+   is a form half-filled with someone's name. */
+var CART_KEY = 'onto:flightCart:v1';
+function goCheckout(){
+  var o = UI.chosen.out, r = UI.chosen.ret;
+  if(!o) return;
+  try{
+    sessionStorage.setItem(CART_KEY, JSON.stringify({
+      from:REQ.from, to:REQ.to,
+      dep:[REQ.dep.getFullYear(),REQ.dep.getMonth(),REQ.dep.getDate()],
+      ret:REQ.ret ? [REQ.ret.getFullYear(),REQ.ret.getMonth(),REQ.ret.getDate()] : null,
+      adults:REQ.adults, children:REQ.children, infants:REQ.infants, cabin:REQ.cabin,
+      /* The chosen flights travel whole. They are derived deterministically from
+         the route and date, so they could be looked up again by id — but only
+         for as long as the two pages agree on how to derive them, and a cart
+         that carries its own contents can't drift. */
+      outFlight:o, retFlight: LEGS.ret ? r : null
+    }));
+  }catch(e){}
+  location.href = 'flight-checkout.html';
+}
+$('dockGo').addEventListener('click', goCheckout);
+
 (function(){
   var btn = $('profileBtn'), menu = $('profileMenu');
   if(!btn || !menu) return;
@@ -819,7 +1227,8 @@ $('sortSel').addEventListener('change', function(){ UI.sort = $('sortSel').value
 
 function paintAll(){ paintTabs(); paintList(); paintRail(); paintDock(); }
 
-paintRecap();
+paintHead();
+paintTrip();
 paintAll();
 </script>
 

@@ -52,7 +52,7 @@
       <span class="rzp-flow">Razorpay flow</span>
     </div>
     <div class="rzp-body" id="rzpBody">
-      <div class="rzp-merchant">Paying <b>Taj Exotica Resort &amp; Spa</b></div>
+      <div class="rzp-merchant">Paying <b id="merchant">Taj Exotica Resort &amp; Spa</b></div>
       <div class="rzp-amt" id="amt">₹55,500</div>
       <div class="rzp-note">Prototype only — no real payment is processed. Tap “Pay” to simulate a successful transaction and return to the booking confirmation.</div>
       <label class="rzp-sim"><input type="checkbox" id="simPending"> Simulate settlement pending (money received, awaiting the hotel&rsquo;s confirmation)</label>
@@ -74,11 +74,19 @@
   </div>
 
 <script>
+  // Which record is being charged. The stay owns 'booking'; the flights flow
+  // keeps its own so that paying for one never writes a paid flag onto the
+  // other. Callers say which by setting payKey before sending us here.
+  var PKEY = 'booking';
+  try { var k = sessionStorage.getItem('payKey'); if(k) PKEY = k; } catch(e){}
+
   var booking = {};
-  try { booking = JSON.parse(sessionStorage.getItem('booking')) || {}; } catch(e){}
+  try { booking = JSON.parse(sessionStorage.getItem(PKEY)) || {}; } catch(e){}
   var amt = booking.amount || '₹55,500';
   document.getElementById('amt').textContent = amt;
   document.getElementById('payAmt').textContent = amt;
+  // who the money is going to — the hotel unless the caller says otherwise
+  if(booking.merchant) document.getElementById('merchant').textContent = booking.merchant;
   // reveal the resolution picker only when "settlement pending" is simulated
   var simPend = document.getElementById('simPending'), pendSel = document.getElementById('pendOutcome');
   if(simPend && pendSel) simPend.addEventListener('change', function(){ pendSel.hidden = !simPend.checked; });
@@ -95,7 +103,7 @@
       if(payfail){
         // charge failed at the bank and was instantly reversed → no booking, no money held
         booking.paid = false;
-        sessionStorage.setItem('booking', JSON.stringify(booking));
+        sessionStorage.setItem(PKEY, JSON.stringify(booking));
         sessionStorage.setItem('payFailed','1');
         sessionStorage.removeItem('settlePending'); sessionStorage.removeItem('settleOutcome');
         var ptx = document.querySelector('.rzp-ptx'), psub = document.querySelector('.rzp-psub');
@@ -104,7 +112,7 @@
       } else {
         // payment succeeded; if settlement isn't confirmed yet, flag it (and how it resolves)
         booking.paid = true;
-        sessionStorage.setItem('booking', JSON.stringify(booking));
+        sessionStorage.setItem(PKEY, JSON.stringify(booking));
         if(pending){
           sessionStorage.setItem('settlePending','1');
           sessionStorage.setItem('settleOutcome', (document.getElementById('pendOutcome')||{}).value || 'confirmed');
@@ -113,7 +121,15 @@
     } catch(e){}
     // callers can route the post-payment return (default: the standalone confirmation page)
     var dest = 'booking-details.html';
-    try { var r = sessionStorage.getItem('payReturn'); if(r){ dest = r; sessionStorage.removeItem('payReturn'); } } catch(e){}
+    try {
+      var r = sessionStorage.getItem('payReturn'); if(r) dest = r;
+      // A declined charge can need its own way back — the stay's confirmation
+      // screen can tell the story, a flight's cannot, so it returns to the form.
+      var fr = sessionStorage.getItem('payFailReturn'); if(payfail && fr) dest = fr;
+      sessionStorage.removeItem('payReturn');
+      sessionStorage.removeItem('payFailReturn');
+      sessionStorage.removeItem('payKey');
+    } catch(e){}
     setTimeout(function(){ location.href = dest; }, 1600);
   });
   document.getElementById('cancel').addEventListener('click', function(){ history.back(); });
