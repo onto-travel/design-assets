@@ -143,8 +143,6 @@
   .tk{position:relative;display:flex;align-items:stretch;background:var(--card);
     border-radius:20px;padding:8px;box-shadow:var(--shadow-card);}
   .tk-body{flex:1;min-width:0;padding:16px 14px 16px 16px;}
-  .tk-k{display:block;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
-    color:var(--muted);font-weight:700;margin-bottom:4px;}
   .tk-h{font-size:19px;font-weight:700;letter-spacing:-.015em;}
   .tk-sub{margin-top:5px;font-size:13.5px;font-weight:500;color:var(--muted);
     display:flex;flex-wrap:wrap;align-items:center;gap:2px 7px;}
@@ -180,6 +178,9 @@
     border:2px solid var(--gold);transform:translate(-50%,-50%);}
   .tk-stops{font-size:12px;margin-top:5px;color:var(--muted);}
   .tk-t.right{text-align:right;}
+  .tk-bag{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;
+    color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:2px 7px;}
+  .tk-bag .sep{color:#e3e3df;}
 
   .tk-perf{flex:none;width:34px;position:relative;align-self:stretch;}
   .tk-perf::before{content:"";position:absolute;left:50%;top:16px;bottom:16px;
@@ -435,9 +436,12 @@ $('ref').textContent = B.ref;
    THE TICKETS — one per leg, each with its own airline PNR and stamp
    ============================================================= */
 $('flightsH').textContent = LEGS.length > 1 ? 'Your flights' : 'Your flight';
+var BAG_KG = 15;
+var hasBagExtra = (B.extras || []).some(function(x){ return x.k === 'bag'; });
 $('legs').innerHTML = LEGS.map(function(L, i){
   var f = L.flight, d = fromYmd(L.date), A = Flights.byCode(f.from), Z = Flights.byCode(f.to);
   var plus = Flights.dayOffset(f.arrMin);
+  var seats = ((B.seats && B.seats[L.k]) || []).slice().sort();
   var stopNode = '';
   if(f.stops && f.via){
     var at = f.legAMin && f.durMin ? f.legAMin / f.durMin : 0.5;
@@ -446,7 +450,6 @@ $('legs').innerHTML = LEGS.map(function(L, i){
   }
   return '<article class="tk">' +
     '<div class="tk-body">' +
-      '<span class="tk-k">' + esc(L.label) + '</span>' +
       '<div class="tk-h">' + esc(A ? A.city : f.from) + ' → ' + esc(Z ? Z.city : f.to) + '</div>' +
       '<div class="tk-sub">' +
         '<span>' + esc(fmtDay(d)) + '</span>' +
@@ -469,6 +472,13 @@ $('legs').innerHTML = LEGS.map(function(L, i){
         '<div class="tk-t right"><div class="tk-hh">' + Flights.hhmm(f.arrMin) +
           (plus ? '<sup>+' + plus + '</sup>' : '') + '</div>' +
           '<div class="tk-cd">' + esc(f.to) + '</div></div>' +
+      '</div>' +
+      '<div class="tk-bag">' +
+        '<span>Cabin ' + Flights.RULES.cabinKg + ' kg</span>' +
+        '<span class="sep">&middot;</span>' +
+        '<span>Check-in ' + (Flights.RULES.checkinKg + (hasBagExtra ? BAG_KG : 0)) + ' kg</span>' +
+        (seats.length ? '<span class="sep">&middot;</span><span>Seat' + (seats.length > 1 ? 's ' : ' ') +
+          esc(seats.join(', ')) + '</span>' : '') +
       '</div>' +
     '</div>' +
     '<div class="tk-perf"><span class="notch t"></span><span class="notch b"></span></div>' +

@@ -83,10 +83,9 @@
   .leg-s.done{color:var(--jade-deep);font-weight:600;}
 
   /* ============ SEAT MAP ============ */
-  .map-h{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:2px;}
+  .map-h{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
   .map-t{font-size:17px;font-weight:700;letter-spacing:-.01em;}
   .map-hint{font-size:13.5px;font-weight:600;color:var(--jade-deep);}
-  .map-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
 
   .legend{display:flex;flex-wrap:wrap;gap:16px;padding:12px 14px;background:#fafaf9;
     border:.8px solid var(--line);border-radius:14px;margin-bottom:18px;}
@@ -194,7 +193,7 @@
   </div>
 
   <div class="pdp-title">
-    <h1 class="page-h">Choose your seat</h1>
+    <h1 class="page-h" id="pageTitle">—</h1>
   </div>
 
   <div class="alert" id="payAlert">
@@ -211,10 +210,9 @@
 
       <section class="card">
         <div class="map-h">
-          <h2 class="map-t" id="mapTitle">—</h2>
+          <h2 class="map-t" id="mapTitle">Choose your seat</h2>
           <span class="map-hint" id="mapHint"></span>
         </div>
-        <div class="map-sub" id="mapSub"></div>
 
         <div class="legend">
           <span class="lg-item"><i class="lg-sw"></i>Available</span>
@@ -338,9 +336,9 @@ function seatMapHTML(L){
 
 function paintSeatMap(){
   var L = legOf(activeLeg);
-  $('mapTitle').textContent = (LEGS.length > 1 ? L.label + ' · ' : '') + L.flight.from + ' → ' + L.flight.to;
-  $('mapSub').textContent = L.flight.carrier.name + ' ' + L.flight.number + ' · ' + (L.flight.aircraft || '') +
-    ' · ' + CABIN_LABEL[B.cabin || 'economy'];
+  var fromCity = (Flights.byCode(L.flight.from) || {}).city || L.flight.from;
+  var toCity = (Flights.byCode(L.flight.to) || {}).city || L.flight.to;
+  $('pageTitle').textContent = (LEGS.length > 1 ? L.label + ' · ' : '') + fromCity + ' → ' + toCity;
 
   var need = PAYING - (chosen[L.k] || []).length;
   $('mapHint').textContent = need > 0
