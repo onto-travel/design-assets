@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto — Boarding pass</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg-default);color:var(--text-primary);
+    font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+  }
+
+  /* ---------- phone frame ---------- */
+  .phone{position:relative;width:390px;height:844px;background:#000;border-radius:54px;
+    padding:12px;box-shadow:0 40px 90px rgba(30,22,10,.16),0 0 0 2px rgba(0,0,0,.15);flex:none;}
+  .screen{position:relative;width:100%;height:100%;background:var(--bg-surface);border-radius:42px;
+    overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:30px;
+    background:#000;border-radius:20px;z-index:40;}
+
+  .statusbar{position:relative;z-index:35;flex:none;display:flex;align-items:center;
+    justify-content:space-between;padding:20px 26px 6px;font-size:14px;font-weight:600;
+    color:var(--text-primary);}
+  .sb-right{display:flex;align-items:center;gap:6px;font-size:13px;}
+
+  .appbar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 12px 8px;}
+  .ab-btn{width:38px;height:38px;border-radius:50%;border:none;background:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--icon-primary);
+    transition:background .15s;flex:none;}
+  .ab-btn:hover{background:var(--green-soft);}
+  .ab-btn svg{width:20px;height:20px;stroke:var(--icon-primary);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .at-title{font-family:var(--font-body);font-size:var(--fs-xl);font-weight:var(--fw-bold);color:var(--text-primary);}
+
+  .body{flex:1;overflow-y:auto;padding:4px 20px 28px;display:flex;flex-direction:column;gap:var(--sp-20);}
+
+  /* ---------- status banner — amber: needs attention, not just informational ---------- */
+  .status-banner{background:var(--accent-amber-bg);border-radius:var(--r-xl);padding:var(--sp-16) var(--sp-20);
+    display:flex;flex-direction:column;gap:2px;}
+  .status-banner .headline{font-size:var(--fs-xxxl);font-weight:var(--fw-bold);color:var(--text-primary);}
+  .status-banner .cause{display:flex;align-items:center;gap:4px;font-size:var(--fs-s);
+    font-weight:var(--fw-medium);color:var(--text-body);cursor:pointer;}
+  .status-banner .cause svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* ---------- boarding pass ---------- */
+  .bpass{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--r-xl);
+    box-shadow:var(--shadow-l2);display:flex;flex-direction:column;}
+  .bpass-top{padding:var(--sp-20);display:flex;flex-direction:column;gap:var(--sp-16);}
+  .bpass-air{display:flex;align-items:center;gap:var(--sp-12);}
+  .air-mark{width:40px;height:40px;border-radius:50%;background:var(--green-soft);color:var(--green-deep);
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:var(--fw-bold);flex:none;}
+  .air-tx{flex:1;min-width:0;}
+  .air-name{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+  .air-num{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .bpass-gate{text-align:right;flex:none;}
+  .bpass-gate .g-label{font-size:var(--fs-xs);color:var(--text-secondary);font-weight:var(--fw-bold);
+    text-transform:uppercase;letter-spacing:.03em;}
+  .bpass-gate .g-val{font-family:var(--font-display);font-size:28px;font-weight:var(--fw-display);
+    color:var(--text-primary);line-height:1.1;}
+
+  .bpass-route{display:flex;align-items:center;gap:var(--sp-8);font-size:var(--fs-l);
+    font-weight:var(--fw-bold);color:var(--text-primary);}
+  .bpass-route .arrow{color:var(--icon-secondary);font-weight:var(--fw-medium);}
+  .bpass-status{font-size:var(--fs-s);font-weight:var(--fw-bold);}
+  .bpass-status.on{color:var(--accent-brand-primary);}
+  .bpass-status.delayed{color:var(--accent-amber-icon);}
+
+  .bpass-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-8);}
+  .bpass-field{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .bpass-field .lbl{font-size:10px;color:var(--text-secondary);font-weight:var(--fw-bold);
+    text-transform:uppercase;letter-spacing:.03em;}
+  .bpass-field .val{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  .bpass-tear{border-top:2px dashed var(--border-default);margin:0 var(--sp-20);}
+  .bpass-stub{padding:var(--sp-16) var(--sp-20) var(--sp-20);}
+  .barcode{height:34px;border-radius:2px;
+    background:repeating-linear-gradient(90deg,
+      var(--text-primary) 0 2px, transparent 2px 5px,
+      var(--text-primary) 5px 6px, transparent 6px 12px,
+      var(--text-primary) 12px 15px, transparent 15px 18px,
+      var(--text-primary) 18px 19px, transparent 19px 24px);}
+
+  /* ---------- weather + baggage ---------- */
+  .wx-row{display:flex;gap:var(--sp-12);}
+  .wx{flex:1;display:flex;align-items:center;gap:var(--sp-8);border:1px solid var(--border-default);
+    border-radius:var(--r-lg);padding:var(--sp-12);}
+  .wx-icon{font-size:20px;line-height:1;flex:none;}
+  .wx-tx{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .wx-city{font-size:var(--fs-xs);color:var(--text-secondary);font-weight:var(--fw-medium);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .wx-temp{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+
+  .baggage{text-align:center;font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
+
+  /* ---------- prototype stage nav — review aid, not part of the product UI ---------- */
+  .stage-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+    display:flex;gap:6px;background:rgba(17,24,39,.92);backdrop-filter:blur(6px);
+    padding:8px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);
+    max-width:calc(100vw - 32px);overflow-x:auto;z-index:9999;}
+  .stage-nav::-webkit-scrollbar{display:none;}
+  .stage-nav a{flex:none;padding:7px 12px;border-radius:999px;font-family:-apple-system,sans-serif;
+    font-size:12px;font-weight:600;color:rgba(255,255,255,.6);text-decoration:none;white-space:nowrap;
+    transition:background .15s,color .15s;}
+  .stage-nav a:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .stage-nav a.current{background:#fff;color:#111827;}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+    <div class="notch"></div>
+
+    <div class="statusbar">
+      <span>13:45</span>
+      <span class="sb-right">&#9679;&#9679;&#9679; &nbsp;&#128246;&nbsp; &#128267;</span>
+    </div>
+
+    <div class="appbar">
+      <button class="ab-btn" aria-label="Back" onclick="location.href='flight-tracker-detail.html?num=' + encodeURIComponent(compact)">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="at-title" id="pageTitle">AI 101</span>
+      <button class="ab-btn" aria-label="More options" onclick="stopTracking()">
+        <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+
+    <div class="body">
+      <div class="status-banner">
+        <div class="headline" id="bannerHeadline">Boarding now</div>
+        <div class="cause">
+          <span id="bannerCauseText">Zone 2 — have your boarding pass ready</span>
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="bpass">
+        <div class="bpass-top">
+          <div class="bpass-air">
+            <div class="air-mark" id="airMark">AI</div>
+            <div class="air-tx">
+              <div class="air-name" id="airName">Air India</div>
+              <div class="air-num" id="airNum">AI 101</div>
+            </div>
+            <div class="bpass-gate">
+              <div class="g-label">Gate</div>
+              <div class="g-val" id="gateVal">24</div>
+            </div>
+          </div>
+
+          <div class="bpass-route">
+            <span id="fromCode">DEL</span>
+            <span class="arrow">&rarr;</span>
+            <span id="toCode">BOM</span>
+            <span class="arrow" id="depTime">&middot; 14:30</span>
+          </div>
+          <div class="bpass-status" id="statusVal">On time</div>
+
+          <div class="bpass-grid">
+            <div class="bpass-field"><span class="lbl">Passenger</span><span class="val">SAANVI</span></div>
+            <div class="bpass-field"><span class="lbl">Seat</span><span class="val" id="seatVal">14A</span></div>
+            <div class="bpass-field"><span class="lbl">Zone</span><span class="val" id="zoneVal">2</span></div>
+            <div class="bpass-field"><span class="lbl">Boarding</span><span class="val" id="boardTimeVal">13:50</span></div>
+          </div>
+        </div>
+
+        <div class="bpass-tear"></div>
+
+        <div class="bpass-stub">
+          <div class="barcode"></div>
+        </div>
+      </div>
+
+      <div class="wx-row">
+        <div class="wx">
+          <span class="wx-icon">&#9728;&#65039;</span>
+          <div class="wx-tx">
+            <div class="wx-city" id="originWxCity">Delhi</div>
+            <div class="wx-temp" id="originWxTemp">34&deg;</div>
+          </div>
+        </div>
+        <div class="wx">
+          <span class="wx-icon">&#9925;</span>
+          <div class="wx-tx">
+            <div class="wx-city" id="destWxCity">Mumbai</div>
+            <div class="wx-temp" id="destWxTemp">29&deg;</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="baggage">Cabin 7kg &middot; Checked 25kg</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var MOCK_FLIGHTS = {
+  AI101:{airline:'Air India',
+    from:{code:'DEL',city:'Delhi',time:'14:30',weather:'34°'},
+    to:{code:'BOM',city:'Mumbai',weather:'29°'},
+    gate:'24',seat:'14A',zone:'2',boardingTime:'13:50',status:'On time',
+    headline:'Boarding now',cause:'Zone 2 — have your boarding pass ready'},
+  '6E234':{airline:'IndiGo',
+    from:{code:'DEL',city:'Delhi',time:'19:15',weather:'31°'},
+    to:{code:'BOM',city:'Mumbai',weather:'28°'},
+    gate:'12',seat:'22C',zone:'3',boardingTime:'18:35',status:'On time',
+    headline:'Boarding starts in 15m',cause:'Zone 3 boards first — check your zone'},
+  UK955:{airline:'Vistara',
+    from:{code:'BLR',city:'Bengaluru',time:'18:05',weather:'24°'},
+    to:{code:'DEL',city:'Delhi',weather:'33°'},
+    gate:'7',seat:'8F',zone:'1',boardingTime:'17:25',status:'On time',
+    headline:'Boarding now',cause:'Zone 1 — have your boarding pass ready'}
+};
+var CARRIERS = {AI:'Air India', '6E':'IndiGo', UK:'Vistara', SG:'SpiceJet', G8:'Go First', QP:'Akasa Air'};
+
+var compact = (new URLSearchParams(location.search).get('num') || 'AI101').replace(/\s+/g,'').toUpperCase();
+var code = compact.slice(0,2);
+var num = compact.slice(2);
+var currentFlightNum = num ? (code + ' ' + num) : code;
+var flight = MOCK_FLIGHTS[compact] || MOCK_FLIGHTS.AI101;
+
+document.getElementById('airMark').textContent = code;
+document.getElementById('airNum').textContent = currentFlightNum;
+document.getElementById('airName').textContent = CARRIERS[code] || 'Tracked flight';
+document.getElementById('pageTitle').textContent = currentFlightNum;
+document.title = 'onto — ' + currentFlightNum + ' boarding pass';
+
+document.getElementById('bannerHeadline').textContent = flight.headline;
+document.getElementById('bannerCauseText').textContent = flight.cause;
+
+document.getElementById('gateVal').textContent = flight.gate;
+document.getElementById('fromCode').textContent = flight.from.code;
+document.getElementById('toCode').textContent = flight.to.code;
+document.getElementById('depTime').textContent = '· ' + flight.from.time;
+var statusEl = document.getElementById('statusVal');
+statusEl.textContent = flight.status;
+statusEl.className = 'bpass-status ' + (flight.status === 'On time' ? 'on' : 'delayed');
+document.getElementById('seatVal').textContent = flight.seat;
+document.getElementById('zoneVal').textContent = flight.zone;
+document.getElementById('boardTimeVal').textContent = flight.boardingTime;
+
+document.getElementById('originWxCity').textContent = flight.from.city;
+document.getElementById('originWxTemp').textContent = flight.from.weather;
+document.getElementById('destWxCity').textContent = flight.to.city;
+document.getElementById('destWxTemp').textContent = flight.to.weather;
+
+function stopTracking(){
+  if(confirm('Stop tracking ' + currentFlightNum + '?')){
+    location.href = 'flight-tracker.html';
+  }
+}
+</script>
+<script>
+(function(){
+  var STAGES = [
+    {file:'flight-tracker.html', label:'Add flight'},
+    {file:'flight-tracker-confirm.html', label:'Confirm'},
+    {file:'flight-tracker-detail.html', label:'Pre-flight'},
+    {file:'flight-tracker-airport.html', label:'Boarding pass'},
+    {file:'flight-tracker-inflight.html', label:'Boarded', extra:'phase=boarded'},
+    {file:'flight-tracker-inflight.html', label:'In the air'},
+    {file:'flight-tracker-arrival.html', label:'Landed'}
+  ];
+  var here = location.pathname.split('/').pop();
+  var herePhase = new URLSearchParams(location.search).get('phase') || '';
+  var nav = document.createElement('div');
+  nav.className = 'stage-nav';
+  STAGES.forEach(function(s){
+    var params = [];
+    if(s.file !== 'flight-tracker.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
+    if(s.extra) params.push(s.extra);
+    var a = document.createElement('a');
+    a.href = s.file + (params.length ? '?' + params.join('&') : '');
+    a.textContent = s.label;
+    var matchesPhase = s.extra ? herePhase === 'boarded' : herePhase !== 'boarded';
+    if(s.file === here && matchesPhase) a.classList.add('current');
+    nav.appendChild(a);
+  });
+  document.body.appendChild(nav);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto — Landed</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg-default);color:var(--text-primary);
+    font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+  }
+
+  /* ---------- phone frame ---------- */
+  .phone{position:relative;width:390px;height:844px;background:#000;border-radius:54px;
+    padding:12px;box-shadow:0 40px 90px rgba(30,22,10,.16),0 0 0 2px rgba(0,0,0,.15);flex:none;}
+  .screen{position:relative;width:100%;height:100%;background:var(--bg-surface);border-radius:42px;
+    overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:30px;
+    background:#000;border-radius:20px;z-index:40;}
+
+  .statusbar{position:relative;z-index:35;flex:none;display:flex;align-items:center;
+    justify-content:space-between;padding:20px 26px 6px;font-size:14px;font-weight:600;
+    color:var(--text-primary);}
+  .sb-right{display:flex;align-items:center;gap:6px;font-size:13px;}
+
+  .appbar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 12px 8px;}
+  .ab-btn{width:38px;height:38px;border-radius:50%;border:none;background:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--icon-primary);
+    transition:background .15s;flex:none;}
+  .ab-btn:hover{background:var(--green-soft);}
+  .ab-btn svg{width:20px;height:20px;stroke:var(--icon-primary);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .at-title{font-family:var(--font-body);font-size:var(--fs-xl);font-weight:var(--fw-bold);color:var(--text-primary);}
+
+  .body{flex:1;overflow-y:auto;padding:4px 20px 28px;display:flex;flex-direction:column;gap:var(--sp-20);}
+
+  /* ---------- status banner ---------- */
+  .status-banner{background:var(--green-soft);border-radius:var(--r-xl);padding:var(--sp-16) var(--sp-20);
+    display:flex;flex-direction:column;gap:2px;}
+  .status-banner .headline{font-size:var(--fs-xxxl);font-weight:var(--fw-bold);color:var(--green-deep);}
+  .status-banner .cause{font-size:var(--fs-s);font-weight:var(--fw-medium);color:var(--green-deep);opacity:.82;}
+
+  /* ---------- summary card ---------- */
+  .card{border:1px solid var(--border-default);border-radius:var(--r-xl);box-shadow:var(--shadow-l2);
+    padding:var(--sp-20);display:flex;flex-direction:column;gap:var(--sp-16);}
+  .air-row{display:flex;align-items:center;gap:var(--sp-12);}
+  .air-mark{width:40px;height:40px;border-radius:50%;background:var(--green-soft);color:var(--green-deep);
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:var(--fw-bold);flex:none;}
+  .air-tx{flex:1;min-width:0;}
+  .air-name{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+  .air-num{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
+
+  .divider{height:1px;background:var(--border-default);border:none;margin:0;}
+
+  .route-row{display:flex;align-items:center;justify-content:center;gap:var(--sp-8);
+    font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+  .route-row .arrow{color:var(--icon-secondary);font-weight:var(--fw-medium);}
+
+  .arrive-time{text-align:center;display:flex;flex-direction:column;gap:2px;}
+  .arrive-time .time{font-family:var(--font-display);font-size:40px;font-weight:var(--fw-display);
+    color:var(--text-primary);display:flex;align-items:baseline;justify-content:center;gap:10px;}
+  .arrive-time .orig{font-family:var(--font-body);font-size:var(--fs-l);font-weight:var(--fw-medium);
+    color:var(--text-secondary);text-decoration:line-through;}
+  .arrive-time .delta{font-size:var(--fs-s);font-weight:var(--fw-bold);color:var(--accent-brand-primary);}
+
+  .meta-row{display:flex;align-items:center;justify-content:space-between;}
+  .meta-label{font-size:var(--fs-l);color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .meta-value{font-size:var(--fs-l);color:var(--text-primary);font-weight:var(--fw-bold);}
+
+  /* ---------- baggage ---------- */
+  .bag-card{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-12);
+    border:1px solid var(--border-default);border-radius:var(--r-xl);padding:var(--sp-16) var(--sp-20);}
+  .bag-tx{display:flex;flex-direction:column;gap:2px;}
+  .bag-label{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .bag-status{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+  .bag-belt{font-family:var(--font-display);font-size:32px;font-weight:var(--fw-display);
+    color:var(--text-primary);line-height:1;}
+  .bag-belt-lbl{font-size:var(--fs-xs);color:var(--text-secondary);font-weight:var(--fw-bold);
+    text-transform:uppercase;letter-spacing:.03em;text-align:right;}
+
+  .cta{width:100%;border:none;border-radius:var(--r-lg);background:var(--bg-button);
+    color:var(--text-inverse);padding:17px;font-family:inherit;font-size:var(--fs-l);
+    font-weight:var(--fw-bold);cursor:pointer;box-shadow:var(--shadow-l2);
+    transition:opacity .15s,transform .12s;}
+  .cta:hover{opacity:.88;}
+  .cta:active{transform:scale(.98);}
+
+  /* ---------- prototype stage nav — review aid, not part of the product UI ---------- */
+  .stage-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+    display:flex;gap:6px;background:rgba(17,24,39,.92);backdrop-filter:blur(6px);
+    padding:8px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);
+    max-width:calc(100vw - 32px);overflow-x:auto;z-index:9999;}
+  .stage-nav::-webkit-scrollbar{display:none;}
+  .stage-nav a{flex:none;padding:7px 12px;border-radius:999px;font-family:-apple-system,sans-serif;
+    font-size:12px;font-weight:600;color:rgba(255,255,255,.6);text-decoration:none;white-space:nowrap;
+    transition:background .15s,color .15s;}
+  .stage-nav a:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .stage-nav a.current{background:#fff;color:#111827;}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+    <div class="notch"></div>
+
+    <div class="statusbar">
+      <span>16:38</span>
+      <span class="sb-right">&#9679;&#9679;&#9679; &nbsp;&#128246;&nbsp; &#128267;</span>
+    </div>
+
+    <div class="appbar">
+      <button class="ab-btn" aria-label="Back" onclick="location.href='flight-tracker-inflight.html?num=' + encodeURIComponent(compact)">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="at-title" id="pageTitle">AI 101</span>
+      <button class="ab-btn" aria-label="More options" onclick="stopTracking()">
+        <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+
+    <div class="body">
+      <div class="status-banner">
+        <div class="headline" id="bannerHeadline">Landed &middot; 10m early</div>
+        <div class="cause" id="bannerCause">Baggage on carousel now</div>
+      </div>
+
+      <div class="card">
+        <div class="air-row">
+          <div class="air-mark" id="airMark">AI</div>
+          <div class="air-tx">
+            <div class="air-name" id="airName">Air India</div>
+            <div class="air-num" id="airNum">AI 101</div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="route-row">
+          <span id="fromCode">DEL</span>
+          <span class="arrow">&rarr;</span>
+          <span id="toCode">BOM</span>
+        </div>
+
+        <div class="arrive-time">
+          <div class="time"><span id="actualTime">16:35</span> <span class="orig" id="schedTime">16:45</span></div>
+          <div class="delta" id="deltaText">10m early</div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="meta-row">
+          <span class="meta-label">Flight time</span>
+          <span class="meta-value" id="durationVal">2h 05m</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Arrival terminal</span>
+          <span class="meta-value" id="terminalVal">Terminal 2</span>
+        </div>
+      </div>
+
+      <div class="bag-card">
+        <div class="bag-tx">
+          <div class="bag-label">Baggage claim</div>
+          <div class="bag-status">Bags arriving now</div>
+        </div>
+        <div>
+          <div class="bag-belt-lbl">Belt</div>
+          <div class="bag-belt" id="beltVal">4</div>
+        </div>
+      </div>
+
+      <button class="cta" onclick="doneTracking()">Done tracking this flight</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var MOCK_FLIGHTS = {
+  AI101:{airline:'Air India', from:{code:'DEL'}, to:{code:'BOM'},
+    actual:'16:35',scheduled:'16:45',delta:'10m early',duration:'2h 05m',belt:'4',terminal:'Terminal 2'},
+  '6E234':{airline:'IndiGo', from:{code:'DEL'}, to:{code:'BOM'},
+    actual:'21:25',scheduled:'21:25',delta:'On time',duration:'2h 10m',belt:'2',terminal:'Terminal 1'},
+  UK955:{airline:'Vistara', from:{code:'BLR'}, to:{code:'DEL'},
+    actual:'20:55',scheduled:'20:55',delta:'On time',duration:'2h 50m',belt:'6',terminal:'Terminal 3'}
+};
+var CARRIERS = {AI:'Air India', '6E':'IndiGo', UK:'Vistara', SG:'SpiceJet', G8:'Go First', QP:'Akasa Air'};
+
+var compact = (new URLSearchParams(location.search).get('num') || 'AI101').replace(/\s+/g,'').toUpperCase();
+var code = compact.slice(0,2);
+var num = compact.slice(2);
+var currentFlightNum = num ? (code + ' ' + num) : code;
+var flight = MOCK_FLIGHTS[compact] || MOCK_FLIGHTS.AI101;
+
+document.getElementById('airMark').textContent = code;
+document.getElementById('airNum').textContent = currentFlightNum;
+document.getElementById('airName').textContent = CARRIERS[code] || 'Tracked flight';
+document.getElementById('pageTitle').textContent = currentFlightNum;
+document.title = 'onto — ' + currentFlightNum + ' landed';
+
+document.getElementById('bannerHeadline').textContent = 'Landed · ' + flight.delta;
+document.getElementById('fromCode').textContent = flight.from.code;
+document.getElementById('toCode').textContent = flight.to.code;
+
+document.getElementById('actualTime').textContent = flight.actual;
+if(flight.actual === flight.scheduled){
+  document.getElementById('schedTime').style.display = 'none';
+} else {
+  document.getElementById('schedTime').textContent = flight.scheduled;
+}
+document.getElementById('deltaText').textContent = flight.delta;
+
+document.getElementById('durationVal').textContent = flight.duration;
+document.getElementById('terminalVal').textContent = flight.terminal;
+document.getElementById('beltVal').textContent = flight.belt;
+
+function doneTracking(){
+  location.href = 'flight-tracker.html';
+}
+
+function stopTracking(){
+  if(confirm('Stop tracking ' + currentFlightNum + '?')){
+    location.href = 'flight-tracker.html';
+  }
+}
+</script>
+<script>
+(function(){
+  var STAGES = [
+    {file:'flight-tracker.html', label:'Add flight'},
+    {file:'flight-tracker-confirm.html', label:'Confirm'},
+    {file:'flight-tracker-detail.html', label:'Pre-flight'},
+    {file:'flight-tracker-airport.html', label:'Boarding pass'},
+    {file:'flight-tracker-inflight.html', label:'Boarded', extra:'phase=boarded'},
+    {file:'flight-tracker-inflight.html', label:'In the air'},
+    {file:'flight-tracker-arrival.html', label:'Landed'}
+  ];
+  var here = location.pathname.split('/').pop();
+  var herePhase = new URLSearchParams(location.search).get('phase') || '';
+  var nav = document.createElement('div');
+  nav.className = 'stage-nav';
+  STAGES.forEach(function(s){
+    var params = [];
+    if(s.file !== 'flight-tracker.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
+    if(s.extra) params.push(s.extra);
+    var a = document.createElement('a');
+    a.href = s.file + (params.length ? '?' + params.join('&') : '');
+    a.textContent = s.label;
+    var matchesPhase = s.extra ? herePhase === 'boarded' : herePhase !== 'boarded';
+    if(s.file === here && matchesPhase) a.classList.add('current');
+    nav.appendChild(a);
+  });
+  document.body.appendChild(nav);
+})();
+</script>
+</body>
+</html>

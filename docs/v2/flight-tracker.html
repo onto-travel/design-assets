@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto — Add flight</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg-default);color:var(--text-primary);
+    font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+  }
+
+  /* ---------- phone frame (same chrome as hotel-firstfold-app.html) ---------- */
+  .phone{position:relative;width:390px;height:844px;background:#000;border-radius:54px;
+    padding:12px;box-shadow:0 40px 90px rgba(30,22,10,.16),0 0 0 2px rgba(0,0,0,.15);flex:none;}
+  .screen{position:relative;width:100%;height:100%;background:var(--bg-surface);border-radius:42px;
+    overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:30px;
+    background:#000;border-radius:20px;z-index:40;}
+
+  /* status bar — light, since this screen sits on a white ground rather than a hero photo */
+  .statusbar{position:relative;z-index:35;flex:none;display:flex;align-items:center;
+    justify-content:space-between;padding:20px 26px 6px;font-size:14px;font-weight:600;
+    color:var(--text-primary);}
+  .sb-right{display:flex;align-items:center;gap:6px;font-size:13px;}
+
+  /* ---------- app header ---------- */
+  .appbar{flex:none;display:flex;align-items:center;justify-content:space-between;
+    padding:4px 12px 8px;}
+  .ab-btn{width:38px;height:38px;border-radius:50%;border:none;background:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--icon-primary);
+    transition:background .15s;flex:none;}
+  .ab-btn:hover{background:var(--green-soft);}
+  .ab-btn svg{width:20px;height:20px;stroke:var(--icon-primary);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .at-title{font-family:var(--font-body);font-size:var(--fs-xl);font-weight:var(--fw-bold);
+    color:var(--text-primary);}
+
+  /* ---------- scroll body ---------- */
+  .body{flex:1;overflow-y:auto;padding:4px 20px 28px;display:flex;flex-direction:column;gap:var(--sp-20);}
+
+  /* ---------- field pills ---------- */
+  .field{display:flex;align-items:center;gap:var(--sp-12);background:var(--bg-surface);
+    border:1.5px solid var(--border-default);border-radius:var(--r-xl);padding:0 var(--sp-16);
+    height:64px;box-shadow:var(--shadow-field);}
+  .field svg{width:20px;height:20px;stroke:var(--icon-primary);fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .field-tx{display:flex;flex-direction:column;min-width:0;flex:1;}
+  .field-tx em{font-style:normal;font-size:var(--fs-xs);font-weight:var(--fw-medium);
+    color:var(--text-secondary);line-height:1.2;}
+  .field-tx input{border:none;outline:none;background:none;font-family:inherit;width:100%;
+    font-size:var(--fs-xl);font-weight:var(--fw-bold);color:var(--text-primary);padding:0;line-height:1.35;}
+  .field-tx input::placeholder{color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .field-stack{display:flex;flex-direction:column;gap:var(--sp-12);}
+  #searchView{display:flex;flex-direction:column;gap:var(--sp-16);}
+  .actions{display:flex;flex-direction:column;gap:var(--sp-8);}
+
+  /* ---------- CTA ---------- */
+  .cta{width:100%;border:none;border-radius:var(--r-lg);background:var(--bg-button);
+    color:var(--text-inverse);padding:17px;font-family:inherit;font-size:var(--fs-l);
+    font-weight:var(--fw-bold);cursor:pointer;box-shadow:var(--shadow-l2);
+    transition:opacity .15s,transform .12s;text-align:center;text-decoration:none;display:block;}
+  .cta:hover{opacity:.88;}
+  .cta:active{transform:scale(.98);}
+
+  /* ---------- upload ticket — tertiary: text only, no container ---------- */
+  .cta-upload{display:flex;align-items:center;justify-content:center;gap:var(--sp-8);
+    width:100%;border:none;background:none;color:var(--text-secondary);
+    padding:2px;font-family:inherit;font-size:var(--fs-l);
+    font-weight:var(--fw-bold);cursor:pointer;transition:color .15s;}
+  .cta-upload:hover{color:var(--text-primary);}
+  .cta-upload:disabled{cursor:default;}
+  .cta-upload svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .btn-spin{width:15px;height:15px;border:2px solid var(--border-default);
+    border-top-color:var(--text-secondary);border-radius:50%;animation:spin .7s linear infinite;flex:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- prototype stage nav — review aid, not part of the product UI ---------- */
+  .stage-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+    display:flex;gap:6px;background:rgba(17,24,39,.92);backdrop-filter:blur(6px);
+    padding:8px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);
+    max-width:calc(100vw - 32px);overflow-x:auto;z-index:9999;}
+  .stage-nav::-webkit-scrollbar{display:none;}
+  .stage-nav a{flex:none;padding:7px 12px;border-radius:999px;font-family:-apple-system,sans-serif;
+    font-size:12px;font-weight:600;color:rgba(255,255,255,.6);text-decoration:none;white-space:nowrap;
+    transition:background .15s,color .15s;}
+  .stage-nav a:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .stage-nav a.current{background:#fff;color:#111827;}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+    <div class="notch"></div>
+
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-right">&#9679;&#9679;&#9679; &nbsp;&#128246;&nbsp; &#128267;</span>
+    </div>
+
+    <div class="appbar">
+      <button class="ab-btn" aria-label="Back" onclick="history.back()">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="at-title">Add flight</span>
+      <span style="width:38px"></span>
+    </div>
+
+    <div class="body">
+      <div id="searchView">
+        <div class="field-stack">
+          <div class="field">
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+            <div class="field-tx">
+              <em>Flight number</em>
+              <input type="text" id="flightNumInput" value="AI 101" placeholder="e.g. AI 101" aria-label="Flight number">
+            </div>
+          </div>
+
+          <div class="field">
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+            <div class="field-tx">
+              <em>Date</em>
+              <input type="text" value="Today &middot; 24 Aug" readonly aria-label="Date">
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="cta" onclick="searchFlight()">Search flight</button>
+          <button class="cta-upload" id="uploadBtn" onclick="document.getElementById('ticketFile').click()">
+            <svg viewBox="0 0 24 24"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+            Upload ticket
+          </button>
+          <input type="file" id="ticketFile" accept="image/*,.pdf" style="display:none" onchange="handleTicket()">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function searchFlight(){
+  var num = document.getElementById('flightNumInput').value.trim() || 'AI 101';
+  location.href = 'flight-tracker-confirm.html?num=' + encodeURIComponent(num);
+}
+
+function handleTicket(){
+  var input = document.getElementById('ticketFile');
+  if(!input.files || !input.files.length) return;
+  var btn = document.getElementById('uploadBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="btn-spin"></span> Reading your ticket&hellip;';
+  setTimeout(function(){
+    location.href = 'flight-tracker-confirm.html?src=upload';
+  }, 900);
+}
+</script>
+<script>
+(function(){
+  var STAGES = [
+    {file:'flight-tracker.html', label:'Add flight'},
+    {file:'flight-tracker-confirm.html', label:'Confirm'},
+    {file:'flight-tracker-detail.html', label:'Pre-flight'},
+    {file:'flight-tracker-airport.html', label:'Boarding pass'},
+    {file:'flight-tracker-inflight.html', label:'Boarded', extra:'phase=boarded'},
+    {file:'flight-tracker-inflight.html', label:'In the air'},
+    {file:'flight-tracker-arrival.html', label:'Landed'}
+  ];
+  var here = location.pathname.split('/').pop();
+  var herePhase = new URLSearchParams(location.search).get('phase') || '';
+  var nav = document.createElement('div');
+  nav.className = 'stage-nav';
+  STAGES.forEach(function(s){
+    var params = [];
+    if(s.file !== 'flight-tracker.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
+    if(s.extra) params.push(s.extra);
+    var a = document.createElement('a');
+    a.href = s.file + (params.length ? '?' + params.join('&') : '');
+    a.textContent = s.label;
+    var matchesPhase = s.extra ? herePhase === 'boarded' : herePhase !== 'boarded';
+    if(s.file === here && matchesPhase) a.classList.add('current');
+    nav.appendChild(a);
+  });
+  document.body.appendChild(nav);
+})();
+</script>
+</body>
+</html>

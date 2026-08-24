@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto — AI 101</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg-default);color:var(--text-primary);
+    font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+  }
+
+  /* ---------- phone frame ---------- */
+  .phone{position:relative;width:390px;height:844px;background:#000;border-radius:54px;
+    padding:12px;box-shadow:0 40px 90px rgba(30,22,10,.16),0 0 0 2px rgba(0,0,0,.15);flex:none;}
+  .screen{position:relative;width:100%;height:100%;background:var(--bg-surface);border-radius:42px;
+    overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:30px;
+    background:#000;border-radius:20px;z-index:40;}
+
+  .statusbar{position:relative;z-index:35;flex:none;display:flex;align-items:center;
+    justify-content:space-between;padding:20px 26px 6px;font-size:14px;font-weight:600;
+    color:var(--text-primary);}
+  .sb-right{display:flex;align-items:center;gap:6px;font-size:13px;}
+
+  .appbar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 12px 8px;}
+  .ab-btn{width:38px;height:38px;border-radius:50%;border:none;background:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--icon-primary);
+    transition:background .15s;flex:none;}
+  .ab-btn:hover{background:var(--green-soft);}
+  .ab-btn svg{width:20px;height:20px;stroke:var(--icon-primary);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .at-title{font-family:var(--font-body);font-size:var(--fs-xl);font-weight:var(--fw-bold);color:var(--text-primary);}
+
+  .body{flex:1;overflow-y:auto;padding:4px 20px 28px;display:flex;flex-direction:column;gap:var(--sp-24);}
+
+  /* ---------- status banner — headline + the "why", not just the badge ---------- */
+  .status-banner{background:var(--green-soft);border-radius:var(--r-xl);padding:var(--sp-16) var(--sp-20);
+    display:flex;flex-direction:column;gap:2px;}
+  .status-banner .headline{font-size:var(--fs-xxxl);font-weight:var(--fw-bold);color:var(--green-deep);}
+  .status-banner .cause{display:flex;align-items:center;gap:4px;font-size:var(--fs-s);
+    font-weight:var(--fw-medium);color:var(--green-deep);opacity:.82;cursor:pointer;}
+  .status-banner .cause svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* ---------- summary card (shared idiom with confirm screen) ---------- */
+  .card{border:1px solid var(--border-default);border-radius:var(--r-xl);box-shadow:var(--shadow-l2);
+    padding:var(--sp-20);display:flex;flex-direction:column;gap:var(--sp-16);}
+
+  .air-row{display:flex;align-items:center;gap:var(--sp-12);}
+  .air-mark{width:40px;height:40px;border-radius:50%;background:var(--green-soft);color:var(--green-deep);
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:var(--fw-bold);flex:none;}
+  .air-tx{flex:1;min-width:0;}
+  .air-name{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+  .air-num{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
+
+  .divider{height:1px;background:var(--border-default);border:none;margin:0;}
+
+  /* ---------- per-leg rows ---------- */
+  .leg{display:flex;flex-direction:column;gap:6px;}
+  .leg-top{display:flex;align-items:center;gap:6px;font-size:var(--fs-s);font-weight:var(--fw-bold);
+    color:var(--text-secondary);}
+  .leg-top svg{width:13px;height:13px;stroke:var(--icon-secondary);fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .leg-main{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--sp-8);}
+  .leg-time{font-family:var(--font-display);font-size:var(--fs-h4);font-weight:var(--fw-display);
+    color:var(--text-primary);display:flex;align-items:baseline;gap:8px;}
+  .leg-time .orig{font-family:var(--font-body);font-size:var(--fs-l);font-weight:var(--fw-medium);
+    color:var(--text-secondary);text-decoration:line-through;}
+  .leg-badges{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+  .leg-chip{background:var(--accent-amber-bg);color:var(--text-primary);border-radius:var(--r-sm);
+    padding:3px 9px;font-size:var(--fs-xs);font-weight:var(--fw-bold);}
+  .leg-term{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .leg-status{font-size:var(--fs-s);font-weight:var(--fw-bold);color:var(--accent-brand-primary);}
+
+  .leg-divider{display:flex;align-items:center;gap:var(--sp-8);font-size:var(--fs-xs);
+    color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .leg-divider::before,.leg-divider::after{content:"";flex:1;height:1px;background:var(--border-default);}
+
+  .meta-row{display:flex;align-items:center;justify-content:space-between;}
+  .meta-label{font-size:var(--fs-l);color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .meta-value{font-size:var(--fs-l);color:var(--text-primary);font-weight:var(--fw-bold);}
+
+  .ontime{display:flex;align-items:center;gap:var(--sp-8);font-size:var(--fs-s);color:var(--text-secondary);
+    font-weight:var(--fw-medium);}
+  .ontime svg{width:15px;height:15px;stroke:var(--accent-brand-primary);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* ---------- where's my plane card ---------- */
+  .plane-card{display:flex;align-items:center;gap:var(--sp-12);border:1px solid var(--border-default);
+    border-radius:var(--r-xl);padding:var(--sp-16);}
+  .plane-mark{width:40px;height:40px;border-radius:50%;background:var(--accent-teal-bg);
+    color:var(--accent-teal-icon);display:flex;align-items:center;justify-content:center;flex:none;}
+  .plane-mark svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .plane-tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
+  .plane-title{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+  .plane-sub{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .plane-reg{flex:none;font-size:var(--fs-xs);font-weight:var(--fw-bold);color:var(--text-secondary);
+    background:var(--bg-muted);border-radius:var(--r-sm);padding:4px 8px;}
+  .plane-card{cursor:pointer;}
+  .plane-right{flex:none;display:flex;align-items:center;gap:8px;}
+  .plane-right svg{width:15px;height:15px;stroke:var(--icon-secondary);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---------- where's my plane sheet ---------- */
+  .plane-sheet{display:none;position:absolute;left:0;right:0;top:42px;bottom:0;z-index:38;
+    overflow-y:auto;color:#fff;background:
+      radial-gradient(1px 1px at 22px 38px, rgba(255,255,255,.35) 50%, transparent 51%),
+      radial-gradient(1px 1px at 96px 84px, rgba(255,255,255,.25) 50%, transparent 51%),
+      radial-gradient(1px 1px at 150px 22px, rgba(255,255,255,.3) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 110px, rgba(255,255,255,.22) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 50px, rgba(255,255,255,.3) 50%, transparent 51%),
+      radial-gradient(1px 1px at 320px 130px, rgba(255,255,255,.22) 50%, transparent 51%),
+      radial-gradient(ellipse 480px 260px at 50% -8%, rgba(153,235,209,.3), transparent 65%),
+      linear-gradient(180deg,#012417 0%,var(--green-deep) 45%,#0a5940 100%);
+    background-repeat:repeat;background-size:360px 160px,360px 160px,360px 160px,360px 160px,360px 160px,360px 160px,auto,auto;}
+  .plane-sheet.open{display:block;}
+  .ps-header{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 20px 18px;}
+  .ps-flightline{font-size:12px;font-weight:800;letter-spacing:.05em;color:rgba(255,255,255,.55);
+    text-transform:uppercase;}
+  .ps-route{font-size:21px;font-weight:800;margin-top:4px;}
+  .ps-close{width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.12);
+    color:#fff;display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;}
+  .ps-close svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+
+  .ps-panel{margin:0 16px 24px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);
+    border-radius:24px;padding:22px 20px;}
+  .ps-title{font-size:21px;font-weight:800;}
+  .ps-sub{margin-top:10px;font-size:14px;color:rgba(255,255,255,.72);font-weight:600;}
+  .ps-age{margin-top:2px;font-size:12.5px;color:rgba(255,255,255,.45);font-weight:500;}
+  .ps-plane-art{width:100%;height:auto;margin:20px 0 16px;display:block;}
+  .ps-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(153,235,209,.2);color:var(--green-2);
+    border-radius:999px;padding:6px 14px;font-size:11.5px;font-weight:800;letter-spacing:.03em;
+    text-transform:uppercase;}
+  .ps-pill svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.6;}
+  .ps-note{margin-top:12px;font-size:14.5px;line-height:1.45;color:rgba(255,255,255,.85);font-weight:500;}
+
+  .ps-this{margin-top:20px;display:flex;align-items:center;justify-content:space-between;
+    background:rgba(255,255,255,.07);border-radius:14px;padding:12px 14px;font-size:14px;font-weight:700;}
+  .ps-this .ps-this-status{color:var(--green-2);}
+
+  .ps-timeline{margin-top:16px;}
+  .ps-station{display:flex;align-items:center;gap:10px;padding-left:1px;}
+  .ps-node{width:9px;height:9px;border-radius:50%;border:2px solid rgba(255,255,255,.4);flex:none;}
+  .ps-station-code{font-size:12px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:.03em;}
+  .ps-leg-row{display:flex;}
+  .ps-leg-line{width:9px;display:flex;justify-content:center;flex:none;}
+  .ps-leg-line span{width:1.5px;flex:1;background:rgba(255,255,255,.18);}
+  .ps-leg-body{flex:1;padding:8px 0 10px 12px;display:flex;align-items:flex-start;justify-content:space-between;
+    gap:10px;}
+  .ps-leg-body.is-this{background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px;margin-left:-2px;}
+  .ps-leg-route{font-size:14.5px;font-weight:700;}
+  .ps-leg-note{font-size:12.5px;color:rgba(255,255,255,.5);font-weight:600;margin-top:2px;}
+  .ps-leg-status{font-size:12.5px;font-weight:800;flex:none;}
+  .ps-leg-status.ok{color:var(--green-2);}
+  .ps-leg-status.pending{color:rgba(255,255,255,.4);}
+
+  /* ---------- check-in card ---------- */
+  .checkin{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-12);
+    border:1px solid var(--border-default);border-radius:var(--r-xl);padding:var(--sp-16);}
+  .checkin-tx{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .checkin-title{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+  .checkin-sub{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .checkin-cta{flex:none;border:none;border-radius:var(--r-md);background:var(--bg-button);
+    color:var(--text-inverse);padding:11px 18px;font-family:inherit;font-size:var(--fs-s);
+    font-weight:var(--fw-bold);cursor:pointer;transition:opacity .15s;}
+  .checkin-cta:hover{opacity:.88;}
+
+  /* ---------- prototype stage nav — review aid, not part of the product UI ---------- */
+  .stage-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+    display:flex;gap:6px;background:rgba(17,24,39,.92);backdrop-filter:blur(6px);
+    padding:8px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);
+    max-width:calc(100vw - 32px);overflow-x:auto;z-index:9999;}
+  .stage-nav::-webkit-scrollbar{display:none;}
+  .stage-nav a{flex:none;padding:7px 12px;border-radius:999px;font-family:-apple-system,sans-serif;
+    font-size:12px;font-weight:600;color:rgba(255,255,255,.6);text-decoration:none;white-space:nowrap;
+    transition:background .15s,color .15s;}
+  .stage-nav a:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .stage-nav a.current{background:#fff;color:#111827;}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+    <div class="notch"></div>
+
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-right">&#9679;&#9679;&#9679; &nbsp;&#128246;&nbsp; &#128267;</span>
+    </div>
+
+    <div class="appbar">
+      <button class="ab-btn" aria-label="Back" onclick="location.href='flight-tracker.html'">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="at-title" id="pageTitle">AI 101</span>
+      <button class="ab-btn" aria-label="More options" onclick="stopTracking()">
+        <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+
+    <div class="body">
+      <div class="status-banner">
+        <div class="headline" id="bannerHeadline">On time &middot; Departs in 4h 49m</div>
+        <div class="cause">
+          <span id="bannerCauseText">Aircraft is on schedule</span>
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="air-row">
+          <div class="air-mark" id="airMark">AI</div>
+          <div class="air-tx">
+            <div class="air-name" id="airName">Air India</div>
+            <div class="air-num" id="airNum">AI 101 &middot; Mon, 24 Aug</div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="leg">
+          <div class="leg-top">
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+            <span id="fromAirportLine">DEL &middot; Indira Gandhi Intl.</span>
+          </div>
+          <div class="leg-main">
+            <div class="leg-time" id="fromTime">14:30</div>
+            <div class="leg-badges">
+              <span class="leg-chip" id="fromGateChip">Gate 24</span>
+              <span class="leg-term" id="fromTermLabel">Terminal 3</span>
+            </div>
+          </div>
+          <div class="leg-status" id="legStatusDep">On time &middot; Departs in 4h 49m</div>
+        </div>
+
+        <div class="leg-divider"><span id="legDur">2h 15m &middot; 1,150 km</span></div>
+
+        <div class="leg">
+          <div class="leg-top">
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z" transform="rotate(90 12 12)"/></svg>
+            <span id="toAirportLine">BOM &middot; Chhatrapati Shivaji Intl.</span>
+          </div>
+          <div class="leg-main">
+            <div class="leg-time" id="toTime">16:35 <span class="orig">16:45</span></div>
+            <div class="leg-badges">
+              <span class="leg-chip" id="toBeltChip">Belt 4</span>
+              <span class="leg-term" id="toTermLabel">Terminal 2</span>
+            </div>
+          </div>
+          <div class="leg-status" id="legStatusArr">10m early &middot; Arrives in 6h 54m</div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="meta-row">
+          <span class="meta-label">Aircraft</span>
+          <span class="meta-value" id="aircraftVal">Airbus A320</span>
+        </div>
+
+        <div class="ontime">
+          <svg viewBox="0 0 24 24"><path d="M12 2v6M12 22v-6M4.9 4.9l4.2 4.2M14.9 14.9l4.2 4.2M2 12h6M16 12h6M4.9 19.1l4.2-4.2M14.9 9.1l4.2-4.2"/></svg>
+          <span id="ontimeText">On-time 89% of the last 30 days</span>
+        </div>
+      </div>
+
+      <div class="plane-card" id="planeCard" onclick="openPlaneSheet()">
+        <div class="plane-mark">
+          <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+        </div>
+        <div class="plane-tx">
+          <div class="plane-title" id="planeTitle">Your aircraft is in the air</div>
+          <div class="plane-sub" id="planeSub">Inbound as 6E 5023 from Bengaluru &middot; lands 12:55</div>
+        </div>
+        <div class="plane-right">
+          <span class="plane-reg" id="planeReg">VT-EXU</span>
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="checkin">
+        <div class="checkin-tx">
+          <div class="checkin-title" id="checkinTitle">Check-in is open</div>
+          <div class="checkin-sub" id="checkinSub">Online check-in closes 1h before departure</div>
+        </div>
+        <button class="checkin-cta" onclick="checkIn()">Check in</button>
+      </div>
+    </div>
+
+    <div class="plane-sheet" id="planeSheet">
+      <div class="ps-header">
+        <div>
+          <div class="ps-flightline" id="psFlightLine">AI 101 &middot; MON, 24 AUG</div>
+          <div class="ps-route" id="psRoute">Delhi to Mumbai</div>
+        </div>
+        <button class="ps-close" aria-label="Close" onclick="closePlaneSheet()">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="ps-panel">
+        <div class="ps-title">Where's My Plane?</div>
+        <div class="ps-sub" id="psAircraft">Airbus A320 &middot; VT-EXQ</div>
+        <div class="ps-age" id="psAge">First flight: 14 Mar 2016 &middot; 9 years old</div>
+
+        <svg class="ps-plane-art" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+          <path d="M40 62 C40 50 55 44 80 44 L300 44 C320 44 332 52 345 60 L370 66 L345 70 C332 78 320 84 300 84 L80 84 C55 84 40 78 40 66 Z" fill="#eef0f4"/>
+          <path d="M150 84 L110 118 L138 118 L178 88 Z" fill="#c7cbd4"/>
+          <path d="M300 46 L328 14 L316 46 Z" fill="#c7cbd4"/>
+          <ellipse cx="150" cy="90" rx="14" ry="8" fill="#9aa0ac"/>
+          <g fill="#0b1226" opacity=".5">
+            <rect x="95" y="58" width="7" height="7" rx="1.5"/>
+            <rect x="112" y="58" width="7" height="7" rx="1.5"/>
+            <rect x="129" y="58" width="7" height="7" rx="1.5"/>
+            <rect x="196" y="58" width="7" height="7" rx="1.5"/>
+            <rect x="213" y="58" width="7" height="7" rx="1.5"/>
+            <rect x="230" y="58" width="7" height="7" rx="1.5"/>
+            <rect x="247" y="58" width="7" height="7" rx="1.5"/>
+            <rect x="264" y="58" width="7" height="7" rx="1.5"/>
+          </g>
+          <circle cx="55" cy="63" r="3" fill="#0b1226" opacity=".4"/>
+        </svg>
+
+        <span class="ps-pill">
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          No issue
+        </span>
+        <div class="ps-note" id="psNote">Looking great! The aircraft is en route and on time.</div>
+
+        <div class="ps-this">
+          <span id="psThisRoute">Delhi to Mumbai</span>
+          <span class="ps-this-status" id="psThisStatus">On time</span>
+        </div>
+
+        <div class="ps-timeline" id="psTimeline"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Same three known mock flights as flight-tracker-confirm.html, extended with
+   the live-tracking facts (gate, belt, revised time, countdowns) that only
+   show up once a flight is actually being tracked. Anything else falls back
+   to the AI101 shape — the identity fields still reflect what was searched. */
+var MOCK_FLIGHTS = {
+  AI101:{airline:'Air India',
+    from:{code:'DEL',city:'Delhi',airport:'Indira Gandhi Intl.',time:'14:30',gate:'24',terminal:'Terminal 3'},
+    to:{code:'BOM',city:'Mumbai',airport:'Chhatrapati Shivaji Intl.',time:'16:45',revised:'16:35',belt:'4',terminal:'Terminal 2'},
+    duration:'2h 15m',distance:'1,150 km',aircraft:'Airbus A320',onTimePct:89,
+    departsIn:'4h 49m',arrivesIn:'6h 54m',arriveDelta:'10m early',cause:'Aircraft is on schedule',
+    incoming:{status:'landed',flightNum:'AI 505',city:'Bengaluru',time:'11:52',tail:'VT-EXQ'},
+    plane:{tail:'VT-EXQ',firstFlight:'14 Mar 2016',age:'9 years old',rotation:[
+      {from:{code:'BLR',city:'Bengaluru'},to:{code:'DEL',city:'Delhi'},note:'Landed 11:52',status:'ok'},
+      {from:{code:'DEL',city:'Delhi'},to:{code:'BOM',city:'Mumbai'},note:'Departs in 4h 49m',status:'ok',isThis:true},
+      {from:{code:'BOM',city:'Mumbai'},to:{code:'GOI',city:'Goa'},note:'Departs in 8h 10m',status:'ok'}
+    ]}},
+  '6E234':{airline:'IndiGo',
+    from:{code:'DEL',city:'Delhi',airport:'Indira Gandhi Intl.',time:'19:15',gate:'12',terminal:'Terminal 1'},
+    to:{code:'BOM',city:'Mumbai',airport:'Chhatrapati Shivaji Intl.',time:'21:25',revised:null,belt:'2',terminal:'Terminal 1'},
+    duration:'2h 10m',distance:'1,150 km',aircraft:'Airbus A321neo',onTimePct:82,
+    departsIn:'9h 34m',arrivesIn:'11h 44m',arriveDelta:'On time',cause:'Aircraft is on schedule',
+    incoming:{status:'in-air',flightNum:'6E 5087',city:'Guwahati',time:'17:40',tail:'VT-IJP'},
+    plane:{tail:'VT-IJP',firstFlight:'2 Jul 2022',age:'3 years old',rotation:[
+      {from:{code:'GAU',city:'Guwahati'},to:{code:'DEL',city:'Delhi'},note:'Lands 17:40',status:'ok'},
+      {from:{code:'DEL',city:'Delhi'},to:{code:'BOM',city:'Mumbai'},note:'Departs in 9h 34m',status:'ok',isThis:true},
+      {from:{code:'BOM',city:'Mumbai'},to:{code:'HYD',city:'Hyderabad'},note:'Departs in 12h 24m',status:'ok'}
+    ]}},
+  UK955:{airline:'Vistara',
+    from:{code:'BLR',city:'Bengaluru',airport:'Kempegowda Intl.',time:'18:05',gate:'7',terminal:'Terminal 1'},
+    to:{code:'DEL',city:'Delhi',airport:'Indira Gandhi Intl.',time:'20:55',revised:null,belt:'6',terminal:'Terminal 3'},
+    duration:'2h 50m',distance:'1,740 km',aircraft:'Airbus A321',onTimePct:91,
+    departsIn:'8h 24m',arrivesIn:'11h 14m',arriveDelta:'On time',cause:'Aircraft is on schedule',
+    incoming:{status:'scheduled',flightNum:'UK 812',city:'Chennai',time:'16:10',tail:'VT-TQH'},
+    plane:{tail:'VT-TQH',firstFlight:'30 Dec 2024',age:'1 year old',rotation:[
+      {from:{code:'MAA',city:'Chennai'},to:{code:'BLR',city:'Bengaluru'},note:'Departs 16:10',status:'scheduled'},
+      {from:{code:'BLR',city:'Bengaluru'},to:{code:'DEL',city:'Delhi'},note:'Departs in 8h 24m',status:'ok',isThis:true},
+      {from:{code:'DEL',city:'Delhi'},to:{code:'PNQ',city:'Pune'},note:'Departs in 13h 40m',status:'ok'}
+    ]}}
+};
+var CARRIERS = {AI:'Air India', '6E':'IndiGo', UK:'Vistara', SG:'SpiceJet', G8:'Go First', QP:'Akasa Air'};
+
+var compact = (new URLSearchParams(location.search).get('num') || 'AI101').replace(/\s+/g,'').toUpperCase();
+var code = compact.slice(0,2);
+var num = compact.slice(2);
+var currentFlightNum = num ? (code + ' ' + num) : code;
+var flight = MOCK_FLIGHTS[compact] || MOCK_FLIGHTS.AI101;
+
+document.getElementById('airMark').textContent = code;
+document.getElementById('airNum').textContent = currentFlightNum + ' · Mon, 24 Aug';
+document.getElementById('airName').textContent = CARRIERS[code] || 'Tracked flight';
+document.getElementById('pageTitle').textContent = currentFlightNum;
+document.title = 'onto — ' + currentFlightNum;
+
+document.getElementById('bannerHeadline').textContent = 'On time · Departs in ' + flight.departsIn;
+document.getElementById('bannerCauseText').textContent = flight.cause;
+
+document.getElementById('fromAirportLine').textContent = flight.from.code + ' · ' + flight.from.airport;
+document.getElementById('fromTime').textContent = flight.from.time;
+document.getElementById('fromGateChip').textContent = 'Gate ' + flight.from.gate;
+document.getElementById('fromTermLabel').textContent = flight.from.terminal;
+document.getElementById('legStatusDep').textContent = 'On time · Departs in ' + flight.departsIn;
+
+document.getElementById('legDur').textContent = flight.duration + ' · ' + flight.distance;
+
+document.getElementById('toAirportLine').textContent = flight.to.code + ' · ' + flight.to.airport;
+document.getElementById('toTime').innerHTML = flight.to.revised
+  ? flight.to.revised + ' <span class="orig">' + flight.to.time + '</span>'
+  : flight.to.time;
+document.getElementById('toBeltChip').textContent = 'Belt ' + flight.to.belt;
+document.getElementById('toTermLabel').textContent = flight.to.terminal;
+document.getElementById('legStatusArr').textContent = flight.arriveDelta + ' · Arrives in ' + flight.arrivesIn;
+
+document.getElementById('aircraftVal').textContent = flight.aircraft;
+document.getElementById('ontimeText').textContent = 'On-time ' + flight.onTimePct + '% of the last 30 days';
+
+/* "Where's my plane" only becomes trackable ~20h before departure — before that
+   the operating aircraft isn't reliably assigned yet. */
+(function renderPlaneCard(){
+  var m = /(\d+)h(?:\s*(\d+)m)?/.exec(flight.departsIn || '');
+  var hoursToDeparture = m ? parseInt(m[1], 10) + (m[2] ? parseInt(m[2], 10) / 60 : 0) : Infinity;
+  var card = document.getElementById('planeCard');
+  if(!flight.incoming || hoursToDeparture > 20){
+    card.style.display = 'none';
+    return;
+  }
+  var inc = flight.incoming;
+  var title, sub;
+  if(inc.status === 'landed'){
+    title = 'Your aircraft has landed';
+    sub = 'Arrived from ' + inc.city + ' at ' + inc.time + ' as ' + inc.flightNum;
+  } else if(inc.status === 'in-air'){
+    title = 'Your aircraft is in the air';
+    sub = 'Inbound as ' + inc.flightNum + ' from ' + inc.city + ' · lands ' + inc.time;
+  } else {
+    title = "Your aircraft hasn't departed yet";
+    sub = 'Inbound as ' + inc.flightNum + ' from ' + inc.city + ' · departs ' + inc.time;
+  }
+  document.getElementById('planeTitle').textContent = title;
+  document.getElementById('planeSub').textContent = sub;
+  document.getElementById('planeReg').textContent = inc.tail;
+
+  if(flight.plane) renderPlaneSheet();
+})();
+
+function renderPlaneSheet(){
+  var p = flight.plane;
+  var inc = flight.incoming;
+
+  document.getElementById('psFlightLine').textContent = currentFlightNum + ' · MON, 24 AUG';
+  document.getElementById('psRoute').textContent = flight.from.city + ' to ' + flight.to.city;
+  document.getElementById('psAircraft').textContent = flight.aircraft + ' · ' + p.tail;
+  document.getElementById('psAge').textContent = 'First flight: ' + p.firstFlight + ' · ' + p.age;
+
+  var noteMap = {
+    landed: 'Looking great! Your aircraft has landed and is being turned around for your flight.',
+    'in-air': 'Looking great! The aircraft is en route and on time.',
+    scheduled: "Looking great! Your aircraft hasn't departed on its inbound flight yet, but it's on schedule."
+  };
+  document.getElementById('psNote').textContent = noteMap[inc.status] || noteMap['in-air'];
+
+  var legs = p.rotation;
+  var thisLeg = legs.filter(function(l){ return l.isThis; })[0];
+  document.getElementById('psThisRoute').textContent = thisLeg.from.city + ' to ' + thisLeg.to.city;
+  document.getElementById('psThisStatus').textContent = thisLeg.status === 'ok' ? 'On time' : 'Scheduled';
+
+  function stationRow(stop){
+    var d = document.createElement('div');
+    d.className = 'ps-station';
+    d.innerHTML = '<span class="ps-node"></span><span class="ps-station-code">' + stop.code + '</span>';
+    return d;
+  }
+  function legRow(leg){
+    var statusCls = leg.status === 'ok' ? 'ok' : 'pending';
+    var statusLabel = leg.status === 'ok' ? 'On time' : 'Scheduled';
+    var row = document.createElement('div');
+    row.className = 'ps-leg-row';
+    row.innerHTML =
+      '<span class="ps-leg-line"><span></span></span>' +
+      '<div class="ps-leg-body' + (leg.isThis ? ' is-this' : '') + '">' +
+        '<div>' +
+          '<div class="ps-leg-route">' + leg.from.city + ' to ' + leg.to.city + '</div>' +
+          '<div class="ps-leg-note">' + leg.note + '</div>' +
+        '</div>' +
+        '<span class="ps-leg-status ' + statusCls + '">' + statusLabel + '</span>' +
+      '</div>';
+    return row;
+  }
+
+  var tl = document.getElementById('psTimeline');
+  tl.innerHTML = '';
+  legs.forEach(function(leg, i){
+    if(i === 0) tl.appendChild(stationRow(leg.from));
+    tl.appendChild(legRow(leg));
+    tl.appendChild(stationRow(leg.to));
+  });
+}
+
+function openPlaneSheet(){
+  document.getElementById('planeSheet').classList.add('open');
+}
+
+function closePlaneSheet(){
+  document.getElementById('planeSheet').classList.remove('open');
+}
+
+function checkIn(){
+  var btn = document.querySelector('.checkin-cta');
+  btn.disabled = true;
+  btn.textContent = 'Checking in…';
+  setTimeout(function(){
+    location.href = 'flight-tracker-airport.html?num=' + encodeURIComponent(compact);
+  }, 400);
+}
+
+function stopTracking(){
+  if(confirm('Stop tracking ' + currentFlightNum + '?')){
+    location.href = 'flight-tracker.html';
+  }
+}
+</script>
+<script>
+(function(){
+  var STAGES = [
+    {file:'flight-tracker.html', label:'Add flight'},
+    {file:'flight-tracker-confirm.html', label:'Confirm'},
+    {file:'flight-tracker-detail.html', label:'Pre-flight'},
+    {file:'flight-tracker-airport.html', label:'Boarding pass'},
+    {file:'flight-tracker-inflight.html', label:'Boarded', extra:'phase=boarded'},
+    {file:'flight-tracker-inflight.html', label:'In the air'},
+    {file:'flight-tracker-arrival.html', label:'Landed'}
+  ];
+  var here = location.pathname.split('/').pop();
+  var herePhase = new URLSearchParams(location.search).get('phase') || '';
+  var nav = document.createElement('div');
+  nav.className = 'stage-nav';
+  STAGES.forEach(function(s){
+    var params = [];
+    if(s.file !== 'flight-tracker.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
+    if(s.extra) params.push(s.extra);
+    var a = document.createElement('a');
+    a.href = s.file + (params.length ? '?' + params.join('&') : '');
+    a.textContent = s.label;
+    var matchesPhase = s.extra ? herePhase === 'boarded' : herePhase !== 'boarded';
+    if(s.file === here && matchesPhase) a.classList.add('current');
+    nav.appendChild(a);
+  });
+  document.body.appendChild(nav);
+})();
+</script>
+</body>
+</html>
