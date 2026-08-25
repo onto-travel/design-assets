@@ -10,7 +10,8 @@
   body{
     margin:0;background:var(--bg-default);color:var(--text-primary);
     font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;
-    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    flex-wrap:wrap;gap:40px;padding:40px 20px;
   }
 
   /* ---------- phone frame ---------- */
@@ -20,6 +21,68 @@
     overflow:hidden;display:flex;flex-direction:column;}
   .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:30px;
     background:#000;border-radius:20px;z-index:40;}
+
+  /* ---------- lock screen — a second phone, sitting next to the app one,
+     showing the Live Activity this page's flight would drive on a real
+     lock screen. Not part of the product UI, just a companion reference. */
+  .lockscreen{position:relative;width:100%;height:100%;color:#fff;
+    display:flex;flex-direction:column;
+    background:url('images/hero-landing.jpg') center 60% / cover no-repeat;}
+  .lockscreen::before{content:"";position:absolute;inset:0;z-index:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.4) 0%,rgba(0,0,0,.05) 26%,rgba(0,0,0,.1) 66%,rgba(0,0,0,.55) 100%);}
+
+  .lock-status{position:relative;z-index:2;flex:none;display:flex;align-items:center;
+    justify-content:space-between;padding:20px 26px 0;font-size:14px;font-weight:600;}
+  .lock-status-right{display:flex;align-items:center;gap:6px;font-size:13px;}
+
+  .lock-datetime{position:relative;z-index:2;flex:none;text-align:center;margin-top:8px;}
+  .lock-date{font-size:16px;font-weight:700;}
+  .lock-time{font-size:78px;font-weight:600;line-height:1;margin-top:2px;letter-spacing:-2px;}
+
+  .live-activity{position:relative;z-index:2;margin:auto 12px 24px;flex:none;
+    background:rgba(20,26,24,.58);backdrop-filter:blur(22px) saturate(1.5);
+    -webkit-backdrop-filter:blur(22px) saturate(1.5);
+    border-radius:24px;padding:16px 18px;box-shadow:0 20px 40px rgba(0,0,0,.3);}
+  .la-top{display:flex;align-items:center;justify-content:space-between;
+    color:rgba(255,255,255,.55);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+  .la-flightno{display:flex;align-items:center;gap:6px;color:#fff;text-transform:none;font-size:13px;}
+  .la-flightno svg{width:13px;height:13px;fill:currentColor;stroke:none;}
+
+  .la-route{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px;}
+  .la-endpoint{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .la-endpoint.right{align-items:flex-end;text-align:right;}
+  .la-code{font-size:13px;font-weight:800;color:rgba(255,255,255,.8);}
+  .la-time{font-size:20px;font-weight:800;color:var(--green-2);}
+  .la-path{flex:1;position:relative;height:14px;margin:0 4px;}
+  .la-path-line{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(255,255,255,.25);}
+  .la-path-done{position:absolute;left:0;top:50%;height:2px;background:var(--green-2);
+    transform:translateY(-1px);}
+  .la-path-plane{position:absolute;top:50%;width:13px;height:13px;color:var(--green-2);
+    transform:translate(-50%,-50%);transition:left .2s;}
+  .la-path-plane svg{width:100%;height:100%;fill:currentColor;stroke:none;transform:rotate(-45deg);}
+
+  .la-subrow{display:flex;justify-content:space-between;margin-top:8px;
+    font-size:11.5px;color:rgba(255,255,255,.5);font-weight:600;}
+
+  .la-divider{height:1px;background:rgba(255,255,255,.15);border:none;margin:12px 0;}
+
+  .la-status{display:flex;align-items:center;gap:10px;}
+  .la-icon{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.92);color:#0f2f22;
+    display:flex;align-items:center;justify-content:center;flex:none;}
+  .la-icon svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.4;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .la-status-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .la-status-title{font-size:15px;font-weight:800;color:var(--green-2);}
+  .la-status-sub{font-size:12px;color:rgba(255,255,255,.5);font-weight:600;}
+  .la-chip{flex:none;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.14);
+    color:#fff;border-radius:9px;padding:6px 10px;font-size:13px;font-weight:800;}
+
+  .lock-bottom-icons{position:relative;z-index:2;flex:none;
+    display:flex;justify-content:space-between;padding:0 26px 30px;}
+  .lock-icon-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.18);
+    backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;}
+  .lock-icon-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;}
 
   .statusbar{position:relative;z-index:35;flex:none;display:flex;align-items:center;
     justify-content:space-between;padding:20px 26px 6px;font-size:14px;font-weight:600;
@@ -181,13 +244,88 @@
   </div>
 </div>
 
+<!-- ---------- companion phone: what the lock screen would show while this
+     flight is tracked — a reference for the Live Activity, not app UI ---------- -->
+<div class="phone">
+  <div class="screen">
+    <div class="lockscreen">
+      <div class="notch"></div>
+
+      <div class="lock-status">
+        <span>Airtel</span>
+        <span class="lock-status-right">&#128246; 4G &#128267; 61%</span>
+      </div>
+
+      <div class="lock-datetime">
+        <div class="lock-date" id="lockDate">Mon, 24 Aug</div>
+        <div class="lock-time" id="lockTime">15:53</div>
+      </div>
+
+      <div class="live-activity">
+        <div class="la-top">
+          <span class="la-flightno">
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+            <span id="laFlightNo">AI 101</span>
+          </span>
+          <span class="la-app">ONTO</span>
+        </div>
+
+        <div class="la-route">
+          <div class="la-endpoint">
+            <span class="la-time" id="laFromTime">14:30</span>
+            <span class="la-code" id="laFromCode">GOI</span>
+          </div>
+          <div class="la-path" id="laPath">
+            <span class="la-path-line"></span>
+            <span class="la-path-done" id="laPathDone"></span>
+            <span class="la-path-plane" id="laPathPlane">
+              <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+            </span>
+          </div>
+          <div class="la-endpoint right">
+            <span class="la-time" id="laToTime">16:35</span>
+            <span class="la-code" id="laToCode">BOM</span>
+          </div>
+        </div>
+
+        <div class="la-subrow">
+          <span id="laFromSub">Departed 14:30</span>
+          <span id="laToSub">Lands 16:35</span>
+        </div>
+
+        <hr class="la-divider">
+
+        <div class="la-status">
+          <span class="la-icon">
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+          </span>
+          <div class="la-status-tx">
+            <div class="la-status-title" id="laStatusTitle">In the air</div>
+            <div class="la-status-sub" id="laStatusSub">Landing in 52m</div>
+          </div>
+          <div class="la-chip" id="laChip">38,000 ft</div>
+        </div>
+      </div>
+
+      <div class="lock-bottom-icons">
+        <span class="lock-icon-btn">
+          <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.4.3.6.8.6 1.3V16h6v-.9c0-.5.2-1 .6-1.3A6 6 0 0 0 12 3z"/></svg>
+        </span>
+        <span class="lock-icon-btn">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="4"/><path d="M3 8h3l2-2h8l2 2h3v11H3z"/></svg>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* One screen covers both "boarded, about to depart" and "in the air" — they
    differ only in banner copy, plane position, and whether altitude/speed mean
    anything yet. No separate "boarded" page needed. */
 var MOCK_FLIGHTS = {
   AI101:{airline:'Air India',
-    from:{code:'DEL',time:'14:30'}, to:{code:'BOM',eta:'16:35',city:'Mumbai',weather:'29°',belt:'4'},
+    from:{code:'GOI',time:'14:30'}, to:{code:'BOM',eta:'16:35',city:'Mumbai',weather:'29°',belt:'4'},
     altitude:'38,000 ft',speed:'870 km/h',progress:.62,remaining:'52m',
     boarded:{remaining:'12m'}},
   '6E234':{airline:'IndiGo',
@@ -218,6 +356,21 @@ document.getElementById('fromCode').textContent = flight.from.code;
 document.getElementById('toCode').textContent = flight.to.code;
 document.getElementById('etaTime').textContent = 'Lands ' + flight.to.eta;
 
+/* the lock-screen Live Activity, kept in sync with the same flight object
+   and the same boarded/in-air branch — including the plane's position
+   along the route line, which is 0% on the ground */
+document.getElementById('laFlightNo').textContent = currentFlightNum;
+document.getElementById('laFromCode').textContent = flight.from.code;
+document.getElementById('laToCode').textContent = flight.to.code;
+document.getElementById('laFromTime').textContent = flight.from.time;
+document.getElementById('laToTime').textContent = flight.to.eta;
+
+function setLaPlanePos(fraction){
+  var pct = (fraction * 100) + '%';
+  document.getElementById('laPathDone').style.right = (100 - fraction * 100) + '%';
+  document.getElementById('laPathPlane').style.left = pct;
+}
+
 if(isBoarded){
   document.getElementById('bannerHeadline').textContent = 'Boarding complete · Departs in ' + flight.boarded.remaining;
   document.getElementById('bannerCauseText').textContent = 'Doors closed';
@@ -230,6 +383,13 @@ if(isBoarded){
   var x0 = 20;
   document.getElementById('pathDone').setAttribute('x2', x0);
   document.getElementById('planeMark').setAttribute('transform', 'translate(' + x0 + ',26)');
+
+  document.getElementById('laFromSub').textContent = 'Departs ' + flight.from.time;
+  document.getElementById('laToSub').textContent = 'Lands ' + flight.to.eta;
+  document.getElementById('laStatusTitle').textContent = 'Boarding complete';
+  document.getElementById('laStatusSub').textContent = 'Departs in ' + flight.boarded.remaining;
+  document.getElementById('laChip').textContent = 'Ground';
+  setLaPlanePos(0);
 } else {
   document.getElementById('bannerHeadline').textContent = 'In the air · Landing in ' + flight.remaining;
   document.getElementById('bannerCauseText').textContent = 'Cruising at ' + flight.altitude;
@@ -242,6 +402,13 @@ if(isBoarded){
   var x = 20 + 280 * flight.progress;
   document.getElementById('pathDone').setAttribute('x2', x);
   document.getElementById('planeMark').setAttribute('transform', 'translate(' + x + ',26)');
+
+  document.getElementById('laFromSub').textContent = 'Departed ' + flight.from.time;
+  document.getElementById('laToSub').textContent = 'Lands ' + flight.to.eta;
+  document.getElementById('laStatusTitle').textContent = 'In the air';
+  document.getElementById('laStatusSub').textContent = 'Landing in ' + flight.remaining;
+  document.getElementById('laChip').textContent = flight.altitude;
+  setLaPlanePos(flight.progress);
 }
 
 document.getElementById('destCity').textContent = flight.to.city;
@@ -256,8 +423,8 @@ function stopTracking(){
 <script>
 (function(){
   var STAGES = [
+    {file:'flight-tracker-myflights.html', label:'My flights'},
     {file:'flight-tracker.html', label:'Add flight'},
-    {file:'flight-tracker-confirm.html', label:'Confirm'},
     {file:'flight-tracker-detail.html', label:'Pre-flight'},
     {file:'flight-tracker-airport.html', label:'Boarding pass'},
     {file:'flight-tracker-inflight.html', label:'Boarded', extra:'phase=boarded'},
@@ -270,7 +437,7 @@ function stopTracking(){
   nav.className = 'stage-nav';
   STAGES.forEach(function(s){
     var params = [];
-    if(s.file !== 'flight-tracker.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
+    if(s.file !== 'flight-tracker.html' && s.file !== 'flight-tracker-myflights.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
     if(s.extra) params.push(s.extra);
     var a = document.createElement('a');
     a.href = s.file + (params.length ? '?' + params.join('&') : '');

@@ -10,7 +10,8 @@
   body{
     margin:0;background:var(--bg-default);color:var(--text-primary);
     font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;
-    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    flex-wrap:wrap;gap:40px;padding:40px 20px;
   }
 
   /* ---------- phone frame ---------- */
@@ -20,6 +21,63 @@
     overflow:hidden;display:flex;flex-direction:column;}
   .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:30px;
     background:#000;border-radius:20px;z-index:40;}
+
+  /* ---------- lock screen — a second phone, sitting next to the app one,
+     showing the Live Activity this page's flight would drive on a real
+     lock screen. Not part of the product UI, just a companion reference.
+     This is the ~4h-out activity: nothing to act on yet, just the upcoming
+     flight and a line on where the aircraft itself currently is. */
+  .lockscreen{position:relative;width:100%;height:100%;color:#fff;
+    display:flex;flex-direction:column;
+    background:url('images/hero-landing.jpg') center 60% / cover no-repeat;}
+  .lockscreen::before{content:"";position:absolute;inset:0;z-index:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.4) 0%,rgba(0,0,0,.05) 26%,rgba(0,0,0,.1) 66%,rgba(0,0,0,.55) 100%);}
+
+  .lock-status{position:relative;z-index:2;flex:none;display:flex;align-items:center;
+    justify-content:space-between;padding:20px 26px 0;font-size:14px;font-weight:600;}
+  .lock-status-right{display:flex;align-items:center;gap:6px;font-size:13px;}
+
+  .lock-datetime{position:relative;z-index:2;flex:none;text-align:center;margin-top:8px;}
+  .lock-date{font-size:16px;font-weight:700;}
+  .lock-time{font-size:78px;font-weight:600;line-height:1;margin-top:2px;letter-spacing:-2px;}
+
+  .live-activity{position:relative;z-index:2;margin:auto 12px 24px;flex:none;
+    background:rgba(20,26,24,.58);backdrop-filter:blur(22px) saturate(1.5);
+    -webkit-backdrop-filter:blur(22px) saturate(1.5);
+    border-radius:24px;padding:16px 18px;box-shadow:0 20px 40px rgba(0,0,0,.3);}
+  .la-top{display:flex;align-items:center;justify-content:space-between;
+    color:rgba(255,255,255,.55);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+  .la-flightno{display:flex;align-items:center;gap:6px;color:#fff;text-transform:none;font-size:13px;}
+  .la-flightno svg{width:13px;height:13px;fill:currentColor;stroke:none;}
+
+  .la-route{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px;}
+  .la-endpoint{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .la-endpoint.right{align-items:flex-end;text-align:right;}
+  .la-code{font-size:13px;font-weight:800;color:rgba(255,255,255,.8);}
+  .la-time{font-size:20px;font-weight:800;color:var(--green-2);}
+  .la-path{flex:1;display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.35);}
+  .la-path svg{width:14px;height:14px;fill:currentColor;stroke:none;flex:none;}
+  .la-dash{flex:1;height:1px;background:rgba(255,255,255,.25);}
+
+  .la-subrow{display:flex;justify-content:space-between;margin-top:2px;
+    font-size:11.5px;color:rgba(255,255,255,.5);font-weight:600;}
+
+  .la-divider{height:1px;background:rgba(255,255,255,.15);border:none;margin:12px 0;}
+
+  .la-status{display:flex;align-items:center;gap:10px;}
+  .la-icon{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;
+    display:flex;align-items:center;justify-content:center;flex:none;}
+  .la-icon svg{width:12px;height:12px;fill:currentColor;stroke:none;}
+  .la-status-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .la-status-title{font-size:15px;font-weight:800;color:#fff;}
+  .la-status-sub{font-size:12px;color:rgba(255,255,255,.55);font-weight:600;}
+
+  .lock-bottom-icons{position:relative;z-index:2;flex:none;
+    display:flex;justify-content:space-between;padding:0 26px 30px;}
+  .lock-icon-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.18);
+    backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;}
+  .lock-icon-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;}
 
   .statusbar{position:relative;z-index:35;flex:none;display:flex;align-items:center;
     justify-content:space-between;padding:20px 26px 6px;font-size:14px;font-weight:600;
@@ -80,31 +138,30 @@
     color:var(--text-secondary);font-weight:var(--fw-medium);}
   .leg-divider::before,.leg-divider::after{content:"";flex:1;height:1px;background:var(--border-default);}
 
-  .meta-row{display:flex;align-items:center;justify-content:space-between;}
-  .meta-label{font-size:var(--fs-l);color:var(--text-secondary);font-weight:var(--fw-medium);}
-  .meta-value{font-size:var(--fs-l);color:var(--text-primary);font-weight:var(--fw-bold);}
 
-  .ontime{display:flex;align-items:center;gap:var(--sp-8);font-size:var(--fs-s);color:var(--text-secondary);
-    font-weight:var(--fw-medium);}
-  .ontime svg{width:15px;height:15px;stroke:var(--accent-brand-primary);fill:none;stroke-width:2;
+  /* ---------- weather — ambient context, not a decision to make, so it
+     carries no border/shadow of its own ---------- */
+  .wx-row{display:flex;gap:var(--sp-12);}
+  .wx{flex:1;display:flex;align-items:center;gap:var(--sp-8);background:var(--bg-muted);
+    border-radius:var(--r-lg);padding:var(--sp-8) var(--sp-12);}
+  .wx-icon{font-size:18px;line-height:1;flex:none;}
+  .wx-tx{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .wx-city{font-size:var(--fs-xs);color:var(--text-secondary);font-weight:var(--fw-medium);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .wx-temp{font-size:var(--fs-s);font-weight:var(--fw-bold);color:var(--text-body);}
+
+  /* ---------- where's my plane card — a map of the aircraft's last two legs
+     into its current position, not just a text line; tapping still opens
+     the full timeline sheet ---------- */
+  .plane-card{border:1px solid var(--border-default);border-radius:var(--r-xl);
+    box-shadow:var(--shadow-l2);overflow:hidden;cursor:pointer;flex-shrink:0;}
+  .plane-map{width:100%;height:190px;display:block;background:var(--bg-muted);}
+  .plane-caption{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-8);
+    padding:var(--sp-12) var(--sp-16);}
+  .plane-caption-title{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .plane-caption svg{width:16px;height:16px;stroke:var(--icon-secondary);fill:none;stroke-width:2;
     stroke-linecap:round;stroke-linejoin:round;flex:none;}
-
-  /* ---------- where's my plane card ---------- */
-  .plane-card{display:flex;align-items:center;gap:var(--sp-12);border:1px solid var(--border-default);
-    border-radius:var(--r-xl);padding:var(--sp-16);}
-  .plane-mark{width:40px;height:40px;border-radius:50%;background:var(--accent-teal-bg);
-    color:var(--accent-teal-icon);display:flex;align-items:center;justify-content:center;flex:none;}
-  .plane-mark svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;
-    stroke-linecap:round;stroke-linejoin:round;}
-  .plane-tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
-  .plane-title{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
-  .plane-sub{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
-  .plane-reg{flex:none;font-size:var(--fs-xs);font-weight:var(--fw-bold);color:var(--text-secondary);
-    background:var(--bg-muted);border-radius:var(--r-sm);padding:4px 8px;}
-  .plane-card{cursor:pointer;}
-  .plane-right{flex:none;display:flex;align-items:center;gap:8px;}
-  .plane-right svg{width:15px;height:15px;stroke:var(--icon-secondary);fill:none;stroke-width:2;
-    stroke-linecap:round;stroke-linejoin:round;}
 
   /* ---------- where's my plane sheet ---------- */
   .plane-sheet{display:none;position:absolute;left:0;right:0;top:42px;bottom:0;z-index:38;
@@ -132,12 +189,16 @@
   .ps-title{font-size:21px;font-weight:800;}
   .ps-sub{margin-top:10px;font-size:14px;color:rgba(255,255,255,.72);font-weight:600;}
   .ps-age{margin-top:2px;font-size:12.5px;color:rgba(255,255,255,.45);font-weight:500;}
+  .ps-ontime{margin-top:8px;font-size:12.5px;color:var(--green-2);font-weight:700;}
   .ps-plane-art{width:100%;height:auto;margin:20px 0 16px;display:block;}
   .ps-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(153,235,209,.2);color:var(--green-2);
     border-radius:999px;padding:6px 14px;font-size:11.5px;font-weight:800;letter-spacing:.03em;
     text-transform:uppercase;}
   .ps-pill svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.6;}
   .ps-note{margin-top:12px;font-size:14.5px;line-height:1.45;color:rgba(255,255,255,.85);font-weight:500;}
+
+  .ps-map{margin-top:16px;width:100%;height:190px;display:block;overflow:hidden;
+    background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:16px;}
 
   .ps-this{margin-top:20px;display:flex;align-items:center;justify-content:space-between;
     background:rgba(255,255,255,.07);border-radius:14px;padding:12px 14px;font-size:14px;font-weight:700;}
@@ -158,10 +219,14 @@
   .ps-leg-status{font-size:12.5px;font-weight:800;flex:none;}
   .ps-leg-status.ok{color:var(--green-2);}
   .ps-leg-status.pending{color:rgba(255,255,255,.4);}
+  .ps-leg-status.landed{color:rgba(255,255,255,.5);}
 
-  /* ---------- check-in card ---------- */
+  /* ---------- check-in card — the one open action on this page right now,
+     so it carries the same lift as the summary card rather than sitting at
+     the same quiet weight as the ambient cards above it ---------- */
   .checkin{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-12);
-    border:1px solid var(--border-default);border-radius:var(--r-xl);padding:var(--sp-16);}
+    border:1.5px solid var(--accent-brand-primary);border-radius:var(--r-xl);
+    padding:var(--sp-16);box-shadow:var(--shadow-l2);}
   .checkin-tx{display:flex;flex-direction:column;gap:2px;min-width:0;}
   .checkin-title{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
   .checkin-sub{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
@@ -236,7 +301,6 @@
               <span class="leg-term" id="fromTermLabel">Terminal 3</span>
             </div>
           </div>
-          <div class="leg-status" id="legStatusDep">On time &middot; Departs in 4h 49m</div>
         </div>
 
         <div class="leg-divider"><span id="legDur">2h 15m &middot; 1,150 km</span></div>
@@ -255,31 +319,30 @@
           </div>
           <div class="leg-status" id="legStatusArr">10m early &middot; Arrives in 6h 54m</div>
         </div>
-
-        <hr class="divider">
-
-        <div class="meta-row">
-          <span class="meta-label">Aircraft</span>
-          <span class="meta-value" id="aircraftVal">Airbus A320</span>
-        </div>
-
-        <div class="ontime">
-          <svg viewBox="0 0 24 24"><path d="M12 2v6M12 22v-6M4.9 4.9l4.2 4.2M14.9 14.9l4.2 4.2M2 12h6M16 12h6M4.9 19.1l4.2-4.2M14.9 9.1l4.2-4.2"/></svg>
-          <span id="ontimeText">On-time 89% of the last 30 days</span>
-        </div>
       </div>
 
       <div class="plane-card" id="planeCard" onclick="openPlaneSheet()">
-        <div class="plane-mark">
-          <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
-        </div>
-        <div class="plane-tx">
-          <div class="plane-title" id="planeTitle">Your aircraft is in the air</div>
-          <div class="plane-sub" id="planeSub">Inbound as 6E 5023 from Bengaluru &middot; lands 12:55</div>
-        </div>
-        <div class="plane-right">
-          <span class="plane-reg" id="planeReg">VT-EXU</span>
+        <svg class="plane-map" id="planeMapSvg" viewBox="0 0 350 190" preserveAspectRatio="none"></svg>
+        <div class="plane-caption">
+          <span class="plane-caption-title" id="planeTitle">Your aircraft is in the air</span>
           <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="wx-row">
+        <div class="wx">
+          <span class="wx-icon" id="fromWxIcon">&#9728;&#65039;</span>
+          <div class="wx-tx">
+            <div class="wx-city" id="fromWxCity">Delhi</div>
+            <div class="wx-temp" id="fromWxTemp">34&deg;</div>
+          </div>
+        </div>
+        <div class="wx">
+          <span class="wx-icon" id="toWxIcon">&#9925;</span>
+          <div class="wx-tx">
+            <div class="wx-city" id="toWxCity">Mumbai</div>
+            <div class="wx-temp" id="toWxTemp">29&deg;</div>
+          </div>
         </div>
       </div>
 
@@ -307,6 +370,7 @@
         <div class="ps-title">Where's My Plane?</div>
         <div class="ps-sub" id="psAircraft">Airbus A320 &middot; VT-EXQ</div>
         <div class="ps-age" id="psAge">First flight: 14 Mar 2016 &middot; 9 years old</div>
+        <div class="ps-ontime" id="psOntime">On-time 89% of the last 30 days</div>
 
         <svg class="ps-plane-art" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
           <path d="M40 62 C40 50 55 44 80 44 L300 44 C320 44 332 52 345 60 L370 66 L345 70 C332 78 320 84 300 84 L80 84 C55 84 40 78 40 66 Z" fill="#eef0f4"/>
@@ -332,6 +396,8 @@
         </span>
         <div class="ps-note" id="psNote">Looking great! The aircraft is en route and on time.</div>
 
+        <svg class="ps-map" id="planeMapSvgDrawer" viewBox="0 0 350 190" preserveAspectRatio="none"></svg>
+
         <div class="ps-this">
           <span id="psThisRoute">Delhi to Mumbai</span>
           <span class="ps-this-status" id="psThisStatus">On time</span>
@@ -343,41 +409,116 @@
   </div>
 </div>
 
+<!-- ---------- companion phone: what the lock screen would show while this
+     flight is tracked — a reference for the Live Activity, not app UI ---------- -->
+<div class="phone">
+  <div class="screen">
+    <div class="lockscreen">
+      <div class="notch"></div>
+
+      <div class="lock-status">
+        <span>Airtel</span>
+        <span class="lock-status-right">&#128246; 4G &#128267; 61%</span>
+      </div>
+
+      <div class="lock-datetime">
+        <div class="lock-date" id="lockDate">Mon, 24 Aug</div>
+        <div class="lock-time" id="lockTime">09:41</div>
+      </div>
+
+      <div class="live-activity">
+        <div class="la-top">
+          <span class="la-flightno">
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+            <span id="laFlightNo">AI 101</span>
+          </span>
+          <span class="la-app">ONTO</span>
+        </div>
+
+        <div class="la-route">
+          <div class="la-endpoint">
+            <span class="la-time" id="laFromTime">14:30</span>
+            <span class="la-code" id="laFromCode">GOI</span>
+          </div>
+          <div class="la-path">
+            <span class="la-dash"></span>
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+            <span class="la-dash"></span>
+          </div>
+          <div class="la-endpoint right">
+            <span class="la-time" id="laToTime">16:45</span>
+            <span class="la-code" id="laToCode">BOM</span>
+          </div>
+        </div>
+
+        <div class="la-subrow">
+          <span id="laFromSub">Terminal 3 &middot; Gate 24</span>
+          <span id="laToSub">10m early &middot; Terminal 2</span>
+        </div>
+
+        <hr class="la-divider">
+
+        <div class="la-status">
+          <span class="la-icon">
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+          </span>
+          <div class="la-status-tx">
+            <div class="la-status-title" id="laStatusTitle">Departs in 4h 49m</div>
+            <div class="la-status-sub" id="laStatusSub">Inbound as AI 505 from Bengaluru &middot; lands 12:55</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lock-bottom-icons">
+        <span class="lock-icon-btn">
+          <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.4.3.6.8.6 1.3V16h6v-.9c0-.5.2-1 .6-1.3A6 6 0 0 0 12 3z"/></svg>
+        </span>
+        <span class="lock-icon-btn">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="4"/><path d="M3 8h3l2-2h8l2 2h3v11H3z"/></svg>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-/* Same three known mock flights as flight-tracker-confirm.html, extended with
+/* Same three known mock flights as flight-tracker.html's confirm step, extended with
    the live-tracking facts (gate, belt, revised time, countdowns) that only
    show up once a flight is actually being tracked. Anything else falls back
    to the AI101 shape — the identity fields still reflect what was searched. */
 var MOCK_FLIGHTS = {
   AI101:{airline:'Air India',
-    from:{code:'DEL',city:'Delhi',airport:'Indira Gandhi Intl.',time:'14:30',gate:'24',terminal:'Terminal 3'},
-    to:{code:'BOM',city:'Mumbai',airport:'Chhatrapati Shivaji Intl.',time:'16:45',revised:'16:35',belt:'4',terminal:'Terminal 2'},
+    from:{code:'GOI',city:'Goa',airport:'Goa Intl.',time:'14:30',gate:'24',terminal:'Terminal 3',weather:'34°',wxIcon:'&#9728;&#65039;'},
+    to:{code:'BOM',city:'Mumbai',airport:'Chhatrapati Shivaji Intl.',time:'16:45',revised:'16:35',belt:'4',terminal:'Terminal 2',weather:'29°',wxIcon:'&#9925;'},
     duration:'2h 15m',distance:'1,150 km',aircraft:'Airbus A320',onTimePct:89,
     departsIn:'4h 49m',arrivesIn:'6h 54m',arriveDelta:'10m early',cause:'Aircraft is on schedule',
-    incoming:{status:'landed',flightNum:'AI 505',city:'Bengaluru',time:'11:52',tail:'VT-EXQ'},
+    incoming:{status:'landed',flightNum:'AI 505',city:'Delhi',time:'11:52',tail:'VT-EXQ'},
     plane:{tail:'VT-EXQ',firstFlight:'14 Mar 2016',age:'9 years old',rotation:[
-      {from:{code:'BLR',city:'Bengaluru'},to:{code:'DEL',city:'Delhi'},note:'Landed 11:52',status:'ok'},
-      {from:{code:'DEL',city:'Delhi'},to:{code:'BOM',city:'Mumbai'},note:'Departs in 4h 49m',status:'ok',isThis:true},
-      {from:{code:'BOM',city:'Mumbai'},to:{code:'GOI',city:'Goa'},note:'Departs in 8h 10m',status:'ok'}
+      {from:{code:'BOM',city:'Mumbai'},to:{code:'DEL',city:'Delhi'},note:'Landed 08:40',status:'ok'},
+      {from:{code:'DEL',city:'Delhi'},to:{code:'GOI',city:'Goa'},note:'Landed 11:52',status:'ok'},
+      {from:{code:'GOI',city:'Goa'},to:{code:'BOM',city:'Mumbai'},note:'Departs in 4h 49m',status:'ok',isThis:true},
+      {from:{code:'BOM',city:'Mumbai'},to:{code:'BLR',city:'Bengaluru'},note:'Departs in 8h 10m',status:'ok'}
     ]}},
   '6E234':{airline:'IndiGo',
-    from:{code:'DEL',city:'Delhi',airport:'Indira Gandhi Intl.',time:'19:15',gate:'12',terminal:'Terminal 1'},
-    to:{code:'BOM',city:'Mumbai',airport:'Chhatrapati Shivaji Intl.',time:'21:25',revised:null,belt:'2',terminal:'Terminal 1'},
+    from:{code:'DEL',city:'Delhi',airport:'Indira Gandhi Intl.',time:'19:15',gate:'12',terminal:'Terminal 1',weather:'31°',wxIcon:'&#9925;'},
+    to:{code:'BOM',city:'Mumbai',airport:'Chhatrapati Shivaji Intl.',time:'21:25',revised:null,belt:'2',terminal:'Terminal 1',weather:'28°',wxIcon:'&#127783;&#65039;'},
     duration:'2h 10m',distance:'1,150 km',aircraft:'Airbus A321neo',onTimePct:82,
     departsIn:'9h 34m',arrivesIn:'11h 44m',arriveDelta:'On time',cause:'Aircraft is on schedule',
     incoming:{status:'in-air',flightNum:'6E 5087',city:'Guwahati',time:'17:40',tail:'VT-IJP'},
     plane:{tail:'VT-IJP',firstFlight:'2 Jul 2022',age:'3 years old',rotation:[
+      {from:{code:'HYD',city:'Hyderabad'},to:{code:'GAU',city:'Guwahati'},note:'Landed 14:20',status:'ok'},
       {from:{code:'GAU',city:'Guwahati'},to:{code:'DEL',city:'Delhi'},note:'Lands 17:40',status:'ok'},
       {from:{code:'DEL',city:'Delhi'},to:{code:'BOM',city:'Mumbai'},note:'Departs in 9h 34m',status:'ok',isThis:true},
       {from:{code:'BOM',city:'Mumbai'},to:{code:'HYD',city:'Hyderabad'},note:'Departs in 12h 24m',status:'ok'}
     ]}},
   UK955:{airline:'Vistara',
-    from:{code:'BLR',city:'Bengaluru',airport:'Kempegowda Intl.',time:'18:05',gate:'7',terminal:'Terminal 1'},
-    to:{code:'DEL',city:'Delhi',airport:'Indira Gandhi Intl.',time:'20:55',revised:null,belt:'6',terminal:'Terminal 3'},
+    from:{code:'BLR',city:'Bengaluru',airport:'Kempegowda Intl.',time:'18:05',gate:'7',terminal:'Terminal 1',weather:'24°',wxIcon:'&#9729;&#65039;'},
+    to:{code:'DEL',city:'Delhi',airport:'Indira Gandhi Intl.',time:'20:55',revised:null,belt:'6',terminal:'Terminal 3',weather:'33°',wxIcon:'&#9728;&#65039;'},
     duration:'2h 50m',distance:'1,740 km',aircraft:'Airbus A321',onTimePct:91,
     departsIn:'8h 24m',arrivesIn:'11h 14m',arriveDelta:'On time',cause:'Aircraft is on schedule',
     incoming:{status:'scheduled',flightNum:'UK 812',city:'Chennai',time:'16:10',tail:'VT-TQH'},
     plane:{tail:'VT-TQH',firstFlight:'30 Dec 2024',age:'1 year old',rotation:[
+      {from:{code:'CCU',city:'Kolkata'},to:{code:'MAA',city:'Chennai'},note:'Landed 13:05',status:'ok'},
       {from:{code:'MAA',city:'Chennai'},to:{code:'BLR',city:'Bengaluru'},note:'Departs 16:10',status:'scheduled'},
       {from:{code:'BLR',city:'Bengaluru'},to:{code:'DEL',city:'Delhi'},note:'Departs in 8h 24m',status:'ok',isThis:true},
       {from:{code:'DEL',city:'Delhi'},to:{code:'PNQ',city:'Pune'},note:'Departs in 13h 40m',status:'ok'}
@@ -404,7 +545,6 @@ document.getElementById('fromAirportLine').textContent = flight.from.code + ' ·
 document.getElementById('fromTime').textContent = flight.from.time;
 document.getElementById('fromGateChip').textContent = 'Gate ' + flight.from.gate;
 document.getElementById('fromTermLabel').textContent = flight.from.terminal;
-document.getElementById('legStatusDep').textContent = 'On time · Departs in ' + flight.departsIn;
 
 document.getElementById('legDur').textContent = flight.duration + ' · ' + flight.distance;
 
@@ -416,8 +556,58 @@ document.getElementById('toBeltChip').textContent = 'Belt ' + flight.to.belt;
 document.getElementById('toTermLabel').textContent = flight.to.terminal;
 document.getElementById('legStatusArr').textContent = flight.arriveDelta + ' · Arrives in ' + flight.arrivesIn;
 
-document.getElementById('aircraftVal').textContent = flight.aircraft;
-document.getElementById('ontimeText').textContent = 'On-time ' + flight.onTimePct + '% of the last 30 days';
+document.getElementById('fromWxIcon').innerHTML = flight.from.wxIcon;
+document.getElementById('fromWxCity').textContent = flight.from.city;
+document.getElementById('fromWxTemp').innerHTML = flight.from.weather;
+document.getElementById('toWxIcon').innerHTML = flight.to.wxIcon;
+document.getElementById('toWxCity').textContent = flight.to.city;
+document.getElementById('toWxTemp').innerHTML = flight.to.weather;
+
+
+var SVG_NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs, styles){
+  var el = document.createElementNS(SVG_NS, tag);
+  for(var k in attrs) el.setAttribute(k, attrs[k]);
+  /* colors go through inline style, not presentation attributes — Safari
+     doesn't reliably resolve var() when it's set via setAttribute on
+     fill/stroke, which left every shape here invisible or default-black */
+  for(var p in styles) el.style.setProperty(p, styles[p]);
+  return el;
+}
+
+/* Rough relative positions within the India outline below — already plotted
+   directly in the card's own 350×190 landscape space (no viewBox scaling at
+   all: 1 unit = 1 rendered pixel), so there's no aspect-ratio math left to
+   get wrong between here and the screen. Not surveyed, just believable. */
+var INDIA_CITY_XY = {
+  DEL:{x:168,y:52}, BOM:{x:156,y:124}, GOI:{x:162,y:142}, BLR:{x:177,y:157},
+  MAA:{x:192,y:157}, CCU:{x:210,y:97}, HYD:{x:180,y:136}, GAU:{x:225,y:58},
+  PNQ:{x:159,y:130}
+};
+var INDIA_OUTLINE = 'M177,15 L189,25 L201,22 L210,37 L228,43 L240,52 L231,64 L219,67 ' +
+  'L222,79 L216,94 L211,109 L208,127 L205,145 L208,160 L198,175 L189,184 ' +
+  'L180,177 L171,160 L163,145 L157,127 L151,109 L141,100 L135,88 L144,79 ' +
+  'L138,67 L144,52 L156,40 L165,28 Z';
+
+/* Same map drawn twice — once on the light card, once on the dark drawer
+   sheet — so each gets colors that actually read against its own
+   background instead of one palette fighting one of the two contexts.
+   Declared up here, not next to renderPlaneMap below, because renderPlaneSheet
+   (called from inside the IIFE right after this) calls renderPlaneMap too —
+   and a var's assignment only happens at its textual position, not at
+   hoist time, so this has to already be assigned before that call runs. */
+var PLANE_MAP_THEMES = {
+  light: {
+    land: 'var(--green-soft)', border: 'var(--border-default)',
+    route: 'var(--accent-brand-primary)', stationFill: 'var(--bg-surface)',
+    label: 'var(--text-secondary)', plane: 'var(--text-primary)'
+  },
+  dark: {
+    land: 'rgba(255,255,255,.06)', border: 'rgba(255,255,255,.16)',
+    route: 'var(--green-2)', stationFill: 'rgba(255,255,255,.9)',
+    label: 'rgba(255,255,255,.55)', plane: '#ffffff'
+  }
+};
 
 /* "Where's my plane" only becomes trackable ~20h before departure — before that
    the operating aircraft isn't reliably assigned yet. */
@@ -430,32 +620,116 @@ document.getElementById('ontimeText').textContent = 'On-time ' + flight.onTimePc
     return;
   }
   var inc = flight.incoming;
-  var title, sub;
+  var title;
   if(inc.status === 'landed'){
     title = 'Your aircraft has landed';
-    sub = 'Arrived from ' + inc.city + ' at ' + inc.time + ' as ' + inc.flightNum;
   } else if(inc.status === 'in-air'){
     title = 'Your aircraft is in the air';
-    sub = 'Inbound as ' + inc.flightNum + ' from ' + inc.city + ' · lands ' + inc.time;
   } else {
     title = "Your aircraft hasn't departed yet";
-    sub = 'Inbound as ' + inc.flightNum + ' from ' + inc.city + ' · departs ' + inc.time;
   }
   document.getElementById('planeTitle').textContent = title;
-  document.getElementById('planeSub').textContent = sub;
-  document.getElementById('planeReg').textContent = inc.tail;
 
   if(flight.plane) renderPlaneSheet();
+  renderPlaneMap('planeMapSvg', 'light');
 })();
+
+/* The map shows only the last two legs leading into the current leg — the
+   aircraft's earlier history isn't relevant, and showing more would make a
+   busier picture without telling you anything about where the plane is now.
+   Marker position depends on the incoming leg's status: sitting at the
+   final station once landed, partway along the last segment mid-air, or
+   still at the second-to-last station if it hasn't left yet. */
+function renderPlaneMap(svgId, theme){
+  var svg = document.getElementById(svgId);
+  var legs = flight.plane && flight.plane.rotation;
+  if(!legs){ svg.style.display = 'none'; return; }
+  var thisIdx = -1;
+  for(var i = 0; i < legs.length; i++) if(legs[i].isThis) thisIdx = i;
+  var prior = legs.slice(Math.max(0, thisIdx - 2), thisIdx);
+  if(!prior.length){ svg.style.display = 'none'; return; }
+
+  var stations = [prior[0].from].concat(prior.map(function(l){ return l.to; }));
+  var pts = stations.map(function(st){
+    return {x: (INDIA_CITY_XY[st.code] || {x:130,y:150}).x,
+            y: (INDIA_CITY_XY[st.code] || {x:130,y:150}).y,
+            code: st.code};
+  });
+  var c = PLANE_MAP_THEMES[theme] || PLANE_MAP_THEMES.light;
+
+  /* Built as real SVG nodes rather than an innerHTML string — SVG elements
+     assigned via innerHTML get run through the HTML parser in most browsers,
+     which drops unrecognised tags like <line>/<circle> and can leave stray
+     text behind instead of the shapes they belonged to. */
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+  svg.appendChild(svgEl('path', {d: INDIA_OUTLINE},
+    {fill: c.land, stroke: c.border, 'stroke-width': '1.5px'}));
+
+  for(var s = 0; s < pts.length - 1; s++){
+    svg.appendChild(svgEl('line',
+      {x1: pts[s].x, y1: pts[s].y, x2: pts[s + 1].x, y2: pts[s + 1].y, 'stroke-width': 2.5, 'stroke-linecap': 'round'},
+      {stroke: c.route}
+    ));
+  }
+  pts.forEach(function(p, i){
+    var isLast = i === pts.length - 1;
+    svg.appendChild(svgEl('circle',
+      {cx: p.x, cy: p.y, r: isLast ? 5 : 4, 'stroke-width': 2},
+      {fill: isLast ? c.route : c.stationFill, stroke: c.route}
+    ));
+    var labelY = p.y > 45 ? p.y + 18 : p.y - 12;
+    var text = svgEl('text',
+      {x: p.x, y: labelY, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 800},
+      {fill: c.label}
+    );
+    text.textContent = p.code;
+    svg.appendChild(text);
+  });
+
+  var a = pts[pts.length - 2], b = pts[pts.length - 1];
+  var planeX = b.x, planeY = b.y, angle = 0;
+  if(flight.incoming.status === 'in-air'){
+    planeX = (a.x + b.x) / 2; planeY = (a.y + b.y) / 2;
+    angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+  } else if(flight.incoming.status === 'scheduled'){
+    planeX = a.x; planeY = a.y;
+  }
+  var g = svgEl('g', {transform: 'translate(' + planeX + ',' + planeY + ') rotate(' + angle + ')'});
+  g.appendChild(svgEl('path', {d: 'M0 -7L9 0L0 7L2 0Z'}, {fill: c.plane}));
+  svg.appendChild(g);
+}
+
+/* the lock-screen Live Activity for this ~4h-out stage: the upcoming flight,
+   plus the same "where's the aircraft" line as the plane card above — this
+   is the one thing worth surfacing before there's a gate or seat to show */
+document.getElementById('laFlightNo').textContent = currentFlightNum;
+document.getElementById('laFromCode').textContent = flight.from.code;
+document.getElementById('laToCode').textContent = flight.to.code;
+document.getElementById('laFromTime').textContent = flight.from.time;
+document.getElementById('laToTime').textContent = flight.to.revised || flight.to.time;
+document.getElementById('laFromSub').textContent = flight.from.terminal + ' · Gate ' + flight.from.gate;
+document.getElementById('laToSub').textContent = flight.arriveDelta + ' · ' + flight.to.terminal;
+document.getElementById('laStatusTitle').textContent = 'Departs in ' + flight.departsIn;
+document.getElementById('laStatusSub').textContent = flight.incoming
+  ? (flight.incoming.status === 'landed'
+      ? 'Arrived from ' + flight.incoming.city + ' at ' + flight.incoming.time + ' as ' + flight.incoming.flightNum
+      : flight.incoming.status === 'in-air'
+        ? 'Inbound as ' + flight.incoming.flightNum + ' from ' + flight.incoming.city + ' · lands ' + flight.incoming.time
+        : "Aircraft hasn't departed yet · inbound as " + flight.incoming.flightNum)
+  : flight.cause;
 
 function renderPlaneSheet(){
   var p = flight.plane;
   var inc = flight.incoming;
 
+  renderPlaneMap('planeMapSvgDrawer', 'dark');
+
   document.getElementById('psFlightLine').textContent = currentFlightNum + ' · MON, 24 AUG';
   document.getElementById('psRoute').textContent = flight.from.city + ' to ' + flight.to.city;
   document.getElementById('psAircraft').textContent = flight.aircraft + ' · ' + p.tail;
   document.getElementById('psAge').textContent = 'First flight: ' + p.firstFlight + ' · ' + p.age;
+  document.getElementById('psOntime').textContent = 'On-time ' + flight.onTimePct + '% of the last 30 days';
 
   var noteMap = {
     landed: 'Looking great! Your aircraft has landed and is being turned around for your flight.',
@@ -476,8 +750,11 @@ function renderPlaneSheet(){
     return d;
   }
   function legRow(leg){
-    var statusCls = leg.status === 'ok' ? 'ok' : 'pending';
-    var statusLabel = leg.status === 'ok' ? 'On time' : 'Scheduled';
+    /* a leg that's already landed shouldn't also claim to be "on time" —
+       that's a live prediction, and this one's already a completed fact */
+    var landed = /^Landed/.test(leg.note);
+    var statusCls = landed ? 'landed' : (leg.status === 'ok' ? 'ok' : 'pending');
+    var statusLabel = landed ? 'Landed' : (leg.status === 'ok' ? 'On time' : 'Scheduled');
     var row = document.createElement('div');
     row.className = 'ps-leg-row';
     row.innerHTML =
@@ -492,12 +769,22 @@ function renderPlaneSheet(){
     return row;
   }
 
+  /* Only the two legs before this one — same cap as the map card, and for
+     the same reason: the current leg already has its own summary above
+     (ps-this), and anything beyond two legs back is more history than
+     "where's my plane" needs to answer. Latest of those at top, earliest
+     at bottom — read bottom to top, same as before. */
+  var thisIdx = -1;
+  for(var ti = 0; ti < legs.length; ti++) if(legs[ti].isThis) thisIdx = ti;
+  var priorLegs = legs.slice(Math.max(0, thisIdx - 2), thisIdx);
+  var reversedLegs = priorLegs.slice().reverse();
   var tl = document.getElementById('psTimeline');
   tl.innerHTML = '';
-  legs.forEach(function(leg, i){
-    if(i === 0) tl.appendChild(stationRow(leg.from));
+  if(!reversedLegs.length) return;
+  tl.appendChild(stationRow(reversedLegs[0].to));
+  reversedLegs.forEach(function(leg){
     tl.appendChild(legRow(leg));
-    tl.appendChild(stationRow(leg.to));
+    tl.appendChild(stationRow(leg.from));
   });
 }
 
@@ -527,8 +814,8 @@ function stopTracking(){
 <script>
 (function(){
   var STAGES = [
+    {file:'flight-tracker-myflights.html', label:'My flights'},
     {file:'flight-tracker.html', label:'Add flight'},
-    {file:'flight-tracker-confirm.html', label:'Confirm'},
     {file:'flight-tracker-detail.html', label:'Pre-flight'},
     {file:'flight-tracker-airport.html', label:'Boarding pass'},
     {file:'flight-tracker-inflight.html', label:'Boarded', extra:'phase=boarded'},
@@ -541,7 +828,7 @@ function stopTracking(){
   nav.className = 'stage-nav';
   STAGES.forEach(function(s){
     var params = [];
-    if(s.file !== 'flight-tracker.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
+    if(s.file !== 'flight-tracker.html' && s.file !== 'flight-tracker-myflights.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
     if(s.extra) params.push(s.extra);
     var a = document.createElement('a');
     a.href = s.file + (params.length ? '?' + params.join('&') : '');

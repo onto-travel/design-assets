@@ -65,16 +65,9 @@
     stroke:var(--icon-secondary);fill:var(--bg-surface);stroke-width:1.6;}
   .route-dur{font-size:var(--fs-xs);color:var(--text-secondary);font-weight:var(--fw-medium);}
 
-  .flight-date{text-align:center;font-size:var(--fs-s);color:var(--text-body);font-weight:var(--fw-bold);}
-
   .meta-row{display:flex;align-items:center;justify-content:space-between;}
   .meta-label{font-size:var(--fs-l);color:var(--text-secondary);font-weight:var(--fw-medium);}
   .meta-value{font-size:var(--fs-l);color:var(--text-primary);font-weight:var(--fw-bold);}
-
-  .ontime{display:flex;align-items:center;gap:var(--sp-8);font-size:var(--fs-s);color:var(--text-secondary);
-    font-weight:var(--fw-medium);}
-  .ontime svg{width:15px;height:15px;stroke:var(--accent-brand-primary);fill:none;stroke-width:2;
-    stroke-linecap:round;stroke-linejoin:round;flex:none;}
 
   .actions{display:flex;flex-direction:column;gap:var(--sp-12);}
 
@@ -95,7 +88,7 @@
     padding:6px 12px;font-size:var(--fs-xs);font-weight:var(--fw-bold);}
   .src-badge svg{width:13px;height:13px;stroke:var(--green-deep);fill:none;stroke-width:2;
     stroke-linecap:round;stroke-linejoin:round;}
-  .meta-row.upload-only{display:none;}
+  .upload-only{display:none;}
 
   /* ---------- prototype stage nav — review aid, not part of the product UI ---------- */
   .stage-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
@@ -140,7 +133,7 @@
           <div class="air-mark" id="airMark">AI</div>
           <div class="air-tx">
             <div class="air-name" id="airName">Air India</div>
-            <div class="air-num" id="airNum">AI 101</div>
+            <div class="air-num" id="airNum">AI 101 &middot; Mon, 24 Aug</div>
           </div>
           <div class="status-chip">Scheduled</div>
         </div>
@@ -166,18 +159,8 @@
           </div>
         </div>
 
-        <div class="flight-date">Mon, 24 Aug</div>
+        <hr class="divider upload-only" id="metaDivider">
 
-        <hr class="divider">
-
-        <div class="meta-row">
-          <span class="meta-label">Aircraft</span>
-          <span class="meta-value" id="aircraftVal">Airbus A320</span>
-        </div>
-        <div class="meta-row">
-          <span class="meta-label">Terminal</span>
-          <span class="meta-value" id="terminalVal">T3 &middot; Departures</span>
-        </div>
         <div class="meta-row upload-only" id="rowSeat">
           <span class="meta-label">Seat</span>
           <span class="meta-value">14A</span>
@@ -187,10 +170,6 @@
           <span class="meta-value">XKQ9TP</span>
         </div>
 
-        <div class="ontime">
-          <svg viewBox="0 0 24 24"><path d="M12 2v6M12 22v-6M4.9 4.9l4.2 4.2M14.9 14.9l4.2 4.2M2 12h6M16 12h6M4.9 19.1l4.2-4.2M14.9 9.1l4.2-4.2"/></svg>
-          <span id="ontimeText">On-time 89% of the last 30 days</span>
-        </div>
       </div>
 
       <div class="actions">
@@ -208,17 +187,17 @@
    the identity fields (mark/name/number) still reflect what was typed. */
 var MOCK_FLIGHTS = {
   AI101:{airline:'Air India',
-    from:{code:'DEL',city:'Delhi',time:'14:30',terminal:'T3 · Departures'},
-    to:{code:'BOM',city:'Mumbai',time:'16:45',terminal:'T2 · Arrivals'},
-    duration:'2h 15m',distance:'1,150 km',aircraft:'Airbus A320',onTimePct:89},
+    from:{code:'DEL',city:'Delhi',time:'14:30'},
+    to:{code:'BOM',city:'Mumbai',time:'16:45'},
+    duration:'2h 15m',distance:'1,150 km'},
   '6E234':{airline:'IndiGo',
-    from:{code:'DEL',city:'Delhi',time:'19:15',terminal:'T1 · Departures'},
-    to:{code:'BOM',city:'Mumbai',time:'21:25',terminal:'T1 · Arrivals'},
-    duration:'2h 10m',distance:'1,150 km',aircraft:'Airbus A321neo',onTimePct:82},
+    from:{code:'DEL',city:'Delhi',time:'19:15'},
+    to:{code:'BOM',city:'Mumbai',time:'21:25'},
+    duration:'2h 10m',distance:'1,150 km'},
   UK955:{airline:'Vistara',
-    from:{code:'BLR',city:'Bengaluru',time:'18:05',terminal:'T1 · Departures'},
-    to:{code:'DEL',city:'Delhi',time:'20:55',terminal:'T3 · Arrivals'},
-    duration:'2h 50m',distance:'1,740 km',aircraft:'Airbus A321',onTimePct:91}
+    from:{code:'BLR',city:'Bengaluru',time:'18:05'},
+    to:{code:'DEL',city:'Delhi',time:'20:55'},
+    duration:'2h 50m',distance:'1,740 km'}
 };
 var CARRIERS = {AI:'Air India', '6E':'IndiGo', UK:'Vistara', SG:'SpiceJet', G8:'Go First', QP:'Akasa Air'};
 
@@ -230,7 +209,7 @@ var currentFlightNum = num ? (code + ' ' + num) : code;
 var flight = MOCK_FLIGHTS[compact] || MOCK_FLIGHTS.AI101;
 
 document.getElementById('airMark').textContent = code;
-document.getElementById('airNum').textContent = currentFlightNum;
+document.getElementById('airNum').textContent = currentFlightNum + ' · Mon, 24 Aug';
 document.getElementById('airName').textContent = CARRIERS[code] || 'Tracked flight';
 document.getElementById('fromTime').textContent = flight.from.time;
 document.getElementById('fromCode').textContent = flight.from.code;
@@ -239,12 +218,10 @@ document.getElementById('toTime').textContent = flight.to.time;
 document.getElementById('toCode').textContent = flight.to.code;
 document.getElementById('toCity').textContent = flight.to.city;
 document.getElementById('routeDur').textContent = flight.duration;
-document.getElementById('aircraftVal').textContent = flight.aircraft;
-document.getElementById('terminalVal').textContent = flight.from.terminal;
-document.getElementById('ontimeText').textContent = 'On-time ' + flight.onTimePct + '% of the last 30 days';
 
 if(params.get('src') === 'upload'){
   document.getElementById('srcBadge').style.display = 'flex';
+  document.getElementById('metaDivider').style.display = 'block';
   document.getElementById('rowSeat').style.display = 'flex';
   document.getElementById('rowPnr').style.display = 'flex';
 }

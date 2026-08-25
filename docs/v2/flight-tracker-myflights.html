@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onto — My flights</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg-default);color:var(--text-primary);
+    font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+  }
+
+  /* ---------- phone frame ---------- */
+  .phone{position:relative;width:390px;height:844px;background:#000;border-radius:54px;
+    padding:12px;box-shadow:0 40px 90px rgba(30,22,10,.16),0 0 0 2px rgba(0,0,0,.15);flex:none;}
+  .screen{position:relative;width:100%;height:100%;background:var(--bg-surface);border-radius:42px;
+    overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:30px;
+    background:#000;border-radius:20px;z-index:40;}
+
+  /* ---------- map — a painted stand-in for a real map tile, in the app's own
+     green rather than borrowed satellite imagery: terrain-ish blur banks under
+     the tracked routes, dark enough that the status bar reads light on it ---------- */
+  .mapview{position:relative;isolation:isolate;flex:none;height:414px;overflow:hidden;
+    background:linear-gradient(165deg,#0f2f22 0%,#173d2c 42%,#1f4a34 72%,#26573d 100%);}
+  .mapview::before{content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(46% 34% at 78% 18%, rgba(153,235,209,.16), rgba(153,235,209,0) 70%),
+      radial-gradient(40% 30% at 14% 66%, rgba(15,138,99,.30), rgba(15,138,99,0) 70%),
+      radial-gradient(34% 26% at 60% 82%, rgba(203,228,215,.14), rgba(203,228,215,0) 70%);
+    filter:blur(18px);}
+  .mapview::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;
+    background:linear-gradient(180deg,rgba(15,36,26,0) 0%,var(--bg-surface) 100%);}
+  .mapview > *{position:relative;z-index:1;}
+  .map-routes{position:absolute;inset:0;width:100%;height:100%;z-index:0;}
+
+  .statusbar{position:relative;z-index:2;flex:none;display:flex;align-items:center;
+    justify-content:space-between;padding:20px 26px 6px;font-size:14px;font-weight:600;
+    color:#fff;}
+  .sb-right{display:flex;align-items:center;gap:6px;font-size:13px;}
+
+  /* ---------- sheet — overlaps the map, rounded top corners like a drawer ---------- */
+  .sheet{position:relative;z-index:2;flex:1;margin-top:-28px;border-radius:24px 24px 0 0;
+    background:var(--bg-surface);box-shadow:0 -12px 28px rgba(0,0,0,.10);
+    display:flex;flex-direction:column;overflow-y:auto;}
+  .sheet-head{flex:none;display:flex;align-items:center;justify-content:space-between;
+    padding:22px 20px 14px;}
+  .sheet-title{font-family:var(--font-display);font-size:26px;font-weight:var(--fw-display);
+    color:var(--text-primary);}
+  /* ---------- fab — add flight, floating over the sheet rather than sharing
+     its header row ---------- */
+  .fab{position:absolute;right:20px;bottom:28px;z-index:8;
+    width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;
+    background:var(--bg-button);color:var(--text-inverse);display:flex;align-items:center;
+    justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.28);
+    transition:opacity .15s,transform .12s;}
+  .fab:hover{opacity:.9;}
+  .fab:active{transform:scale(.96);}
+  .fab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;}
+
+  .divider{height:1px;background:var(--border-default);border:none;margin:0 20px;}
+
+  .flights{flex:1;display:flex;flex-direction:column;}
+  .flight-row{display:flex;gap:var(--sp-16);align-items:center;padding:18px 20px;
+    text-decoration:none;color:inherit;transition:background .15s;}
+  .flight-row:hover{background:var(--green-soft);}
+
+  .fr-when{flex:none;width:54px;display:flex;flex-direction:column;align-items:center;
+    text-align:center;}
+  .fr-days{font-family:var(--font-display);font-size:22px;font-weight:var(--fw-display);
+    color:var(--text-primary);line-height:1;}
+  .fr-days.soon{color:var(--accent-brand-primary);}
+  .fr-days-lbl{margin-top:2px;font-size:10px;font-weight:var(--fw-bold);color:var(--text-secondary);
+    text-transform:uppercase;letter-spacing:.04em;}
+
+  .fr-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+  .fr-top{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-8);}
+  .fr-num{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fr-date{flex:none;font-size:var(--fs-xs);color:var(--text-secondary);font-weight:var(--fw-medium);}
+  .fr-route{display:flex;align-items:center;gap:8px;font-size:var(--fs-s);font-weight:var(--fw-medium);
+    color:var(--text-secondary);}
+  .fr-route b{font-weight:var(--fw-bold);color:var(--text-primary);}
+  .fr-route svg{width:12px;height:12px;stroke:var(--icon-secondary);fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .fr-caret{flex:none;color:var(--icon-secondary);}
+  .fr-caret svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;}
+
+  .empty-hint{padding:8px 20px 24px;font-size:var(--fs-s);color:var(--text-secondary);
+    font-weight:var(--fw-medium);}
+
+  /* ---------- prototype stage nav — review aid, not part of the product UI ---------- */
+  .stage-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+    display:flex;gap:6px;background:rgba(17,24,39,.92);backdrop-filter:blur(6px);
+    padding:8px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);
+    max-width:calc(100vw - 32px);overflow-x:auto;z-index:9999;}
+  .stage-nav::-webkit-scrollbar{display:none;}
+  .stage-nav a{flex:none;padding:7px 12px;border-radius:999px;font-family:-apple-system,sans-serif;
+    font-size:12px;font-weight:600;color:rgba(255,255,255,.6);text-decoration:none;white-space:nowrap;
+    transition:background .15s,color .15s;}
+  .stage-nav a:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .stage-nav a.current{background:#fff;color:#111827;}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+    <div class="notch"></div>
+
+    <div class="mapview">
+      <svg class="map-routes" viewBox="0 0 390 414" preserveAspectRatio="none">
+        <path d="M70 360 C 130 300 150 230 205 150" fill="none"
+          stroke="var(--accent-brand-primary)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="70" cy="360" r="5" fill="#fff"/>
+        <circle cx="205" cy="150" r="5" fill="#fff"/>
+        <path d="M300 300 C 270 250 250 190 222 128" fill="none"
+          stroke="rgba(255,255,255,.55)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="300" cy="300" r="5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+        <circle cx="222" cy="128" r="5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+      </svg>
+
+      <div class="statusbar">
+        <span>9:41</span>
+        <span class="sb-right">&#9679;&#9679;&#9679; &nbsp;&#128246;&nbsp; &#128267;</span>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <div class="sheet-head">
+        <span class="sheet-title">My flights</span>
+      </div>
+
+      <hr class="divider">
+
+      <div class="flights" id="flights"></div>
+    </div>
+
+    <button class="fab" aria-label="Add flight" onclick="location.href='flight-tracker.html'">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+var MY_FLIGHTS = [
+  {num:'AI101',airline:'Air India',date:'Mon, 24 Aug',daysLabel:'Today',soon:true,
+    from:{code:'GOI',time:'14:30'},to:{code:'BOM',time:'16:35'}},
+  {num:'UK955',airline:'Vistara',date:'Sat, 29 Aug',daysLabel:'5 days',soon:false,
+    from:{code:'BLR',time:'18:05'},to:{code:'DEL',time:'20:55'}}
+];
+
+var list = document.getElementById('flights');
+if(MY_FLIGHTS.length){
+  MY_FLIGHTS.forEach(function(f){
+    var a = document.createElement('a');
+    a.className = 'flight-row';
+    a.href = 'flight-tracker-detail.html?num=' + encodeURIComponent(f.num);
+    a.innerHTML =
+      '<div class="fr-when">' +
+        '<div class="fr-days' + (f.soon ? ' soon' : '') + '">' + (f.soon ? '&#9679;' : f.daysLabel.split(' ')[0]) + '</div>' +
+        '<div class="fr-days-lbl">' + (f.soon ? f.daysLabel : 'days') + '</div>' +
+      '</div>' +
+      '<div class="fr-main">' +
+        '<div class="fr-top">' +
+          '<span class="fr-num">' + f.num.replace(/([A-Z0-9]+?)(\d+)$/,'$1 $2') + ' &middot; ' + f.airline + '</span>' +
+          '<span class="fr-date">' + f.date + '</span>' +
+        '</div>' +
+        '<div class="fr-route">' +
+          '<b>' + f.from.code + '</b> ' + f.from.time +
+          '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+          '<b>' + f.to.code + '</b> ' + f.to.time +
+        '</div>' +
+      '</div>' +
+      '<span class="fr-caret"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>';
+    list.appendChild(a);
+  });
+} else {
+  list.innerHTML = '<div class="empty-hint">No flights tracked yet — tap + to add one.</div>';
+}
+</script>
+<script>
+(function(){
+  var STAGES = [
+    {file:'flight-tracker-myflights.html', label:'My flights'},
+    {file:'flight-tracker.html', label:'Add flight'},
+    {file:'flight-tracker-detail.html', label:'Pre-flight'},
+    {file:'flight-tracker-airport.html', label:'Boarding pass'},
+    {file:'flight-tracker-inflight.html', label:'Boarded', extra:'phase=boarded'},
+    {file:'flight-tracker-inflight.html', label:'In the air'},
+    {file:'flight-tracker-arrival.html', label:'Landed'}
+  ];
+  var here = location.pathname.split('/').pop();
+  var herePhase = new URLSearchParams(location.search).get('phase') || '';
+  var nav = document.createElement('div');
+  nav.className = 'stage-nav';
+  STAGES.forEach(function(s){
+    var params = [];
+    if(s.extra) params.push(s.extra);
+    var a = document.createElement('a');
+    a.href = s.file + (params.length ? '?' + params.join('&') : '');
+    a.textContent = s.label;
+    var matchesPhase = s.extra ? herePhase === 'boarded' : herePhase !== 'boarded';
+    if(s.file === here && matchesPhase) a.classList.add('current');
+    nav.appendChild(a);
+  });
+  document.body.appendChild(nav);
+})();
+</script>
+</body>
+</html>

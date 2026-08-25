@@ -10,7 +10,8 @@
   body{
     margin:0;background:var(--bg-default);color:var(--text-primary);
     font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;
-    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    flex-wrap:wrap;gap:40px;padding:40px 20px;
   }
 
   /* ---------- phone frame ---------- */
@@ -20,6 +21,65 @@
     overflow:hidden;display:flex;flex-direction:column;}
   .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:30px;
     background:#000;border-radius:20px;z-index:40;}
+
+  /* ---------- lock screen — a second phone, sitting next to the app one,
+     showing the Live Activity this page's flight would drive on a real
+     lock screen. Not part of the product UI, just a companion reference. */
+  .lockscreen{position:relative;width:100%;height:100%;color:#fff;
+    display:flex;flex-direction:column;
+    background:url('images/hero-landing.jpg') center 60% / cover no-repeat;}
+  .lockscreen::before{content:"";position:absolute;inset:0;z-index:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.4) 0%,rgba(0,0,0,.05) 26%,rgba(0,0,0,.1) 66%,rgba(0,0,0,.55) 100%);}
+
+  .lock-status{position:relative;z-index:2;flex:none;display:flex;align-items:center;
+    justify-content:space-between;padding:20px 26px 0;font-size:14px;font-weight:600;}
+  .lock-status-right{display:flex;align-items:center;gap:6px;font-size:13px;}
+
+  .lock-datetime{position:relative;z-index:2;flex:none;text-align:center;margin-top:8px;}
+  .lock-date{font-size:16px;font-weight:700;}
+  .lock-time{font-size:78px;font-weight:600;line-height:1;margin-top:2px;letter-spacing:-2px;}
+
+  .live-activity{position:relative;z-index:2;margin:auto 12px 24px;flex:none;
+    background:rgba(20,26,24,.58);backdrop-filter:blur(22px) saturate(1.5);
+    -webkit-backdrop-filter:blur(22px) saturate(1.5);
+    border-radius:24px;padding:16px 18px;box-shadow:0 20px 40px rgba(0,0,0,.3);}
+  .la-top{display:flex;align-items:center;justify-content:space-between;
+    color:rgba(255,255,255,.55);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+  .la-flightno{display:flex;align-items:center;gap:6px;color:#fff;text-transform:none;font-size:13px;}
+  .la-flightno svg{width:13px;height:13px;fill:currentColor;stroke:none;}
+
+  .la-route{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px;}
+  .la-endpoint{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .la-endpoint.right{align-items:flex-end;text-align:right;}
+  .la-code{font-size:13px;font-weight:800;color:rgba(255,255,255,.8);}
+  .la-time{font-size:20px;font-weight:800;color:var(--green-2);}
+  .la-path{flex:1;display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.35);}
+  .la-path svg{width:14px;height:14px;fill:currentColor;stroke:none;flex:none;}
+  .la-dash{flex:1;height:1px;background:rgba(255,255,255,.25);}
+
+  .la-subrow{display:flex;justify-content:space-between;margin-top:2px;
+    font-size:11.5px;color:rgba(255,255,255,.5);font-weight:600;}
+
+  .la-divider{height:1px;background:rgba(255,255,255,.15);border:none;margin:12px 0;}
+
+  .la-status{display:flex;align-items:center;gap:10px;}
+  .la-check{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.92);color:#0f2f22;
+    display:flex;align-items:center;justify-content:center;flex:none;}
+  .la-check svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:3;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .la-status-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .la-status-title{font-size:15px;font-weight:800;color:var(--green-2);}
+  .la-status-sub{font-size:12px;color:rgba(255,255,255,.5);font-weight:600;}
+  .la-bag{flex:none;display:flex;align-items:center;gap:5px;background:var(--accent-amber-icon);
+    color:#1a1a1a;border-radius:9px;padding:6px 10px;font-size:13px;font-weight:800;}
+  .la-bag svg{width:14px;height:14px;fill:currentColor;stroke:none;}
+
+  .lock-bottom-icons{position:relative;z-index:2;flex:none;
+    display:flex;justify-content:space-between;padding:0 26px 30px;}
+  .lock-icon-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.18);
+    backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;}
+  .lock-icon-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;}
 
   .statusbar{position:relative;z-index:35;flex:none;display:flex;align-items:center;
     justify-content:space-between;padding:20px 26px 6px;font-size:14px;font-weight:600;
@@ -81,12 +141,26 @@
   .bag-belt-lbl{font-size:var(--fs-xs);color:var(--text-secondary);font-weight:var(--fw-bold);
     text-transform:uppercase;letter-spacing:.03em;text-align:right;}
 
-  .cta{width:100%;border:none;border-radius:var(--r-lg);background:var(--bg-button);
-    color:var(--text-inverse);padding:17px;font-family:inherit;font-size:var(--fs-l);
-    font-weight:var(--fw-bold);cursor:pointer;box-shadow:var(--shadow-l2);
-    transition:opacity .15s,transform .12s;}
-  .cta:hover{opacity:.88;}
-  .cta:active{transform:scale(.98);}
+  /* ---------- post-flight review — one tap, no separate submit step ---------- */
+  .review-card{border:1px solid var(--border-default);border-radius:var(--r-xl);
+    padding:var(--sp-20);display:flex;flex-direction:column;align-items:center;
+    gap:var(--sp-12);text-align:center;}
+  .review-title{font-size:var(--fs-l);font-weight:var(--fw-bold);color:var(--text-primary);}
+  /* stars run 5→1 in DOM order, row-reverse lays them out 1→5 on screen; that's
+     what makes ":hover ~ .star" light up every star *before* (visually) the
+     one under the pointer, matching how the DOM after it were actually written. */
+  .stars{display:flex;flex-direction:row-reverse;gap:4px;}
+  .star{width:34px;height:34px;border:none;background:none;padding:6px;cursor:pointer;
+    color:var(--icon-secondary);transition:color .15s,transform .1s;}
+  .stars:hover .star{color:var(--icon-secondary);}
+  .star:hover, .star:hover ~ .star{color:var(--accent-amber-icon);}
+  .star svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.5;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .star:active{transform:scale(.9);}
+  .star.filled{color:var(--accent-amber-icon);}
+  .star.filled svg{fill:currentColor;}
+  .star:disabled{cursor:default;pointer-events:none;}
+  .review-note{font-size:var(--fs-s);color:var(--text-secondary);font-weight:var(--fw-medium);}
 
   /* ---------- prototype stage nav — review aid, not part of the product UI ---------- */
   .stage-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
@@ -117,9 +191,7 @@
         <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
       <span class="at-title" id="pageTitle">AI 101</span>
-      <button class="ab-btn" aria-label="More options" onclick="stopTracking()">
-        <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
-      </button>
+      <span style="width:38px"></span>
     </div>
 
     <div class="body">
@@ -173,14 +245,99 @@
         </div>
       </div>
 
-      <button class="cta" onclick="doneTracking()">Done tracking this flight</button>
+      <div class="review-card" id="reviewCard">
+        <div class="review-title" id="reviewTitle">How was your flight?</div>
+        <div class="stars" id="starsRow">
+          <button class="star" data-val="5" aria-label="Rate 5 stars" onclick="rateFlight(5)"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.09 6.26L22 9.77l-5 4.87 1.18 6.86L12 18.27l-6.18 3.23L7 14.64l-5-4.87 6.91-1.01L12 2.5z"/></svg></button>
+          <button class="star" data-val="4" aria-label="Rate 4 stars" onclick="rateFlight(4)"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.09 6.26L22 9.77l-5 4.87 1.18 6.86L12 18.27l-6.18 3.23L7 14.64l-5-4.87 6.91-1.01L12 2.5z"/></svg></button>
+          <button class="star" data-val="3" aria-label="Rate 3 stars" onclick="rateFlight(3)"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.09 6.26L22 9.77l-5 4.87 1.18 6.86L12 18.27l-6.18 3.23L7 14.64l-5-4.87 6.91-1.01L12 2.5z"/></svg></button>
+          <button class="star" data-val="2" aria-label="Rate 2 stars" onclick="rateFlight(2)"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.09 6.26L22 9.77l-5 4.87 1.18 6.86L12 18.27l-6.18 3.23L7 14.64l-5-4.87 6.91-1.01L12 2.5z"/></svg></button>
+          <button class="star" data-val="1" aria-label="Rate 1 star" onclick="rateFlight(1)"><svg viewBox="0 0 24 24"><path d="M12 2.5l3.09 6.26L22 9.77l-5 4.87 1.18 6.86L12 18.27l-6.18 3.23L7 14.64l-5-4.87 6.91-1.01L12 2.5z"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- companion phone: what the lock screen would show while this
+     flight is tracked — a reference for the Live Activity, not app UI ---------- -->
+<div class="phone">
+  <div class="screen">
+    <div class="lockscreen">
+      <div class="notch"></div>
+
+      <div class="lock-status">
+        <span>Airtel</span>
+        <span class="lock-status-right">&#128246; 4G &#128267; 61%</span>
+      </div>
+
+      <div class="lock-datetime">
+        <div class="lock-date" id="lockDate">Mon, 24 Aug</div>
+        <div class="lock-time" id="lockTime">16:41</div>
+      </div>
+
+      <div class="live-activity">
+        <div class="la-top">
+          <span class="la-flightno">
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+            AI 101
+          </span>
+          <span class="la-app">ONTO</span>
+        </div>
+
+        <div class="la-route">
+          <div class="la-endpoint">
+            <span class="la-time" id="laFromTime">14:30</span>
+            <span class="la-code" id="laFromCode">GOI</span>
+          </div>
+          <div class="la-path">
+            <span class="la-dash"></span>
+            <svg viewBox="0 0 24 24"><path d="M2 16l20-8-8 20-3-9-9-3z"/></svg>
+            <span class="la-dash"></span>
+          </div>
+          <div class="la-endpoint right">
+            <span class="la-time" id="laToTime">16:35</span>
+            <span class="la-code" id="laToCode">BOM</span>
+          </div>
+        </div>
+
+        <div class="la-subrow">
+          <span id="laFromSub">Terminal 3 &middot; On time</span>
+          <span id="laToSub">10m early &middot; Terminal 2</span>
+        </div>
+
+        <hr class="la-divider">
+
+        <div class="la-status">
+          <span class="la-check">
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          </span>
+          <div class="la-status-tx">
+            <div class="la-status-title" id="laStatusTitle">Arrived 10m Early</div>
+            <div class="la-status-sub" id="laStatusSub">Terminal 2 &middot; Gate --</div>
+          </div>
+          <div class="la-bag">
+            <svg viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" rx="2"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+            <span id="laBelt">4</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lock-bottom-icons">
+        <span class="lock-icon-btn">
+          <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.4.3.6.8.6 1.3V16h6v-.9c0-.5.2-1 .6-1.3A6 6 0 0 0 12 3z"/></svg>
+        </span>
+        <span class="lock-icon-btn">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="4"/><path d="M3 8h3l2-2h8l2 2h3v11H3z"/></svg>
+        </span>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
 var MOCK_FLIGHTS = {
-  AI101:{airline:'Air India', from:{code:'DEL'}, to:{code:'BOM'},
+  AI101:{airline:'Air India', from:{code:'GOI'}, to:{code:'BOM'},
     actual:'16:35',scheduled:'16:45',delta:'10m early',duration:'2h 05m',belt:'4',terminal:'Terminal 2'},
   '6E234':{airline:'IndiGo', from:{code:'DEL'}, to:{code:'BOM'},
     actual:'21:25',scheduled:'21:25',delta:'On time',duration:'2h 10m',belt:'2',terminal:'Terminal 1'},
@@ -217,21 +374,30 @@ document.getElementById('durationVal').textContent = flight.duration;
 document.getElementById('terminalVal').textContent = flight.terminal;
 document.getElementById('beltVal').textContent = flight.belt;
 
-function doneTracking(){
-  location.href = 'flight-tracker.html';
-}
+/* the lock-screen Live Activity, kept in sync with the same flight object —
+   departure time/terminal aren't tracked on this page, so those two stay as
+   illustrative placeholders rather than wiring up data this page never had */
+document.getElementById('laFromCode').textContent = flight.from.code;
+document.getElementById('laToCode').textContent = flight.to.code;
+document.getElementById('laToTime').textContent = flight.actual;
+document.getElementById('laStatusTitle').textContent = flight.delta === 'On time'
+  ? 'Arrived on time' : 'Arrived ' + flight.delta;
+document.getElementById('laStatusSub').textContent = flight.terminal + ' · Gate --';
+document.getElementById('laBelt').textContent = flight.belt;
 
-function stopTracking(){
-  if(confirm('Stop tracking ' + currentFlightNum + '?')){
-    location.href = 'flight-tracker.html';
-  }
+function rateFlight(rating){
+  document.querySelectorAll('.star').forEach(function(star){
+    star.classList.toggle('filled', parseInt(star.dataset.val, 10) <= rating);
+    star.disabled = true;
+  });
+  document.getElementById('reviewTitle').textContent = 'Thanks for rating your flight';
 }
 </script>
 <script>
 (function(){
   var STAGES = [
+    {file:'flight-tracker-myflights.html', label:'My flights'},
     {file:'flight-tracker.html', label:'Add flight'},
-    {file:'flight-tracker-confirm.html', label:'Confirm'},
     {file:'flight-tracker-detail.html', label:'Pre-flight'},
     {file:'flight-tracker-airport.html', label:'Boarding pass'},
     {file:'flight-tracker-inflight.html', label:'Boarded', extra:'phase=boarded'},
@@ -244,7 +410,7 @@ function stopTracking(){
   nav.className = 'stage-nav';
   STAGES.forEach(function(s){
     var params = [];
-    if(s.file !== 'flight-tracker.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
+    if(s.file !== 'flight-tracker.html' && s.file !== 'flight-tracker-myflights.html' && typeof compact !== 'undefined') params.push('num=' + encodeURIComponent(compact));
     if(s.extra) params.push(s.extra);
     var a = document.createElement('a');
     a.href = s.file + (params.length ? '?' + params.join('&') : '');
